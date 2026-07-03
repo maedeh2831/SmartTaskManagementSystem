@@ -6,4 +6,26 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Context\" />
+    <Folder Include="Data\Interfaces\" />
+    <Folder Include="Data\Configurations\" />
+    <Folder Include="Data\Seed\" />
+    <Folder Include="Data\Repositories\" />
+    <Folder Include="Models\Entities\" />
+    <Folder Include="Models\DTOs\" />
+    <Folder Include="Models\ViewModels\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Common\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Middlewares\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Services\Implementations\" />
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\fonts\" />
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>
