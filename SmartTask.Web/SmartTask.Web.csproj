@@ -7,25 +7,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Context\" />
-    <Folder Include="Data\Interfaces\" />
-    <Folder Include="Data\Configurations\" />
+    <Folder Include="Common\Helpers\" />
+    <Folder Include="Common\Exceptions\" />
+    <Folder Include="Common\Extensions\" />
+    <Folder Include="Common\Constants\" />
+    <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Seed\" />
-    <Folder Include="Data\Repositories\" />
-    <Folder Include="Models\Entities\" />
     <Folder Include="Models\DTOs\" />
     <Folder Include="Models\ViewModels\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="Common\" />
-    <Folder Include="Enums\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="Filters\" />
-    <Folder Include="Extensions\" />
+    <Folder Include="Common\Filters\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Repositories\Implementations\" />
+    <Folder Include="Repositories\Interfaces\" />
     <Folder Include="Services\Interfaces\" />
     <Folder Include="Services\Implementations\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.28">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.28" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.28">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
