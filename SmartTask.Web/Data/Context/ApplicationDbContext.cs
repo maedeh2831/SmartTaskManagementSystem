@@ -29,6 +29,14 @@ namespace SmartTask.Web.Data.Context
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
 
+        // Collaboration
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<Checklist> Checklists { get; set; }
+        public DbSet<ChecklistItem> ChecklistItems { get; set; }
+        public DbSet<Label> Labels { get; set; }
+        public DbSet<TaskLabel> TaskLabels { get; set; }
+
         // Project
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
@@ -38,6 +46,14 @@ namespace SmartTask.Web.Data.Context
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<SubTaskItem> SubTaskItems { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
+
+        // Tracking
+        public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+        public DbSet<TimeLog> TimeLogs { get; set; }
+        public DbSet<TaskDependency> TaskDependencies { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

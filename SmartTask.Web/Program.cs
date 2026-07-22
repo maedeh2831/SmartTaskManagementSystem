@@ -1,5 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
+using SmartTask.Web.Infrastructure.Interfaces;
+using SmartTask.Web.Infrastructure.Repositories;
+using SmartTask.Web.Services.Implementations;
+using SmartTask.Web.Services.Interfaces;
+using SmartTask.Web.Services.PasswordHasher;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace SmartTask.Web
 {
@@ -14,7 +20,28 @@ namespace SmartTask.Web
                 builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add services to the container.
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddControllersWithViews();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+
+                options.Cookie.Name = "SmartTaskAuth";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true;
+            });
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+            builder.Services.AddScoped<ISprintService, SprintService>();
+            builder.Services.AddScoped<IUserStoryService, UserStoryService>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
+            builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 
             var app = builder.Build();
 
@@ -31,6 +58,7 @@ namespace SmartTask.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

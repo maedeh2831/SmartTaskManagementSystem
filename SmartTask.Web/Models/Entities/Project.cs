@@ -49,5 +49,7 @@ namespace SmartTask.Web.Models.Entities
         public ICollection<UserStory> UserStories { get; set; } = new List<UserStory>();
 
         public Backlog? Backlog { get; set; }
+
+        public ICollection<Label> Labels { get; set; } = new List<Label>();
     }
 }

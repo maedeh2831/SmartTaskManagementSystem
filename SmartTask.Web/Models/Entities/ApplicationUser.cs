@@ -5,6 +5,7 @@
 */
 
 using SmartTask.Web.Models.Enums;
+using System.Net.Mail;
 
 namespace SmartTask.Web.Models.Entities
 {
@@ -52,5 +53,17 @@ namespace SmartTask.Web.Models.Entities
         public ICollection<ProjectMember> ProjectMemberships { get; set; } = new List<ProjectMember>();
 
         public ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+        public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
+
+        public virtual ICollection<Reminder> Reminders { get; set; } = new HashSet<Reminder>();
+
+        public ICollection<Notification> Notifications { get; set; } = new HashSet<Notification>();
+
+        public ICollection<ActivityLog> ActivityLogs { get; set; } = new HashSet<ActivityLog>();
+
+        public virtual ICollection<TimeLog> TimeLogs { get; set; } = new HashSet<TimeLog>();
     }
 }
