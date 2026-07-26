@@ -1,21 +1,28 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models;
+using System.Diagnostics;
 
 namespace SmartTask.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            ICurrentUserService currentUser)
+            : base(currentUser)
         {
             _logger = logger;
         }
 
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Index()
         {
             return View();
+
         }
 
         public IActionResult Privacy()
@@ -28,5 +35,6 @@ namespace SmartTask.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

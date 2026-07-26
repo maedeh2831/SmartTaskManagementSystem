@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - SmartTask
+    </title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+</head>
+
+<body>
+
+    @RenderBody()
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            showSuccess('@TempData["Success"]');
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            showError('@TempData["Error"]');
+        </script>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <script>
+            showWarning('@TempData["Warning"]');
+        </script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>

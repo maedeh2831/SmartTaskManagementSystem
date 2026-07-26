@@ -2,55 +2,149 @@
 
 @{
     ViewData["Title"] = "ثبت نام";
+    Layout = "_AuthLayout";
 }
 
-<h2 class="mb-4">ثبت نام</h2>
+<div class="auth-wrapper">
 
-<form asp-action="Register" method="post">
+    <div class="auth-box">
 
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <!-- Left Side -->
+        <div class="auth-banner">
+            <div class="banner-content">
 
-    <div class="mb-3">
-        <label asp-for="FirstName" class="form-label"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+                <h1>SmartTask</h1>
+
+                <p>
+                    مدیریت پروژه‌ها،
+                    ساده‌تر از همیشه
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Right Side -->
+        <div class="auth-form">
+
+            <div class="form-header">
+                <h2>ایجاد حساب</h2>
+                <p>به SmartTask خوش آمدید</p>
+            </div>
+
+            <form asp-controller="Account"
+                  asp-action="Register"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <!-- First Name -->
+                <div class="mb-3">
+
+                    <div class="input-group-custom">
+                        <i class="fa fa-user"></i>
+
+                        <input asp-for="FirstName"
+                               class="form-control"
+                               placeholder="نام" />
+                    </div>
+
+                    <span asp-validation-for="FirstName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+
+                    <div class="input-group-custom">
+                        <i class="fa fa-user"></i>
+
+                        <input asp-for="LastName"
+                               class="form-control"
+                               placeholder="نام خانوادگی" />
+                    </div>
+
+                    <span asp-validation-for="LastName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+
+                    <div class="input-group-custom">
+                        <i class="fa fa-at"></i>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="ایمیل" />
+                    </div>
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+
+                    <div class="input-group-custom">
+                        <i class="fa fa-lock"></i>
+
+                        <input asp-for="Password"
+                               class="form-control"
+                               placeholder="رمز عبور" />
+                    </div>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+
+                    <div class="input-group-custom">
+                        <i class="fa fa-lock"></i>
+
+                        <input asp-for="ConfirmPassword"
+                               class="form-control"
+                               placeholder="تکرار رمز عبور" />
+                    </div>
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <button type="submit"
+                        class="auth-submit">
+                    ثبت نام
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                حساب کاربری دارید؟
+                <a asp-action="Login">
+                    ورود
+                </a>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="mb-3">
-        <label asp-for="LastName" class="form-label"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="UserName" class="form-label"></label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="ConfirmPassword" class="form-label"></label>
-        <input asp-for="ConfirmPassword" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">
-        ثبت نام
-    </button>
-
-</form>
+</div>
 
 @section Scripts
 {

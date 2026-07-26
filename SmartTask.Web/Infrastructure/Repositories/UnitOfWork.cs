@@ -15,10 +15,6 @@ namespace SmartTask.Web.Infrastructure.Repositories
 
         #region Repositories
 
-        private IGenericRepository<ApplicationUser>? _applicationUsers;
-        private IGenericRepository<Role>? _roles;
-        private IGenericRepository<UserRole>? _userRoles;
-
         private IGenericRepository<Workspace>? _workspaces;
         private IGenericRepository<WorkspaceMember>? _workspaceMembers;
 
@@ -55,15 +51,6 @@ namespace SmartTask.Web.Infrastructure.Repositories
         #endregion
 
         #region Repository Properties
-
-        public IGenericRepository<ApplicationUser> ApplicationUsers
-            => _applicationUsers ??= new GenericRepository<ApplicationUser>(_context);
-
-        public IGenericRepository<Role> Roles
-            => _roles ??= new GenericRepository<Role>(_context);
-
-        public IGenericRepository<UserRole> UserRoles
-            => _userRoles ??= new GenericRepository<UserRole>(_context);
 
         public IGenericRepository<Workspace> Workspaces
             => _workspaces ??= new GenericRepository<Workspace>(_context);

@@ -1,0 +1,338 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #f8fafc;
+    font-family: Vazirmatn, sans-serif;
+}
+
+header {
+    height: 70px;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+main {
+    min-height: calc(100vh - 140px);
+}
+
+footer {
+    height: 70px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+/* ================= HEADER ================= */
+
+.main-header {
+    height: 70px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #4f46e5;
+}
+
+    .logo i {
+        font-size: 28px;
+    }
+
+.header-search {
+    width: 420px;
+    height: 45px;
+    position: relative;
+}
+
+    .header-search input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 0 45px 0 15px;
+    }
+
+    .header-search i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.icon-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: .25s;
+}
+
+    .icon-btn:hover {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+.user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+/* USER MENU */
+
+.user-menu {
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #334155;
+}
+
+.small-arrow {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.dropdown-menu {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,.08);
+    padding: 10px;
+    min-width: 220px;
+}
+
+.dropdown-item {
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+    .dropdown-item:hover {
+        background: #eef2ff;
+    }
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#4f46e5,#06b6d4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+}
+/* ================= Layout ================= */
+
+.layout-wrapper {
+    display: flex;
+    min-height: calc(100vh - 140px);
+}
+
+
+/* ================= Sidebar ================= */
+
+.sidebar {
+    width: 260px;
+    background: white;
+    border-left: 1px solid #ececec;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    transition: width .3s ease;
+}
+
+.sidebar-header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-title {
+    padding: 18px 25px 15px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Toggle Button */
+
+.sidebar-toggle {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #4f46e5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* Menu */
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+    .sidebar-menu li {
+        margin-bottom: 6px;
+    }
+
+
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none;
+        color: #334155;
+        padding: 14px 25px;
+        font-weight: 500;
+        transition: .25s;
+    }
+
+
+
+        .sidebar-menu a i {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+
+
+        /* Hover */
+
+        .sidebar-menu a:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+
+
+    /* Active */
+
+    .sidebar-menu li.active a {
+        background: #4f46e5;
+        color: white;
+        border-radius: 14px;
+        margin: 0 12px;
+    }
+
+
+
+/* Badge */
+
+.menu-badge {
+    margin-right: auto;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* ================= COLLAPSED ================= */
+
+
+.sidebar.collapsed {
+    width: 90px;
+}
+
+
+
+    /* Hide Menu Text */
+
+    .sidebar.collapsed .sidebar-menu a span:not(.menu-badge) {
+        display: none;
+    }
+
+
+
+    /* Hide Badge */
+
+    .sidebar.collapsed .menu-badge {
+        display: none;
+    }
+
+
+
+    /* Center Icons */
+
+    .sidebar.collapsed .sidebar-menu a {
+        justify-content: center;
+        padding: 14px 0;
+    }
+
+
+
+    /* Remove Active Margin Problem */
+
+    .sidebar.collapsed .sidebar-menu li.active a {
+        margin: 0 12px;
+    }
+
+
+
+    /* Hide Title */
+
+    .sidebar.collapsed .sidebar-title {
+        display: none;
+    }
+
+
+
+/* Content */
+
+.content-area {
+    flex: 1;
+    padding: 35px;
+    transition: .3s ease;
+}

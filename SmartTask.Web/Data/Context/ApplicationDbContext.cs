@@ -6,20 +6,18 @@
 
 using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Models.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace SmartTask.Web.Data.Context
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext
+    : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
-
-        // Identity
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
 
         // Workspace
         public DbSet<Workspace> Workspaces { get; set; }

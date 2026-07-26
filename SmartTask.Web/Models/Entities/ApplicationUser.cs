@@ -4,24 +4,16 @@
 | Purpose     : نگهداری اطلاعات کاربران، احراز هویت، تنظیمات شخصی و ارتباطات کاربر با سایر بخش‌های سامانه.
 */
 
+using Microsoft.AspNetCore.Identity;
 using SmartTask.Web.Models.Enums;
-using System.Net.Mail;
 
 namespace SmartTask.Web.Models.Entities
 {
-    public class ApplicationUser : BaseEntity
+    public class ApplicationUser : IdentityUser<int>
     {
         public string FirstName { get; set; } = null!;
 
         public string LastName { get; set; } = null!;
-
-        public string UserName { get; set; } = null!;
-
-        public string Email { get; set; } = null!;
-
-        public string PasswordHash { get; set; } = null!;
-
-        public string? PhoneNumber { get; set; }
 
         public string? Avatar { get; set; }
 
@@ -31,10 +23,6 @@ namespace SmartTask.Web.Models.Entities
 
         public bool IsActive { get; set; } = true;
 
-        public bool EmailConfirmed { get; set; } = false;
-
-        public bool PhoneConfirmed { get; set; } = false;
-
         public DateTime? LastLoginDate { get; set; }
 
         public LanguageType Language { get; set; } = LanguageType.Persian;
@@ -43,8 +31,13 @@ namespace SmartTask.Web.Models.Entities
 
         public string TimeZone { get; set; } = "Asia/Tehran";
 
+        public string? ChangeUser { get; set; }
+
+        public DateTime? ChangeDate { get; set; }
+
+        public bool ViewState { get; set; } = true;
+
         // Navigation Properties
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 
         public ICollection<WorkspaceMember> WorkspaceMemberships { get; set; } = new List<WorkspaceMember>();
 

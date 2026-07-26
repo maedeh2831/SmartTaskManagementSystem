@@ -1,0 +1,40 @@
+﻿@using SmartTask.Web.Models
+@using SmartTask.Web.Models.Navigation
+
+@{
+    var controllerName = ViewContext.RouteData.Values["Controller"]?.ToString();
+
+    var menus = SidebarMenu.Items;
+}
+
+
+<ul class="sidebar-menu">
+
+    @foreach (var item in menus)
+    {
+        <li class="@(controllerName == item.Controller ? "active" : "")">
+
+            <a asp-controller="@item.Controller"
+               asp-action="@item.Action">
+
+                <i class="@item.Icon"></i>
+
+                <span>
+                    @item.Title
+                </span>
+
+
+                @if (!string.IsNullOrEmpty(item.Badge))
+                {
+                    <span class="menu-badge">
+                        @item.Badge
+                    </span>
+                }
+
+
+            </a>
+
+        </li>
+    }
+
+</ul>

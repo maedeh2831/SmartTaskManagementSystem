@@ -7,24 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Helpers\" />
     <Folder Include="Common\Exceptions\" />
     <Folder Include="Common\Extensions\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Data\Seed\" />
     <Folder Include="Models\DTOs\" />
     <Folder Include="Middlewares\" />
     <Folder Include="Common\Filters\" />
     <Folder Include="Repositories\Implementations\" />
     <Folder Include="Repositories\Interfaces\" />
-    <Folder Include="wwwroot\images\" />
-    <Folder Include="wwwroot\fonts\" />
+    <Folder Include="wwwroot\fonts\Vazirmatn\" />
+    <Folder Include="wwwroot\assets\" />
+    <Folder Include="wwwroot\images\auth\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.8" />

@@ -1,0 +1,83 @@
+﻿@model SmartTask.Web.Models.ViewModels.Shared.HeaderViewModel
+
+<div class="dropdown">
+
+    <button class="user-menu"
+            data-bs-toggle="dropdown">
+
+        <div class="user-avatar">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div class="text-end">
+
+            <div class="user-name fw-bold">
+                @Model.FullName
+            </div>
+
+        </div>
+
+        <i class="fa-solid fa-chevron-down small-arrow"></i>
+
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end">
+
+        <!-- اطلاعات کاربر -->
+        <li class="px-3 py-2">
+
+            <div class="fw-bold">
+                @Model.FullName
+            </div>
+
+            <small class="text-muted">
+                @Model.Email
+            </small>
+
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- پروفایل -->
+        <li>
+            <a class="dropdown-item" href="#">
+                <i class="fa-regular fa-user"></i>
+                پروفایل
+            </a>
+        </li>
+
+        <!-- تنظیمات -->
+        <li>
+            <a class="dropdown-item" href="#">
+                <i class="fa-solid fa-gear"></i>
+                تنظیمات
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- خروج -->
+        <li>
+            <form id="logoutForm"
+                  asp-controller="Account"
+                  asp-action="Logout"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="button"
+                        id="logoutButton"
+                        class="dropdown-item text-danger">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    خروج
+
+                </button>
+
+            </form>
+        </li>
+
+    </ul>
+
+</div>

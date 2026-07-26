@@ -4,10 +4,6 @@ namespace SmartTask.Web.Infrastructure.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<ApplicationUser> ApplicationUsers { get; }
-        IGenericRepository<Role> Roles { get; }
-        IGenericRepository<UserRole> UserRoles { get; }
-
         IGenericRepository<Workspace> Workspaces { get; }
         IGenericRepository<WorkspaceMember> WorkspaceMembers { get; }
 
