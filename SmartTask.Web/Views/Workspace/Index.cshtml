@@ -89,76 +89,112 @@
             {
                 <div class="workspace-card">
 
-                    <div class="workspace-card-top">
+                    <div class="workspace-card-header"
+                         style="background:@item.Color">
 
-                        <div class="workspace-logo"
-                             style="background:@item.Color">
+                        <div class="workspace-logo">
 
                             <i class="fa-solid fa-layer-group"></i>
 
                         </div>
 
                         <span class="workspace-status">
-
                             @item.Visibility
-
                         </span>
 
                     </div>
 
-                    <div class="workspace-body">
 
-                        <h3>@item.Name</h3>
+                    <div class="workspace-card-content">
+
+
+                        <h3>
+                            @item.Name
+                        </h3>
+
 
                         <p>
-
                             @(string.IsNullOrWhiteSpace(item.Description)
                                                 ? "بدون توضیحات"
                                                 : item.Description)
-
                 </p>
 
-                    </div>
 
-                    <div class="workspace-statistics">
 
-                        <div class="workspace-stat">
+                        <div class="workspace-info">
 
-                            <i class="fa-solid fa-folder-open"></i>
 
-                            <span>@item.ProjectsCount پروژه</span>
+                            <div>
+                                <i class="fa-solid fa-folder"></i>
+                                <span>
+                                    @item.ProjectsCount پروژه
+                                </span>
+                            </div>
+
+
+                            <div>
+                                <i class="fa-solid fa-users"></i>
+                                <span>
+                                    @item.MembersCount عضو
+                                </span>
+                            </div>
+
 
                         </div>
 
-                        <div class="workspace-stat">
-
-                            <i class="fa-solid fa-users"></i>
-
-                            <span>@item.MembersCount عضو</span>
-
-                        </div>
 
                     </div>
 
-                    <div class="workspace-footer">
+
+
+                    <div class="workspace-card-footer">
+
 
                         <small>
-
                             @item.CreateDate.ToString("yyyy/MM/dd")
-
                         </small>
 
-                        <a asp-action="Details"
-                           asp-route-id="@item.Id"
-                           class="workspace-open-btn">
 
-                            ورود
+                        <div class="workspace-actions">
 
-                            <i class="fa-solid fa-arrow-left"></i>
 
-                        </a>
+                            <a asp-controller="Workspace"
+                               asp-action="Details"
+                               asp-route-id="@item.Id"
+                               class="workspace-open-btn">
+
+                                ورود
+                                <i class="fa-solid fa-arrow-left"></i>
+
+                            </a>
+
+
+
+                            <form asp-controller="Workspace"
+                                  asp-action="Delete"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="delete-form">
+
+
+                                @Html.AntiForgeryToken()
+
+
+                                <button class="workspace-delete-btn">
+
+                                    <i class="fa-solid fa-trash"></i>
+
+                                </button>
+
+
+                            </form>
+
+
+                        </div>
+
 
                     </div>
+
 
                 </div>
                 }
@@ -167,3 +203,10 @@
     }
 
 </div>
+@section Scripts
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+}

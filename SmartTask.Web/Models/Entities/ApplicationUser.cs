@@ -15,6 +15,14 @@ namespace SmartTask.Web.Models.Entities
 
         public string LastName { get; set; } = null!;
 
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}".Trim();
+            }
+        }
+
         public string? Avatar { get; set; }
 
         public string? Bio { get; set; }

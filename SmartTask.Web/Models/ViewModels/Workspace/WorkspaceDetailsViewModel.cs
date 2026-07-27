@@ -10,21 +10,21 @@ public class WorkspaceDetailsViewModel
 
     public string? Description { get; set; }
 
-    public string? Logo { get; set; }
-
     public string? Color { get; set; }
 
-    public bool IsActive { get; set; }
+    public string? Logo { get; set; }
 
     public VisibilityType Visibility { get; set; }
 
-    public string OwnerName { get; set; } = "";
-
-    public int ProjectCount { get; set; }
-
-    public int TeamCount { get; set; }
-
-    public int MemberCount { get; set; }
-
     public DateTime CreateDate { get; set; }
+
+    public string OwnerName { get; set; } = "-";
+
+    public int MembersCount { get; set; }
+
+    public int ProjectsCount { get; set; }
+
+    public int TasksCount { get; set; }
+
+    public bool IsOwner { get; set; }
 }

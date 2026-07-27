@@ -1,0 +1,285 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceDetailsViewModel
+
+@{
+    ViewData["Title"] = "جزئیات فضای کاری";
+}
+
+
+@section Styles
+{
+    <link rel="stylesheet"
+          href="~/css/workspace.css"
+          asp-append-version="true" />
+}
+
+
+<div class="workspace-details-page">
+
+
+    <!-- Header -->
+
+    <div class="details-header">
+
+
+        <div class="details-title">
+
+
+            <div class="details-logo"
+                 style="background:@Model.Color">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+            </div>
+
+
+            <div>
+
+                <h1>
+                    @Model.Name
+                </h1>
+
+
+                <div class="details-meta">
+
+
+                    @if (Model.Visibility == SmartTask.Web.Models.Enums.VisibilityType.Private)
+                    {
+                        <span>
+                            <i class="fa-solid fa-lock"></i>
+                            خصوصی
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            <i class="fa-solid fa-globe"></i>
+                            عمومی
+                        </span>
+                    }
+
+
+                    <span>
+                        <i class="fa-solid fa-calendar"></i>
+                        @Model.CreateDate.ToString("yyyy/MM/dd")
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="details-actions">
+
+
+            @if (Model.IsOwner)
+            {
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="details-btn primary">
+
+                    <i class="fa-solid fa-pen"></i>
+
+                    ویرایش
+
+                </a>
+
+            }
+
+
+            <a href="#"
+               class="details-btn">
+
+                <i class="fa-solid fa-users"></i>
+
+                اعضا
+
+            </a>
+
+
+            <a href="#"
+               class="details-btn">
+
+                <i class="fa-solid fa-gear"></i>
+
+                تنظیمات
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+    <!-- Description -->
+
+    <div class="details-card">
+
+
+        <div class="card-title">
+
+            <i class="fa-solid fa-align-right"></i>
+
+            درباره Workspace
+
+        </div>
+
+
+
+        <p>
+
+            @(string.IsNullOrWhiteSpace(Model.Description)
+                        ? "توضیحی ثبت نشده است."
+                        : Model.Description)
+
+        </p>
+
+
+    </div>
+
+
+
+
+
+    <!-- Statistics -->
+
+
+    <div class="details-stat-grid">
+
+
+        <div class="details-stat-card">
+
+
+            <i class="fa-solid fa-users"></i>
+
+
+            <div>
+
+                <strong>
+                    @Model.MembersCount
+                </strong>
+
+
+                <span>
+                    عضو
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="details-stat-card">
+
+
+            <i class="fa-solid fa-folder-open"></i>
+
+
+            <div>
+
+                <strong>
+                    @Model.ProjectsCount
+                </strong>
+
+
+                <span>
+                    پروژه
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="details-stat-card">
+
+
+            <i class="fa-solid fa-list-check"></i>
+
+
+            <div>
+
+                <strong>
+                    @Model.TasksCount
+                </strong>
+
+
+                <span>
+                    تسک
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- Owner -->
+
+
+    <div class="details-card owner-card">
+
+
+        <div class="card-title">
+
+            <i class="fa-solid fa-user-tie"></i>
+
+            مالک Workspace
+
+        </div>
+
+
+
+        <div class="owner-info">
+
+
+            <div class="owner-avatar">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+
+            <div>
+
+                <h4>
+                    @Model.OwnerName
+                </h4>
+
+
+                <span>
+                    Owner
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>

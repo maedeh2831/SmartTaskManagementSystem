@@ -14,27 +14,26 @@ namespace SmartTask.Web.Controllers;
 [Authorize]
 public class WorkspaceController : BaseController
 {
+    private readonly IWorkspaceService _workspaceService;
+    private readonly ApplicationDbContext _context;
     public WorkspaceController(
-     IWorkspaceService workspaceService,
-     ICurrentUserService currentUser,
-     ApplicationDbContext context)
-     : base(currentUser)
+        IWorkspaceService workspaceService,
+        ICurrentUserService currentUser,
+        ApplicationDbContext context)
+        : base(currentUser)
     {
         _workspaceService = workspaceService;
         _context = context;
     }
 
-    private readonly ApplicationDbContext _context;
-
-    private readonly IWorkspaceService _workspaceService;
-
     public async Task<IActionResult> Index()
     {
         var workspaces = await _context.Workspaces
+            .Where(x => x.ViewState)
             .Include(x => x.Members)
             .Include(x => x.Projects)
             .OrderByDescending(x => x.CreateDate)
-            .Select(x => new WorkspaceListItemViewModel
+                    .Select(x => new WorkspaceListItemViewModel
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -58,9 +57,37 @@ public class WorkspaceController : BaseController
         return View(vm);
     }
 
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        return View();
+        var workspace = await _workspaceService.GetDetailsAsync(id);
+
+        if (workspace == null)
+            return NotFound();
+
+
+        var model = new WorkspaceDetailsViewModel
+        {
+            Id = workspace.Id,
+            Name = workspace.Name,
+            Description = workspace.Description,
+            Color = workspace.Color,
+            Logo = workspace.Logo,
+            Visibility = workspace.Visibility,
+            CreateDate = workspace.CreateDate,
+
+            OwnerName = workspace.Owner?.FullName ?? "-",
+
+            MembersCount = workspace.Members.Count,
+
+            ProjectsCount = workspace.Projects.Count,
+
+            TasksCount = 0,
+
+            IsOwner = workspace.OwnerId == CurrentUser.UserId
+        };
+
+
+        return View(model);
     }
 
     [HttpGet]
@@ -73,26 +100,45 @@ public class WorkspaceController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateWorkspaceViewModel model)
     {
+
         if (!ModelState.IsValid)
             return View(model);
+
+        if (await _workspaceService.ExistsByNameAsync(model.Name))
+        {
+            ModelState.AddModelError(
+                "Name",
+                "فضای کاری با این نام قبلاً وجود دارد.");
+
+            return View(model);
+        }
 
         var workspace = new Workspace
         {
             Name = model.Name,
+
             Description = model.Description,
+
             Color = model.Color,
+            
             Visibility = model.Visibility,
+
 
             OwnerId = CurrentUser.UserId,
 
+
             CreateDate = DateTime.Now,
 
-            IsActive = true,
 
+            IsActive = true,
             ViewState = true
         };
 
+
+
         await _workspaceService.AddAsync(workspace);
+
+
 
         var ownerMember = new WorkspaceMember
         {
@@ -103,11 +149,18 @@ public class WorkspaceController : BaseController
             Role = WorkspaceRoleType.Owner
         };
 
+
+
         _context.WorkspaceMembers.Add(ownerMember);
+
 
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "فضای کاری با موفقیت ایجاد شد.";
+
+
+        TempData["Success"] =
+            "فضای کاری با موفقیت ایجاد شد.";
+
 
         return RedirectToAction(nameof(Index));
     }
@@ -140,6 +193,17 @@ public class WorkspaceController : BaseController
         if (!ModelState.IsValid)
             return View(model);
 
+        if (await _workspaceService.ExistsByNameAsync(
+            model.Name,
+            model.Id))
+        {
+            ModelState.AddModelError(
+                "Name",
+                "فضای کاری با این نام قبلاً وجود دارد.");
+
+            return View(model);
+        }
+
         var workspace = await _context.Workspaces
             .FirstOrDefaultAsync(x => x.Id == model.Id);
 
@@ -160,8 +224,26 @@ public class WorkspaceController : BaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
+        if (!await _workspaceService.IsOwnerAsync(
+            id,
+            CurrentUser.UserId))
+        {
+            TempData["Error"] =
+                "شما اجازه حذف این Workspace را ندارید.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        await _workspaceService.DeleteAsync(id);
+
+
+        TempData["Success"] =
+            "Workspace با موفقیت حذف شد.";
+
+
         return RedirectToAction(nameof(Index));
     }
 }

@@ -665,3 +665,412 @@ textarea.form-control {
         justify-content: center;
     }
 }
+/* ==========================================
+        Workspace Details
+========================================== */
+
+
+.workspace-details-page {
+    animation: fadeUp .4s ease;
+}
+
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    gap: 20px;
+}
+
+
+
+.details-title {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+
+.details-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 35px;
+    box-shadow: var(--shadow);
+}
+
+
+
+.details-title h1 {
+    font-size: 38px;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+
+
+.details-meta {
+    display: flex;
+    gap: 20px;
+    color: var(--gray500);
+}
+
+
+
+    .details-meta span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+
+
+.details-actions {
+    display: flex;
+    gap: 12px;
+}
+
+
+
+.details-btn {
+    height: 50px;
+    padding: 0 22px;
+    border-radius: 16px;
+    background: white;
+    color: var(--gray700);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: .25s;
+}
+
+
+
+    .details-btn:hover {
+        transform: translateY(-3px);
+        color: var(--primary);
+    }
+
+
+
+    .details-btn.primary {
+        background: linear-gradient( 135deg, var(--primary), #7679ff);
+        color: white;
+    }
+
+
+
+
+.details-card {
+    background: rgba(255,255,255,.75);
+    backdrop-filter: blur(18px);
+    border-radius: 28px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+}
+
+
+
+.card-title {
+    font-size: 18px;
+    font-weight: 800;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+
+.details-card p {
+    color: var(--gray500);
+    line-height: 2;
+}
+
+
+
+
+
+.details-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+
+
+.details-stat-card {
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+
+
+    .details-stat-card i {
+        width: 55px;
+        height: 55px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+
+
+    .details-stat-card strong {
+        display: block;
+        font-size: 28px;
+    }
+
+
+
+    .details-stat-card span {
+        color: var(--gray500);
+    }
+
+
+
+
+.owner-info {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+
+.owner-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+
+
+
+@media(max-width:768px) {
+
+    .details-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+
+    .details-actions {
+        flex-wrap: wrap;
+    }
+
+
+    .details-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.workspace-delete-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: #FEF2F2;
+    color: #EF4444;
+    transition: .25s;
+}
+
+
+    .workspace-delete-btn:hover {
+        background: #EF4444;
+        color: white;
+        transform: translateY(-3px);
+    }
+.workspace-footer {
+    position: relative;
+    z-index: 20;
+}
+
+    .workspace-footer a,
+    .workspace-footer button,
+    .workspace-delete-btn,
+    .workspace-open-btn {
+        position: relative;
+        z-index: 30;
+        pointer-events: auto;
+    }
+/* =====================================
+        NEW WORKSPACE CARD
+===================================== */
+
+
+.workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+    gap: 28px;
+}
+
+
+
+.workspace-card {
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: .35s;
+}
+
+
+
+    .workspace-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+
+
+
+
+.workspace-card-header {
+    height: 120px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+
+
+
+.workspace-logo {
+    width: 70px;
+    height: 70px;
+    background: white;
+    color: var(--primary);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 15px 30px rgba(0,0,0,.15);
+}
+
+
+
+
+.workspace-status {
+    background: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+
+
+.workspace-card-content {
+    padding: 25px;
+}
+
+
+
+    .workspace-card-content h3 {
+        font-size: 24px;
+        font-weight: 900;
+        margin-bottom: 12px;
+        color: var(--gray900);
+    }
+
+
+
+    .workspace-card-content p {
+        color: var(--gray500);
+        min-height: 50px;
+        line-height: 2;
+    }
+
+
+
+.workspace-info {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+
+
+    .workspace-info div {
+        background: var(--gray50);
+        padding: 12px 15px;
+        border-radius: 16px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        color: var(--gray700);
+    }
+
+
+
+
+.workspace-card-footer {
+    padding: 20px 25px;
+    border-top: 1px solid var(--gray100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+
+.workspace-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+
+.workspace-open-btn {
+    background: var(--primary);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 14px;
+    text-decoration: none;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 700;
+}
+
+
+    .workspace-open-btn:hover {
+        color: white;
+        transform: translateX(-3px);
+    }
+
+
+
+
+.workspace-delete-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+}

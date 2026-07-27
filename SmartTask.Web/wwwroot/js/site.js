@@ -89,4 +89,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    document.querySelectorAll(".delete-form")
+        .forEach(form => {
+
+            console.log("DELETE FORM FOUND");
+
+            form.addEventListener("submit", function (e) {
+
+                console.log("DELETE CLICKED");
+
+                e.preventDefault();
+
+                Swal.fire({
+
+                    title: "حذف Workspace",
+
+                    text: "آیا از حذف این فضای کاری مطمئن هستید؟",
+
+                    icon: "warning",
+
+                    showCancelButton: true,
+
+                    confirmButtonText: "بله، حذف کن",
+
+                    cancelButtonText: "انصراف",
+
+                    confirmButtonColor: "#EF4444",
+
+                    cancelButtonColor: "#64748B"
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        form.submit();
+
+                    }
+
+                });
+
+            });
+
+        });
+
 });

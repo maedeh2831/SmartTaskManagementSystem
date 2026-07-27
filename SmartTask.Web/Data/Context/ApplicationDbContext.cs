@@ -57,6 +57,23 @@ namespace SmartTask.Web.Data.Context
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            // Soft Delete Filters
+
+            modelBuilder.Entity<Workspace>()
+                .HasQueryFilter(x => x.ViewState);
+
+            modelBuilder.Entity<Project>()
+                .HasQueryFilter(x => x.ViewState);
+
+            modelBuilder.Entity<Team>()
+                .HasQueryFilter(x => x.ViewState);
+
+            modelBuilder.Entity<Comment>()
+                .HasQueryFilter(x => x.ViewState);
+
+            modelBuilder.Entity<TaskItem>()
+                .HasQueryFilter(x => x.ViewState);
         }
     }
 }
