@@ -22,7 +22,9 @@ public class WorkspaceMemberService
         _context = context;
     }
 
-    public async Task<List<WorkspaceMemberViewModel>> GetMembersAsync(int workspaceId)
+    public async Task<List<WorkspaceMemberViewModel>> GetMembersAsync(
+    int workspaceId,
+    int currentUserId)
     {
         return await _context.WorkspaceMembers
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
@@ -36,7 +38,8 @@ public class WorkspaceMemberService
                 Email = x.ApplicationUser.Email!,
                 Avatar = x.ApplicationUser.Avatar,
                 Role = x.Role,
-                IsOwner = x.Role == WorkspaceRoleType.Owner
+                IsOwner = x.Role == WorkspaceRoleType.Owner,
+                IsCurrentUser = x.ApplicationUserId == currentUserId
             })
             .OrderBy(x => x.Role)
             .ToListAsync();
@@ -47,14 +50,23 @@ public class WorkspaceMemberService
         int userId,
         WorkspaceRoleType role)
     {
-        var exists = await _context.WorkspaceMembers
-            .AnyAsync(x =>
+        var existingMember = await _context.WorkspaceMembers
+            .FirstOrDefaultAsync(x =>
                 x.WorkspaceId == workspaceId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState);
+                x.ApplicationUserId == userId);
 
-        if (exists)
-            throw new Exception("این کاربر قبلاً عضو Workspace شده است.");
+        if (existingMember != null)
+        {
+            if (existingMember.ViewState)
+                throw new Exception("این کاربر قبلاً عضو Workspace شده است.");
+
+            existingMember.ViewState = true;
+            existingMember.Role = role;
+            existingMember.ChangeDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return;
+        }
 
         var member = new WorkspaceMember
         {

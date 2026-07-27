@@ -7,7 +7,9 @@ namespace SmartTask.Web.Services.Interfaces;
 public interface IWorkspaceMemberService
     : IBaseService<WorkspaceMember>
 {
-    Task<List<WorkspaceMemberViewModel>> GetMembersAsync(int workspaceId);
+    Task<List<WorkspaceMemberViewModel>> GetMembersAsync(
+    int workspaceId,
+    int currentUserId);
 
     Task InviteMemberAsync(
         int workspaceId,

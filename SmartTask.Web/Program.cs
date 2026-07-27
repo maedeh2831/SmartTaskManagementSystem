@@ -94,6 +94,9 @@ namespace SmartTask.Web
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+            builder.Services.AddScoped<IWorkspaceInvitationService, WorkspaceInvitationService>();
+            builder.Services.AddScoped<IWorkspaceMemberService, WorkspaceMemberService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();
             builder.Services.AddScoped<IUserStoryService, UserStoryService>();

@@ -17,6 +17,7 @@ namespace SmartTask.Web.Infrastructure.Repositories
 
         private IGenericRepository<Workspace>? _workspaces;
         private IGenericRepository<WorkspaceMember>? _workspaceMembers;
+        private IGenericRepository<WorkspaceInvitation>? _workspaceInvitations;
 
         private IGenericRepository<Team>? _teams;
         private IGenericRepository<TeamMember>? _teamMembers;
@@ -57,6 +58,9 @@ namespace SmartTask.Web.Infrastructure.Repositories
 
         public IGenericRepository<WorkspaceMember> WorkspaceMembers
             => _workspaceMembers ??= new GenericRepository<WorkspaceMember>(_context);
+
+        public IGenericRepository<WorkspaceInvitation> WorkspaceInvitations
+            => _workspaceInvitations ??= new GenericRepository<WorkspaceInvitation>(_context);
 
         public IGenericRepository<Team> Teams
             => _teams ??= new GenericRepository<Team>(_context);

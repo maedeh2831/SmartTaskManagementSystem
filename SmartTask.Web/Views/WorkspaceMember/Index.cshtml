@@ -1,0 +1,164 @@
+﻿@using SmartTask.Web.Models.Enums
+@model List<SmartTask.Web.Models.ViewModels.Workspace.WorkspaceMemberViewModel>
+
+@{
+    ViewData["Title"] = "اعضای Workspace";
+    var workspaceId = (int)ViewBag.WorkspaceId;
+    bool canManage = (bool)ViewBag.CanManage;
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-member.css" asp-append-version="true" />
+}
+
+<div class="members-page">
+
+    <div class="members-header">
+
+        <div class="members-title">
+
+            <a asp-controller="Workspace"
+               asp-action="Details"
+               asp-route-id="@workspaceId"
+               class="back-link">
+
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به فضای کاری
+
+            </a>
+
+            <h1>اعضای Workspace</h1>
+
+            <p>مدیریت اعضا و نقش‌های این فضای کاری</p>
+
+        </div>
+
+        @if (canManage)
+        {
+            <a asp-action="Invite"
+               asp-route-workspaceId="@workspaceId"
+               class="workspace-create-btn">
+
+                <i class="fa-solid fa-user-plus"></i>
+                دعوت عضو
+
+            </a>
+        }
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="workspace-empty">
+
+            <i class="fa-solid fa-users"></i>
+            <h3>هنوز عضوی وجود ندارد.</h3>
+            <p>یک عضو جدید به این فضای کاری دعوت کنید.</p>
+
+        </div>
+    }
+    else
+    {
+        <div class="member-list">
+
+            @foreach (var member in Model)
+            {
+                <div class="member-row">
+
+                    <div class="member-info">
+
+                        <div class="member-avatar">
+                            @if (!string.IsNullOrWhiteSpace(member.Avatar))
+                            {
+                                <img src="@member.Avatar" alt="@member.FullName" />
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-user"></i>
+                            }
+                        </div>
+
+                        <div>
+                            <h4>
+                                @member.FullName
+                                @if (member.IsCurrentUser)
+                                {
+                                    <span class="you-badge">شما</span>
+                                }
+                            </h4>
+                            <span>@member.Email</span>
+                        </div>
+
+                    </div>
+
+                    <div class="member-role">
+                        <span class="role-badge">
+                            @member.Role
+                        </span>
+                    </div>
+
+                    <div class="member-actions">
+
+                        @if (member.IsOwner)
+                        {
+                            <span class="owner-tag">
+                                <i class="fa-solid fa-crown"></i>
+                                مالک
+                            </span>
+                        }
+                        else if (canManage)
+                        {
+                            <form asp-action="ChangeRole"
+                                  method="post"
+                                  class="change-role-form">
+
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="memberId" value="@member.Id" />
+                                <input type="hidden" name="workspaceId" value="@workspaceId" />
+
+                                <select name="role" class="role-select">
+                                    @foreach (WorkspaceRoleType role in Enum.GetValues(typeof(WorkspaceRoleType)))
+                                    {
+                                        if (role == WorkspaceRoleType.Owner)
+                                        {
+                                            continue;
+                                        }
+                                        <option value="@role" selected="@(role == member.Role)">
+                                            @role
+                                        </option>
+                                    }
+                                </select>
+
+                            </form>
+
+                            <form asp-action="Remove"
+                                  method="post"
+                                  class="remove-member-form">
+
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="memberId" value="@member.Id" />
+                                <input type="hidden" name="workspaceId" value="@workspaceId" />
+
+                                <button type="submit" class="workspace-delete-btn">
+                                    <i class="fa-solid fa-user-xmark"></i>
+                                </button>
+
+                            </form>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/workspace-member.js" asp-append-version="true"></script>
+}

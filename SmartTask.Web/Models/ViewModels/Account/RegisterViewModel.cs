@@ -32,5 +32,7 @@ namespace SmartTask.Web.Models.ViewModels.Account
         [Compare(nameof(Password), ErrorMessage = "تکرار رمز عبور صحیح نیست.")]
         [Display(Name = "تکرار رمز عبور")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        public Guid? InvitationToken { get; set; }
     }
 }

@@ -1,0 +1,124 @@
+﻿@using SmartTask.Web.Models.Enums
+@model SmartTask.Web.Models.ViewModels.Workspace.InviteMemberViewModel
+
+@{
+    ViewData["Title"] = "دعوت عضو جدید";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-member.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+
+        <div>
+            <h1>دعوت عضو جدید</h1>
+            <p>یک کاربر را جستجو کنید و به این فضای کاری دعوت کنید.</p>
+        </div>
+
+        <a asp-action="Index"
+           asp-route-workspaceId="@Model.WorkspaceId"
+           class="back-link">
+
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به اعضا
+
+        </a>
+
+    </div>
+
+    <div class="workspace-form-card invite-card">
+
+        <form asp-action="Invite" method="post" id="inviteForm">
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="WorkspaceId" />
+            <input type="hidden" asp-for="UserId" id="selectedUserId" />
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <div class="mb-4 user-search-box">
+
+                <label class="form-label">جستجوی کاربر</label>
+
+                <div class="autocomplete-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text"
+                           id="userSearchInput"
+                           class="form-control"
+                           placeholder="نام یا ایمیل کاربر را وارد کنید..."
+                           autocomplete="off" />
+                </div>
+
+                <div id="userSearchResults" class="autocomplete-results"></div>
+
+                <div id="selectedUserCard" class="selected-user-card" style="display:none;">
+
+                    <div class="member-avatar" id="selectedUserAvatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <h4 id="selectedUserName"></h4>
+                        <span id="selectedUserEmail"></span>
+                    </div>
+
+                    <button type="button" id="clearSelectedUser" class="clear-user-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+                <span asp-validation-for="UserId" class="text-danger"></span>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">نقش کاربر</label>
+
+                <select asp-for="Role" class="form-control">
+                    @foreach (WorkspaceRoleType role in Enum.GetValues(typeof(WorkspaceRoleType)))
+                    {
+                        if (role == WorkspaceRoleType.Owner)
+                        {
+                            continue;
+                        }
+                        <option value="@role">@role</option>
+                    }
+                </select>
+
+                <span asp-validation-for="Role" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-actions">
+
+                <a asp-action="Index"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   class="btn workspace-btn-light">
+                    انصراف
+                </a>
+
+                <button type="submit" class="btn workspace-btn-primary" id="inviteSubmitBtn" disabled>
+                    <i class="fa-solid fa-user-plus"></i>
+                    دعوت کاربر
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/workspace-member.js" asp-append-version="true"></script>
+}

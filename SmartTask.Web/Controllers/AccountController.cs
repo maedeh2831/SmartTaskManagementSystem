@@ -4,6 +4,7 @@ using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.ViewModels.Account;
 using SmartTask.Web.Services.Email;
 using System.Security.Claims;
+using SmartTask.Web.Services.Interfaces;
 
 namespace SmartTask.Web.Controllers
 {
@@ -12,14 +13,17 @@ namespace SmartTask.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailService _emailService;
+        private readonly IWorkspaceInvitationService _invitationService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            IWorkspaceInvitationService invitationService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
+            _invitationService = invitationService;
         }
 
         [HttpGet]
@@ -34,9 +38,24 @@ namespace SmartTask.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> Register(Guid? invitationToken)
         {
-            return View();
+            var model = new RegisterViewModel();
+
+            if (invitationToken.HasValue)
+            {
+                var invitation = await _invitationService.GetByTokenAsync(invitationToken.Value);
+
+                if (invitation != null &&
+                    invitation.Status == SmartTask.Web.Models.Enums.WorkspaceInvitationStatusType.Pending &&
+                    invitation.ExpiryDate >= DateTime.Now)
+                {
+                    model.Email = invitation.Email;
+                    model.InvitationToken = invitationToken;
+                }
+            }
+
+            return View(model);
         }
 
         [HttpPost]
@@ -81,7 +100,8 @@ namespace SmartTask.Web.Controllers
                     new
                     {
                         userId = user.Id,
-                        token = token
+                        token = token,
+                        invitationToken = model.InvitationToken
                     },
                     Request.Scheme);
 
@@ -125,18 +145,18 @@ namespace SmartTask.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View(model);
-
 
             var user = await _userManager.FindByEmailAsync(model.Email);
 
@@ -146,34 +166,28 @@ namespace SmartTask.Web.Controllers
                 return View(model);
             }
 
-            // جلوگیری از ورود قبل از تایید ایمیل
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 ModelState.AddModelError(
-                    "",
-                    "حساب کاربری شما هنوز فعال نشده است. لطفاً ابتدا ایمیل خود را تایید کنید."
-                );
-
+                    "", "حساب کاربری شما هنوز فعال نشده است. لطفاً ابتدا ایمیل خود را تایید کنید.");
                 return View(model);
             }
 
             var result = await _signInManager.PasswordSignInAsync(
-                user.UserName!,
-                model.Password,
-                model.RememberMe,
-                false);
-
+                user.UserName!, model.Password, model.RememberMe, false);
 
             if (result.Succeeded)
             {
                 user.LastLoginDate = DateTime.Now;
                 await _userManager.UpdateAsync(user);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return LocalRedirect(returnUrl);
+
                 return RedirectToAction("Index", "Home");
             }
 
-
             ModelState.AddModelError("", "ایمیل یا رمز عبور اشتباه است.");
-
             return View(model);
         }
 
@@ -421,7 +435,7 @@ namespace SmartTask.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(int userId, string token)
+        public async Task<IActionResult> ConfirmEmail(int userId, string token, Guid? invitationToken)
         {
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction(nameof(Login));
@@ -435,7 +449,25 @@ namespace SmartTask.Web.Controllers
 
             if (result.Succeeded)
             {
-                TempData["Success"] = "ایمیل شما با موفقیت تایید شد.";
+                if (invitationToken.HasValue)
+                {
+                    try
+                    {
+                        await _invitationService.AcceptInvitationAfterRegisterAsync(
+                            invitationToken.Value, user.Id);
+
+                        TempData["Success"] =
+                            "ایمیل شما تایید شد و به فضای کاری دعوت‌شده اضافه شدید.";
+                    }
+                    catch
+                    {
+                        TempData["Success"] = "ایمیل شما با موفقیت تایید شد.";
+                    }
+                }
+                else
+                {
+                    TempData["Success"] = "ایمیل شما با موفقیت تایید شد.";
+                }
 
                 return RedirectToAction(nameof(Login));
             }

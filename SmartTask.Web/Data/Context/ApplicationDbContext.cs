@@ -22,6 +22,7 @@ namespace SmartTask.Web.Data.Context
         // Workspace
         public DbSet<Workspace> Workspaces { get; set; }
         public DbSet<WorkspaceMember> WorkspaceMembers { get; set; }
+        public DbSet<WorkspaceInvitation> WorkspaceInvitations { get; set; }
 
         // Team
         public DbSet<Team> Teams { get; set; }

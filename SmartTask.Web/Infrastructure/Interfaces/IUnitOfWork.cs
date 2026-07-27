@@ -6,6 +6,7 @@ namespace SmartTask.Web.Infrastructure.Interfaces
     {
         IGenericRepository<Workspace> Workspaces { get; }
         IGenericRepository<WorkspaceMember> WorkspaceMembers { get; }
+        IGenericRepository<WorkspaceInvitation> WorkspaceInvitations { get; }
 
         IGenericRepository<Team> Teams { get; }
         IGenericRepository<TeamMember> TeamMembers { get; }
