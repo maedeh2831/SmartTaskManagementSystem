@@ -70,7 +70,7 @@ public class WorkspaceService
                 x.OwnerId == userId);
     }
 
-    public async Task DeleteAsync(int id)
+    public new async Task DeleteAsync(int id)
     {
         var workspace = await _context.Workspaces
             .FirstOrDefaultAsync(x => x.Id == id);
