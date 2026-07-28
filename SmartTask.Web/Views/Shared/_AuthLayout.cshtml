@@ -29,7 +29,7 @@
     @if (TempData["Success"] != null)
     {
         <script>
-            showSuccess('@TempData["Success"]');
+            showSuccess('@Html.Raw(TempData["Success"])');
         </script>
     }
 

@@ -8,7 +8,6 @@ using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Services.Email;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
-using SmartTask.Web.Infrastructure.Seed;
 using SmartTask.Web.Infrastructure.Services;
 
 namespace SmartTask.Web
@@ -45,6 +44,14 @@ namespace SmartTask.Web
             });
 
             // MVC
+            builder.Services
+            .AddAuthentication()
+            .AddGoogle(options =>
+            {
+                options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+            });
+
             builder.Services
            .AddControllersWithViews();
 

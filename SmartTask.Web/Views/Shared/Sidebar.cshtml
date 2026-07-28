@@ -5,36 +5,45 @@
     var controllerName = ViewContext.RouteData.Values["Controller"]?.ToString();
 
     var menus = SidebarMenu.Items;
-}
 
+    var groups = menus.GroupBy(x => x.Category);
+}
 
 <ul class="sidebar-menu">
 
-    @foreach (var item in menus)
+    @foreach (var group in groups)
     {
-        <li class="@(controllerName == item.Controller ? "active" : "")">
-
-            <a asp-controller="@item.Controller"
-               asp-action="@item.Action">
-
-                <i class="@item.Icon"></i>
-
-                <span>
-                    @item.Title
-                </span>
-
-
-                @if (!string.IsNullOrEmpty(item.Badge))
-                {
-                    <span class="menu-badge">
-                        @item.Badge
-                    </span>
-                }
-
-
-            </a>
-
+        <li class="sidebar-category">
+            @group.Key
         </li>
+
+        @foreach (var item in group)
+        {
+
+            <li class="@(controllerName == item.Controller ? "active" : "")">
+
+                <a asp-controller="@item.Controller"
+                   asp-action="@item.Action">
+
+                    <i class="@item.Icon"></i>
+
+                    <span>@item.Title</span>
+
+                    @if (!string.IsNullOrEmpty(item.Badge))
+                    {
+                        <span class="menu-badge">
+
+                            @item.Badge
+
+                        </span>
+                    }
+
+                </a>
+
+            </li>
+
+        }
+
     }
 
 </ul>

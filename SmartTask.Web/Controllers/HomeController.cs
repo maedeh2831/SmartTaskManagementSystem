@@ -18,7 +18,7 @@ namespace SmartTask.Web.Controllers
             _logger = logger;
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize]
         public IActionResult Index()
         {
             return View();

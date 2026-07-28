@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.ViewModels.Account;
 using SmartTask.Web.Services.Email;
+using System.Security.Claims;
 
 namespace SmartTask.Web.Controllers
 {
@@ -178,6 +179,125 @@ namespace SmartTask.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+        {
+            var redirectUrl = Url.Action(
+                nameof(ExternalLoginCallback),
+                "Account",
+                new { returnUrl });
+
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    provider,
+                    redirectUrl);
+
+            return Challenge(properties, provider);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(
+            string? returnUrl = null,
+            string? remoteError = null)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            if (remoteError != null)
+            {
+                TempData["Error"] = "ورود با حساب گوگل انجام نشد.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                TempData["Error"] = "دریافت اطلاعات حساب گوگل با مشکل مواجه شد.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // اگر قبلاً با گوگل ثبت شده باشد
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false,
+                bypassTwoFactor: true);
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "با موفقیت وارد شدید.";
+
+                return LocalRedirect(returnUrl);
+            }
+
+            // گرفتن ایمیل از گوگل
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "ایمیل از گوگل دریافت نشد.";
+
+                return RedirectToAction(nameof(Login));
+            }
+
+            // اگر قبلاً کاربر با این ایمیل وجود دارد
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                var firstName =
+                    info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "";
+
+                var lastName =
+                    info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    EmailConfirmed = true
+                };
+
+                var createResult =
+                    await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    TempData["Error"] = "حساب کاربری ایجاد نشد. دوباره تلاش کنید.";
+
+                    return RedirectToAction(nameof(Login));
+                }
+
+                await _userManager.AddToRoleAsync(user, "Member");
+            }
+
+            // اگر قبلاً این Login متصل نشده باشد
+            var existingLogins = await _userManager.GetLoginsAsync(user);
+
+            if (!existingLogins.Any(x =>
+                    x.LoginProvider == info.LoginProvider &&
+                    x.ProviderKey == info.ProviderKey))
+            {
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+
+                if (!addLoginResult.Succeeded)
+                {
+                    TempData["Error"] = "خطا در اتصال حساب گوگل.";
+
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+
+            await _signInManager.SignInAsync(user, false);
+
+            TempData["Success"] = "ورود با گوگل انجام شد.";
+
+            return LocalRedirect(returnUrl);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -324,6 +444,7 @@ namespace SmartTask.Web.Controllers
 
             return RedirectToAction(nameof(Login));
         }
+
 
     }
 }

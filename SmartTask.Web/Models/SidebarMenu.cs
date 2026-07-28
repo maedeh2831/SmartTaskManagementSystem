@@ -9,20 +9,23 @@ namespace SmartTask.Web.Models
             new()
             {
                 Title="داشبورد",
+                Category="اصلی",
                 Icon="fa-solid fa-house",
                 Controller="Home"
             },
 
             new()
             {
-                Title="Workspace",
+                Title="فضاهای کاری",
+                Category="مدیریت",
                 Icon="fa-solid fa-layer-group",
                 Controller="Workspace"
             },
 
             new()
             {
-                Title="Projects",
+                Title="پروژه‌ها",
+                Category="مدیریت",
                 Icon="fa-solid fa-folder-open",
                 Controller="Project",
                 Badge="12"
@@ -30,22 +33,16 @@ namespace SmartTask.Web.Models
 
             new()
             {
-                Title="Backlog",
-                Icon="fa-solid fa-list-check",
-                Controller="Backlog"
+                Title="تیم‌ها",
+                Category="مدیریت",
+                Icon="fa-solid fa-users",
+                Controller="Team"
             },
 
             new()
             {
-                Title="Sprint",
-                Icon="fa-solid fa-bolt",
-                Controller="Sprint",
-                Badge="3"
-            },
-
-            new()
-            {
-                Title="Tasks",
+                Title="وظایف",
+                Category="مدیریت",
                 Icon="fa-solid fa-square-check",
                 Controller="Task",
                 Badge="25"
@@ -53,14 +50,25 @@ namespace SmartTask.Web.Models
 
             new()
             {
-                Title="Team",
-                Icon="fa-solid fa-users",
-                Controller="Team"
+                Title="بک‌لاگ",
+                Category="برنامه‌ریزی",
+                Icon="fa-solid fa-list-check",
+                Controller="Backlog"
             },
 
             new()
             {
-                Title="Reports",
+                Title="اسپرینت‌ها",
+                Category="برنامه‌ریزی",
+                Icon="fa-solid fa-bolt",
+                Controller="Sprint",
+                Badge="3"
+            },
+
+            new()
+            {
+                Title="گزارش‌ها",
+                Category="تحلیل",
                 Icon="fa-solid fa-chart-line",
                 Controller="Report"
             }

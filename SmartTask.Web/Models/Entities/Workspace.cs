@@ -1,37 +1,52 @@
 ﻿/*
 | Module      : Workspace
 | Entity      : Workspace
-| Purpose     : بالاترین سطح سازماندهی سامانه که شامل اعضا، تیم‌ها، پروژه‌ها و تنظیمات اختصاصی است.
+| Purpose     : نگهداری اطلاعات Workspace و مدیریت مالک، اعضا، پروژه‌ها و تیم‌ها.
 */
 
 using SmartTask.Web.Models.Enums;
 
-namespace SmartTask.Web.Models.Entities
+namespace SmartTask.Web.Models.Entities;
+
+public class Workspace
 {
-    public class Workspace : BaseEntity
-    {
-        // Properties
-        public string Name { get; set; } = null!;
+    public int Id { get; set; }
 
-        public string? Description { get; set; }
+    public string Name { get; set; } = null!;
 
-        public string? Logo { get; set; }
+    public string? Description { get; set; }
 
-        public string? Color { get; set; }
+    public string? Logo { get; set; }
 
-        public string Slug { get; set; } = null!;
+    public string? Color { get; set; }
 
-        public bool IsPublic { get; set; } = false;
+    public VisibilityType Visibility { get; set; }
+        = VisibilityType.Private;
 
-        public string TimeZone { get; set; } = "Asia/Tehran";
+    public bool IsActive { get; set; } = true;
 
-        public LanguageType DefaultLanguage { get; set; } = LanguageType.Persian;
+    public DateTime CreateDate { get; set; } = DateTime.Now;
 
-        // Navigation Properties
-        public ICollection<WorkspaceMember> Members { get; set; } = new List<WorkspaceMember>();
+    public string? ChangeUser { get; set; }
 
-        public ICollection<Team> Teams { get; set; } = new List<Team>();
+    public DateTime? ChangeDate { get; set; }
 
-        public ICollection<Project> Projects { get; set; } = new List<Project>();
-    }
+    public bool ViewState { get; set; } = true;
+
+    //================ Owner =================
+
+    public int OwnerId { get; set; }
+
+    public virtual ApplicationUser Owner { get; set; } = null!;
+
+    //================ Navigation =================
+
+    public virtual ICollection<Project> Projects { get; set; }
+        = new HashSet<Project>();
+
+    public virtual ICollection<Team> Teams { get; set; }
+        = new HashSet<Team>();
+
+    public virtual ICollection<WorkspaceMember> Members { get; set; }
+        = new HashSet<WorkspaceMember>();
 }

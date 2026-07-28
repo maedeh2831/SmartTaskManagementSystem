@@ -1,0 +1,303 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workspace.CreateWorkspaceViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+}
+
+@{
+    ViewData["Title"] = "Create Workspace";
+}
+
+<div class="workspace-page">
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form">
+
+            <div class="workspace-card">
+
+                <div class="workspace-header">
+
+            <div class="workspace-icon">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+            </div>
+
+                    <h2>ایجاد فضای کاری</h2>
+
+            <p>
+                        فضای کاری جدید خود را ایجاد کنید و پروژه‌ها، تیم‌ها و اعضای خود را در یک محیط واحد مدیریت نمایید.
+            </p>
+
+        </div>
+
+        <form asp-action="Create"
+              method="post">
+
+            <div class="mb-4">
+
+                <label asp-for="Name" class="form-label"></label>
+
+                <input asp-for="Name" id="workspaceName" class="form-control" />
+
+                <span asp-validation-for="Name"
+                      class="text-danger"></span>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label asp-for="Description"
+                       class="form-label"></label>
+
+            <textarea asp-for="Description"
+                      id="workspaceDescription"
+                      rows="4"
+                      class="form-control"></textarea>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                            رنگ فضای کاری
+
+                </label>
+
+                <div class="workspace-colors">
+
+                    <label>
+
+                        <input type="radio"
+                               asp-for="Color"
+                               class="color-radio"
+                               value="#4F46E5" checked />
+
+                        <span style="background:#4F46E5"></span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio"
+                               asp-for="Color"
+                               class="color-radio"
+                               value="#06B6D4" />
+
+                        <span style="background:#06B6D4"></span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio"
+                               asp-for="Color"
+                               class="color-radio"
+                               value="#10B981" />
+
+                        <span style="background:#10B981"></span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio"
+                               asp-for="Color"
+                               class="color-radio"
+                               value="#F59E0B" />
+
+                        <span style="background:#F59E0B"></span>
+
+                    </label>
+
+                    <label>
+
+                        <input type="radio"
+                               asp-for="Color"
+                               class="color-radio"
+                               value="#EF4444" />
+
+                        <span style="background:#EF4444"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="mb-5">
+
+                <label class="form-label">
+
+                            سطح دسترسی
+
+                </label>
+
+                <div class="visibility-box">
+
+                    <label>
+
+                        <input asp-for="Visibility"
+                               type="radio"
+                               class="visibility-radio"
+                               value="1" checked />
+
+                                <i class="fa-solid fa-lock ms-2"></i>
+                                خصوصی
+
+                    </label>
+
+                    <label>
+
+                        <input asp-for="Visibility"
+                               class="visibility-radio"
+                               type="radio"
+                               value="2" />
+
+                                <i class="fa-solid fa-globe ms-2"></i>
+                                عمومی
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="workspace-buttons">
+
+                <a asp-action="Index"
+                   class="btn btn-light">
+
+                            انصراف
+
+                </a>
+
+                <button class="btn btn-primary">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                            ایجاد فضای کاری
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+        <div class="workspace-preview">
+
+            <div class="preview-card">
+
+                <div class="preview-header">
+
+                    <div class="preview-logo"
+                         id="previewLogo">
+
+                        <i class="fa-solid fa-layer-group"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h4 id="previewName">
+
+                            فضای کاری جدید
+
+                        </h4>
+
+                        <small id="previewVisibility">
+
+                            <i class="fa-solid fa-lock ms-2"></i>
+                            خصوصی
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="preview-description"
+                     id="previewDescription">
+
+                    توضیحات فضای کاری شما...
+
+                </div>
+
+            </div>
+
+        </div>
+    </div> 
+
+</div>  
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const workspaceName =
+        document.getElementById("workspaceName");
+
+        const previewName =
+        document.getElementById("previewName");
+
+        workspaceName.addEventListener("input",()=>{
+
+            previewName.innerText =
+                workspaceName.value || "New Workspace";
+
+        });
+
+        const workspaceDescription =
+        document.getElementById("workspaceDescription");
+
+        const previewDescription =
+        document.getElementById("previewDescription");
+
+        workspaceDescription.addEventListener("input",()=>{
+
+            previewDescription.innerText =
+                workspaceDescription.value ||
+                "Your workspace description...";
+
+        });
+
+        document.querySelectorAll(".color-radio")
+        .forEach(x=>{
+
+            x.addEventListener("change",()=>{
+
+                document
+                .getElementById("previewLogo")
+                .style.background=x.value;
+
+            });
+
+        });
+
+        document.querySelectorAll(".visibility-radio")
+        .forEach(x=>{
+
+            x.addEventListener("change",()=>{
+
+                document
+                .getElementById("previewVisibility")
+                .innerHTML=
+                x.value=="1"
+                ?"🔒 Private"
+                :"🌍 Public";
+
+            });
+
+        });
+
+    </script>
+
+}

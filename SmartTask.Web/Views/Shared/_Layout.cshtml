@@ -10,8 +10,9 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/layout.css" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
 
 </head>
 
@@ -57,10 +58,6 @@
                </button>
             </div>
 
-            <div class="sidebar-title">
-                 MENU
-            </div>
-
             <partial name="Sidebar" />
 
         </aside>
@@ -84,7 +81,7 @@
     @if (TempData["Success"] != null)
     {
         <script>
-            showSuccess('@TempData["Success"]');
+            showSuccess('@Html.Raw(TempData["Success"])');
         </script>
     }
 

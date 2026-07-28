@@ -32,18 +32,6 @@ namespace SmartTask.Web.Data.Configurations
             builder.Property(x => x.Color)
                 .HasMaxLength(20);
 
-            builder.Property(x => x.Slug)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            builder.Property(x => x.TimeZone)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            // Indexes
-            builder.HasIndex(x => x.Slug)
-                .IsUnique();
-
             // Relationships
             builder.HasMany(x => x.Members)
                    .WithOne(x => x.Workspace)

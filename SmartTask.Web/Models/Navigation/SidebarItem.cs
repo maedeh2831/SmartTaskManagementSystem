@@ -11,5 +11,7 @@
         public string Action { get; set; } = "Index";
 
         public string? Badge { get; set; }
+
+        public string Category { get; set; } = "";
     }
 }
