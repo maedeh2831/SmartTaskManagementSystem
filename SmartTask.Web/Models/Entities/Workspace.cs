@@ -20,6 +20,8 @@ public class Workspace
 
     public string? Color { get; set; }
 
+    public string? TimeZone { get; set; } = "Iran Standard Time";
+
     public VisibilityType Visibility { get; set; }
         = VisibilityType.Private;
 

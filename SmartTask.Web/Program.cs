@@ -4,11 +4,12 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Infrastructure.Repositories;
 using SmartTask.Web.Infrastructure.Seed;
+using SmartTask.Web.Infrastructure.Services;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Services.Email;
+using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
-using SmartTask.Web.Infrastructure.Services;
 
 namespace SmartTask.Web
 {
@@ -96,6 +97,8 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
             builder.Services.AddScoped<IWorkspaceInvitationService, WorkspaceInvitationService>();
             builder.Services.AddScoped<IWorkspaceMemberService, WorkspaceMemberService>();
+            builder.Services.AddScoped<IWorkspaceDashboardService, WorkspaceDashboardService>();
+            builder.Services.AddScoped<IFileUploadService, SmartTask.Web.Services.Files.FileUploadService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();

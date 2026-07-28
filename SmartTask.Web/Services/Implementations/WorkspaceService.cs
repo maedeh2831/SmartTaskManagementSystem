@@ -12,7 +12,6 @@ public class WorkspaceService
 
     private readonly ApplicationDbContext _context;
 
-
     public WorkspaceService(
         IGenericRepository<Workspace> repository,
         IUnitOfWork unitOfWork,
@@ -21,8 +20,6 @@ public class WorkspaceService
     {
         _context = context;
     }
-
-
 
     public async Task<Workspace?> GetDetailsAsync(int id)
     {
@@ -36,8 +33,6 @@ public class WorkspaceService
 
             .FirstOrDefaultAsync(x => x.Id == id);
     }
-
-
 
     public async Task<bool> ExistsByNameAsync(
         string name,
@@ -56,8 +51,6 @@ public class WorkspaceService
 
         return await query.AnyAsync();
     }
-
-
 
     public async Task<bool> IsOwnerAsync(
         int workspaceId,
@@ -80,6 +73,28 @@ public class WorkspaceService
 
 
         workspace.ViewState = false;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateSettingsAsync(
+    int workspaceId,
+    string? logoPath,
+    string color,
+    string timeZone)
+    {
+        var workspace = await _context.Workspaces
+            .FirstOrDefaultAsync(x => x.Id == workspaceId);
+
+        if (workspace == null)
+            throw new Exception("فضای کاری یافت نشد.");
+
+        if (!string.IsNullOrWhiteSpace(logoPath))
+            workspace.Logo = logoPath;
+
+        workspace.Color = color;
+        workspace.TimeZone = timeZone;
+        workspace.ChangeDate = DateTime.Now;
 
         await _context.SaveChangesAsync();
     }

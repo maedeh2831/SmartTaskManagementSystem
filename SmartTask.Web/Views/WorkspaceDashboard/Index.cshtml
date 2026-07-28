@@ -1,0 +1,199 @@
+﻿@using SmartTask.Web.Models.Enums
+@model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceDashboardViewModel
+
+@{
+    ViewData["Title"] = "داشبورد Workspace";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.WorkspaceId" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به فضای کاری
+            </a>
+            <h1>داشبورد @Model.WorkspaceName</h1>
+            <p>نمای کلی از وضعیت فعلی فضای کاری شما</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-primary"><i class="fa-solid fa-diagram-project"></i></div>
+            <div class="stat-info">
+                <h3>@Model.TotalProjects</h3>
+                <span>کل پروژه‌ها</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-success"><i class="fa-solid fa-bolt"></i></div>
+            <div class="stat-info">
+                <h3>@Model.ActiveProjects</h3>
+                <span>پروژه‌های فعال</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-warning"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <h3>@Model.TotalMembers</h3>
+                <span>اعضای فضای کاری</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-info"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <div class="stat-info">
+                <h3>@Model.PendingInvitations</h3>
+                <span>دعوت‌نامه‌های در انتظار</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>وضعیت پروژه‌ها</h3>
+            @if (Model.ProjectStatusChart.Any())
+            {
+                <canvas id="projectStatusChart"></canvas>
+            }
+            else
+            {
+                <div class="chart-empty">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <p>هنوز پروژه‌ای برای نمایش وجود ندارد.</p>
+                </div>
+            }
+        </div>
+
+        <div class="chart-card">
+            <h3>فعالیت ۷ روز اخیر</h3>
+            <canvas id="activityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="widgets-grid">
+
+        <div class="widget-card">
+            <div class="widget-header">
+                <h3>پروژه‌های اخیر</h3>
+                <a asp-controller="Project" asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId">مشاهده همه</a>
+            </div>
+
+            @if (!Model.RecentProjects.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <p>هنوز پروژه‌ای ایجاد نشده است.</p>
+                </div>
+            }
+            else
+            {
+                <div class="recent-project-list">
+                    @foreach (var project in Model.RecentProjects)
+                    {
+                        <div class="recent-project-row">
+                            <span class="project-color-dot" style="background:@project.Color"></span>
+                            <div class="recent-project-info">
+                                <h4>@project.Name</h4>
+                                <span>@project.Status.GetDisplayName()</span>
+                            </div>
+                            <span class="recent-project-date">@project.CreateDate.ToString("yyyy/MM/dd")</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="widget-card">
+            <div class="widget-header">
+                <h3>اعضای فضای کاری</h3>
+                <a asp-controller="WorkspaceMember" asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId">مشاهده همه</a>
+            </div>
+
+            @if (!Model.TopMembers.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-users"></i>
+                    <p>عضوی یافت نشد.</p>
+                </div>
+            }
+            else
+            {
+                <div class="members-widget-list">
+                    @foreach (var member in Model.TopMembers)
+                    {
+                        <div class="member-widget-row">
+                            <div class="member-avatar">
+                                @if (!string.IsNullOrWhiteSpace(member.Avatar))
+                                {
+                                    <img src="@member.Avatar" alt="@member.FullName" />
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-user"></i>
+                                }
+                            </div>
+                            <div class="member-widget-info">
+                                <h4>@member.FullName</h4>
+                                <span>@member.Role.GetDisplayName()</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="widget-card widget-card-wide">
+            <div class="widget-header">
+                <h3>فعالیت‌های اخیر</h3>
+            </div>
+
+            @if (!Model.RecentActivities.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <p>هنوز فعالیتی ثبت نشده است.</p>
+                </div>
+            }
+            else
+            {
+                <div class="activity-timeline">
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        <div class="activity-row">
+                            <div class="activity-icon"><i class="@activity.Icon"></i></div>
+                            <div class="activity-info">
+                                <p>@activity.Title</p>
+                                <span>@activity.CreateDate.ToString("yyyy/MM/dd HH:mm")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const projectStatusLabels = @Html.Raw(Json.Serialize(Model.ProjectStatusChart.Select(x => x.Label)));
+        const projectStatusValues = @Html.Raw(Json.Serialize(Model.ProjectStatusChart.Select(x => x.Value)));
+
+        const activityLabels = @Html.Raw(Json.Serialize(Model.ActivityChart.Select(x => x.Label)));
+        const activityValues = @Html.Raw(Json.Serialize(Model.ActivityChart.Select(x => x.Value)));
+    </script>
+    <script src="~/js/workspace-dashboard.js" asp-append-version="true"></script>
+}

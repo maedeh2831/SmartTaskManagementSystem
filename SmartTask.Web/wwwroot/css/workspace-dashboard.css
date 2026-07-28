@@ -1,0 +1,343 @@
+/* ==========================================================
+                Workspace Dashboard
+   ========================================================== */
+
+.dashboard-page {
+    animation: fadeUp .4s ease;
+}
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-title h1 {
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--gray900);
+    margin-top: 12px;
+}
+
+.dashboard-title p {
+    color: var(--gray500);
+    margin-top: 8px;
+}
+
+/* ===== Statistics Cards ===== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+    .stat-card:hover {
+        box-shadow: var(--shadow);
+        transform: translateY(-3px);
+    }
+
+.stat-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.stat-icon-primary {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.stat-icon-success {
+    background: #DCFCE7;
+    color: #16A34A;
+}
+
+.stat-icon-warning {
+    background: #FEF3C7;
+    color: var(--warning);
+}
+
+.stat-icon-info {
+    background: #DBEAFE;
+    color: #2563EB;
+}
+
+.stat-info h3 {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--gray900);
+    margin: 0;
+}
+
+.stat-info span {
+    color: var(--gray500);
+    font-size: 13px;
+}
+
+/* ===== Charts ===== */
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+    .chart-card h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--gray900);
+        margin-bottom: 18px;
+    }
+
+    .chart-card canvas {
+        max-height: 260px;
+    }
+
+.chart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: var(--gray400);
+    gap: 10px;
+}
+
+    .chart-empty i {
+        font-size: 30px;
+    }
+
+/* ===== Widgets ===== */
+
+.widgets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.widget-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.widget-card-wide {
+    grid-column: span 2;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+    .widget-header h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--gray900);
+    }
+
+    .widget-header a {
+        font-size: 13px;
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+.widget-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: var(--gray400);
+    gap: 10px;
+}
+
+    .widget-empty i {
+        font-size: 26px;
+    }
+
+/* Recent Projects */
+
+.recent-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.recent-project-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray100);
+}
+
+    .recent-project-row:last-child {
+        border-bottom: none;
+    }
+
+.project-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.recent-project-info {
+    flex: 1;
+}
+
+    .recent-project-info h4 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray900);
+        margin: 0;
+    }
+
+    .recent-project-info span {
+        font-size: 12px;
+        color: var(--gray500);
+    }
+
+.recent-project-date {
+    font-size: 12px;
+    color: var(--gray400);
+}
+
+/* Members Widget */
+
+.members-widget-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.member-widget-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+    .member-widget-row .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-light);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .member-widget-row .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+.member-widget-info h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray900);
+    margin: 0;
+}
+
+.member-widget-info span {
+    font-size: 12px;
+    color: var(--gray500);
+}
+
+/* Activity Timeline */
+
+.activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.activity-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--gray50);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.activity-info p {
+    font-size: 14px;
+    color: var(--gray900);
+    margin: 0;
+    font-weight: 600;
+}
+
+.activity-info span {
+    font-size: 12px;
+    color: var(--gray400);
+}
+
+/* ===== Responsive ===== */
+
+@media(max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .widgets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .widget-card-wide {
+        grid-column: span 1;
+    }
+}
+
+@media(max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

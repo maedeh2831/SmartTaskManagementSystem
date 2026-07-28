@@ -973,7 +973,19 @@ textarea.form-control {
     box-shadow: 0 15px 30px rgba(0,0,0,.15);
 }
 
+    .workspace-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: inherit;
+    }
 
+.details-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
 
 
 .workspace-status {

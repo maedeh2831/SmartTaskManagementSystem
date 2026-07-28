@@ -93,10 +93,15 @@
                          style="background:@item.Color">
 
                         <div class="workspace-logo">
-
-                            <i class="fa-solid fa-layer-group"></i>
-
-                        </div>
+                            @if (!string.IsNullOrWhiteSpace(item.Logo))
+                            {
+                                <img src="@item.Logo" alt="@item.Name" />
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-layer-group"></i>
+                            }
+                    </div>
 
                         <span class="workspace-status">
                             @item.Visibility

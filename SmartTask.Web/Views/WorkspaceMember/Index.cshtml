@@ -1,10 +1,8 @@
 ﻿@using SmartTask.Web.Models.Enums
-@model List<SmartTask.Web.Models.ViewModels.Workspace.WorkspaceMemberViewModel>
+@model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceMemberIndexViewModel
 
 @{
     ViewData["Title"] = "اعضای Workspace";
-    var workspaceId = (int)ViewBag.WorkspaceId;
-    bool canManage = (bool)ViewBag.CanManage;
 }
 
 @section Styles
@@ -21,7 +19,7 @@
 
             <a asp-controller="Workspace"
                asp-action="Details"
-               asp-route-id="@workspaceId"
+               asp-route-id="@Model.WorkspaceId"
                class="back-link">
 
                 <i class="fa-solid fa-arrow-right"></i>
@@ -31,14 +29,14 @@
 
             <h1>اعضای Workspace</h1>
 
-            <p>مدیریت اعضا و نقش‌های این فضای کاری</p>
+            <p>مدیریت اعضا، نقش‌ها و دعوت‌نامه‌های این فضای کاری</p>
 
         </div>
 
-        @if (canManage)
+        @if (Model.CanManage)
         {
             <a asp-action="Invite"
-               asp-route-workspaceId="@workspaceId"
+               asp-route-workspaceId="@Model.WorkspaceId"
                class="workspace-create-btn">
 
                 <i class="fa-solid fa-user-plus"></i>
@@ -49,21 +47,19 @@
 
     </div>
 
-    @if (!Model.Any())
+    @if (!Model.Members.Any() && !Model.Invitations.Any())
     {
         <div class="workspace-empty">
-
             <i class="fa-solid fa-users"></i>
             <h3>هنوز عضوی وجود ندارد.</h3>
             <p>یک عضو جدید به این فضای کاری دعوت کنید.</p>
-
         </div>
     }
     else
     {
         <div class="member-list">
 
-            @foreach (var member in Model)
+            @foreach (var member in Model.Members)
             {
                 <div class="member-row">
 
@@ -94,9 +90,7 @@
                     </div>
 
                     <div class="member-role">
-                        <span class="role-badge">
-                            @member.Role
-                        </span>
+                        <span class="role-badge">@member.Role</span>
                     </div>
 
                     <div class="member-actions">
@@ -108,15 +102,12 @@
                                 مالک
                             </span>
                         }
-                        else if (canManage)
+                        else if (Model.CanManage)
                         {
-                            <form asp-action="ChangeRole"
-                                  method="post"
-                                  class="change-role-form">
-
+                            <form asp-action="ChangeRole" method="post" class="change-role-form">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="memberId" value="@member.Id" />
-                                <input type="hidden" name="workspaceId" value="@workspaceId" />
+                                <input type="hidden" name="workspaceId" value="@Model.WorkspaceId" />
 
                                 <select name="role" class="role-select">
                                     @foreach (WorkspaceRoleType role in Enum.GetValues(typeof(WorkspaceRoleType)))
@@ -125,32 +116,73 @@
                                         {
                                             continue;
                                         }
-                                        <option value="@role" selected="@(role == member.Role)">
-                                            @role
-                                        </option>
+                                        <option value="@role" selected="@(role == member.Role)">@role</option>
                                     }
                                 </select>
-
                             </form>
 
-                            <form asp-action="Remove"
-                                  method="post"
-                                  class="remove-member-form">
-
+                            <form asp-action="Remove" method="post" class="remove-member-form">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="memberId" value="@member.Id" />
-                                <input type="hidden" name="workspaceId" value="@workspaceId" />
-
+                                <input type="hidden" name="workspaceId" value="@Model.WorkspaceId" />
                                 <button type="submit" class="workspace-delete-btn">
                                     <i class="fa-solid fa-user-xmark"></i>
                                 </button>
-
                             </form>
                         }
 
                     </div>
 
                 </div>
+            }
+
+            @if (Model.CanManage)
+            {
+                @foreach (var invitation in Model.Invitations)
+                {
+                    <div class="member-row pending-row">
+
+                        <div class="member-info">
+
+                            <div class="member-avatar pending-avatar">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+
+                            <div>
+                                <h4>
+                                    @(invitation.FullName ?? invitation.Email)
+                                    <span class="pending-badge">در انتظار تایید</span>
+                                    @if (invitation.IsNewUser)
+                                    {
+                                        <span class="new-user-badge">کاربر جدید</span>
+                                    }
+                                </h4>
+                                <span>@invitation.Email</span>
+                            </div>
+
+                        </div>
+
+                        <div class="member-role">
+                            <span class="role-badge">@invitation.Role</span>
+                        </div>
+
+                        <div class="member-actions">
+                            <span class="expiry-info">
+                                تا @invitation.ExpiryDate.ToString("yyyy/MM/dd")
+                            </span>
+
+                            <form asp-action="CancelInvitation" method="post" class="cancel-invitation-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="invitationId" value="@invitation.Id" />
+                                <input type="hidden" name="workspaceId" value="@Model.WorkspaceId" />
+                                <button type="submit" class="workspace-delete-btn">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                }
             }
 
         </div>

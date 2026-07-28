@@ -1,0 +1,94 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceSettingsViewModel
+
+@{
+    ViewData["Title"] = "تنظیمات فضای کاری";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-settings.css" asp-append-version="true" />
+}
+
+<div class="settings-page">
+
+    <div class="settings-header">
+        <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به فضای کاری
+        </a>
+        <h1>تنظیمات @Model.Name</h1>
+        <p>مدیریت لوگو، رنگ تم و منطقه زمانی فضای کاری</p>
+    </div>
+
+    <form asp-action="Settings" asp-controller="Workspace" method="post" enctype="multipart/form-data" class="settings-card">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Name" />
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <!-- Logo Section -->
+        <div class="settings-section">
+            <h3>لوگوی فضای کاری</h3>
+            <div class="logo-upload-row">
+                <div class="logo-preview" id="logoPreview">
+                    @if (!string.IsNullOrWhiteSpace(Model.CurrentLogo))
+                    {
+                        <img src="@Model.CurrentLogo" alt="Logo" id="logoPreviewImg" />
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-image" id="logoPreviewIcon"></i>
+                        <img src="" alt="Logo" id="logoPreviewImg" style="display:none" />
+                    }
+                </div>
+                <div class="logo-upload-info">
+                    <label for="LogoFile" class="upload-btn">
+                        <i class="fa-solid fa-upload"></i>
+                        انتخاب فایل جدید
+                    </label>
+                    <input type="file" asp-for="LogoFile" id="LogoFile" accept=".jpg,.jpeg,.png,.webp" hidden />
+                    <span class="upload-hint">فرمت مجاز: JPG, PNG, WEBP — حداکثر حجم ۲ مگابایت</span>
+                    <span asp-validation-for="LogoFile" class="field-error"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Section -->
+        <div class="settings-section">
+            <h3>رنگ تم</h3>
+            <div class="color-picker-row">
+                <div class="color-swatches">
+                    @foreach (var swatch in new[] { "#4F46E5", "#16A34A", "#F59E0B", "#EF4444", "#06B6D4", "#8B5CF6", "#EC4899", "#0EA5E9" })
+                    {
+                        <span class="color-swatch @(Model.Color == swatch ? "active" : "")" data-color="@swatch" style="background:@swatch"></span>
+                    }
+                </div>
+                <input type="color" asp-for="Color" id="ColorPicker" class="color-input" />
+            </div>
+            <span asp-validation-for="Color" class="field-error"></span>
+        </div>
+
+        <!-- TimeZone Section -->
+        <div class="settings-section">
+            <h3>منطقه زمانی</h3>
+            <select asp-for="TimeZone" asp-items="@((List<SelectListItem>)ViewBag.TimeZones)" class="form-select"></select>
+            <span asp-validation-for="TimeZone" class="field-error"></span>
+        </div>
+
+        <div class="settings-actions">
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-check"></i>
+                ذخیره تغییرات
+            </button>
+            <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.Id" class="btn-secondary">انصراف</a>
+        </div>
+    </form>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/workspace-settings.js" asp-append-version="true"></script>
+}

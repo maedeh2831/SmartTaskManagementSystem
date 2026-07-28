@@ -51,7 +51,7 @@ public class WorkspaceInvitationService
                 x.WorkspaceId == workspaceId &&
                 x.Status == WorkspaceInvitationStatusType.Pending)
             .Include(x => x.InvitedUser)
-            .OrderByDescending(x => x.CreateDate)
+            .OrderByDescending(x => x.CreatedDate)
             .Select(x => new WorkspaceInvitationViewModel
             {
                 Id = x.Id,
@@ -62,7 +62,7 @@ public class WorkspaceInvitationService
                     : null,
                 Role = x.Role,
                 Status = x.Status,
-                CreateDate = x.CreateDate,
+                CreateDate = x.CreatedDate,
                 ExpiryDate = x.ExpiryDate,
                 IsNewUser = x.InvitedUserId == null
             })

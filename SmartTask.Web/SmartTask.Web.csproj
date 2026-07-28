@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Exceptions\" />
-    <Folder Include="Common\Extensions\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Models\DTOs\" />

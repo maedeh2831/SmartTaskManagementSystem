@@ -23,11 +23,17 @@
 
         <div class="details-title">
 
-
             <div class="details-logo"
                  style="background:@Model.Color">
 
-                <i class="fa-solid fa-layer-group"></i>
+                @if (!string.IsNullOrWhiteSpace(Model.Logo))
+                {
+                    <img src="@Model.Logo" alt="@Model.Name" />
+                }
+                else
+                {
+                    <i class="fa-solid fa-layer-group"></i>
+                }
 
             </div>
 
@@ -76,7 +82,7 @@
 
         <div class="details-actions">
 
-
+           
             @if (Model.IsOwner)
             {
 
@@ -88,6 +94,13 @@
 
                     ویرایش
 
+                </a>
+
+                <a asp-controller="Workspace"
+                asp-action="Settings"
+                asp-route-id="@Model.Id"
+                class="btn-icon">
+                    <i class="fa-solid fa-gear"></i>
                 </a>
 
             }
@@ -111,6 +124,10 @@
 
             </a>
 
+            <a asp-controller="WorkspaceDashboard" asp-action="Index" asp-route-workspaceId="@Model.Id" class="workspace-create-btn">
+                <i class="fa-solid fa-gauge"></i>
+                داشبورد
+            </a>
 
         </div>
 

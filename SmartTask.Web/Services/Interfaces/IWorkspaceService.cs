@@ -13,4 +13,10 @@ public interface IWorkspaceService : IBaseService<Workspace>
     Task<bool> IsOwnerAsync(
         int workspaceId,
         int userId);
+
+    Task UpdateSettingsAsync(
+    int workspaceId,
+    string? logoPath,
+    string color,
+    string timeZone);
 }
