@@ -69,39 +69,30 @@
                         @Model.CreateDate.ToString("yyyy/MM/dd")
                     </span>
 
-
                 </div>
-
 
             </div>
 
-
         </div>
 
-
-
         <div class="details-actions">
-
-           
+         
             @if (Model.IsOwner)
             {
-
                 <a asp-action="Edit"
                    asp-route-id="@Model.Id"
-                   class="details-btn primary">
-
+                   class="details-btn">
                     <i class="fa-solid fa-pen"></i>
-
                     ویرایش
-
                 </a>
 
-                <a asp-controller="Workspace"
-                asp-action="Settings"
-                asp-route-id="@Model.Id"
-                class="btn-icon">
-                    <i class="fa-solid fa-gear"></i>
-                </a>
+            <a asp-controller="Workspace"
+               asp-action="Settings"
+               asp-route-id="@Model.Id"
+               class="details-btn">
+                <i class="fa-solid fa-gear"></i>
+                تنظیمات
+            </a>
 
             }
 
@@ -114,15 +105,6 @@
                 اعضا
             </a>
 
-
-            <a href="#"
-               class="details-btn">
-
-                <i class="fa-solid fa-gear"></i>
-
-                تنظیمات
-
-            </a>
 
             <a asp-controller="WorkspaceDashboard" asp-action="Index" asp-route-workspaceId="@Model.Id" class="workspace-create-btn">
                 <i class="fa-solid fa-gauge"></i>
