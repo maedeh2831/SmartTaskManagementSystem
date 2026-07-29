@@ -99,6 +99,9 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IWorkspaceMemberService, WorkspaceMemberService>();
             builder.Services.AddScoped<IWorkspaceDashboardService, WorkspaceDashboardService>();
             builder.Services.AddScoped<IFileUploadService, SmartTask.Web.Services.Files.FileUploadService>();
+            builder.Services.AddScoped<ITeamService, SmartTask.Web.Services.Implementations.TeamService>();
+            builder.Services.AddScoped<ITeamMemberService, SmartTask.Web.Services.Implementations.TeamMemberService>();
+            builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();

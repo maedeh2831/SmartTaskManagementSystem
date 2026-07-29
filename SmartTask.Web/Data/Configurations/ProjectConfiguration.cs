@@ -40,17 +40,10 @@ namespace SmartTask.Web.Data.Configurations
             builder.HasIndex(x => new { x.WorkspaceId, x.Key })
                 .IsUnique();
 
-            builder.HasIndex(x => new { x.TeamId, x.Name });
-
             // Relationships
             builder.HasOne(x => x.Workspace)
                 .WithMany(x => x.Projects)
                 .HasForeignKey(x => x.WorkspaceId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(x => x.Team)
-                .WithMany(x => x.Projects)
-                .HasForeignKey(x => x.TeamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(x => x.Members)

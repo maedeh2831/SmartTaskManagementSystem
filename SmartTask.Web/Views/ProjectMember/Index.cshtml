@@ -1,0 +1,149 @@
+﻿@model SmartTask.Web.Models.ViewModels.ProjectMember.ProjectMemberIndexViewModel
+
+@{
+    ViewData["Title"] = "اعضای پروژه";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+
+        <div class="workspace-hero-content">
+            <h1>
+                اعضای پروژه @Model.ProjectName
+                <span class="project-key-badge">@Model.ProjectKey</span>
+            </h1>
+            <p>اعضای این پروژه و نقش هرکدام را مدیریت کنید.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+
+    </div>
+
+    @if (Model.CanManage)
+    {
+        <div class="team-detail-card" style="margin-bottom:24px;">
+
+            <h3><i class="fa-solid fa-user-plus"></i> افزودن عضو</h3>
+
+            @if (!Model.AvailableWorkspaceMembers.Any())
+            {
+                <p class="team-empty-text">همه اعضای Workspace قبلاً به این پروژه اضافه شده‌اند.</p>
+            }
+            else
+            {
+                <form asp-controller="ProjectMember" asp-action="AddMember" method="post" class="add-member-fields">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="projectId" value="@Model.ProjectId" />
+
+                    <select name="userId" class="form-control" required>
+                        <option value="">انتخاب عضو...</option>
+                        @foreach (var item in Model.AvailableWorkspaceMembers)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+
+                    <select name="role" class="form-control" style="max-width:200px;">
+                        @foreach (var role in Html.GetEnumSelectList<SmartTask.Web.Models.Enums.ProjectRoleType>())
+                        {
+                            <option value="@role.Value">@role.Text</option>
+                        }
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i>
+                        افزودن
+                    </button>
+                </form>
+            }
+
+        </div>
+    }
+
+    <div class="team-detail-card">
+
+        <h3><i class="fa-solid fa-users"></i> اعضای پروژه (@Model.Members.Count)</h3>
+
+        @if (!Model.Members.Any())
+        {
+            <p class="team-empty-text">هنوز عضوی به این پروژه اضافه نشده است.</p>
+        }
+        else
+        {
+            <div class="team-member-list">
+
+                @foreach (var member in Model.Members)
+                {
+                    <div class="team-member-row">
+
+                        <div class="team-member-info">
+                            <div class="preview-logo" style="width:44px;height:44px;font-size:16px;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <h4>@member.FullName</h4>
+                                <span class="team-role-badge role-@member.Role.ToString().ToLower()">
+                                    @member.Role.GetDisplayName()
+                                </span>
+                            </div>
+                        </div>
+
+                        @if (Model.CanManage)
+                        {
+                            <div class="team-member-actions">
+
+                                <form asp-controller="ProjectMember" asp-action="ChangeRole" method="post" class="change-role-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                    <input type="hidden" name="userId" value="@member.ApplicationUserId" />
+                                    <select name="role" class="form-control role-select">
+                                        @foreach (var role in Html.GetEnumSelectList<SmartTask.Web.Models.Enums.ProjectRoleType>())
+                                        {
+                                            <option value="@role.Value" selected="@(role.Value == ((int)member.Role).ToString())">
+                                                @role.Text
+                                            </option>
+                                        }
+                                    </select>
+                                </form>
+
+                                <form asp-controller="ProjectMember" asp-action="RemoveMember" method="post" class="remove-member-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                    <input type="hidden" name="userId" value="@member.ApplicationUserId" />
+                                    <button type="submit" class="workspace-delete-btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        }
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/team.js" asp-append-version="true"></script>
+}

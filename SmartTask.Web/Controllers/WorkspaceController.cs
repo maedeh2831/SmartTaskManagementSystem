@@ -80,15 +80,10 @@ public class WorkspaceController : BaseController
             Logo = workspace.Logo,
             Visibility = workspace.Visibility,
             CreateDate = workspace.CreateDate,
-
             OwnerName = workspace.Owner?.FullName ?? "-",
-
             MembersCount = workspace.Members.Count,
-
             ProjectsCount = workspace.Projects.Count,
-
             TasksCount = 0,
-
             IsOwner = workspace.OwnerId == CurrentUser.UserId
         };
 

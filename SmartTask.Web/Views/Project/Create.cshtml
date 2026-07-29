@@ -1,0 +1,200 @@
+﻿@model SmartTask.Web.Models.ViewModels.Project.CreateProjectViewModel
+
+@{
+    ViewData["Title"] = "ایجاد پروژه";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ایجاد پروژه جدید</h1>
+            <p>یک پروژه برای سازماندهی Sprint‌ها و Task‌ها ایجاد کنید.</p>
+        </div>
+
+        <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <!-- ================= Form ================= -->
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات پروژه</h3>
+                        <p>اطلاعات زیر را تکمیل کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Create" method="post">
+
+                    <input asp-for="WorkspaceId" type="hidden" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="Name"></label>
+                            <input asp-for="Name" id="projectName" class="form-control" placeholder="مثلاً سامانه فروشگاهی" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group form-group-sm">
+                            <label asp-for="Key"></label>
+                            <input asp-for="Key" id="projectKey" class="form-control" placeholder="مثلاً SHOP" style="text-transform:uppercase;" maxlength="10" />
+                            <span asp-validation-for="Key" class="text-danger"></span>
+                            <small class="team-hint-text">در آدرس‌ها و شماره‌گذاری Task‌ها استفاده می‌شود.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" id="projectDescription" rows="4" class="form-control" placeholder="توضیح کوتاهی درباره این پروژه..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="StartDate"></label>
+                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DueDate"></label>
+                            <input asp-for="DueDate" type="date" class="form-control" />
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Priority"></label>
+                        <select asp-for="Priority" asp-items="Html.GetEnumSelectList<SmartTask.Web.Models.Enums.ProjectPriorityType>()" class="form-control"></select>
+                        <span asp-validation-for="Priority" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>رنگ پروژه</label>
+                        <div class="workspace-colors">
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#4F46E5" checked type="radio">
+                                <span style="background:#4F46E5"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#06B6D4" type="radio">
+                                <span style="background:#06B6D4"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#10B981" type="radio">
+                                <span style="background:#10B981"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#F59E0B" type="radio">
+                                <span style="background:#F59E0B"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#EF4444" type="radio">
+                                <span style="background:#EF4444"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>آیکون پروژه</label>
+                        <div class="project-icon-picker">
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-diagram-project" checked type="radio">
+                                <span><i class="fa-solid fa-diagram-project"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-rocket" type="radio">
+                                <span><i class="fa-solid fa-rocket"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-briefcase" type="radio">
+                                <span><i class="fa-solid fa-briefcase"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-code" type="radio">
+                                <span><i class="fa-solid fa-code"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-mobile-screen" type="radio">
+                                <span><i class="fa-solid fa-mobile-screen"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-chart-line" type="radio">
+                                <span><i class="fa-solid fa-chart-line"></i></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            ایجاد پروژه
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- ================= Preview ================= -->
+        <div class="workspace-preview">
+
+            <div class="preview-card">
+
+                <div class="preview-card-header">
+                    <div id="previewLogo" class="preview-logo">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <div>
+                        <h4 id="previewName">پروژه جدید</h4>
+                        <small id="previewKey" class="project-key-badge">KEY</small>
+                    </div>
+                </div>
+
+                <div id="previewDescription" class="preview-description">
+                    توضیح پروژه اینجا نمایش داده خواهد شد...
+                </div>
+
+                <div class="preview-stats">
+                    <div>
+                        <i class="fa-solid fa-users"></i>
+                        ۱ عضو (شما)
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-people-group"></i>
+                        ۰ تیم
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/project.js" asp-append-version="true"></script>
+}

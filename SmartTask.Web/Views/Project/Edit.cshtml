@@ -1,0 +1,179 @@
+﻿@model SmartTask.Web.Models.ViewModels.Project.EditProjectViewModel
+
+@{
+    ViewData["Title"] = "ویرایش پروژه";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ویرایش پروژه</h1>
+            <p>اطلاعات پروژه را به‌روزرسانی کنید.</p>
+        </div>
+
+        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form" style="max-width:100%;">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-pen"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات پروژه</h3>
+                        <p>تغییرات لازم را اعمال کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Edit" method="post">
+
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="WorkspaceId" type="hidden" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="Name"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group form-group-sm">
+                            <label asp-for="Key"></label>
+                            <input asp-for="Key" class="form-control" style="text-transform:uppercase;" maxlength="10" />
+                            <span asp-validation-for="Key" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="StartDate"></label>
+                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DueDate"></label>
+                            <input asp-for="DueDate" type="date" class="form-control" />
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="Status"></label>
+                            <select asp-for="Status" asp-items="Html.GetEnumSelectList<SmartTask.Web.Models.Enums.ProjectStatusType>()" class="form-control"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Priority"></label>
+                            <select asp-for="Priority" asp-items="Html.GetEnumSelectList<SmartTask.Web.Models.Enums.ProjectPriorityType>()" class="form-control"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>رنگ پروژه</label>
+                        <div class="workspace-colors">
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#4F46E5" type="radio">
+                                <span style="background:#4F46E5"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#06B6D4" type="radio">
+                                <span style="background:#06B6D4"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#10B981" type="radio">
+                                <span style="background:#10B981"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#F59E0B" type="radio">
+                                <span style="background:#F59E0B"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#EF4444" type="radio">
+                                <span style="background:#EF4444"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>آیکون پروژه</label>
+                        <div class="project-icon-picker">
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-diagram-project" type="radio">
+                                <span><i class="fa-solid fa-diagram-project"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-rocket" type="radio">
+                                <span><i class="fa-solid fa-rocket"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-briefcase" type="radio">
+                                <span><i class="fa-solid fa-briefcase"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-code" type="radio">
+                                <span><i class="fa-solid fa-code"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-mobile-screen" type="radio">
+                                <span><i class="fa-solid fa-mobile-screen"></i></span>
+                            </label>
+                            <label>
+                                <input asp-for="Icon" class="icon-radio" value="fa-solid fa-chart-line" type="radio">
+                                <span><i class="fa-solid fa-chart-line"></i></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="team-archive-toggle">
+                            <input asp-for="IsArchived" type="checkbox" />
+                            آرشیو کردن این پروژه
+                        </label>
+                        <small class="team-hint-text">پروژه‌های آرشیو شده در لیست فعال نمایش داده نمی‌شوند.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/project.js" asp-append-version="true"></script>
+}

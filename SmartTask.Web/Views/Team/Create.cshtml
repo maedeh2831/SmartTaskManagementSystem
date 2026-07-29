@@ -1,0 +1,160 @@
+﻿@model SmartTask.Web.Models.ViewModels.Team.CreateTeamViewModel
+
+@{
+    ViewData["Title"] = "ایجاد تیم";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ایجاد تیم جدید</h1>
+            <p>یک تیم برای سازماندهی اعضا و پروژه‌های این Workspace ایجاد کنید.</p>
+        </div>
+
+        <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <!-- ================= Form ================= -->
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات تیم</h3>
+                        <p>اطلاعات زیر را تکمیل کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Create" method="post">
+
+                    <input asp-for="WorkspaceId" type="hidden" />
+
+                    <div class="form-group">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" id="teamName" class="form-control" placeholder="مثلاً تیم توسعه بک‌اند" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" id="teamDescription" rows="4" class="form-control" placeholder="توضیح کوتاهی درباره این تیم..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>رنگ تیم</label>
+                        <div class="workspace-colors">
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#4F46E5" checked type="radio">
+                                <span style="background:#4F46E5"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#06B6D4" type="radio">
+                                <span style="background:#06B6D4"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#10B981" type="radio">
+                                <span style="background:#10B981"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#F59E0B" type="radio">
+                                <span style="background:#F59E0B"></span>
+                            </label>
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#EF4444" type="radio">
+                                <span style="background:#EF4444"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>حریم خصوصی</label>
+                        <div class="visibility-box">
+                            <label>
+                                <input type="radio" name="IsPrivate" class="visibility-radio" value="false" checked />
+                                <i class="fa-solid fa-globe"></i>
+                                عمومی
+                            </label>
+                            <label>
+                                <input type="radio" name="IsPrivate" class="visibility-radio" value="true" />
+                                <i class="fa-solid fa-lock"></i>
+                                خصوصی
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            ایجاد تیم
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- ================= Preview ================= -->
+        <div class="workspace-preview">
+
+            <div class="preview-card">
+
+                <div class="preview-card-header">
+                    <div id="previewLogo" class="preview-logo">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div>
+                        <h4 id="previewName">تیم جدید</h4>
+                        <small id="previewVisibility">
+                            <i class="fa-solid fa-globe"></i>
+                            عمومی
+                        </small>
+                    </div>
+                </div>
+
+                <div id="previewDescription" class="preview-description">
+                    توضیح تیم اینجا نمایش داده خواهد شد...
+                </div>
+
+                <div class="preview-stats">
+                    <div>
+                        <i class="fa-solid fa-users"></i>
+                        ۱ عضو (شما)
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-diagram-project"></i>
+                        ۰ پروژه
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/team.js" asp-append-version="true"></script>
+}

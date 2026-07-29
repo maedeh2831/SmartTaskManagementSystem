@@ -1,0 +1,165 @@
+﻿@model SmartTask.Web.Models.ViewModels.Project.ProjectIndexViewModel
+
+@{
+    ViewData["Title"] = "پروژه‌ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <!-- Hero -->
+    <div class="workspace-hero">
+
+        <div class="workspace-hero-content">
+            <h1>پروژه‌های @Model.WorkspaceName</h1>
+            <p>پروژه‌های این Workspace را مدیریت و پیگیری کنید.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <div class="workspace-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="projectSearchInput" placeholder="جستجوی پروژه..." />
+            </div>
+
+            <div style="display:flex;gap:12px;">
+
+                <a asp-controller="Workspace"
+                   asp-action="Details"
+                   asp-route-id="@Model.WorkspaceId"
+                   class="workspace-filter" style="text-decoration:none;">
+                    <button type="button">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        بازگشت به Workspace
+                    </button>
+                </a>
+
+                @if (Model.CanManageProjects)
+                {
+                    <a asp-action="Create" asp-route-workspaceId="@Model.WorkspaceId" class="workspace-create-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        ایجاد پروژه
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (!Model.Projects.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-diagram-project"></i>
+            <h3>هنوز پروژه‌ای ایجاد نشده است.</h3>
+            <p>اولین پروژه خود را برای شروع مدیریت وظایف ایجاد کنید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="workspace-grid" id="projectGrid">
+
+            @foreach (var project in Model.Projects)
+            {
+                <div class="workspace-card project-card" data-name="@project.Name">
+
+                    <div class="workspace-card-header" style="background:@project.Color">
+
+                        <div class="workspace-logo">
+                            <i class="@project.Icon"></i>
+                        </div>
+
+                        <span class="project-status-badge status-@project.Status.ToString().ToLower()">
+                            @project.Status.GetDisplayName()
+                        </span>
+
+                    </div>
+
+                    <div class="workspace-card-content">
+
+                        <h3>
+                            @project.Name
+                            <span class="project-key-badge">@project.Key</span>
+                            @if (project.IsArchived)
+                            {
+                                <span class="team-archived-badge">آرشیو شده</span>
+                            }
+                        </h3>
+
+                        <p>
+                            @(string.IsNullOrWhiteSpace(project.Description) ? "بدون توضیحات" : project.Description)
+                        </p>
+
+                        <div class="project-priority-row">
+                            <span class="project-priority-badge priority-@project.Priority.ToString().ToLower()">
+                                <i class="fa-solid fa-flag"></i>
+                                @project.Priority.GetDisplayName()
+                            </span>
+                            @if (project.DueDate.HasValue)
+                            {
+                                <span class="project-due-date">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    @project.DueDate.Value.ToString("yyyy/MM/dd")
+                                </span>
+                            }
+                        </div>
+
+                        <div class="workspace-info">
+                            <div>
+                                <i class="fa-solid fa-users"></i>
+                                <span>@project.MembersCount عضو</span>
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-people-group"></i>
+                                <span>@project.TeamsCount تیم</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="workspace-card-footer">
+
+                        <small>@project.CreateDate.ToString("yyyy/MM/dd")</small>
+
+                        <div class="workspace-actions">
+
+                            <a asp-action="Details" asp-route-id="@project.Id" class="workspace-open-btn">
+                                ورود
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+
+                            @if (Model.CanManageProjects)
+                            {
+                                <form asp-action="Delete"
+                                      asp-route-id="@project.Id"
+                                      method="post"
+                                      class="delete-project-form">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="workspace-delete-btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/project.js" asp-append-version="true"></script>
+}

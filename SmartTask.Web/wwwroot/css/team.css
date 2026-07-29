@@ -1,0 +1,175 @@
+/* ==========================================================
+                    SmartTask Team UI
+   ========================================================== */
+
+.team-archived-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 12px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.team-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* ================= Add Member ================= */
+
+.add-member-fields {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+    .add-member-fields select {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .add-member-fields .btn-primary {
+        white-space: nowrap;
+    }
+
+.team-empty-text {
+    color: var(--gray500);
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* ================= Member List ================= */
+
+.team-member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.team-member-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gray50);
+    border-radius: 18px;
+    padding: 16px 20px;
+    transition: var(--transition);
+}
+
+    .team-member-row:hover {
+        background: var(--primary-light);
+    }
+
+.team-member-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+    .team-member-info h4 {
+        font-size: 15px;
+        font-weight: 800;
+        margin: 0 0 6px;
+        color: var(--gray900);
+    }
+
+.team-role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+    .team-role-badge.role-leader {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+.team-member-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .team-member-actions .role-select {
+        height: 44px;
+        min-height: auto;
+        padding: 8px 14px;
+        font-size: 13px;
+        width: auto;
+    }
+
+    .team-member-actions .workspace-delete-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+/* ================= Projects ================= */
+
+.team-project-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.team-project-chip {
+    background: var(--gray50);
+    color: var(--gray700);
+    padding: 8px 16px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ================= Archive toggle ================= */
+
+.team-archive-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--gray700);
+    cursor: pointer;
+}
+
+    .team-archive-toggle input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--danger);
+    }
+
+.team-hint-text {
+    display: block;
+    margin-top: 8px;
+    color: var(--gray400);
+    font-size: 12px;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+
+    .add-member-fields {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .team-member-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .team-member-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

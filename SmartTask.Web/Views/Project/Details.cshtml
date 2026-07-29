@@ -1,0 +1,162 @@
+﻿@model SmartTask.Web.Models.ViewModels.Project.ProjectDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero" style="background:linear-gradient(135deg, @Model.Color, @Model.Color)">
+
+        <div class="workspace-hero-content">
+
+            <div class="team-detail-header">
+                <div class="preview-logo" style="width:64px;height:64px;font-size:26px;">
+                    <i class="@Model.Icon"></i>
+                </div>
+                <div>
+                    <h1>
+                        @Model.Name
+                        <span class="project-key-badge">@Model.Key</span>
+                        @if (Model.IsArchived)
+                        {
+                            <span class="team-archived-badge">آرشیو شده</span>
+                        }
+                    </h1>
+                    <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "بدون توضیحات" : Model.Description)</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه‌ها
+                </button>
+            </a>
+
+            <a asp-controller="ProjectMember" asp-action="Index" asp-route-projectId="@Model.Id" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-users"></i>
+                    اعضا
+                </button>
+            </a>
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="workspace-create-btn">
+                    <i class="fa-solid fa-pen"></i>
+                    ویرایش پروژه
+                </a>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="team-stat-grid">
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <h4>@Model.Status.GetDisplayName()</h4>
+                <span>وضعیت</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-flag"></i>
+            <div>
+                <h4>@Model.Priority.GetDisplayName()</h4>
+                <span>اولویت</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-users"></i>
+            <div>
+                <h4>@Model.MembersCount</h4>
+                <span>عضو</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-people-group"></i>
+            <div>
+                <h4>@Model.TeamNames.Count</h4>
+                <span>تیم مرتبط</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="team-detail-grid">
+
+        <div class="team-detail-card">
+            <h3><i class="fa-regular fa-calendar"></i> زمان‌بندی</h3>
+            <div class="project-timeline-row">
+                <div>
+                    <span>تاریخ شروع</span>
+                    <strong>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                </div>
+                <div>
+                    <span>موعد تحویل</span>
+                    <strong>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                </div>
+                <div>
+                    <span>تاریخ پایان</span>
+                    <strong>@(Model.EndDate?.ToString("yyyy/MM/dd") ?? "-")</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-detail-card">
+            <h3><i class="fa-solid fa-people-group"></i> تیم‌های مرتبط</h3>
+            @if (!Model.TeamNames.Any())
+            {
+                <p class="team-empty-text">هیچ تیمی به این پروژه متصل نیست.</p>
+            }
+            else
+            {
+                <div class="team-project-chips">
+                    @foreach (var teamName in Model.TeamNames)
+                    {
+                        <span class="team-project-chip">@teamName</span>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+
+    @if (Model.CanManage)
+    {
+        <div class="team-detail-card" style="margin-top:24px;">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> منطقه خطر</h3>
+            <p class="team-empty-text" style="text-align:right;padding:0 0 16px;">حذف پروژه غیرقابل بازگشت است و تمام اطلاعات مرتبط را حذف می‌کند.</p>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-project-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i>
+                    حذف پروژه
+                </button>
+            </form>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/project.js" asp-append-version="true"></script>
+}

@@ -105,6 +105,21 @@
                 اعضا
             </a>
 
+           <a asp-controller="Team"
+               asp-action="Index"
+               asp-route-workspaceId="@Model.Id"
+               class="details-btn">
+                <i class="fa-solid fa-people-group"></i>
+                تیم‌ها
+            </a>
+
+            <a asp-controller="Project"
+               asp-action="Index"
+               asp-route-workspaceId="@Model.Id"
+               class="details-btn">
+                <i class="fa-solid fa-diagram-project"></i>
+                پروژه‌ها
+            </a>
 
             <a asp-controller="WorkspaceDashboard" asp-action="Index" asp-route-workspaceId="@Model.Id" class="workspace-create-btn">
                 <i class="fa-solid fa-gauge"></i>

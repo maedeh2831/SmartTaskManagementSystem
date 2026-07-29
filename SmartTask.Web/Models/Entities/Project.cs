@@ -13,8 +13,6 @@ namespace SmartTask.Web.Models.Entities
         // Properties
         public int WorkspaceId { get; set; }
 
-        public int TeamId { get; set; }
-
         public string Name { get; set; } = null!;
 
         public string Key { get; set; } = null!;
@@ -40,8 +38,6 @@ namespace SmartTask.Web.Models.Entities
         // Navigation Properties
         public Workspace Workspace { get; set; } = null!;
 
-        public Team Team { get; set; } = null!;
-
         public ICollection<ProjectMember> Members { get; set; } = new List<ProjectMember>();
 
         public ICollection<Sprint> Sprints { get; set; } = new List<Sprint>();
@@ -51,5 +47,7 @@ namespace SmartTask.Web.Models.Entities
         public Backlog? Backlog { get; set; }
 
         public ICollection<Label> Labels { get; set; } = new List<Label>();
+
+        public ICollection<ProjectTeam> ProjectTeams { get; set; } = new List<ProjectTeam>();
     }
 }

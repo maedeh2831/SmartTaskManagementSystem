@@ -46,11 +46,6 @@ namespace SmartTask.Web.Data.Configurations
                 .WithOne(x => x.Team)
                 .HasForeignKey(x => x.TeamId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(x => x.Projects)
-                .WithOne(x => x.Team)
-                .HasForeignKey(x => x.TeamId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

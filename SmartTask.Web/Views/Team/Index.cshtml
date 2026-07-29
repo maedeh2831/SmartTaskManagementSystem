@@ -1,0 +1,157 @@
+﻿@model SmartTask.Web.Models.ViewModels.Team.TeamIndexViewModel
+
+@{
+    ViewData["Title"] = "تیم‌ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <!-- Hero -->
+    <div class="workspace-hero">
+
+        <div class="workspace-hero-content">
+            <h1>تیم‌های @Model.WorkspaceName</h1>
+            <p>تیم‌ها را برای سازماندهی اعضا و پروژه‌های این Workspace مدیریت کنید.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <div class="workspace-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="teamSearchInput" placeholder="جستجوی تیم..." />
+            </div>
+
+            <div style="display:flex;gap:12px;">
+
+                <a asp-controller="Workspace"
+                   asp-action="Details"
+                   asp-route-id="@Model.WorkspaceId"
+                   class="workspace-filter" style="text-decoration:none;">
+                    <button type="button">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        بازگشت به Workspace
+                    </button>
+                </a>
+
+                @if (Model.CanManageTeams)
+                {
+                    <a asp-action="Create" asp-route-workspaceId="@Model.WorkspaceId" class="workspace-create-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        ایجاد تیم
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (!Model.Teams.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-people-group"></i>
+            <h3>هنوز تیمی ایجاد نشده است.</h3>
+            <p>اولین تیم خود را برای سازماندهی اعضا و پروژه‌ها ایجاد کنید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="workspace-grid" id="teamGrid">
+
+            @foreach (var team in Model.Teams)
+            {
+                <div class="workspace-card team-card" data-name="@team.Name">
+
+                    <div class="workspace-card-header" style="background:@team.Color">
+
+                        <div class="workspace-logo">
+                            @if (!string.IsNullOrWhiteSpace(team.Logo))
+                            {
+                                <img src="@team.Logo" alt="@team.Name" />
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-people-group"></i>
+                            }
+                        </div>
+
+                        <span class="workspace-status">
+                            @(team.IsPrivate ? "خصوصی" : "عمومی")
+                        </span>
+
+                    </div>
+
+                    <div class="workspace-card-content">
+
+                        <h3>
+                            @team.Name
+                            @if (team.IsArchived)
+                            {
+                                <span class="team-archived-badge">آرشیو شده</span>
+                            }
+                        </h3>
+
+                        <p>
+                            @(string.IsNullOrWhiteSpace(team.Description) ? "بدون توضیحات" : team.Description)
+                        </p>
+
+                        <div class="workspace-info">
+                            <div>
+                                <i class="fa-solid fa-users"></i>
+                                <span>@team.MembersCount عضو</span>
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-diagram-project"></i>
+                                <span>@team.ProjectsCount پروژه</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="workspace-card-footer">
+
+                        <small>@team.CreateDate.ToString("yyyy/MM/dd")</small>
+
+                        <div class="workspace-actions">
+
+                            <a asp-action="Details" asp-route-id="@team.Id" class="workspace-open-btn">
+                                ورود
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+
+                            @if (Model.CanManageTeams)
+                            {
+                                <form asp-action="Delete"
+                                      asp-route-id="@team.Id"
+                                      method="post"
+                                      class="delete-team-form">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="workspace-delete-btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/team.js" asp-append-version="true"></script>
+}

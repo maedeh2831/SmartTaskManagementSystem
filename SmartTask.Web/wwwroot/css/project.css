@@ -1,0 +1,293 @@
+/* ==========================================================
+                    SmartTask Project UI
+   ========================================================== */
+
+/* ================= Key Badge ================= */
+
+.project-key-badge {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.25);
+    color: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+.workspace-card-content .project-key-badge {
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+/* ================= Status Badge ================= */
+
+.project-status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--gray700);
+}
+
+    .project-status-badge.status-planning {
+        background: #E0E7FF;
+        color: #4338CA;
+    }
+
+    .project-status-badge.status-active {
+        background: #D1FAE5;
+        color: #047857;
+    }
+
+    .project-status-badge.status-onhold {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+    .project-status-badge.status-completed {
+        background: #DBEAFE;
+        color: #1D4ED8;
+    }
+
+    .project-status-badge.status-cancelled {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+/* ================= Priority Badge ================= */
+
+.project-priority-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.project-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+    .project-priority-badge.priority-low {
+        background: var(--gray100);
+        color: var(--gray500);
+    }
+
+    .project-priority-badge.priority-medium {
+        background: #E0E7FF;
+        color: #4338CA;
+    }
+
+    .project-priority-badge.priority-high {
+        background: #FFEDD5;
+        color: #C2410C;
+    }
+
+    .project-priority-badge.priority-critical {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+.project-due-date {
+    font-size: 12px;
+    color: var(--gray500);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ================= Icon Picker ================= */
+
+.project-icon-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+    .project-icon-picker input {
+        display: none;
+    }
+
+    .project-icon-picker span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--gray50);
+        color: var(--gray500);
+        font-size: 18px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid transparent;
+    }
+
+    .project-icon-picker input:checked + span {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .project-icon-picker span:hover {
+        background: var(--primary-light);
+    }
+
+/* ================= Form Row ================= */
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+.form-group-sm {
+    max-width: 200px;
+}
+
+/* ================= Details Header ================= */
+
+.team-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* ================= Details Grid ================= */
+
+.team-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.team-detail-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+}
+
+    .team-detail-card h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--gray900);
+        margin: 0 0 16px;
+    }
+
+.team-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+}
+
+    .team-stat-card i {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .team-stat-card h4 {
+        font-size: 18px;
+        font-weight: 800;
+        margin: 0 0 2px;
+        color: var(--gray900);
+    }
+
+    .team-stat-card span {
+        font-size: 12px;
+        color: var(--gray500);
+        font-weight: 600;
+    }
+
+.project-timeline-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+    .project-timeline-row > div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .project-timeline-row span {
+        font-size: 12px;
+        color: var(--gray500);
+    }
+
+    .project-timeline-row strong {
+        font-size: 14px;
+        color: var(--gray900);
+    }
+
+/* ================= Responsive ================= */
+
+@@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-group-sm {
+        max-width: 100%;
+    }
+
+    .team-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* ================= Project Role Badges ================= */
+
+.team-role-badge.role-owner {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.team-role-badge.role-manager {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.team-role-badge.role-developer {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.team-role-badge.role-tester {
+    background: #D1FAE5;
+    color: #047857;
+}
+
+.team-role-badge.role-guest {
+    background: var(--gray100);
+    color: var(--gray500);
+}

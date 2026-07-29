@@ -1,0 +1,149 @@
+﻿@model SmartTask.Web.Models.ViewModels.Team.EditTeamViewModel
+
+@{
+    ViewData["Title"] = "ویرایش تیم";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ویرایش تیم</h1>
+            <p>اطلاعات تیم خود را مدیریت کنید.</p>
+        </div>
+
+        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات تیم</h3>
+                        <p>تغییرات موردنظر را اعمال کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Edit" method="post">
+
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="WorkspaceId" type="hidden" />
+
+                    <div class="form-group">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" id="teamName" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" id="teamDescription" rows="4" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>رنگ تیم</label>
+                        <div class="workspace-colors">
+                            @foreach (var color in new[] { "#4F46E5", "#06B6D4", "#10B981", "#F59E0B", "#EF4444" })
+                            {
+                                <label>
+                                    <input asp-for="Color" class="color-radio" type="radio" value="@color" checked="@(Model.Color == color)" />
+                                    <span style="background:@color"></span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>حریم خصوصی</label>
+                        <div class="visibility-box">
+                            <label>
+                                <input type="radio" name="IsPrivate" class="visibility-radio" value="false" checked="@(!Model.IsPrivate)" />
+                                <i class="fa-solid fa-globe"></i>
+                                عمومی
+                            </label>
+                            <label>
+                                <input type="radio" name="IsPrivate" class="visibility-radio" value="true" checked="@(Model.IsPrivate)" />
+                                <i class="fa-solid fa-lock"></i>
+                                خصوصی
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="team-archive-toggle">
+                            <input asp-for="IsArchived" type="checkbox" />
+                            آرشیو کردن این تیم
+                        </label>
+                        <small class="team-hint-text">تیم‌های آرشیو شده در لیست‌های فعال نمایش داده نمی‌شوند.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="workspace-preview">
+            <div class="preview-card">
+
+                <div class="preview-card-header">
+                    <div id="previewLogo" class="preview-logo" style="background:@Model.Color">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div>
+                        <h4 id="previewName">@Model.Name</h4>
+                        <small id="previewVisibility">
+                            @if (Model.IsPrivate)
+                            {
+                                <i class="fa-solid fa-lock"></i>
+                                <span>خصوصی</span>
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-globe"></i>
+                                <span>عمومی</span>
+                            }
+                        </small>
+                    </div>
+                </div>
+
+                <div id="previewDescription" class="preview-description">
+                    @(Model.Description ?? "توضیح تیم اینجا نمایش داده خواهد شد...")
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/team.js" asp-append-version="true"></script>
+}

@@ -24,14 +24,10 @@ public class WorkspaceService
     public async Task<Workspace?> GetDetailsAsync(int id)
     {
         return await _context.Workspaces
-
             .Include(x => x.Owner)
-
-            .Include(x => x.Members)
-
-            .Include(x => x.Projects)
-
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .Include(x => x.Members.Where(m => m.ViewState))
+            .Include(x => x.Projects.Where(p => p.ViewState))
+            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
     }
 
     public async Task<bool> ExistsByNameAsync(

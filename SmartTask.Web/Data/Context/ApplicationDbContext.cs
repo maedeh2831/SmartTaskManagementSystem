@@ -27,6 +27,7 @@ namespace SmartTask.Web.Data.Context
         // Team
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
+        public DbSet<ProjectTeam> ProjectTeams { get; set; }
 
         // Collaboration
         public DbSet<Comment> Comments { get; set; }

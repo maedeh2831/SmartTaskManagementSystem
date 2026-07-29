@@ -7,12 +7,12 @@ using SmartTask.Web.Services.Interfaces;
 
 namespace SmartTask.Web.Services.Implementations;
 
-public class ProjectService : BaseService<Project>, IProjectService
+public class TeamService : BaseService<Team>, ITeamService
 {
     private readonly ApplicationDbContext _context;
 
-    public ProjectService(
-        IGenericRepository<Project> repository,
+    public TeamService(
+        IGenericRepository<Team> repository,
         IUnitOfWork unitOfWork,
         ApplicationDbContext context)
         : base(repository, unitOfWork)
@@ -20,24 +20,24 @@ public class ProjectService : BaseService<Project>, IProjectService
         _context = context;
     }
 
-    public async Task<Project?> GetDetailsAsync(int id)
+    public async Task<Team?> GetDetailsAsync(int id)
     {
-        return await _context.Projects
+        return await _context.Teams
             .Include(x => x.Members.Where(m => m.ViewState))
                 .ThenInclude(m => m.ApplicationUser)
             .Include(x => x.ProjectTeams.Where(pt => pt.ViewState))
-                .ThenInclude(pt => pt.Team)
+                .ThenInclude(pt => pt.Project)
             .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
     }
 
-    public async Task<bool> ExistsByKeyAsync(int workspaceId, string key, int? excludeId = null)
+    public async Task<bool> ExistsByNameAsync(
+        int workspaceId,
+        string name,
+        int? excludeId = null)
     {
         var query = _repository
             .Query()
-            .Where(x =>
-            x.WorkspaceId == workspaceId &&
-            x.Key == key &&
-            x.ViewState);
+            .Where(x => x.WorkspaceId == workspaceId && x.Name == name);
 
         if (excludeId.HasValue)
             query = query.Where(x => x.Id != excludeId.Value);
@@ -45,7 +45,7 @@ public class ProjectService : BaseService<Project>, IProjectService
         return await query.AnyAsync();
     }
 
-    public async Task<bool> CanManageProjectsAsync(int workspaceId, int userId)
+    public async Task<bool> CanManageTeamsAsync(int workspaceId, int userId)
     {
         var isOwner = await _context.Workspaces
             .AnyAsync(x => x.Id == workspaceId && x.OwnerId == userId);
@@ -61,35 +61,35 @@ public class ProjectService : BaseService<Project>, IProjectService
                 (x.Role == WorkspaceRoleType.Owner || x.Role == WorkspaceRoleType.Admin));
     }
 
-    public async Task<bool> CanManageProjectAsync(int projectId, int userId)
+    public async Task<bool> CanManageTeamAsync(int teamId, int userId)
     {
-        var project = await _repository
+        var team = await _repository
             .Query()
-            .FirstOrDefaultAsync(x => x.Id == projectId);
+            .FirstOrDefaultAsync(x => x.Id == teamId);
 
-        if (project == null)
+        if (team == null)
             return false;
 
-        if (await CanManageProjectsAsync(project.WorkspaceId, userId))
+        if (await CanManageTeamsAsync(team.WorkspaceId, userId))
             return true;
 
-        return await _context.ProjectMembers
+        return await _context.TeamMembers
             .AnyAsync(x =>
-                x.ProjectId == projectId &&
+                x.TeamId == teamId &&
                 x.ApplicationUserId == userId &&
                 x.ViewState &&
-                x.Role == ProjectRoleType.Manager);
+                x.Role == TeamRoleType.Leader);
     }
 
     public new async Task DeleteAsync(int id)
     {
-        var project = await _context.Projects
+        var team = await _context.Teams
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (project == null)
+        if (team == null)
             return;
 
-        project.ViewState = false;
+        team.ViewState = false;
         await _context.SaveChangesAsync();
     }
 }

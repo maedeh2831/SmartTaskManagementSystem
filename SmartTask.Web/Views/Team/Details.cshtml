@@ -1,0 +1,234 @@
+﻿@model SmartTask.Web.Models.ViewModels.Team.TeamDetailsViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "جزئیات تیم";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <!-- Header -->
+    <div class="details-header">
+
+        <div class="details-title">
+
+            <div class="details-logo" style="background:@Model.Color">
+                @if (!string.IsNullOrWhiteSpace(Model.Logo))
+                {
+                    <img src="@Model.Logo" alt="@Model.Name" />
+                }
+                else
+                {
+                    <i class="fa-solid fa-people-group"></i>
+                }
+            </div>
+
+            <div>
+                <h1>
+                    @Model.Name
+                    @if (Model.IsArchived)
+                    {
+                        <span class="team-archived-badge">آرشیو شده</span>
+                    }
+                </h1>
+
+                <div class="details-meta">
+                    @if (Model.IsPrivate)
+                    {
+                        <span><i class="fa-solid fa-lock"></i> خصوصی</span>
+                    }
+                    else
+                    {
+                        <span><i class="fa-solid fa-globe"></i> عمومی</span>
+                    }
+                    <span><i class="fa-solid fa-calendar"></i> @Model.CreateDate.ToString("yyyy/MM/dd")</span>
+                    <span><i class="fa-solid fa-users"></i> @Model.Members.Count عضو</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="details-actions">
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="details-btn">
+                    <i class="fa-solid fa-pen"></i>
+                    ویرایش
+                </a>
+            }
+
+            <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="details-btn">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به تیم‌ها
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Description -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-align-right"></i>
+            درباره تیم
+        </div>
+        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "توضیحی ثبت نشده است." : Model.Description)</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="details-stat-grid team-stat-grid">
+        <div class="details-stat-card">
+            <i class="fa-solid fa-users"></i>
+            <div>
+                <strong>@Model.Members.Count</strong>
+                <span>عضو</span>
+            </div>
+        </div>
+
+        <div class="details-stat-card">
+            <i class="fa-solid fa-diagram-project"></i>
+            <div>
+                <strong>@Model.ProjectNames.Count</strong>
+                <span>پروژه</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member -->
+    @if (Model.CanManage)
+    {
+        <div class="details-card">
+            <div class="card-title">
+                <i class="fa-solid fa-user-plus"></i>
+                افزودن عضو
+            </div>
+
+            @if (!Model.AvailableWorkspaceMembers.Any())
+            {
+                <p class="team-empty-text">تمام اعضای Workspace در حال حاضر عضو این تیم هستند.</p>
+            }
+            else
+            {
+                <form asp-action="AddMember" method="post" class="add-member-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="teamId" value="@Model.Id" />
+
+                    <div class="add-member-fields">
+                        <select name="userId" class="form-control" required>
+                            <option value="">انتخاب عضو Workspace...</option>
+                            @foreach (var item in Model.AvailableWorkspaceMembers)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+
+                        <select name="role" class="form-control" required>
+                            @foreach (TeamRoleType role in Enum.GetValues<TeamRoleType>())
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </select>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            افزودن
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    }
+
+    <!-- Members List -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-users"></i>
+            اعضای تیم
+        </div>
+
+        @if (!Model.Members.Any())
+        {
+            <p class="team-empty-text">هنوز عضوی به این تیم اضافه نشده است.</p>
+        }
+        else
+        {
+            <div class="team-member-list">
+                @foreach (var member in Model.Members)
+                {
+                    <div class="team-member-row">
+
+                        <div class="team-member-info">
+                            <div class="owner-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <h4>@member.FullName</h4>
+                                <span class="team-role-badge role-@member.Role.ToString().ToLower()">@member.Role</span>
+                            </div>
+                        </div>
+
+                        @if (Model.CanManage)
+                        {
+                            <div class="team-member-actions">
+
+                                <form asp-action="ChangeRole" method="post" class="change-role-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="teamId" value="@Model.Id" />
+                                    <input type="hidden" name="userId" value="@member.ApplicationUserId" />
+                                    <select name="role" class="form-control role-select">
+                                        @foreach (TeamRoleType role in Enum.GetValues<TeamRoleType>())
+                                        {
+                                            <option value="@role" selected="@(role == member.Role)">@role</option>
+                                        }
+                                    </select>
+                                </form>
+
+                                <form asp-action="RemoveMember" method="post" class="remove-member-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="teamId" value="@Model.Id" />
+                                    <input type="hidden" name="userId" value="@member.ApplicationUserId" />
+                                    <button type="submit" class="workspace-delete-btn">
+                                        <i class="fa-solid fa-user-minus"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        }
+
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Related Projects -->
+    @if (Model.ProjectNames.Any())
+    {
+        <div class="details-card">
+            <div class="card-title">
+                <i class="fa-solid fa-diagram-project"></i>
+                پروژه‌های مرتبط
+            </div>
+
+            <div class="team-project-chips">
+                @foreach (var name in Model.ProjectNames)
+                {
+                    <span class="team-project-chip">@name</span>
+                }
+            </div>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/team.js" asp-append-version="true"></script>
+}
