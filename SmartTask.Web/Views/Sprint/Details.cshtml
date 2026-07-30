@@ -1,0 +1,124 @@
+﻿@model SmartTask.Web.Models.ViewModels.Sprint.SprintDetailsViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "جزئیات اسپرینت";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>
+                @Model.Name
+                <span class="sprint-status-badge status-@Model.Status.ToString().ToLower()">
+                    @(Model.Status switch
+                    {
+                        SprintStatusType.Planning => "برنامه‌ریزی",
+                        SprintStatusType.Active => "فعال",
+                        SprintStatusType.Completed => "پایان یافته",
+                        SprintStatusType.Cancelled => "لغو شده",
+                        _ => "-"
+                    })
+                </span>
+            </h1>
+            <p>پروژه: @Model.ProjectName</p>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+
+            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت
+            </a>
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    ویرایش
+                </a>
+            }
+
+        </div>
+    </div>
+
+    <div class="details-card">
+
+        <div class="card-title">
+            <i class="fa-solid fa-bullseye"></i>
+            هدف اسپرینت
+        </div>
+
+        <p>@(string.IsNullOrWhiteSpace(Model.Goal) ? "هدفی برای این اسپرینت تعیین نشده است." : Model.Goal)</p>
+
+        <div class="sprint-progress-wrap" style="margin-top:16px;">
+            <div class="sprint-progress-bar">
+                <div class="sprint-progress-fill status-@Model.Status.ToString().ToLower()"
+                     style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%"></div>
+            </div>
+            <small>@Model.StartDate.ToString("yyyy/MM/dd") تا @Model.EndDate.ToString("yyyy/MM/dd") — ظرفیت @Model.Capacity Story Point</small>
+        </div>
+
+        @if (Model.CanManage)
+        {
+            <div class="sprint-action-buttons">
+
+                @if (Model.Status == SprintStatusType.Planning)
+                {
+                    <form asp-action="Activate" asp-route-id="@Model.Id" method="post" class="activate-sprint-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-play"></i>
+                            فعال‌سازی اسپرینت
+                        </button>
+                    </form>
+                }
+
+                @if (Model.Status == SprintStatusType.Active)
+                {
+                    <form asp-action="Complete" asp-route-id="@Model.Id" method="post" class="complete-sprint-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-light">
+                            <i class="fa-solid fa-flag-checkered"></i>
+                            بستن اسپرینت
+                        </button>
+                    </form>
+                }
+
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-sprint-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                        حذف اسپرینت
+                    </button>
+                </form>
+
+            </div>
+        }
+
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-list-check"></i>
+            User Story های این اسپرینت
+        </div>
+        <div class="team-empty-text">
+            هنوز User Story ای به این اسپرینت اضافه نشده است (این بخش در استوری بعدی تکمیل می‌شود).
+        </div>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/sprint.js" asp-append-version="true"></script>
+}

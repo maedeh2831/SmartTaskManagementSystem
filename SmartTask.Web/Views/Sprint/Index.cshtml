@@ -1,0 +1,162 @@
+﻿@model SmartTask.Web.Models.ViewModels.Sprint.SprintIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "اسپرینت‌ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+
+        <div class="workspace-hero-content">
+            <h1>اسپرینت‌های @Model.ProjectName</h1>
+            <p>برنامه‌ریزی و مدیریت چرخه‌های Agile این پروژه.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <div class="workspace-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="sprintSearchInput" placeholder="جستجوی اسپرینت..." />
+            </div>
+
+            <div style="display:flex;gap:12px;">
+
+                <a asp-controller="Project"
+                   asp-action="Details"
+                   asp-route-id="@Model.ProjectId"
+                   class="workspace-filter" style="text-decoration:none;">
+                    <button type="button">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        بازگشت به پروژه
+                    </button>
+                </a>
+
+                @if (Model.CanManageSprints)
+                {
+                    <a asp-action="Create" asp-route-projectId="@Model.ProjectId" class="workspace-create-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        اسپرینت جدید
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (!Model.Sprints.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-flag-checkered"></i>
+            <h3>هنوز اسپرینتی ایجاد نشده است.</h3>
+            <p>اولین اسپرینت این پروژه را برای شروع برنامه‌ریزی Agile ایجاد کنید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="workspace-grid" id="sprintGrid">
+
+            @foreach (var sprint in Model.Sprints)
+            {
+                <div class="workspace-card sprint-card" data-name="@sprint.Name">
+
+                    <div class="workspace-card-header sprint-card-header status-@sprint.Status.ToString().ToLower()">
+
+                        <div class="workspace-logo">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+
+                        <span class="sprint-status-badge status-@sprint.Status.ToString().ToLower()">
+                            @(sprint.Status switch
+                            {
+                                SprintStatusType.Planning => "برنامه‌ریزی",
+                                SprintStatusType.Active => "فعال",
+                                SprintStatusType.Completed => "پایان یافته",
+                                SprintStatusType.Cancelled => "لغو شده",
+                                _ => "-"
+                            })
+                </span>
+
+                    </div>
+
+                    <div class="workspace-card-content">
+
+                        <h3>@sprint.Name</h3>
+
+                        <p>
+                            @(string.IsNullOrWhiteSpace(sprint.Goal) ? "بدون هدف تعیین شده" : sprint.Goal)
+                        </p>
+
+                        <div class="sprint-progress-wrap">
+                            <div class="sprint-progress-bar">
+                                <div class="sprint-progress-fill status-@sprint.Status.ToString().ToLower()"
+                                     style="width:@(
+                                 sprint.Status == SprintStatusType.Completed ? 100 :
+                                 sprint.Status == SprintStatusType.Cancelled ? 0 :
+                                 sprint.ProgressPercent)%"></div>
+                            </div>
+                            <small>@sprint.StartDate.ToString("yyyy/MM/dd") تا @sprint.EndDate.ToString("yyyy/MM/dd")</small>
+                        </div>
+
+                        <div class="workspace-info">
+                            <div>
+                                <i class="fa-solid fa-list-check"></i>
+                                <span>@sprint.UserStoriesCount داستان</span>
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-gauge-high"></i>
+                                <span>ظرفیت @sprint.Capacity</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="workspace-card-footer">
+
+                        <small>ایجاد شده: @sprint.StartDate.ToString("yyyy/MM/dd")</small>
+
+                        <div class="workspace-actions">
+
+                            <a asp-action="Details" asp-route-id="@sprint.Id" class="workspace-open-btn">
+                                ورود
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+
+                    @if (Model.CanManageSprints)
+                            {
+                                <form asp-action="Delete"
+                                      asp-route-id="@sprint.Id"
+                                      method="post"
+                                      class="delete-sprint-form">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="workspace-delete-btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/sprint.js" asp-append-version="true"></script>
+}

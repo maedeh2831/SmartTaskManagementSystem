@@ -1,10 +1,9 @@
 ﻿/*
-| Module      : Agile
+| Module      : Project
 | Entity      : Sprint
-| Purpose     : مدیریت اسپرینت‌های هر پروژه و برنامه‌ریزی اجرای User Storyها.
+| Purpose     : مدیریت اسپرینت‌های Agile در هر پروژه.
 */
 
-using Microsoft.AspNetCore.Identity;
 using SmartTask.Web.Models.Enums;
 
 namespace SmartTask.Web.Models.Entities
@@ -12,23 +11,21 @@ namespace SmartTask.Web.Models.Entities
     public class Sprint : BaseEntity
     {
         // Properties
-
         public int ProjectId { get; set; }
 
         public string Name { get; set; } = null!;
 
-        public string Goal { get; set; } = null!;
+        public string? Goal { get; set; }
 
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
 
-        public SprintStatusType Status { get; set; } = SprintStatusType.Planned;
+        public int Capacity { get; set; }
 
-        public bool IsCompleted { get; set; } = false;
+        public SprintStatusType Status { get; set; } = SprintStatusType.Planning;
 
         // Navigation Properties
-
         public Project Project { get; set; } = null!;
 
         public ICollection<UserStory> UserStories { get; set; } = new List<UserStory>();

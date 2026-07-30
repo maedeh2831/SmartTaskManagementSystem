@@ -49,5 +49,6 @@ namespace SmartTask.Web.Models.Entities
         public ICollection<Label> Labels { get; set; } = new List<Label>();
 
         public ICollection<ProjectTeam> ProjectTeams { get; set; } = new List<ProjectTeam>();
+
     }
 }

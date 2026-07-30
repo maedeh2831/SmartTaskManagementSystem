@@ -103,10 +103,11 @@ namespace SmartTask.Web
             builder.Services.AddScoped<ITeamMemberService, SmartTask.Web.Services.Implementations.TeamMemberService>();
             builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
             builder.Services.AddScoped<IProjectDashboardService, ProjectDashboardService>();
+            builder.Services.AddScoped<IBacklogService, BacklogService>();
+            builder.Services.AddScoped<IUserStoryService, UserStoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();
-            builder.Services.AddScoped<IUserStoryService, UserStoryService>();
             builder.Services.AddScoped<ITaskService, TaskService>();
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));

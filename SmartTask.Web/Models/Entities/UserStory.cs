@@ -1,7 +1,7 @@
 ﻿/*
 | Module      : Agile
 | Entity      : UserStory
-| Purpose     : مدیریت نیازمندی‌های پروژه به صورت User Story.
+| Purpose     : مدیریت Product Backlog Itemهای هر پروژه.
 */
 
 using SmartTask.Web.Models.Enums;
@@ -10,7 +10,7 @@ namespace SmartTask.Web.Models.Entities
 {
     public class UserStory : BaseEntity
     {
-        // Properties
+        #region Foreign Keys
 
         public int ProjectId { get; set; }
 
@@ -18,24 +18,55 @@ namespace SmartTask.Web.Models.Entities
 
         public int? SprintId { get; set; }
 
+        public int? OwnerId { get; set; }
+
+        #endregion
+
+        #region Basic Information
+
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
 
+        /// <summary>
+        /// معیارهای پذیرش (Acceptance Criteria)
+        /// </summary>
+        public string? AcceptanceCriteria { get; set; }
+
+        #endregion
+
+        #region Planning
+
         public int StoryPoint { get; set; }
+
+        /// <summary>
+        /// ارزش تجاری برای اولویت‌بندی Product Backlog
+        /// </summary>
+        public int BusinessValue { get; set; }
+
+        /// <summary>
+        /// ترتیب نمایش داخل Product Backlog
+        /// </summary>
+        public int Order { get; set; }
 
         public StoryPriorityType Priority { get; set; } = StoryPriorityType.Medium;
 
         public StoryStatusType Status { get; set; } = StoryStatusType.New;
 
-        // Navigation Properties
+        #endregion
 
-        public Project Project { get; set; } = null!;
+        #region Navigation Properties
 
-        public Backlog Backlog { get; set; } = null!;
+        public virtual Project Project { get; set; } = null!;
 
-        public Sprint? Sprint { get; set; }
+        public virtual Backlog Backlog { get; set; } = null!;
 
-        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+        public virtual Sprint? Sprint { get; set; }
+
+        public virtual ApplicationUser? Owner { get; set; }
+
+        public virtual ICollection<TaskItem> Tasks { get; set; } = new HashSet<TaskItem>();
+
+        #endregion
     }
 }

@@ -1,0 +1,239 @@
+/* ==========================================================
+                    SmartTask Backlog UI (Grid)
+   ========================================================== */
+
+.backlog-quick-add {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--gray100);
+    border-radius: 14px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.03);
+}
+
+    .backlog-quick-add i {
+        color: var(--primary);
+    }
+
+    .backlog-quick-add input[type="text"] {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        background: transparent;
+    }
+
+    .backlog-quick-add button {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .backlog-quick-add button:hover {
+            background: var(--primary-light);
+        }
+
+/* ===== Table Container ===== */
+.backlog-table-wrap {
+    background: #fff;
+    border: 1px solid var(--gray100);
+    border-radius: 16px;
+    overflow: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+}
+
+.backlog-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 980px;
+}
+
+    .backlog-table thead th {
+        position: sticky;
+        top: 0;
+        background: var(--gray100);
+        color: var(--gray700);
+        font-size: 12px;
+        font-weight: 700;
+        text-align: right;
+        padding: 12px 14px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    .backlog-table tbody tr.backlog-row {
+        border-top: 1px solid var(--gray100);
+        transition: background .15s ease;
+    }
+
+        .backlog-table tbody tr.backlog-row:hover {
+            background: #FAFAFE;
+        }
+
+    .backlog-table td {
+        padding: 10px 14px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+.col-title {
+    max-width: 320px;
+    white-space: normal !important;
+}
+
+.backlog-item-title {
+    font-weight: 600;
+    color: var(--gray700);
+}
+
+.col-drag {
+    width: 30px;
+    text-align: center;
+}
+
+.backlog-drag-handle {
+    cursor: grab;
+    color: var(--gray500);
+    font-size: 13px;
+}
+
+    .backlog-drag-handle:active {
+        cursor: grabbing;
+    }
+
+.backlog-id-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray500);
+}
+
+/* ===== Badges (readonly mode) ===== */
+.backlog-sp-badge,
+.backlog-bv-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: var(--gray100);
+    color: var(--gray700);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.backlog-status-badge,
+.backlog-priority-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* ===== Inline Select (editable mode) ===== */
+.backlog-inline-form {
+    display: inline-block;
+}
+
+.backlog-status-select,
+.backlog-priority-select,
+.backlog-owner-select {
+    border: 1px solid var(--gray100);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    background: #fff;
+    max-width: 150px;
+}
+
+/* Status colors */
+.status-new {
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+.status-ready {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.status-inprogress {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.status-done {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.status-closed {
+    background: #EDE9FE;
+    color: #6D28D9;
+}
+
+/* Priority colors */
+.priority-lowest, .priority-low {
+    color: #15803D;
+}
+
+.priority-medium {
+    color: #B45309;
+}
+
+.priority-high, .priority-highest {
+    color: #B91C1C;
+}
+
+.backlog-owner-select {
+    max-width: 130px;
+    color: var(--gray700);
+}
+
+.backlog-contributors-empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray500);
+    font-size: 12px;
+}
+
+.col-actions {
+    width: 40px;
+    text-align: center;
+}
+
+/* ===== SortableJS states ===== */
+.backlog-ghost {
+    opacity: .4;
+    background: var(--gray100);
+}
+
+.backlog-chosen {
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+.backlog-drag {
+    cursor: grabbing;
+}
+
+@media (max-width: 900px) {
+    .backlog-table-wrap {
+        overflow-x: auto;
+    }
+}

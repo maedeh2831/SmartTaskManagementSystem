@@ -1,0 +1,233 @@
+﻿@model SmartTask.Web.Models.ViewModels.Backlog.BacklogIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "Product Backlog";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1>Product Backlog — @Model.ProjectName</h1>
+            <p>لیست User Storyهایی که هنوز به هیچ اسپرینتی اختصاص نیافته‌اند.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <div class="workspace-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="backlogSearchInput" placeholder="جستجوی User Story..." />
+            </div>
+
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId"
+               class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+    </div>
+
+    @if (Model.CanManage)
+    {
+        <form asp-action="QuickAdd" method="post" class="backlog-quick-add">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+            <i class="fa-solid fa-plus"></i>
+            <input type="text" name="Title" placeholder="افزودن سریع User Story جدید... (Enter بزنید)" required maxlength="250" />
+            <button type="submit">افزودن</button>
+        </form>
+    }
+
+    @if (!Model.Stories.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-layer-group"></i>
+            <h3>Backlog خالی است.</h3>
+            <p>اولین User Story این پروژه را از بالای صفحه اضافه کنید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="backlog-table-wrap">
+            <table class="backlog-table">
+                <thead>
+                    <tr>
+                        @if (Model.CanManage)
+                        {
+                            <th class="col-drag"></th>
+                        }
+                        <th class="col-id">#</th>
+                        <th class="col-title">عنوان</th>
+                        <th class="col-status">وضعیت</th>
+                        <th class="col-priority">اولویت</th>
+                        <th class="col-sp">Story Point</th>
+                        <th class="col-bv">ارزش تجاری</th>
+                        <th class="col-owner">مسئول</th>
+                        <th class="col-contributors">افراد درگیر</th>
+                        @if (Model.CanManage)
+                        {
+                            <th class="col-actions"></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody id="backlogList" data-project-id="@Model.ProjectId">
+                    @foreach (var story in Model.Stories)
+                    {
+                        <tr class="backlog-row" data-id="@story.Id" data-title="@story.Title">
+
+                            @if (Model.CanManage)
+                            {
+                                <td class="col-drag">
+                                    <i class="fa-solid fa-grip-vertical backlog-drag-handle"></i>
+                                </td>
+                            }
+
+                            <td class="col-id">
+                                <span class="backlog-id-badge">#@story.Id</span>
+                            </td>
+
+                            <td class="col-title">
+                                <span class="backlog-item-title">@story.Title</span>
+                            </td>
+
+                            <td class="col-status">
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-action="ChangeStatus" method="post" class="backlog-inline-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="storyId" value="@story.Id" />
+                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                        <select name="status" class="backlog-status-select status-@story.Status.ToString().ToLower()" onchange="this.form.submit()">
+                                            @foreach (StoryStatusType s in Enum.GetValues(typeof(StoryStatusType)))
+                                            {
+                                                <option value="@s" selected="@(s == story.Status)">
+                                                    @(s switch
+                                                    {
+                                                        StoryStatusType.New => "جدید",
+                                                        StoryStatusType.Ready => "آماده",
+                                                        StoryStatusType.InProgress => "درحال انجام",
+                                                        StoryStatusType.Done => "انجام‌شده",
+                                                        StoryStatusType.Closed => "بسته‌شده",
+                                                        _ => "-"
+                                                    })
+                                </option>
+                                                                }
+                                        </select>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">
+                                        @story.Status
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="col-priority">
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-action="ChangePriority" method="post" class="backlog-inline-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="storyId" value="@story.Id" />
+                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                        <select name="priority" class="backlog-priority-select priority-@story.Priority.ToString().ToLower()" onchange="this.form.submit()">
+                                            @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
+                                            {
+                                                <option value="@p" selected="@(p == story.Priority)">
+                                                    @(p switch
+                                                    {
+                                                        StoryPriorityType.Lowest => "خیلی کم",
+                                                        StoryPriorityType.Low => "کم",
+                                                        StoryPriorityType.Medium => "متوسط",
+                                                        StoryPriorityType.High => "زیاد",
+                                                        StoryPriorityType.Highest => "خیلی زیاد",
+                                                        _ => "-"
+                                                    })
+                                </option>
+                                                                }
+                                        </select>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                        @story.Priority
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="col-sp">
+                                <span class="backlog-sp-badge">@story.StoryPoint</span>
+                            </td>
+
+                            <td class="col-bv">
+                                <span class="backlog-bv-badge">@story.BusinessValue</span>
+                            </td>
+
+                            <td class="col-owner">
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-action="ChangeOwner" method="post" class="backlog-inline-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="storyId" value="@story.Id" />
+                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                        <select name="ownerId" class="backlog-owner-select" onchange="this.form.submit()">
+                                            <option value="">— بدون مسئول —</option>
+                                            @foreach (var member in Model.ProjectMembers)
+                                            {
+                                                <option value="@member.UserId" selected="@(member.UserId == story.OwnerId)">
+                                                    @member.FullName
+                                                </option>
+                                            }
+                                        </select>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span>@(story.OwnerName ?? "—")</span>
+                                }
+                            </td>
+
+                            <td class="col-contributors">
+                                <span class="backlog-contributors-empty" title="پس از ساخت Task این بخش تکمیل می‌شود">
+                                    <i class="fa-regular fa-circle-user"></i>
+                                    —
+                                </span>
+                            </td>
+
+                            @if (Model.CanManage)
+                            {
+                                <td class="col-actions">
+                                    <form asp-action="Delete" method="post" class="delete-story-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@story.Id" />
+                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                        <button type="submit" class="workspace-delete-btn">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <script src="~/js/backlog.js" asp-append-version="true"></script>
+}

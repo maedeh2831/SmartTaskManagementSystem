@@ -50,6 +50,13 @@ namespace SmartTask.Web.Data.Configurations
                 .HasForeignKey(x => x.SprintId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            builder.HasOne(x => x.Owner)
+                .WithMany()
+                .HasForeignKey(x => x.OwnerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasIndex(x => x.OwnerId);
+
             builder.HasIndex(x => x.ProjectId);
 
             builder.HasIndex(x => x.BacklogId);

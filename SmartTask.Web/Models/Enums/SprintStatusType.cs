@@ -8,7 +8,7 @@ namespace SmartTask.Web.Models.Enums
 {
     public enum SprintStatusType
     {
-        Planned = 1,
+        Planning = 1,
         Active = 2,
         Completed = 3,
         Cancelled = 4

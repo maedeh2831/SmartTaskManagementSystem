@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTask.Web.Data.Context;
 
@@ -11,9 +12,11 @@ using SmartTask.Web.Data.Context;
 namespace SmartTask.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260730204240_UpdateUserStoryForBacklog")]
+    partial class UpdateUserStoryForBacklog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1389,9 +1392,6 @@ namespace SmartTask.Web.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OwnerId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -1424,8 +1424,6 @@ namespace SmartTask.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BacklogId");
-
-                    b.HasIndex("OwnerId");
 
                     b.HasIndex("ProjectId");
 
@@ -1977,11 +1975,6 @@ namespace SmartTask.Web.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
                         .WithMany("UserStories")
                         .HasForeignKey("ProjectId")
@@ -1994,8 +1987,6 @@ namespace SmartTask.Web.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Backlog");
-
-                    b.Navigation("Owner");
 
                     b.Navigation("Project");
 

@@ -76,6 +76,9 @@ namespace SmartTask.Web.Data.Context
 
             modelBuilder.Entity<TaskItem>()
                 .HasQueryFilter(x => x.ViewState);
+
+            modelBuilder.Entity<Sprint>()
+               .HasQueryFilter(x => x.ViewState);
         }
     }
 }

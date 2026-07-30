@@ -52,6 +52,27 @@
                 </button>
             </a>
 
+            <a asp-controller="Sprint"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    اسپرینت‌ها
+                </button>
+            </a>
+            <a asp-controller="Backlog"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-layer-group"></i>
+                    بک‌لاگ محصول
+                </button>
+            </a>
+
             <a asp-controller="ProjectDashboard" asp-action="Index" asp-route-projectId="@Model.Id" class="workspace-filter" style="text-decoration:none;">
                 <button type="button">
                     <i class="fa-solid fa-gauge"></i>

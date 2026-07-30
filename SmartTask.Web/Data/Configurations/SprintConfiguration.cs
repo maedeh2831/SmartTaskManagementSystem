@@ -1,7 +1,7 @@
 ﻿/*
-| Module      : Agile
+| Module      : Database
 | Entity      : SprintConfiguration
-| Purpose     : پیکربندی موجودیت Sprint.
+| Purpose     : تنظیمات دیتابیس موجودیت Sprint.
 */
 
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +18,7 @@ namespace SmartTask.Web.Data.Configurations
 
             builder.HasKey(x => x.Id);
 
+            // Properties
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasMaxLength(150);
@@ -25,24 +26,27 @@ namespace SmartTask.Web.Data.Configurations
             builder.Property(x => x.Goal)
                 .HasMaxLength(1000);
 
+            builder.Property(x => x.StartDate)
+                .IsRequired();
+
+            builder.Property(x => x.EndDate)
+                .IsRequired();
+
+            builder.Property(x => x.Capacity)
+                .IsRequired();
+
             builder.Property(x => x.Status)
-                .HasDefaultValue(Models.Enums.SprintStatusType.Planned);
+                .IsRequired();
 
-            builder.Property(x => x.IsCompleted)
-                .HasDefaultValue(false);
+            // Indexes
+            builder.HasIndex(x => new { x.ProjectId, x.Name })
+                .IsUnique();
 
+            // Relationships
             builder.HasOne(x => x.Project)
                 .WithMany(x => x.Sprints)
                 .HasForeignKey(x => x.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasIndex(x => x.ProjectId);
-
-            builder.HasIndex(x => new
-            {
-                x.ProjectId,
-                x.Name
-            }).IsUnique();
         }
     }
 }
