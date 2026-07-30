@@ -1,0 +1,495 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workspace.EditWorkspaceViewModel
+
+@using SmartTask.Web.Models.Enums
+
+
+@{
+    ViewData["Title"] = "ویرایش فضای کاری";
+}
+
+
+@section Styles {
+
+    <link rel="stylesheet"
+          href="~/css/workspace.css"
+          asp-append-version="true" />
+
+}
+
+
+
+<div class="workspace-create-page">
+
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                ویرایش فضای کاری
+            </h1>
+
+
+            <p>
+                اطلاعات Workspace خود را مدیریت کنید.
+            </p>
+
+        </div>
+
+
+
+        <a asp-action="Index"
+           class="back-link">
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+            بازگشت
+
+        </a>
+
+
+    </div>
+
+
+
+
+    <div class="workspace-layout">
+
+
+        <div class="workspace-form">
+
+
+            <div class="workspace-form-card">
+
+
+                <div class="form-title">
+
+
+                    <div class="workspace-icon">
+
+                        <i class="fa-solid fa-pen-to-square"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3>
+                            اطلاعات Workspace
+                        </h3>
+
+
+                        <p>
+                            تغییرات موردنظر را اعمال کنید.
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+                <form asp-action="Edit"
+                      method="post">
+
+
+                    <input asp-for="Id" type="hidden" />
+
+
+
+                    <div class="form-group">
+
+
+                        <label asp-for="Name"></label>
+
+
+                        <input asp-for="Name"
+                               id="workspaceName"
+                               class="form-control" />
+
+
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label asp-for="Description"></label>
+
+
+<textarea asp-for="Description"
+          id="workspaceDescription"
+          rows="4"
+          class="form-control"></textarea>
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            رنگ Workspace
+                        </label>
+
+
+
+                        <div class="workspace-colors">
+
+
+
+                            @foreach (var color in new[]
+                                                        {
+                                                        "#4F46E5",
+                                                        "#06B6D4",
+                                                        "#10B981",
+                                                        "#F59E0B",
+                                                        "#EF4444"
+                                                        })
+                            {
+
+
+                                <label>
+
+
+                                    <input asp-for="Color"
+                                           class="color-radio"
+                                           type="radio"
+                                           value="@color"
+                                           checked="@(Model.Color == color)" />
+
+
+
+                                    <span style="background:@color"></span>
+
+
+                                </label>
+
+
+                            }
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            سطح دسترسی
+                        </label>
+
+
+
+                        <div class="visibility-box">
+
+
+
+                            <label>
+
+
+                                <input asp-for="Visibility"
+                                       class="visibility-radio"
+                                       type="radio"
+                                       value="1"
+                                       checked="@(Model.Visibility == VisibilityType.Private)" />
+
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                خصوصی
+
+
+                            </label>
+
+
+
+
+
+                            <label>
+
+
+                                <input asp-for="Visibility"
+                                       class="visibility-radio"
+                                       type="radio"
+                                       value="2"
+                                       checked="@(Model.Visibility == VisibilityType.Public)" />
+
+
+                                <i class="fa-solid fa-globe"></i>
+
+                                عمومی
+
+
+                            </label>
+
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+                    <div class="form-actions">
+
+
+                        <a asp-action="Index"
+                           class="btn btn-light">
+
+                            انصراف
+
+                        </a>
+
+
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+
+                            <i class="fa-solid fa-floppy-disk"></i>
+
+                            ذخیره تغییرات
+
+
+                        </button>
+
+
+
+                    </div>
+
+
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <div class="workspace-preview">
+
+
+            <div class="preview-card">
+
+
+
+                <div class="preview-card-header">
+
+
+                    <div id="previewLogo"
+                         class="preview-logo"
+                         style="background:@Model.Color">
+
+
+                        <i class="fa-solid fa-layer-group"></i>
+
+
+                    </div>
+
+
+
+                    <div>
+
+
+                        <h4 id="previewName">
+
+                            @Model.Name
+
+                        </h4>
+
+
+
+                        <small id="previewVisibility">
+
+
+                            @if (Model.Visibility == VisibilityType.Private)
+                            {
+                                <i class="fa-solid fa-lock"></i>
+                                <span>خصوصی</span>
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-globe"></i>
+                                <span>عمومی</span>
+                            }
+
+
+                        </small>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+                <div id="previewDescription"
+                     class="preview-description">
+
+                    @(Model.Description ?? "توضیح Workspace اینجا نمایش داده خواهد شد...")
+
+
+                </div>
+
+
+
+                <div class="preview-stats">
+
+
+                    <div>
+
+                        <i class="fa-solid fa-users"></i>
+
+                        ۰ عضو
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-folder-open"></i>
+
+                        ۰ پروژه
+
+                    </div>
+
+
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+@section Scripts {
+
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+
+        const nameInput =
+        document.getElementById("workspaceName");
+
+
+        const descInput =
+        document.getElementById("workspaceDescription");
+
+
+
+        nameInput.addEventListener("input",()=>{
+
+        document.getElementById("previewName").innerText =
+        nameInput.value || "Workspace جدید";
+
+        });
+
+
+
+
+        descInput.addEventListener("input",()=>{
+
+
+        document.getElementById("previewDescription").innerText =
+        descInput.value || "توضیح Workspace اینجا نمایش داده خواهد شد...";
+
+
+        });
+
+
+
+
+
+        document.querySelectorAll(".color-radio")
+        .forEach(x=>{
+
+
+        x.addEventListener("change",()=>{
+
+
+        document.getElementById("previewLogo")
+        .style.background=x.value;
+
+
+        });
+
+
+        });
+
+
+
+
+
+        document.querySelectorAll(".visibility-radio")
+        .forEach(x=>{
+
+
+        x.addEventListener("change",()=>{
+
+
+        document.getElementById("previewVisibility").innerHTML =
+        x.value=="1"
+        ?
+        '<i class="fa-solid fa-lock"></i> خصوصی'
+        :
+        '<i class="fa-solid fa-globe"></i> عمومی';
+
+
+
+        });
+
+
+        });
+
+
+
+    </script>
+
+
+}

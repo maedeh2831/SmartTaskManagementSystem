@@ -1,0 +1,169 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceIndexViewModel
+
+@{
+    ViewData["Title"] = "فضاهای کاری";
+}
+
+@section Styles
+{
+    <link rel="stylesheet"
+          href="~/css/workspace.css"
+          asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <!-- Hero -->
+
+    <div class="workspace-hero">
+
+        <div class="workspace-hero-content">
+
+            <h1>فضاهای کاری</h1>
+
+            <p>
+                پروژه‌ها، اعضا و تیم‌های خود را در یک محیط حرفه‌ای مدیریت کنید.
+            </p>
+
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <div class="workspace-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text"
+                       placeholder="جستجوی فضای کاری..." />
+
+            </div>
+
+            <div style="display:flex;gap:12px;">
+
+                <div class="workspace-filter">
+
+                    <button>
+
+                        <i class="fa-solid fa-sliders"></i>
+
+                        فیلتر
+
+                    </button>
+
+                </div>
+
+                <a asp-action="Create"
+                   class="workspace-create-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    ایجاد فضای کاری
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (!Model.Workspaces.Any())
+    {
+        <div class="workspace-empty">
+
+            <i class="fa-solid fa-layer-group"></i>
+
+            <h3>هنوز فضای کاری ندارید.</h3>
+
+            <p>
+                اولین فضای کاری خود را ایجاد کنید.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="workspace-grid">
+
+            @foreach (var item in Model.Workspaces)
+            {
+                <div class="workspace-card">
+
+                    <div class="workspace-card-top">
+
+                        <div class="workspace-logo"
+                             style="background:@item.Color">
+
+                            <i class="fa-solid fa-layer-group"></i>
+
+                        </div>
+
+                        <span class="workspace-status">
+
+                            @item.Visibility
+
+                        </span>
+
+                    </div>
+
+                    <div class="workspace-body">
+
+                        <h3>@item.Name</h3>
+
+                        <p>
+
+                            @(string.IsNullOrWhiteSpace(item.Description)
+                                                ? "بدون توضیحات"
+                                                : item.Description)
+
+                </p>
+
+                    </div>
+
+                    <div class="workspace-statistics">
+
+                        <div class="workspace-stat">
+
+                            <i class="fa-solid fa-folder-open"></i>
+
+                            <span>@item.ProjectsCount پروژه</span>
+
+                        </div>
+
+                        <div class="workspace-stat">
+
+                            <i class="fa-solid fa-users"></i>
+
+                            <span>@item.MembersCount عضو</span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="workspace-footer">
+
+                        <small>
+
+                            @item.CreateDate.ToString("yyyy/MM/dd")
+
+                        </small>
+
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="workspace-open-btn">
+
+                            ورود
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+                }
+
+        </div>
+    }
+
+</div>

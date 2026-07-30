@@ -1,203 +1,204 @@
 ﻿@model SmartTask.Web.Models.ViewModels.Workspace.CreateWorkspaceViewModel
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
-}
-
 @{
-    ViewData["Title"] = "Create Workspace";
+    ViewData["Title"] = "ایجاد فضای کاری";
 }
 
-<div class="workspace-page">
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/workspace.css"
+          asp-append-version="true" />
+}
 
-    <div class="workspace-layout">
+<div class="workspace-create-page">
 
-        <div class="workspace-form">
+    <div class="page-header">
 
-            <div class="workspace-card">
+        <div>
 
-                <div class="workspace-header">
-
-            <div class="workspace-icon">
-
-                <i class="fa-solid fa-layer-group"></i>
-
-            </div>
-
-                    <h2>ایجاد فضای کاری</h2>
+            <h1>ایجاد فضای کاری</h1>
 
             <p>
-                        فضای کاری جدید خود را ایجاد کنید و پروژه‌ها، تیم‌ها و اعضای خود را در یک محیط واحد مدیریت نمایید.
+                یک Workspace جدید ایجاد کنید و اعضای تیم خود را مدیریت نمایید.
             </p>
 
         </div>
 
-        <form asp-action="Create"
-              method="post">
+        <a asp-action="Index" class="back-link">
 
-            <div class="mb-4">
+            <i class="fa-solid fa-arrow-right"></i>
 
-                <label asp-for="Name" class="form-label"></label>
+            بازگشت
 
-                <input asp-for="Name" id="workspaceName" class="form-control" />
-
-                <span asp-validation-for="Name"
-                      class="text-danger"></span>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label asp-for="Description"
-                       class="form-label"></label>
-
-            <textarea asp-for="Description"
-                      id="workspaceDescription"
-                      rows="4"
-                      class="form-control"></textarea>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="form-label">
-
-                            رنگ فضای کاری
-
-                </label>
-
-                <div class="workspace-colors">
-
-                    <label>
-
-                        <input type="radio"
-                               asp-for="Color"
-                               class="color-radio"
-                               value="#4F46E5" checked />
-
-                        <span style="background:#4F46E5"></span>
-
-                    </label>
-
-                    <label>
-
-                        <input type="radio"
-                               asp-for="Color"
-                               class="color-radio"
-                               value="#06B6D4" />
-
-                        <span style="background:#06B6D4"></span>
-
-                    </label>
-
-                    <label>
-
-                        <input type="radio"
-                               asp-for="Color"
-                               class="color-radio"
-                               value="#10B981" />
-
-                        <span style="background:#10B981"></span>
-
-                    </label>
-
-                    <label>
-
-                        <input type="radio"
-                               asp-for="Color"
-                               class="color-radio"
-                               value="#F59E0B" />
-
-                        <span style="background:#F59E0B"></span>
-
-                    </label>
-
-                    <label>
-
-                        <input type="radio"
-                               asp-for="Color"
-                               class="color-radio"
-                               value="#EF4444" />
-
-                        <span style="background:#EF4444"></span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-            <div class="mb-5">
-
-                <label class="form-label">
-
-                            سطح دسترسی
-
-                </label>
-
-                <div class="visibility-box">
-
-                    <label>
-
-                        <input asp-for="Visibility"
-                               type="radio"
-                               class="visibility-radio"
-                               value="1" checked />
-
-                                <i class="fa-solid fa-lock ms-2"></i>
-                                خصوصی
-
-                    </label>
-
-                    <label>
-
-                        <input asp-for="Visibility"
-                               class="visibility-radio"
-                               type="radio"
-                               value="2" />
-
-                                <i class="fa-solid fa-globe ms-2"></i>
-                                عمومی
-
-                    </label>
-
-                </div>
-
-            </div>
-
-            <div class="workspace-buttons">
-
-                <a asp-action="Index"
-                   class="btn btn-light">
-
-                            انصراف
-
-                </a>
-
-                <button class="btn btn-primary">
-
-                    <i class="fa-solid fa-plus"></i>
-
-                            ایجاد فضای کاری
-
-                </button>
-
-            </div>
-
-        </form>
+        </a>
 
     </div>
 
-</div>
+    <div class="workspace-layout">
+
+        <!-- ================= Form ================= -->
+
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+
+                    <div class="workspace-icon">
+
+                        <i class="fa-solid fa-layer-group"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h3>اطلاعات Workspace</h3>
+
+                        <p>
+                            اطلاعات زیر را تکمیل کنید.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <form asp-action="Create"
+                      method="post">
+
+                    <div class="form-group">
+
+                        <label asp-for="Name"></label>
+
+                        <input asp-for="Name"
+                               id="workspaceName"
+                               class="form-control"
+                               placeholder="مثلاً تیم طراحی محصول" />
+
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label asp-for="Description"></label>
+
+                        <textarea asp-for="Description"
+                                  id="workspaceDescription"
+                                  rows="4"
+                                  class="form-control"
+                                  placeholder="توضیح کوتاهی درباره Workspace..."></textarea>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>رنگ Workspace</label>
+
+                        <div class="workspace-colors">
+
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#4F46E5" checked type="radio">
+                                <span style="background:#4F46E5"></span>
+                            </label>
+
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#06B6D4" type="radio">
+                                <span style="background:#06B6D4"></span>
+                            </label>
+
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#10B981" type="radio">
+                                <span style="background:#10B981"></span>
+                            </label>
+
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#F59E0B" type="radio">
+                                <span style="background:#F59E0B"></span>
+                            </label>
+
+                            <label>
+                                <input asp-for="Color" class="color-radio" value="#EF4444" type="radio">
+                                <span style="background:#EF4444"></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>سطح دسترسی</label>
+
+                        <div class="visibility-box">
+
+                            <label>
+
+                                <input asp-for="Visibility"
+                                       class="visibility-radio"
+                                       value="1"
+                                       checked
+                                       type="radio" />
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                خصوصی
+
+                            </label>
+
+                            <label>
+
+                                <input asp-for="Visibility"
+                                       class="visibility-radio"
+                                       value="2"
+                                       type="radio" />
+
+                                <i class="fa-solid fa-globe"></i>
+
+                                عمومی
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        <a asp-action="Index"
+                           class="btn btn-light">
+
+                            انصراف
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="fa-solid fa-plus"></i>
+
+                            ایجاد Workspace
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- ================= Preview ================= -->
 
         <div class="workspace-preview">
 
             <div class="preview-card">
 
-                <div class="preview-header">
+                <div class="preview-card-header">
 
-                    <div class="preview-logo"
-                         id="previewLogo">
+                    <div id="previewLogo"
+                         class="preview-logo">
 
                         <i class="fa-solid fa-layer-group"></i>
 
@@ -207,13 +208,14 @@
 
                         <h4 id="previewName">
 
-                            فضای کاری جدید
+                            Workspace جدید
 
                         </h4>
 
                         <small id="previewVisibility">
 
-                            <i class="fa-solid fa-lock ms-2"></i>
+                            <i class="fa-solid fa-lock"></i>
+
                             خصوصی
 
                         </small>
@@ -222,19 +224,40 @@
 
                 </div>
 
-                <div class="preview-description"
-                     id="previewDescription">
+                <div id="previewDescription"
+                     class="preview-description">
 
-                    توضیحات فضای کاری شما...
+                    توضیح Workspace اینجا نمایش داده خواهد شد...
+
+                </div>
+
+                <div class="preview-stats">
+
+                    <div>
+
+                        <i class="fa-solid fa-users"></i>
+
+                        ۰ عضو
+
+                    </div>
+
+                    <div>
+
+                        <i class="fa-solid fa-folder-open"></i>
+
+                        ۰ پروژه
+
+                    </div>
 
                 </div>
 
             </div>
 
         </div>
-    </div> 
 
-</div>  
+    </div>
+
+</div>
 
 @section Scripts {
 
@@ -242,61 +265,52 @@
 
     <script>
 
-        const workspaceName =
-        document.getElementById("workspaceName");
+        const nameInput = document.getElementById("workspaceName");
+        const descInput = document.getElementById("workspaceDescription");
 
-        const previewName =
-        document.getElementById("previewName");
+        const previewName = document.getElementById("previewName");
+        const previewDesc = document.getElementById("previewDescription");
+        const previewLogo = document.getElementById("previewLogo");
+        const previewVisibility = document.getElementById("previewVisibility");
 
-        workspaceName.addEventListener("input",()=>{
+        nameInput.addEventListener("input", () => {
 
             previewName.innerText =
-                workspaceName.value || "New Workspace";
+                nameInput.value || "Workspace جدید";
 
         });
 
-        const workspaceDescription =
-        document.getElementById("workspaceDescription");
+        descInput.addEventListener("input", () => {
 
-        const previewDescription =
-        document.getElementById("previewDescription");
-
-        workspaceDescription.addEventListener("input",()=>{
-
-            previewDescription.innerText =
-                workspaceDescription.value ||
-                "Your workspace description...";
+            previewDesc.innerText =
+                descInput.value || "توضیح Workspace اینجا نمایش داده خواهد شد...";
 
         });
 
         document.querySelectorAll(".color-radio")
-        .forEach(x=>{
+            .forEach(x => {
 
-            x.addEventListener("change",()=>{
+                x.addEventListener("change", () => {
 
-                document
-                .getElementById("previewLogo")
-                .style.background=x.value;
+                    previewLogo.style.background = x.value;
+
+                });
 
             });
-
-        });
 
         document.querySelectorAll(".visibility-radio")
-        .forEach(x=>{
+            .forEach(x => {
 
-            x.addEventListener("change",()=>{
+                x.addEventListener("change", () => {
 
-                document
-                .getElementById("previewVisibility")
-                .innerHTML=
-                x.value=="1"
-                ?"🔒 Private"
-                :"🌍 Public";
+                    previewVisibility.innerHTML =
+                        x.value == "1"
+                            ? '<i class="fa-solid fa-lock"></i> خصوصی'
+                            : '<i class="fa-solid fa-globe"></i> عمومی';
+
+                });
 
             });
-
-        });
 
     </script>
 

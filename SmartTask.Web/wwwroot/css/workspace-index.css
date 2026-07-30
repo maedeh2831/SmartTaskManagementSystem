@@ -1,0 +1,196 @@
+﻿.workspace-page {
+    animation: fadeIn .4s ease;
+}
+
+/*==========================
+    Header
+==========================*/
+
+.workspace-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.workspace-title h2 {
+    font-weight: 800;
+    margin: 0;
+    color: #1e293b;
+}
+
+.workspace-title p {
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.btn-create-workspace {
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(79,70,229,.15);
+}
+
+/*==========================
+    Grid
+==========================*/
+
+.workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+    gap: 28px;
+}
+
+/*==========================
+    Card
+==========================*/
+
+.workspace-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: .25s;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    position: relative;
+}
+
+    .workspace-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 45px rgba(79,70,229,.12);
+    }
+
+/*==========================
+    Color Strip
+==========================*/
+
+.workspace-color {
+    height: 8px;
+}
+
+/*==========================
+    Body
+==========================*/
+
+.workspace-body {
+    padding: 24px;
+}
+
+.workspace-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.workspace-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.workspace-description {
+    color: #64748b;
+    margin: 15px 0 25px;
+    min-height: 45px;
+}
+
+/*==========================
+    Info
+==========================*/
+
+.workspace-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.info-box {
+    text-align: center;
+}
+
+    .info-box strong {
+        display: block;
+        color: #1e293b;
+        font-size: 18px;
+    }
+
+    .info-box span {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+/*==========================
+    Footer
+==========================*/
+
+.workspace-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.workspace-owner {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.workspace-actions {
+    display: flex;
+    gap: 8px;
+}
+
+    .workspace-actions .btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+/*==========================
+    Empty State
+==========================*/
+
+.empty-workspace {
+    background: white;
+    border-radius: 28px;
+    padding: 80px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+}
+
+    .empty-workspace i {
+        font-size: 70px;
+        color: #4f46e5;
+        margin-bottom: 25px;
+    }
+
+    .empty-workspace h3 {
+        font-weight: 700;
+    }
+
+    .empty-workspace p {
+        color: #64748b;
+        margin: 20px auto;
+        max-width: 500px;
+    }
+
+/*==========================
+    Animation
+==========================*/
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
