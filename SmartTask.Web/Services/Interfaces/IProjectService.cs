@@ -11,4 +11,10 @@ public interface IProjectService : IBaseService<Project>
     Task<bool> CanManageProjectsAsync(int workspaceId, int userId);
 
     Task<bool> CanManageProjectAsync(int projectId, int userId);
+
+    Task ArchiveAsync(int id);
+
+    Task RestoreAsync(int id);
+
+    Task UpdatePreferencesAsync(int id, string color, string icon);
 }

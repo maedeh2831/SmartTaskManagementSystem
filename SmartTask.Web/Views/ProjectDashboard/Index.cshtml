@@ -1,0 +1,209 @@
+﻿@model SmartTask.Web.Models.ViewModels.ProjectDashboard.ProjectDashboardViewModel
+
+@{
+    ViewData["Title"] = "داشبورد پروژه";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <!-- Hero -->
+    <div class="workspace-hero" style="background:linear-gradient(135deg, @Model.Color, @Model.Color)">
+
+        <div class="workspace-hero-content">
+            <div class="team-detail-header">
+                <div class="preview-logo" style="width:60px;height:60px;font-size:24px;">
+                    <i class="@Model.Icon"></i>
+                </div>
+                <div>
+                    <h1>
+                        داشبورد @Model.ProjectName
+                        <span class="project-key-badge">@Model.ProjectKey</span>
+                    </h1>
+                    <p>نمای کلی از وضعیت، پیشرفت و اعضای این پروژه.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="team-stat-grid dashboard-stat-grid">
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <h4>@Model.Status.GetDisplayName()</h4>
+                <span>وضعیت پروژه</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-flag"></i>
+            <div>
+                <h4>@Model.Priority.GetDisplayName()</h4>
+                <span>اولویت</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-users"></i>
+            <div>
+                <h4>@Model.MembersCount</h4>
+                <span>عضو پروژه</span>
+            </div>
+        </div>
+
+        <div class="team-stat-card">
+            <i class="fa-solid fa-people-group"></i>
+            <div>
+                <h4>@Model.TeamsCount</h4>
+                <span>تیم مرتبط</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Row -->
+    <div class="dashboard-charts-grid">
+
+        <!-- Completion Donut -->
+        <div class="team-detail-card dashboard-chart-card">
+            <h3><i class="fa-solid fa-chart-pie"></i> پیشرفت پروژه</h3>
+
+            <div class="dashboard-donut-wrap">
+                <svg viewBox="0 0 120 120" class="dashboard-donut" data-progress="@Model.ProgressPercentage">
+                    <circle cx="60" cy="60" r="52" class="donut-track"></circle>
+                    <circle cx="60" cy="60" r="52" class="donut-value" style="stroke:@Model.Color"></circle>
+                </svg>
+                <div class="dashboard-donut-label">
+                    <strong>@Model.ProgressPercentage%</strong>
+                    <span>پیشرفت</span>
+                </div>
+            </div>
+
+            @if (Model.DueDate.HasValue)
+            {
+                <div class="dashboard-timeline-info @(Model.IsOverdue ? "overdue" : "")">
+                    <i class="fa-regular fa-calendar"></i>
+                    @if (Model.IsOverdue)
+                    {
+                        <span>@Math.Abs(Model.DaysRemaining!.Value) روز از موعد گذشته</span>
+                    }
+                    else if (Model.DaysRemaining.HasValue)
+                    {
+                        <span>@Model.DaysRemaining روز تا موعد تحویل باقی مانده</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="team-empty-text">موعد تحویلی برای این پروژه تعیین نشده است.</p>
+            }
+        </div>
+
+        <!-- Member Workload -->
+        <div class="team-detail-card dashboard-chart-card">
+            <h3><i class="fa-solid fa-users-gear"></i> توزیع نقش اعضا</h3>
+
+            @if (!Model.RoleDistribution.Any())
+            {
+                <p class="team-empty-text">هنوز عضوی به این پروژه اضافه نشده است.</p>
+            }
+            else
+            {
+                <div class="dashboard-bar-list">
+                    @{
+                        var maxCount = Model.RoleDistribution.Max(x => x.Count);
+                    }
+                    @foreach (var item in Model.RoleDistribution)
+                    {
+                        var widthPercent = maxCount == 0 ? 0 : (item.Count * 100 / maxCount);
+                        <div class="dashboard-bar-row">
+                            <span class="dashboard-bar-label">@item.Role.GetDisplayName()</span>
+                            <div class="dashboard-bar-track">
+                                <div class="dashboard-bar-fill role-@item.Role.ToString().ToLower()" style="width:@widthPercent%"></div>
+                            </div>
+                            <span class="dashboard-bar-count">@item.Count</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="dashboard-charts-grid">
+
+        <!-- Recent Activity -->
+        <div class="team-detail-card">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> آخرین اعضای اضافه‌شده</h3>
+
+            @if (!Model.RecentMembers.Any())
+            {
+                <p class="team-empty-text">فعالیتی ثبت نشده است.</p>
+            }
+            else
+            {
+                <div class="dashboard-activity-list">
+                    @foreach (var member in Model.RecentMembers)
+                    {
+                        <div class="dashboard-activity-item">
+                            <div class="preview-logo" style="width:38px;height:38px;font-size:14px;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="dashboard-activity-text">
+                                <strong>@member.FullName</strong>
+                                <span>با نقش @member.Role.GetDisplayName() به پروژه پیوست</span>
+                            </div>
+                            <small>@member.JoinedDate.ToString("yyyy/MM/dd")</small>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Team Widget -->
+        <div class="team-detail-card">
+            <h3><i class="fa-solid fa-people-group"></i> تیم‌های مرتبط</h3>
+
+            @if (!Model.TeamNames.Any())
+            {
+                <p class="team-empty-text">هیچ تیمی به این پروژه متصل نیست.</p>
+            }
+            else
+            {
+                <div class="team-project-chips">
+                    @foreach (var teamName in Model.TeamNames)
+                    {
+                        <span class="team-project-chip">@teamName</span>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/project-dashboard.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,134 @@
+﻿@model SmartTask.Web.Models.ViewModels.Project.ProjectSettingsViewModel
+
+@{
+    ViewData["Title"] = "تنظیمات پروژه";
+
+    var icons = new[]
+    {
+        "fa-solid fa-diagram-project", "fa-solid fa-rocket", "fa-solid fa-bullseye",
+        "fa-solid fa-chart-line", "fa-solid fa-code", "fa-solid fa-briefcase",
+        "fa-solid fa-cube", "fa-solid fa-flag", "fa-solid fa-lightbulb",
+        "fa-solid fa-layer-group", "fa-solid fa-shield", "fa-solid fa-globe"
+    };
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project-settings.css" asp-append-version="true" />
+}
+
+<div class="settings-page">
+
+    <div class="settings-header">
+        <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به پروژه
+        </a>
+        <h1>تنظیمات @Model.Name</h1>
+        <p>مدیریت ظاهر، بایگانی و حذف پروژه</p>
+    </div>
+
+    <form asp-action="Settings" asp-controller="Project" method="post" class="settings-card">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="WorkspaceId" />
+        <input type="hidden" asp-for="Name" />
+        <input type="hidden" asp-for="Key" />
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <!-- Color Section -->
+        <div class="settings-section">
+            <h3>رنگ پروژه</h3>
+            <div class="color-picker-row">
+                <div class="color-swatches">
+                    @foreach (var swatch in new[] { "#4F46E5", "#16A34A", "#F59E0B", "#EF4444", "#06B6D4", "#8B5CF6", "#EC4899", "#0EA5E9" })
+                    {
+                        <span class="color-swatch @(Model.Color == swatch ? "active" : "")" data-color="@swatch" style="background:@swatch"></span>
+                    }
+                </div>
+                <input type="color" asp-for="Color" id="ColorPicker" class="color-input" />
+            </div>
+            <span asp-validation-for="Color" class="field-error"></span>
+        </div>
+
+        <!-- Icon Section -->
+        <div class="settings-section">
+            <h3>آیکون پروژه</h3>
+            <div class="icon-picker-row">
+                @foreach (var icon in icons)
+                {
+                    <span class="icon-swatch @(Model.Icon == icon ? "active" : "")" data-icon="@icon">
+                        <i class="@icon"></i>
+                    </span>
+                }
+            </div>
+            <input type="hidden" asp-for="Icon" id="IconInput" />
+            <span asp-validation-for="Icon" class="field-error"></span>
+        </div>
+
+        <div class="settings-actions">
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-check"></i>
+                ذخیره تغییرات
+            </button>
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.Id" class="btn-secondary">انصراف</a>
+        </div>
+    </form>
+
+    <!-- Archive / Danger Zone -->
+    <div class="settings-card danger-zone">
+        <h3>ناحیه خطر</h3>
+
+        @if (Model.IsArchived)
+        {
+            <div class="danger-row">
+                <div>
+                    <strong>بازگردانی پروژه</strong>
+                    <p>این پروژه در حال حاضر بایگانی شده است. با بازگردانی، پروژه دوباره فعال می‌شود.</p>
+                </div>
+                <form id="restoreForm" asp-action="Restore" asp-controller="Project" asp-route-id="@Model.Id" method="post">
+                    <button type="button" class="btn-warning" id="btnRestore">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        بازگردانی
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="danger-row">
+                <div>
+                    <strong>بایگانی پروژه</strong>
+                    <p>پروژه بایگانی‌شده غیرفعال می‌شود اما اطلاعات آن حفظ می‌ماند.</p>
+                </div>
+                <form id="archiveForm" asp-action="Archive" asp-controller="Project" asp-route-id="@Model.Id" method="post">
+                    <button type="button" class="btn-warning" id="btnArchive">
+                        <i class="fa-solid fa-box-archive"></i>
+                        بایگانی
+                    </button>
+                </form>
+            </div>
+        }
+
+        <div class="danger-row">
+            <div>
+                <strong>حذف پروژه</strong>
+                <p>حذف پروژه غیرقابل بازگشت است و تمام اطلاعات مرتبط با آن حذف می‌شود.</p>
+            </div>
+            <form id="deleteForm" asp-action="Delete" asp-controller="Project" asp-route-id="@Model.Id" method="post">
+                <button type="button" class="btn-danger" id="btnDelete">
+                    <i class="fa-solid fa-trash"></i>
+                    حذف پروژه
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/project-settings.js" asp-append-version="true"></script>
+}

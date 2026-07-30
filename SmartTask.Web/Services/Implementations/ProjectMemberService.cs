@@ -23,21 +23,18 @@ public class ProjectMemberService : IProjectMemberService
 
     public async Task AddMemberAsync(int projectId, int userId, ProjectRoleType role)
     {
-        var member = await _context.ProjectMembers
-            .FirstOrDefaultAsync(x =>
-                x.ProjectId == projectId &&
-                x.ApplicationUserId == userId);
+        var existing = await _context.ProjectMembers
+            .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.ApplicationUserId == userId);
 
-        if (member != null)
+        if (existing != null)
         {
-            if (member.ViewState)
+            if (existing.ViewState)
                 return;
 
-            member.ViewState = true;
-            member.Role = role;
-            member.JoinedDate = DateTime.Now;
-            member.ChangeDate = DateTime.Now;
-
+            existing.ViewState = true;
+            existing.Role = role;
+            existing.JoinedDate = DateTime.Now;
+            existing.ChangeDate = DateTime.Now;
             await _context.SaveChangesAsync();
             return;
         }

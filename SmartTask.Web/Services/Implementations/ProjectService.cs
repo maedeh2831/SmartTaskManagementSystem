@@ -92,4 +92,53 @@ public class ProjectService : BaseService<Project>, IProjectService
         project.ViewState = false;
         await _context.SaveChangesAsync();
     }
+
+    public async Task ArchiveAsync(int id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+
+        if (project == null)
+            throw new Exception("پروژه یافت نشد.");
+
+        if (project.IsArchived)
+            return;
+
+        project.IsArchived = true;
+        project.ChangeDate = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RestoreAsync(int id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+
+        if (project == null)
+            throw new Exception("پروژه یافت نشد.");
+
+        if (!project.IsArchived)
+            return;
+
+        project.IsArchived = false;
+        project.ChangeDate = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdatePreferencesAsync(int id, string color, string icon)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+
+        if (project == null)
+            throw new Exception("پروژه یافت نشد.");
+
+        project.Color = color;
+        project.Icon = icon;
+        project.ChangeDate = DateTime.Now;
+
+        await _context.SaveChangesAsync();
+    }
 }

@@ -31,8 +31,21 @@ public class TeamMemberService : BaseService<TeamMember>, ITeamMemberService
 
     public async Task AddMemberAsync(int teamId, int userId, TeamRoleType role)
     {
-        if (await IsMemberAsync(teamId, userId))
+        var existing = await _context.TeamMembers
+            .FirstOrDefaultAsync(x => x.TeamId == teamId && x.ApplicationUserId == userId);
+
+        if (existing != null)
+        {
+            if (existing.ViewState)
+                return;
+
+            existing.ViewState = true;
+            existing.Role = role;
+            existing.JoinedDate = DateTime.Now;
+            existing.ChangeDate = DateTime.Now;
+            await _context.SaveChangesAsync();
             return;
+        }
 
         var member = new TeamMember
         {

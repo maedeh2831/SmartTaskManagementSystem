@@ -1,0 +1,231 @@
+/* ==========================================================
+                Project Settings
+   ========================================================== */
+
+.settings-page {
+    max-width: 720px;
+    margin: 0 auto;
+    animation: fadeUp .4s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-header {
+    margin-bottom: 4px;
+}
+
+    .settings-header h1 {
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--gray900);
+        margin-top: 12px;
+    }
+
+    .settings-header p {
+        color: var(--gray500);
+        margin-top: 6px;
+    }
+
+.settings-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.settings-section h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--gray900);
+    margin-bottom: 14px;
+}
+
+/* Icon Picker */
+.icon-picker-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.icon-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--gray50);
+    color: var(--gray500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+    .icon-swatch:hover {
+        background: var(--gray100);
+    }
+
+    .icon-swatch.active {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-light);
+    }
+
+/* Color Picker (shared visual language with workspace-settings) */
+.color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.color-swatches {
+    display: flex;
+    gap: 10px;
+}
+
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+    .color-swatch.active {
+        border-color: var(--gray900);
+        transform: scale(1.1);
+    }
+
+.color-input {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: none;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary {
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+    .btn-primary:hover {
+        opacity: .9;
+    }
+
+.btn-secondary {
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: var(--gray50);
+    color: var(--gray700);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+/* Danger Zone */
+.danger-zone {
+    border: 1px solid #FEE2E2;
+}
+
+    .danger-zone h3 {
+        color: #DC2626;
+    }
+
+.danger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--gray100);
+}
+
+    .danger-row:first-of-type {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .danger-row strong {
+        display: block;
+        color: var(--gray900);
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .danger-row p {
+        color: var(--gray500);
+        font-size: 13px;
+        max-width: 420px;
+    }
+
+.btn-warning {
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: #FFFBEB;
+    color: #B45309;
+    font-weight: 700;
+    font-size: 13px;
+    border: 1px solid #FDE68A;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+    .btn-warning:hover {
+        background: #FEF3C7;
+    }
+
+.btn-danger {
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: #FEF2F2;
+    color: #DC2626;
+    font-weight: 700;
+    font-size: 13px;
+    border: 1px solid #FECACA;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+    .btn-danger:hover {
+        background: #FEE2E2;
+    }
+
+.field-error {
+    color: var(--danger, #EF4444);
+    font-size: 12px;
+}
+
+.validation-summary ul {
+    color: var(--danger, #EF4444);
+    font-size: 13px;
+    padding-right: 18px;
+}
+
+@media(max-width: 576px) {
+    .danger-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

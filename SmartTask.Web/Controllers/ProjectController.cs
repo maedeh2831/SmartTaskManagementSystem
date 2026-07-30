@@ -283,4 +283,105 @@ public class ProjectController : BaseController
         TempData["Success"] = "پروژه با موفقیت حذف شد.";
         return RedirectToAction(nameof(Index), new { workspaceId });
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Settings(int id)
+    {
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (project == null)
+            return NotFound();
+
+        if (!await _projectService.CanManageProjectAsync(id, CurrentUser.UserId))
+        {
+            TempData["Error"] = "شما اجازه دسترسی به تنظیمات این پروژه را ندارید.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        var model = new ProjectSettingsViewModel
+        {
+            Id = project.Id,
+            WorkspaceId = project.WorkspaceId,
+            Name = project.Name,
+            Key = project.Key,
+            Color = project.Color ?? "#4F46E5",
+            Icon = project.Icon ?? "fa-solid fa-diagram-project",
+            IsArchived = project.IsArchived
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Settings(ProjectSettingsViewModel model)
+    {
+        if (!await _projectService.CanManageProjectAsync(model.Id, CurrentUser.UserId))
+        {
+            TempData["Error"] = "شما اجازه دسترسی به تنظیمات این پروژه را ندارید.";
+            return RedirectToAction(nameof(Details), new { id = model.Id });
+        }
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        await _projectService.UpdatePreferencesAsync(model.Id, model.Color, model.Icon);
+
+        TempData["Success"] = "تنظیمات پروژه با موفقیت ذخیره شد.";
+        return RedirectToAction(nameof(Settings), new { id = model.Id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Archive(int id)
+    {
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (project == null)
+            return NotFound();
+
+        if (!await _projectService.CanManageProjectAsync(id, CurrentUser.UserId))
+        {
+            TempData["Error"] = "شما اجازه بایگانی این پروژه را ندارید.";
+            return RedirectToAction(nameof(Settings), new { id });
+        }
+
+        if (project.IsArchived)
+        {
+            TempData["Error"] = "این پروژه در حال حاضر بایگانی شده است.";
+            return RedirectToAction(nameof(Settings), new { id });
+        }
+
+        await _projectService.ArchiveAsync(id);
+
+        TempData["Success"] = "پروژه با موفقیت بایگانی شد.";
+        return RedirectToAction(nameof(Settings), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Restore(int id)
+    {
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (project == null)
+            return NotFound();
+
+        if (!await _projectService.CanManageProjectAsync(id, CurrentUser.UserId))
+        {
+            TempData["Error"] = "شما اجازه بازگردانی این پروژه را ندارید.";
+            return RedirectToAction(nameof(Settings), new { id });
+        }
+
+        if (!project.IsArchived)
+        {
+            TempData["Error"] = "این پروژه بایگانی نشده است.";
+            return RedirectToAction(nameof(Settings), new { id });
+        }
+
+        await _projectService.RestoreAsync(id);
+
+        TempData["Success"] = "پروژه با موفقیت بازگردانی شد.";
+        return RedirectToAction(nameof(Settings), new { id });
+    }
 }

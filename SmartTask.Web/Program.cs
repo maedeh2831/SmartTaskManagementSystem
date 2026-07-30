@@ -102,6 +102,7 @@ namespace SmartTask.Web
             builder.Services.AddScoped<ITeamService, SmartTask.Web.Services.Implementations.TeamService>();
             builder.Services.AddScoped<ITeamMemberService, SmartTask.Web.Services.Implementations.TeamMemberService>();
             builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
+            builder.Services.AddScoped<IProjectDashboardService, ProjectDashboardService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();
