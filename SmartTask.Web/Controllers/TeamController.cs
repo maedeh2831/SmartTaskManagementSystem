@@ -17,12 +17,14 @@ public class TeamController : BaseController
     private readonly ITeamService _teamService;
     private readonly ITeamMemberService _teamMemberService;
     private readonly IWorkspaceMemberService _workspaceMemberService;
+    private readonly IProjectTeamService _projectTeamService;
     private readonly ApplicationDbContext _context;
 
     public TeamController(
         ITeamService teamService,
         ITeamMemberService teamMemberService,
         IWorkspaceMemberService workspaceMemberService,
+        IProjectTeamService projectTeamService,
         ICurrentUserService currentUser,
         ApplicationDbContext context)
         : base(currentUser)
@@ -30,6 +32,7 @@ public class TeamController : BaseController
         _teamService = teamService;
         _teamMemberService = teamMemberService;
         _workspaceMemberService = workspaceMemberService;
+        _projectTeamService = projectTeamService;
         _context = context;
     }
 
@@ -106,6 +109,9 @@ public class TeamController : BaseController
             })
             .ToListAsync();
 
+        var projects = await _projectTeamService.GetProjectsForTeamAsync(id);
+        var availableProjects = await _projectTeamService.GetAvailableProjectsAsync(team.WorkspaceId, id);
+
         var model = new TeamDetailsViewModel
         {
             Id = team.Id,
@@ -128,8 +134,13 @@ public class TeamController : BaseController
                     JoinedDate = m.JoinedDate
                 })
                 .ToList(),
-            ProjectNames = team.ProjectTeams.Select(pt => pt.Project.Name).ToList(),
-            AvailableWorkspaceMembers = availableMembers
+            Projects = projects.Select(p => new ProjectTeamItemViewModel
+            {
+                ProjectId = p.ProjectId,
+                ProjectName = p.ProjectName
+            }).ToList(),
+            AvailableWorkspaceMembers = availableMembers,
+            AvailableProjects = availableProjects
         };
 
         return View(model);

@@ -15,17 +15,23 @@ public class TaskController : BaseController
 {
     private readonly ITaskService _taskService;
     private readonly IUserStoryService _userStoryService;
+    private readonly ISubTaskService _subTaskService;
+    private readonly ITaskAssignmentService _taskAssignmentService;
     private readonly ApplicationDbContext _context;
 
     public TaskController(
         ITaskService taskService,
         IUserStoryService userStoryService,
+        ISubTaskService subTaskService,
+        ITaskAssignmentService taskAssignmentService,
         ICurrentUserService currentUser,
         ApplicationDbContext context)
         : base(currentUser)
     {
         _taskService = taskService;
         _userStoryService = userStoryService;
+        _subTaskService = subTaskService;
+        _taskAssignmentService = taskAssignmentService;
         _context = context;
     }
 
@@ -67,6 +73,16 @@ public class TaskController : BaseController
         if (task == null)
             return NotFound();
 
+        var subTasks = await _subTaskService.GetByTaskAsync(id);
+        var assignees = await _taskAssignmentService.GetAssigneesAsync(id);
+
+        var projectMembers = await _context.ProjectMembers
+            .Where(x => x.ProjectId == task.UserStory.ProjectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .ToListAsync();
+
+        var assignedIds = assignees.Select(x => x.Id).ToHashSet();
+
         var vm = new TaskDetailsViewModel
         {
             Id = task.Id,
@@ -84,7 +100,25 @@ public class TaskController : BaseController
             DueDate = task.DueDate,
             CompletedDate = task.CompletedDate,
             CreateDate = task.CreatedDate,
-            CanManage = await _taskService.CanManageTaskAsync(id, CurrentUser.UserId)
+            CanManage = await _taskService.CanManageTaskAsync(id, CurrentUser.UserId),
+            SubTasks = subTasks.Select(x => new SubTaskItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                IsCompleted = x.IsCompleted
+            }).ToList(),
+            Assignees = assignees.Select(x => new AssigneeOptionViewModel
+            {
+                UserId = x.Id,
+                FullName = x.FullName
+            }).ToList(),
+            AvailableMembers = projectMembers
+                .Where(x => !assignedIds.Contains(x.ApplicationUserId))
+                .Select(x => new AssigneeOptionViewModel
+                {
+                    UserId = x.ApplicationUserId,
+                    FullName = x.ApplicationUser.FullName
+                }).ToList()
         };
 
         return View(vm);

@@ -13,4 +13,5 @@ public class UserStoryListItemViewModel
     public StoryStatusType Status { get; set; }
     public int? OwnerId { get; set; }
     public string? OwnerName { get; set; }
+    public List<string> Contributors { get; set; } = new();
 }

@@ -104,7 +104,10 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
             builder.Services.AddScoped<IProjectDashboardService, ProjectDashboardService>();
             builder.Services.AddScoped<IBacklogService, BacklogService>();
+            builder.Services.AddScoped<ISubTaskService, SubTaskService>();
             builder.Services.AddScoped<IUserStoryService, UserStoryService>();
+            builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
+            builder.Services.AddScoped<IProjectTeamService, ProjectTeamService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();

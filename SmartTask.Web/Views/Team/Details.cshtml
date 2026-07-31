@@ -95,7 +95,7 @@
         <div class="details-stat-card">
             <i class="fa-solid fa-diagram-project"></i>
             <div>
-                <strong>@Model.ProjectNames.Count</strong>
+                <strong>@Model.Projects.Count</strong>
                 <span>پروژه</span>
             </div>
         </div>
@@ -209,22 +209,59 @@
     </div>
 
     <!-- Related Projects -->
-    @if (Model.ProjectNames.Any())
-    {
-        <div class="details-card">
-            <div class="card-title">
-                <i class="fa-solid fa-diagram-project"></i>
-                پروژه‌های مرتبط
-            </div>
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-diagram-project"></i>
+            پروژه‌های مرتبط
+        </div>
 
+        @if (!Model.Projects.Any())
+        {
+            <p class="team-empty-text">این تیم هنوز به هیچ پروژه‌ای اضافه نشده است.</p>
+        }
+        else
+        {
             <div class="team-project-chips">
-                @foreach (var name in Model.ProjectNames)
+                @foreach (var project in Model.Projects)
                 {
-                    <span class="team-project-chip">@name</span>
+                    <span class="team-project-chip">
+                        @project.ProjectName
+
+                        @if (Model.CanManage)
+                        {
+                            <form asp-controller="ProjectTeam" asp-action="RemoveProject" method="post" class="remove-project-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="teamId" value="@Model.Id" />
+                                <input type="hidden" name="projectId" value="@project.ProjectId" />
+                                <button type="submit" title="حذف از این پروژه">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        }
+                    </span>
                 }
             </div>
-        </div>
-    }
+        }
+
+        @if (Model.CanManage && Model.AvailableProjects.Any())
+        {
+            <form asp-controller="ProjectTeam" asp-action="AssignProject" method="post" class="assign-project-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="teamId" value="@Model.Id" />
+                <select name="projectId" class="form-control" required>
+                    <option value="">— انتخاب پروژه برای افزودن —</option>
+                    @foreach (var item in Model.AvailableProjects)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    افزودن به پروژه
+                </button>
+            </form>
+        }
+    </div>
 
 </div>
 

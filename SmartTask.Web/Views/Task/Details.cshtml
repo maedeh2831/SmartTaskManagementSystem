@@ -96,6 +96,130 @@
         </div>
     </div>
 
+    <!-- ===== 👇 بخش جدید: افراد تخصیص‌یافته (Story 3) ===== -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-users"></i>
+            افراد تخصیص‌یافته
+        </div>
+
+        @if (!Model.Assignees.Any())
+        {
+            <div class="team-empty-text">هنوز کسی به این Task تخصیص نیافته است.</div>
+        }
+        else
+        {
+            <div class="assignee-list">
+                @foreach (var assignee in Model.Assignees)
+                {
+                    <div class="assignee-chip">
+                        <i class="fa-regular fa-circle-user"></i>
+                        <span>@assignee.FullName</span>
+
+                        @if (Model.CanManage)
+                        {
+                            <form asp-controller="TaskAssignment" asp-action="RemoveMember" method="post" class="assignee-remove-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <input type="hidden" name="userId" value="@assignee.UserId" />
+                                <button type="submit" title="حذف تخصیص">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.CanManage && Model.AvailableMembers.Any())
+        {
+            <form asp-controller="TaskAssignment" asp-action="AssignMember" method="post" class="assignee-add-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <select name="userId" class="form-control" required>
+                    <option value="">— انتخاب عضو برای تخصیص —</option>
+                    @foreach (var member in Model.AvailableMembers)
+                    {
+                        <option value="@member.UserId">@member.FullName</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-user-plus"></i>
+                    تخصیص
+                </button>
+            </form>
+        }
+    </div>
+    <!-- ===== 👆 پایان بخش افراد تخصیص‌یافته ===== -->
+    <!-- ===== 👇 بخش SubTask (Story 2) ===== -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-list-check"></i>
+            SubTask ها
+            @if (Model.SubTasksTotal > 0)
+            {
+                <span class="subtask-progress-text">(@Model.SubTasksCompleted از @Model.SubTasksTotal)</span>
+            }
+        </div>
+
+        @if (Model.SubTasksTotal > 0)
+        {
+            <div class="subtask-progress-track">
+                <div class="subtask-progress-fill" style="width:@Model.SubTasksProgressPercent%"></div>
+            </div>
+        }
+
+        @if (!Model.SubTasks.Any())
+        {
+            <div class="team-empty-text">هنوز SubTask ای برای این Task ثبت نشده است.</div>
+        }
+        else
+        {
+            <div class="subtask-list">
+                @foreach (var sub in Model.SubTasks)
+                {
+                    <div class="subtask-item @(sub.IsCompleted ? "completed" : "")" data-id="@sub.Id">
+
+                        <label class="subtask-checkbox-wrap">
+                            <input type="checkbox"
+                                   class="subtask-toggle"
+                                   data-id="@sub.Id"
+                                   data-task-id="@Model.Id"
+                                   checked="@sub.IsCompleted"
+                                   disabled="@(!Model.CanManage)" />
+                            <span class="subtask-title">@sub.Title</span>
+                        </label>
+
+                        @if (Model.CanManage)
+                        {
+                            <form asp-controller="SubTask" asp-action="Delete" method="post" class="delete-subtask-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@sub.Id" />
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <button type="submit" class="subtask-delete-btn">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </form>
+                        }
+
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.CanManage)
+        {
+            <form asp-controller="SubTask" asp-action="QuickAdd" method="post" class="subtask-quick-add">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <i class="fa-solid fa-plus"></i>
+                <input type="text" name="title" placeholder="افزودن SubTask جدید... (Enter بزنید)" required maxlength="250" />
+                <button type="submit">افزودن</button>
+            </form>
+        }
+    </div>
+    <!-- ===== 👆 پایان بخش SubTask ===== -->
     @if (Model.CanManage)
     {
         <div class="details-card">

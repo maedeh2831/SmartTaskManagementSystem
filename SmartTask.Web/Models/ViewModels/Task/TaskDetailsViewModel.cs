@@ -22,4 +22,15 @@ public class TaskDetailsViewModel
     public DateTime CreateDate { get; set; }
 
     public bool CanManage { get; set; }
+
+    // Story 2: SubTasks
+    public List<SubTaskItemViewModel> SubTasks { get; set; } = new();
+    public int SubTasksTotal => SubTasks.Count;
+    public int SubTasksCompleted => SubTasks.Count(x => x.IsCompleted);
+    public int SubTasksProgressPercent =>
+        SubTasksTotal == 0 ? 0 : (int)Math.Round((double)SubTasksCompleted / SubTasksTotal * 100);
+
+    // Story 3: Assignees
+    public List<AssigneeOptionViewModel> Assignees { get; set; } = new();
+    public List<AssigneeOptionViewModel> AvailableMembers { get; set; } = new();
 }

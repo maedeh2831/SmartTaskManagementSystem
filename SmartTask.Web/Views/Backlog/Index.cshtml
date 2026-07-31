@@ -200,10 +200,22 @@
                             </td>
 
                             <td class="col-contributors">
-                                <span class="backlog-contributors-empty" title="پس از ساخت Task این بخش تکمیل می‌شود">
-                                    <i class="fa-regular fa-circle-user"></i>
-                                    —
-                                </span>
+                                @if (!story.Contributors.Any())
+                                {
+                                    <span class="backlog-contributors-empty">
+                                        <i class="fa-regular fa-circle-user"></i>
+                                        —
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="backlog-contributors-list" title="@string.Join("، ", story.Contributors)">
+                                        <i class="fa-regular fa-circle-user"></i>
+                                        @(story.Contributors.Count == 1
+                                                                    ? story.Contributors[0]
+                                                                    : $"{story.Contributors[0]} +{story.Contributors.Count - 1}")
+                        </span>
+                                                }
                             </td>
 
                             @if (Model.CanManage)

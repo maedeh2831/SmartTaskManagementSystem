@@ -21,4 +21,5 @@ public interface IUserStoryService : IBaseService<UserStory>
     Task ChangeOwnerAsync(int storyId, int? ownerId);
     Task ReorderAsync(List<int> orderedIds);
     new Task DeleteAsync(int id);
+    Task<Dictionary<int, List<string>>> GetContributorsMapAsync(int projectId);
 }

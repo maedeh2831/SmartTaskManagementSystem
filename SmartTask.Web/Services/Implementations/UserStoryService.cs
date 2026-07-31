@@ -200,5 +200,25 @@ namespace SmartTask.Web.Services.Implementations
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Dictionary<int, List<string>>> GetContributorsMapAsync(int projectId)
+        {
+            var data = await _context.TaskAssignments
+                .Where(x =>
+                    x.ViewState &&
+                    x.TaskItem.ViewState &&
+                    x.TaskItem.UserStory.ProjectId == projectId)
+                .Select(x => new
+                {
+                    x.TaskItem.UserStoryId,
+                    x.ApplicationUser.FullName
+                })
+                .Distinct()
+                .ToListAsync();
+
+            return data
+                .GroupBy(x => x.UserStoryId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.FullName).ToList());
+        }
     }
 }

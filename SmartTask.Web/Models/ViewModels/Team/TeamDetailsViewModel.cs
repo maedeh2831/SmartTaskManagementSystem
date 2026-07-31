@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace SmartTask.Web.Models.ViewModels.Team;
-
 public class TeamDetailsViewModel
 {
     public int Id { get; set; }
@@ -13,10 +11,9 @@ public class TeamDetailsViewModel
     public bool IsPrivate { get; set; }
     public bool IsArchived { get; set; }
     public DateTime CreateDate { get; set; }
-
     public bool CanManage { get; set; }
-
     public List<TeamMemberViewModel> Members { get; set; } = new();
-    public List<string> ProjectNames { get; set; } = new();
+    public List<ProjectTeamItemViewModel> Projects { get; set; } = new(); // 👈 جایگزین ProjectNames
     public List<SelectListItem> AvailableWorkspaceMembers { get; set; } = new();
+    public List<SelectListItem> AvailableProjects { get; set; } = new(); // 👈 جدید
 }

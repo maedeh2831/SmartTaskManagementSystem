@@ -201,3 +201,56 @@
 .task-chosen {
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
 }
+/* ===== Assignees ===== */
+.assignee-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.assignee-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gray100);
+    border-radius: 20px;
+    padding: 6px 8px 6px 14px;
+    font-size: 13px;
+    color: var(--gray700);
+}
+
+    .assignee-chip i:first-child {
+        color: var(--primary);
+    }
+
+.assignee-remove-form {
+    display: inline-block;
+}
+
+    .assignee-remove-form button {
+        background: none;
+        border: none;
+        color: var(--gray500);
+        cursor: pointer;
+        font-size: 11px;
+        padding: 4px 6px;
+        border-radius: 50%;
+        transition: background .2s ease, color .2s ease;
+    }
+
+        .assignee-remove-form button:hover {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+.assignee-add-form {
+    display: flex;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray100);
+}
+
+    .assignee-add-form select {
+        flex: 1;
+    }
