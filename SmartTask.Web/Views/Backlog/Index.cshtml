@@ -9,6 +9,7 @@
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
 }
 
 <div class="workspace-container">
@@ -95,7 +96,9 @@
                             </td>
 
                             <td class="col-title">
-                                <span class="backlog-item-title">@story.Title</span>
+                                <a asp-controller="UserStory" asp-action="Details" asp-route-id="@story.Id" class="story-title-link">
+                                    @story.Title
+                                </a>
                             </td>
 
                             <td class="col-status">

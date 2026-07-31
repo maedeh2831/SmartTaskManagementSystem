@@ -4,6 +4,7 @@ using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Services.Interfaces;
+using SmartTask.Web.Models.DTOs;
 
 namespace SmartTask.Web.Services.Implementations;
 
@@ -156,5 +157,74 @@ public class SprintService : BaseService<Sprint>, ISprintService
 
         sprint.ViewState = false;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<BurndownPointDto>> GetBurndownDataAsync(int sprintId)
+    {
+        var sprint = await _context.Sprints
+            .Include(x => x.UserStories.Where(s => s.ViewState))
+            .FirstOrDefaultAsync(x => x.Id == sprintId);
+
+        if (sprint == null)
+            return new List<BurndownPointDto>();
+
+        var totalPoints = sprint.UserStories.Sum(x => x.StoryPoint);
+        var totalDays = Math.Max(1, (sprint.EndDate.Date - sprint.StartDate.Date).Days);
+        var today = DateTime.Today;
+
+        var doneStories = sprint.UserStories
+            .Where(x => x.Status == StoryStatusType.Done)
+            .Select(x => new { x.StoryPoint, CompletedOn = (x.ChangeDate ?? x.CreatedDate).Date })
+            .ToList();
+
+        var points = new List<BurndownPointDto>();
+
+        for (var day = sprint.StartDate.Date; day <= sprint.EndDate.Date; day = day.AddDays(1))
+        {
+            var elapsedDays = (day - sprint.StartDate.Date).Days;
+            var idealRemaining = (int)Math.Round(
+                totalPoints - ((double)totalPoints / totalDays * elapsedDays));
+
+            int? actualRemaining = null;
+
+            if (day <= today)
+            {
+                var completedByThisDay = doneStories
+                    .Where(x => x.CompletedOn <= day)
+                    .Sum(x => x.StoryPoint);
+
+                actualRemaining = totalPoints - completedByThisDay;
+            }
+
+            points.Add(new BurndownPointDto
+            {
+                Date = day,
+                IdealRemaining = Math.Max(0, idealRemaining),
+                ActualRemaining = actualRemaining
+            });
+        }
+
+        return points;
+    }
+
+    public async Task<List<VelocityPointDto>> GetVelocityDataAsync(int projectId, int lastCount = 6)
+    {
+        var completedSprints = await _context.Sprints
+            .Where(x => x.ProjectId == projectId && x.ViewState && x.Status == SprintStatusType.Completed)
+            .Include(x => x.UserStories.Where(s => s.ViewState))
+            .OrderByDescending(x => x.EndDate)
+            .Take(lastCount)
+            .ToListAsync();
+
+        completedSprints.Reverse(); // ترتیب زمانی صحیح برای نمودار
+
+        return completedSprints.Select(sprint => new VelocityPointDto
+        {
+            SprintName = sprint.Name,
+            PlannedPoints = sprint.UserStories.Sum(x => x.StoryPoint),
+            CompletedPoints = sprint.UserStories
+                .Where(x => x.Status == StoryStatusType.Done)
+                .Sum(x => x.StoryPoint)
+        }).ToList();
     }
 }

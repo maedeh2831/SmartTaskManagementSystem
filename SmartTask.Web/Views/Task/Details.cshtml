@@ -1,0 +1,117 @@
+﻿@model SmartTask.Web.Models.ViewModels.Task.TaskDetailsViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "جزئیات Task";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>
+                @Model.Title
+                <span class="backlog-status-badge task-status-badge status-@Model.Status.ToString().ToLower()">
+                    @(Model.Status switch
+                    {
+                        TaskStatusType.ToDo => "برای انجام",
+                        TaskStatusType.InProgress => "درحال انجام",
+                        TaskStatusType.InReview => "درحال بررسی",
+                        TaskStatusType.Done => "انجام‌شده",
+                        TaskStatusType.Cancelled => "لغو‌شده",
+                        _ => "-"
+                    })
+                </span>
+            </h1>
+            <p>User Story: @Model.UserStoryTitle — پروژه: @Model.ProjectName</p>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+
+            <a asp-action="Index" asp-route-userStoryId="@Model.UserStoryId" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت
+            </a>
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    ویرایش
+                </a>
+            }
+
+        </div>
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-align-right"></i>
+            توضیحات
+        </div>
+        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "توضیحاتی ثبت نشده است." : Model.Description)</p>
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-gauge-high"></i>
+            اطلاعات Task
+        </div>
+
+        <div class="userstory-info-grid">
+            <div>
+                <span class="userstory-info-label">نوع</span>
+                <span class="task-type-badge type-@Model.Type.ToString().ToLower()">@Model.Type</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">اولویت</span>
+                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">@Model.Priority</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">برآورد</span>
+                <span>@Model.Estimate ساعت</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">تاریخ شروع</span>
+                <span>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">موعد انجام</span>
+                <span>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+            </div>
+            @if (Model.CompletedDate.HasValue)
+            {
+                <div>
+                    <span class="userstory-info-label">تاریخ تکمیل</span>
+                    <span>@Model.CompletedDate.Value.ToString("yyyy/MM/dd")</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.CanManage)
+    {
+        <div class="details-card">
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-task-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i>
+                    حذف Task
+                </button>
+            </form>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/task.js" asp-append-version="true"></script>
+}

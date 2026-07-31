@@ -1,0 +1,203 @@
+/* ==========================================================
+                    SmartTask Task UI
+   ========================================================== */
+
+.task-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .task-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Kanban Board ===== */
+.task-kanban {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+@media (max-width: 1200px) {
+    .task-kanban {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .task-kanban {
+        grid-template-columns: 1fr;
+    }
+}
+
+.task-column {
+    background: #fff;
+    border: 1px solid var(--gray100);
+    border-radius: 16px;
+    padding: 12px;
+    min-height: 200px;
+}
+
+.task-column-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 6px 12px;
+    border-bottom: 1px solid var(--gray100);
+    margin-bottom: 10px;
+    color: var(--gray700);
+}
+
+    .task-column-header.status-todo {
+        color: var(--gray700);
+    }
+
+    .task-column-header.status-inprogress {
+        color: #B45309;
+    }
+
+    .task-column-header.status-inreview {
+        color: #1D4ED8;
+    }
+
+    .task-column-header.status-done {
+        color: #15803D;
+    }
+
+    .task-column-header.status-cancelled {
+        color: #B91C1C;
+    }
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 60px;
+}
+
+.task-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #FAFAFE;
+    border: 1px solid var(--gray100);
+    border-radius: 12px;
+    padding: 12px;
+    transition: box-shadow .2s ease;
+}
+
+    .task-card:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+
+.task-drag-handle {
+    cursor: grab;
+    color: var(--gray500);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+    .task-drag-handle:active {
+        cursor: grabbing;
+    }
+
+.task-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.task-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray700);
+    text-decoration: none;
+}
+
+    .task-card-title:hover {
+        color: var(--primary);
+    }
+
+.task-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.task-type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+    .task-type-badge.type-bug {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+    .task-type-badge.type-feature {
+        background: #DBEAFE;
+        color: #1D4ED8;
+    }
+
+    .task-type-badge.type-improvement {
+        background: #DCFCE7;
+        color: #15803D;
+    }
+
+    .task-type-badge.type-technicaldebt {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+.task-card-footer {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--gray500);
+}
+
+.task-status-badge.status-todo {
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+.task-status-badge.status-inprogress {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.task-status-badge.status-inreview {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.task-status-badge.status-done {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.task-status-badge.status-cancelled {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.task-ghost {
+    opacity: .4;
+    background: var(--gray100);
+}
+
+.task-chosen {
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}

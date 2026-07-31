@@ -1,0 +1,170 @@
+﻿@model SmartTask.Web.Models.ViewModels.AgileDashboard.AgileDashboardViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "داشبورد Agile";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/agile-dashboard.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1>داشبورد Agile — @Model.ProjectName</h1>
+            <p>وضعیت پیشرفت، Burndown و Velocity اسپرینت‌های این پروژه.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+
+            <form method="get" class="agile-sprint-select-form">
+                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                <select name="sprintId" class="agile-sprint-select" onchange="this.form.submit()">
+                    @foreach (var s in Model.AvailableSprints)
+                    {
+                        <option value="@s.Id" selected="@(s.Id == Model.SprintId)">@s.Name</option>
+                    }
+                </select>
+            </form>
+
+            <a asp-controller="Sprint" asp-action="Details" asp-route-id="@Model.SprintId"
+               class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به اسپرینت
+                </button>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- ===== Stat Cards ===== -->
+    <div class="agile-stats-grid">
+
+        <div class="agile-stat-card">
+            <div class="agile-stat-icon" style="background:#EEF2FF;color:var(--primary);">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div>
+                <span class="agile-stat-value">@Model.TotalStories</span>
+                <span class="agile-stat-label">کل User Story ها</span>
+            </div>
+        </div>
+
+        <div class="agile-stat-card">
+            <div class="agile-stat-icon" style="background:#DCFCE7;color:#15803D;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <span class="agile-stat-value">@Model.DoneStories</span>
+                <span class="agile-stat-label">انجام‌شده</span>
+            </div>
+        </div>
+
+        <div class="agile-stat-card">
+            <div class="agile-stat-icon" style="background:#FEF3C7;color:#B45309;">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
+            <div>
+                <span class="agile-stat-value">@Model.InProgressStories</span>
+                <span class="agile-stat-label">درحال انجام</span>
+            </div>
+        </div>
+
+        <div class="agile-stat-card">
+            <div class="agile-stat-icon" style="background:#EDE9FE;color:#6D28D9;">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div>
+                <span class="agile-stat-value">@Model.RemainingDays</span>
+                <span class="agile-stat-label">روز باقی‌مانده</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== Progress Bars ===== -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-gauge-high"></i>
+            پیشرفت اسپرینت
+        </div>
+
+        <div class="agile-progress-row">
+            <div class="agile-progress-item">
+                <div class="agile-progress-labels">
+                    <span>پیشرفت زمانی</span>
+                    <strong>@Model.TimeProgressPercent%</strong>
+                </div>
+                <div class="agile-progress-track">
+                    <div class="agile-progress-fill time" style="width:@Model.TimeProgressPercent%"></div>
+                </div>
+            </div>
+
+            <div class="agile-progress-item">
+                <div class="agile-progress-labels">
+                    <span>پیشرفت کاری (@Model.DonePoints از @Model.TotalPoints Story Point)</span>
+                    <strong>@Model.WorkProgressPercent%</strong>
+                </div>
+                <div class="agile-progress-track">
+                    <div class="agile-progress-fill work" style="width:@Model.WorkProgressPercent%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Charts ===== -->
+    <div class="agile-charts-grid">
+
+        <div class="details-card">
+            <div class="card-title">
+                <i class="fa-solid fa-chart-line"></i>
+                نمودار Burndown
+            </div>
+            @if (Model.TotalPoints == 0)
+            {
+                <div class="team-empty-text">هیچ Story با امتیازی به این اسپرینت اختصاص نیافته است.</div>
+            }
+            else
+            {
+                <canvas id="burndownChart" height="260"></canvas>
+            }
+        </div>
+
+        <div class="details-card">
+            <div class="card-title">
+                <i class="fa-solid fa-chart-column"></i>
+                نمودار Velocity
+            </div>
+            @if (!Model.VelocityPoints.Any())
+            {
+                <div class="team-empty-text">هنوز هیچ اسپرینتی به پایان نرسیده است. Velocity پس از بستن اولین اسپرینت نمایش داده می‌شود.</div>
+            }
+            else
+            {
+                <canvas id="velocityChart" height="260"></canvas>
+            }
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script>
+        window.__burndownData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BurndownPoints.Select(p => new {
+            date = p.Date.ToString("MM/dd"),
+            ideal = p.IdealRemaining,
+            actual = p.ActualRemaining
+        })));
+
+        window.__velocityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.VelocityPoints));
+    </script>
+    <script src="~/js/agile-dashboard.js" asp-append-version="true"></script>
+}

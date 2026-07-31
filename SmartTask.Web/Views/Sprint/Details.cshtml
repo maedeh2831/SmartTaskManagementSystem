@@ -45,6 +45,15 @@
                     <i class="fa-solid fa-pen-to-square"></i>
                     ویرایش
                 </a>
+                <a asp-controller="AgileDashboard" asp-action="Index" asp-route-projectId="@Model.ProjectId" asp-route-sprintId="@Model.Id" class="btn btn-light">
+                    <i class="fa-solid fa-chart-line"></i>
+                    داشبورد Agile
+                </a>
+                <a asp-action="Planning" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fa-solid fa-list-check"></i>
+                    برنامه‌ریزی اسپرینت
+                </a>
+
             }
 
         </div>

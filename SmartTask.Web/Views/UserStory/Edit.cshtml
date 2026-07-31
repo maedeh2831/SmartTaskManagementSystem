@@ -1,0 +1,142 @@
+﻿@model SmartTask.Web.Models.ViewModels.UserStory.EditUserStoryViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "ویرایش User Story";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ویرایش User Story</h1>
+            <p>اطلاعات این نیازمندی را به‌روزرسانی کنید.</p>
+        </div>
+
+        <a asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات User Story</h3>
+                        <p>تغییرات موردنظر را اعمال کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Edit" method="post">
+
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="ProjectId" type="hidden" />
+
+                    <div class="form-group">
+                        <label asp-for="Title"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="AcceptanceCriteria"></label>
+                        <textarea asp-for="AcceptanceCriteria" rows="3" class="form-control"></textarea>
+                        <span asp-validation-for="AcceptanceCriteria" class="text-danger"></span>
+                    </div>
+
+                    <div class="userstory-form-row">
+                        <div class="form-group">
+                            <label asp-for="StoryPoint"></label>
+                            <input asp-for="StoryPoint" type="number" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="StoryPoint" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="BusinessValue"></label>
+                            <input asp-for="BusinessValue" type="number" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="BusinessValue" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Priority"></label>
+                            <select asp-for="Priority" class="form-control">
+                                @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
+                                {
+                                    <option value="@p" selected="@(p == Model.Priority)">
+                                        @(p switch
+                                        {
+                                            StoryPriorityType.Lowest => "خیلی کم",
+                                            StoryPriorityType.Low => "کم",
+                                            StoryPriorityType.Medium => "متوسط",
+                                            StoryPriorityType.High => "زیاد",
+                                            StoryPriorityType.Highest => "خیلی زیاد",
+                                            _ => "-"
+                                        })
+                                </option>
+                                                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Status"></label>
+                            <select asp-for="Status" class="form-control">
+                                @foreach (StoryStatusType s in Enum.GetValues(typeof(StoryStatusType)))
+                                {
+                                    <option value="@s" selected="@(s == Model.Status)">
+                                        @(s switch
+                                        {
+                                            StoryStatusType.New => "جدید",
+                                            StoryStatusType.Ready => "آماده",
+                                            StoryStatusType.InProgress => "درحال انجام",
+                                            StoryStatusType.Done => "انجام‌شده",
+                                            StoryStatusType.Closed => "بسته‌شده",
+                                            _ => "-"
+                                        })
+                                </option>
+                                                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/userstory.js" asp-append-version="true"></script>
+}

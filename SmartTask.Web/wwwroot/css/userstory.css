@@ -1,0 +1,82 @@
+/* ==========================================================
+                    SmartTask UserStory UI
+   ========================================================== */
+
+.userstory-preview-logo {
+    background: var(--primary);
+}
+
+.userstory-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .userstory-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.story-title-link {
+    color: var(--gray700);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .story-title-link:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+.userstory-sprint-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #EEF2FF;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.userstory-no-sprint {
+    font-size: 11px;
+    color: var(--gray500);
+}
+
+.userstory-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--gray100);
+    color: var(--gray700);
+    text-decoration: none;
+    transition: background .2s ease;
+}
+
+    .userstory-edit-btn:hover {
+        background: var(--primary);
+        color: #fff;
+    }
+
+.userstory-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+}
+
+    .userstory-info-grid > div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+.userstory-info-label {
+    font-size: 11px;
+    color: var(--gray500);
+    font-weight: 600;
+}

@@ -14,15 +14,18 @@ namespace SmartTask.Web.Controllers;
 public class SprintController : BaseController
 {
     private readonly ISprintService _sprintService;
+    private readonly IUserStoryService _userStoryService;
     private readonly ApplicationDbContext _context;
 
     public SprintController(
         ISprintService sprintService,
+        IUserStoryService userStoryService,
         ICurrentUserService currentUser,
         ApplicationDbContext context)
         : base(currentUser)
     {
         _sprintService = sprintService;
+        _userStoryService = userStoryService;
         _context = context;
     }
 
@@ -262,5 +265,79 @@ public class SprintController : BaseController
 
         TempData["Success"] = "اسپرینت با موفقیت بسته شد.";
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    public async Task<IActionResult> Planning(int id)
+    {
+        var sprint = await _context.Sprints
+            .Include(x => x.Project)
+            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+
+        if (sprint == null)
+            return NotFound();
+
+        var backlogStories = await _context.UserStories
+            .Where(x => x.ProjectId == sprint.ProjectId && x.SprintId == null && x.ViewState)
+            .Include(x => x.Owner)
+            .OrderBy(x => x.Order)
+            .ToListAsync();
+
+        var sprintStories = await _context.UserStories
+            .Where(x => x.SprintId == id && x.ViewState)
+            .Include(x => x.Owner)
+            .OrderBy(x => x.Order)
+            .ToListAsync();
+
+        var vm = new SprintPlanningViewModel
+        {
+            SprintId = sprint.Id,
+            SprintName = sprint.Name,
+            ProjectId = sprint.ProjectId,
+            ProjectName = sprint.Project.Name,
+            Capacity = sprint.Capacity,
+            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            BacklogStories = backlogStories.Select(x => new PlanningStoryItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                StoryPoint = x.StoryPoint,
+                Priority = x.Priority,
+                Status = x.Status,
+                OwnerName = x.Owner != null ? x.Owner.FullName : null
+            }).ToList(),
+            SprintStories = sprintStories.Select(x => new PlanningStoryItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                StoryPoint = x.StoryPoint,
+                Priority = x.Priority,
+                Status = x.Status,
+                OwnerName = x.Owner != null ? x.Owner.FullName : null
+            }).ToList()
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignToSprint(int storyId, int sprintId)
+    {
+        if (!await _sprintService.CanManageSprintAsync(sprintId, CurrentUser.UserId))
+            return Forbid();
+
+        await _userStoryService.MoveToSprintAsync(storyId, sprintId);
+        return Json(new { success = true });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveFromSprintPlanning(int storyId, int sprintId)
+    {
+        if (!await _sprintService.CanManageSprintAsync(sprintId, CurrentUser.UserId))
+            return Forbid();
+
+        await _userStoryService.RemoveFromSprintAsync(storyId);
+        return Json(new { success = true });
     }
 }

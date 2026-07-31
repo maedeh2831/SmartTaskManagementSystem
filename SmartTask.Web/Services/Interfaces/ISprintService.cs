@@ -1,5 +1,6 @@
 ﻿using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Models.DTOs;
 
 namespace SmartTask.Web.Services.Interfaces;
 
@@ -27,4 +28,7 @@ public interface ISprintService : IBaseService<Sprint>
     Task ActivateAsync(int sprintId);
 
     Task CompleteAsync(int sprintId);
+
+    Task<List<BurndownPointDto>> GetBurndownDataAsync(int sprintId);
+    Task<List<VelocityPointDto>> GetVelocityDataAsync(int projectId, int lastCount = 6);
 }

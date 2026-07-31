@@ -1,0 +1,104 @@
+﻿@model SmartTask.Web.Models.ViewModels.UserStory.UserStoryDetailsViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "جزئیات User Story";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>
+                @Model.Title
+                <span class="backlog-status-badge status-@Model.Status.ToString().ToLower()">
+                    @(Model.Status switch
+                    {
+                        StoryStatusType.New => "جدید",
+                        StoryStatusType.Ready => "آماده",
+                        StoryStatusType.InProgress => "درحال انجام",
+                        StoryStatusType.Done => "انجام‌شده",
+                        StoryStatusType.Closed => "بسته‌شده",
+                        _ => "-"
+                    })
+                </span>
+            </h1>
+            <p>پروژه: @Model.ProjectName</p>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+
+            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت
+            </a>
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    ویرایش
+                </a>
+            }
+            <a asp-controller="Task" asp-action="Index" asp-route-userStoryId="@Model.Id" class="btn btn-primary">
+                <i class="fa-solid fa-list-check"></i>
+                Task ها
+            </a>
+
+        </div>
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-align-right"></i>
+            توضیحات
+        </div>
+        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "توضیحاتی ثبت نشده است." : Model.Description)</p>
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-circle-check"></i>
+            معیارهای پذیرش
+        </div>
+        <p>@(string.IsNullOrWhiteSpace(Model.AcceptanceCriteria) ? "معیار پذیرشی ثبت نشده است." : Model.AcceptanceCriteria)</p>
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-gauge-high"></i>
+            اطلاعات برنامه‌ریزی
+        </div>
+
+        <div class="userstory-info-grid">
+            <div>
+                <span class="userstory-info-label">اولویت</span>
+                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">@Model.Priority</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">Story Point</span>
+                <span class="backlog-sp-badge">@Model.StoryPoint</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">ارزش تجاری</span>
+                <span class="backlog-bv-badge">@Model.BusinessValue</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">اسپرینت</span>
+                <span>@(Model.SprintName ?? "در بک‌لاگ")</span>
+            </div>
+            <div>
+                <span class="userstory-info-label">مسئول</span>
+                <span>@(Model.OwnerName ?? "—")</span>
+            </div>
+        </div>
+    </div>
+
+</div>

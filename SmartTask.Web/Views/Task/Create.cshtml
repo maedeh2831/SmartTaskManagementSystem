@@ -1,0 +1,142 @@
+﻿@model SmartTask.Web.Models.ViewModels.Task.CreateTaskViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "Task جدید";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ایجاد Task جدید</h1>
+            <p>یک وظیفه اجرایی جدید برای این User Story تعریف کنید.</p>
+        </div>
+
+        <a asp-action="Index" asp-route-userStoryId="@Model.UserStoryId" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات Task</h3>
+                        <p>اطلاعات زیر را تکمیل کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Create" method="post">
+
+                    <input asp-for="UserStoryId" type="hidden" />
+
+                    <div class="form-group">
+                        <label asp-for="Title"></label>
+                        <input asp-for="Title" id="taskTitle" class="form-control" placeholder="مثلاً: طراحی View ثبت‌نام" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" id="taskDescription" rows="3" class="form-control" placeholder="شرح این Task..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="task-form-row">
+                        <div class="form-group">
+                            <label asp-for="Type"></label>
+                            <select asp-for="Type" class="form-control">
+                                @foreach (TaskType t in Enum.GetValues(typeof(TaskType)))
+                                {
+                                    <option value="@t">
+                                        @(t switch
+                                        {
+                                            TaskType.Task => "Task",
+                                            TaskType.Bug => "Bug",
+                                            TaskType.Feature => "Feature",
+                                            TaskType.Improvement => "بهبود",
+                                            TaskType.TechnicalDebt => "بدهی فنی",
+                                            _ => "-"
+                                        })
+                                </option>
+                                                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Priority"></label>
+                            <select asp-for="Priority" class="form-control">
+                                @foreach (TaskPriorityType p in Enum.GetValues(typeof(TaskPriorityType)))
+                                {
+                                    <option value="@p">
+                                        @(p switch
+                                        {
+                                            TaskPriorityType.Lowest => "خیلی کم",
+                                            TaskPriorityType.Low => "کم",
+                                            TaskPriorityType.Medium => "متوسط",
+                                            TaskPriorityType.High => "زیاد",
+                                            TaskPriorityType.Highest => "خیلی زیاد",
+                                            _ => "-"
+                                        })
+                                </option>
+                                                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Estimate"></label>
+                            <input asp-for="Estimate" type="number" min="0" max="999" class="form-control" />
+                            <span asp-validation-for="Estimate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="sprint-date-row">
+                        <div class="form-group">
+                            <label asp-for="StartDate"></label>
+                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DueDate"></label>
+                            <input asp-for="DueDate" type="date" class="form-control" />
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Index" asp-route-userStoryId="@Model.UserStoryId" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            ایجاد Task
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

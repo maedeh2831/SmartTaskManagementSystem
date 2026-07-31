@@ -1,0 +1,136 @@
+﻿@model SmartTask.Web.Models.ViewModels.UserStory.UserStoryIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "User Story ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1>User Story های @Model.ProjectName</h1>
+            <p>مدیریت کامل تمام نیازمندی‌های کسب‌وکار این پروژه.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <div class="workspace-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="storySearchInput" placeholder="جستجوی User Story..." />
+            </div>
+
+            <a asp-controller="Backlog" asp-action="Index" asp-route-projectId="@Model.ProjectId"
+               class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-layer-group"></i>
+                    بک‌لاگ
+                </button>
+            </a>
+
+            @if (Model.CanManage)
+            {
+                <a asp-action="Create" asp-route-projectId="@Model.ProjectId" class="workspace-create-btn">
+                    <i class="fa-solid fa-plus"></i>
+                    User Story جدید
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (!Model.Stories.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-book-open"></i>
+            <h3>هنوز User Story ای ثبت نشده است.</h3>
+            <p>اولین نیازمندی کسب‌وکار این پروژه را ایجاد کنید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="backlog-table-wrap">
+            <table class="backlog-table">
+                <thead>
+                    <tr>
+                        <th class="col-title">عنوان</th>
+                        <th class="col-status">وضعیت</th>
+                        <th class="col-priority">اولویت</th>
+                        <th class="col-sp">Story Point</th>
+                        <th class="col-bv">ارزش تجاری</th>
+                        <th>اسپرینت</th>
+                        <th class="col-owner">مسئول</th>
+                        <th class="col-actions"></th>
+                    </tr>
+                </thead>
+                <tbody id="storyList">
+                    @foreach (var story in Model.Stories)
+                    {
+                        <tr class="backlog-row" data-title="@story.Title">
+                            <td class="col-title">
+                                <a asp-action="Details" asp-route-id="@story.Id" class="story-title-link">
+                                    @story.Title
+                                </a>
+                            </td>
+                            <td class="col-status">
+                                <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">
+                                    @(story.Status switch
+                                    {
+                                        StoryStatusType.New => "جدید",
+                                        StoryStatusType.Ready => "آماده",
+                                        StoryStatusType.InProgress => "درحال انجام",
+                                        StoryStatusType.Done => "انجام‌شده",
+                                        StoryStatusType.Closed => "بسته‌شده",
+                                        _ => "-"
+                                    })
+                        </span>
+                    </td>
+                    <td class="col-priority">
+                        <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                    @(story.Priority switch
+                                    {
+                                        StoryPriorityType.Lowest => "خیلی کم",
+                                        StoryPriorityType.Low => "کم",
+                                        StoryPriorityType.Medium => "متوسط",
+                                        StoryPriorityType.High => "زیاد",
+                                        StoryPriorityType.Highest => "خیلی زیاد",
+                                        _ => "-"
+                                    })
+                        </span>
+                    </td>
+                    <td class="col-sp"><span class="backlog-sp-badge">@story.StoryPoint</span></td>
+                    <td class="col-bv"><span class="backlog-bv-badge">@story.BusinessValue</span></td>
+                    <td>
+                        @if (story.SprintName != null)
+                                {
+                                    <span class="userstory-sprint-tag">@story.SprintName</span>
+                                }
+                                else
+                                {
+                                    <span class="userstory-no-sprint">در بک‌لاگ</span>
+                                }
+                            </td>
+                            <td class="col-owner">@(story.OwnerName ?? "—")</td>
+                            <td class="col-actions">
+                                <a asp-action="Edit" asp-route-id="@story.Id" class="userstory-edit-btn">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/userstory.js" asp-append-version="true"></script>
+}

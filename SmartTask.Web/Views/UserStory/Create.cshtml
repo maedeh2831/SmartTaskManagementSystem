@@ -1,0 +1,143 @@
+﻿@model SmartTask.Web.Models.ViewModels.UserStory.CreateUserStoryViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "User Story جدید";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
+}
+
+<div class="workspace-create-page">
+
+    <div class="page-header">
+        <div>
+            <h1>ایجاد User Story جدید</h1>
+            <p>یک نیازمندی کسب‌وکار جدید برای این پروژه تعریف کنید.</p>
+        </div>
+
+        <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-form">
+
+            <div class="workspace-form-card">
+
+                <div class="form-title">
+                    <div class="workspace-icon">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h3>اطلاعات User Story</h3>
+                        <p>اطلاعات زیر را تکمیل کنید.</p>
+                    </div>
+                </div>
+
+                <form asp-action="Create" method="post">
+
+                    <input asp-for="ProjectId" type="hidden" />
+
+                    <div class="form-group">
+                        <label asp-for="Title"></label>
+                        <input asp-for="Title" id="storyTitle" class="form-control" placeholder="مثلاً: به عنوان کاربر می‌خواهم..." />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" id="storyDescription" rows="3" class="form-control" placeholder="شرح کامل این نیازمندی..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="AcceptanceCriteria"></label>
+                        <textarea asp-for="AcceptanceCriteria" rows="3" class="form-control" placeholder="این Story چه زمانی کامل محسوب می‌شود؟"></textarea>
+                        <span asp-validation-for="AcceptanceCriteria" class="text-danger"></span>
+                    </div>
+
+                    <div class="userstory-form-row">
+                        <div class="form-group">
+                            <label asp-for="StoryPoint"></label>
+                            <input asp-for="StoryPoint" id="storyPoint" type="number" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="StoryPoint" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="BusinessValue"></label>
+                            <input asp-for="BusinessValue" id="storyBv" type="number" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="BusinessValue" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Priority"></label>
+                            <select asp-for="Priority" id="storyPriority" class="form-control">
+                                @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
+                                {
+                                    <option value="@p">
+                                        @(p switch
+                                        {
+                                            StoryPriorityType.Lowest => "خیلی کم",
+                                            StoryPriorityType.Low => "کم",
+                                            StoryPriorityType.Medium => "متوسط",
+                                            StoryPriorityType.High => "زیاد",
+                                            StoryPriorityType.Highest => "خیلی زیاد",
+                                            _ => "-"
+                                        })
+                                </option>
+                                                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-light">انصراف</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            ایجاد User Story
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="workspace-preview">
+
+            <div class="preview-card">
+
+                <div class="preview-card-header">
+                    <div class="preview-logo userstory-preview-logo">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h4 id="previewTitle">User Story جدید</h4>
+                        <small id="previewPoints">۰ Story Point</small>
+                    </div>
+                </div>
+
+                <div id="previewDescription" class="preview-description">
+                    توضیحات این Story اینجا نمایش داده خواهد شد...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/userstory.js" asp-append-version="true"></script>
+}
