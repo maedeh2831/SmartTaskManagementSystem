@@ -3,7 +3,7 @@
 | Entity      : SubTaskItemConfiguration
 | Purpose     : پیکربندی موجودیت SubTaskItem.
 */
-
+ 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartTask.Web.Models.Entities;
