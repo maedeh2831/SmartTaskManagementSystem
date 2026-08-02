@@ -254,3 +254,356 @@
     .assignee-add-form select {
         flex: 1;
     }
+/* ===== Labels ===== */
+.label-badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.task-label-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.label-remove-form {
+    display: inline-block;
+}
+
+    .label-remove-form button {
+        background: none;
+        border: none;
+        color: #fff;
+        opacity: .8;
+        cursor: pointer;
+        font-size: 10px;
+        padding: 0;
+    }
+
+        .label-remove-form button:hover {
+            opacity: 1;
+        }
+
+.label-assign-form {
+    display: flex;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray100);
+    margin-bottom: 10px;
+}
+
+    .label-assign-form select {
+        flex: 1;
+    }
+
+.label-manage-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray500);
+    text-decoration: none;
+}
+
+    .label-manage-link:hover {
+        color: var(--primary);
+    }
+
+/* ===== Checklist ===== */
+.checklist-block {
+    border: 1px solid var(--gray100);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.checklist-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.checklist-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--gray700);
+}
+
+.checklist-header form {
+    margin-right: auto;
+}
+
+.checklist-create-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray100);
+}
+
+    .checklist-create-form i {
+        color: var(--primary);
+    }
+
+    .checklist-create-form input[type="text"] {
+        flex: 1;
+        border: 1px solid var(--gray100);
+        border-radius: 8px;
+        padding: 8px 12px;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .checklist-create-form button {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+/* ===== Comments ===== */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 10px;
+}
+
+.comment-avatar {
+    color: var(--primary);
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.comment-body {
+    flex: 1;
+    background: #FAFAFE;
+    border: 1px solid var(--gray100);
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.comment-author {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--gray700);
+}
+
+.comment-date {
+    font-size: 11px;
+    color: var(--gray500);
+}
+
+.comment-content {
+    font-size: 13px;
+    color: var(--gray700);
+    white-space: pre-wrap;
+    margin: 0 0 6px;
+}
+
+.comment-delete-btn {
+    background: none;
+    border: none;
+    color: var(--gray500);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+    .comment-delete-btn:hover {
+        color: #B91C1C;
+    }
+
+.comment-add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray100);
+}
+
+    .comment-add-form textarea {
+        resize: vertical;
+    }
+
+    .comment-add-form button {
+        align-self: flex-end;
+    }
+
+/* ===== Attachments ===== */
+.attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FAFAFE;
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+    .attachment-item i {
+        color: var(--primary);
+        font-size: 18px;
+    }
+
+.attachment-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.attachment-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray700);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .attachment-name:hover {
+        color: var(--primary);
+    }
+
+.attachment-meta {
+    font-size: 11px;
+    color: var(--gray500);
+}
+
+.attachment-upload-form {
+    display: flex;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray100);
+    align-items: center;
+}
+/* ===== Time Tracking ===== */
+.timer-active-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #FEF3C7;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+}
+
+.timer-live-display {
+    font-size: 22px;
+    font-weight: 800;
+    color: #B45309;
+    font-family: monospace;
+    direction: ltr;
+}
+
+.timer-start-form {
+    margin-bottom: 14px;
+}
+
+.manual-timelog-form {
+    padding: 14px 0;
+    border-top: 1px dashed var(--gray100);
+    border-bottom: 1px dashed var(--gray100);
+    margin-bottom: 14px;
+}
+
+.manual-timelog-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .manual-timelog-fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+.timelog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.timelog-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FAFAFE;
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+    .timelog-item i {
+        color: var(--primary);
+    }
+
+.timelog-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.timelog-user {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray700);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timelog-running-badge {
+    background: #FEF3C7;
+    color: #B45309;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.timelog-meta {
+    font-size: 11px;
+    color: var(--gray500);
+}

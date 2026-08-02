@@ -5,6 +5,7 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Task;
+using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
 using TaskEntity = SmartTask.Web.Models.Entities.TaskItem;
 
@@ -17,6 +18,11 @@ public class TaskController : BaseController
     private readonly IUserStoryService _userStoryService;
     private readonly ISubTaskService _subTaskService;
     private readonly ITaskAssignmentService _taskAssignmentService;
+    private readonly ICommentService _commentService;
+    private readonly IAttachmentService _attachmentService;
+    private readonly ITaskLabelService _taskLabelService;
+    private readonly ILabelService _labelService;
+    private readonly IChecklistService _checklistService;
     private readonly ApplicationDbContext _context;
 
     public TaskController(
@@ -24,6 +30,11 @@ public class TaskController : BaseController
         IUserStoryService userStoryService,
         ISubTaskService subTaskService,
         ITaskAssignmentService taskAssignmentService,
+        ICommentService commentService,
+        IAttachmentService attachmentService,
+        ITaskLabelService taskLabelService,
+        ILabelService labelService,
+        IChecklistService checklistService,
         ICurrentUserService currentUser,
         ApplicationDbContext context)
         : base(currentUser)
@@ -32,6 +43,11 @@ public class TaskController : BaseController
         _userStoryService = userStoryService;
         _subTaskService = subTaskService;
         _taskAssignmentService = taskAssignmentService;
+        _commentService = commentService;
+        _attachmentService = attachmentService;
+        _taskLabelService = taskLabelService;
+        _labelService = labelService;
+        _checklistService = checklistService;
         _context = context;
     }
 
@@ -83,6 +99,18 @@ public class TaskController : BaseController
 
         var assignedIds = assignees.Select(x => x.Id).ToHashSet();
 
+        var comments = await _commentService.GetByTaskAsync(id);
+        var attachments = await _attachmentService.GetByTaskAsync(id);
+        var taskLabels = await _taskLabelService.GetLabelsForTaskAsync(id);
+        var projectLabels = await _labelService.GetByProjectAsync(task.UserStory.ProjectId);
+        var checklists = await _checklistService.GetByTaskAsync(id);
+
+        var currentUserId = CurrentUser.UserId;
+        var canManageTask = await _taskService.CanManageTaskAsync(id, currentUserId);
+        var assignedLabelIds = taskLabels.Select(x => x.Id).ToHashSet();
+        var timeLogs = await _timeLogService.GetByTaskAsync(id);
+        var activeTimer = await _timeLogService.GetActiveTimerAsync(id, currentUserId);
+        var totalMinutes = await _timeLogService.GetTotalMinutesForTaskAsync(id);
         var vm = new TaskDetailsViewModel
         {
             Id = task.Id,
@@ -100,7 +128,7 @@ public class TaskController : BaseController
             DueDate = task.DueDate,
             CompletedDate = task.CompletedDate,
             CreateDate = task.CreatedDate,
-            CanManage = await _taskService.CanManageTaskAsync(id, CurrentUser.UserId),
+            CanManage = canManageTask,
             SubTasks = subTasks.Select(x => new SubTaskItemViewModel
             {
                 Id = x.Id,
@@ -118,7 +146,70 @@ public class TaskController : BaseController
                 {
                     UserId = x.ApplicationUserId,
                     FullName = x.ApplicationUser.FullName
+                }).ToList(),
+            Comments = comments.Select(x => new CommentViewModel
+            {
+                Id = x.Id,
+                Content = x.Content,
+                AuthorName = x.ApplicationUser.FullName,
+                CreateDate = x.CreatedDate,
+                IsEdited = x.IsEdited,
+                CanDelete = x.ApplicationUserId == currentUserId || canManageTask
+            }).ToList(),
+            Attachments = attachments.Select(x => new AttachmentViewModel
+            {
+                Id = x.Id,
+                FileName = x.FileName,
+                FilePath = x.FilePath,
+                FileSize = x.FileSize,
+                ContentType = x.ContentType,
+                UploaderName = x.ApplicationUser.FullName,
+                CreateDate = x.CreatedDate,
+                CanDelete = x.ApplicationUserId == currentUserId || canManageTask
+            }).ToList(),
+            Labels = taskLabels.Select(x => new LabelBadgeViewModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Color = x.Color
+            }).ToList(),
+            AvailableLabels = projectLabels
+                .Where(x => !assignedLabelIds.Contains(x.Id))
+                .Select(x => new LabelBadgeViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Color = x.Color
+                }).ToList(),
+            Checklists = checklists.Select(c => new ChecklistViewModel
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Items = c.Items.Select(i => new ChecklistItemViewModel
+                {
+                    Id = i.Id,
+                    Title = i.Title,
+                    IsCompleted = i.IsCompleted
                 }).ToList()
+            }).ToList(),
+
+            TimeLogs = timeLogs.Select(x => new TimeLogItemViewModel
+            {
+                Id = x.Id,
+                UserName = x.ApplicationUser.FullName,
+                StartTime = x.StartTime,
+                EndTime = x.EndTime,
+                DurationMinutes = x.DurationMinutes,
+                Description = x.Description,
+                CanDelete = x.ApplicationUserId == currentUserId || canManageTask
+            }).ToList(),
+            MyActiveTimer = activeTimer == null ? null : new ActiveTimerViewModel
+            {
+                Id = activeTimer.Id,
+                StartTime = activeTimer.StartTime
+            },
+            TotalLoggedMinutes = totalMinutes,
+
         };
 
         return View(vm);

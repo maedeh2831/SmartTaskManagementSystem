@@ -93,5 +93,41 @@ namespace SmartTask.Web.Services.Implementations
             task.ViewState = false;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<TaskItem>> GetProjectBoardAsync(
+        int projectId,
+        int? assigneeId = null,
+        TaskPriorityType? priority = null,
+        TaskType? type = null,
+        int? labelId = null)
+            {
+                var query = _context.TaskItems
+                    .Where(x =>
+                        x.ViewState &&
+                        x.UserStory.ViewState &&
+                        x.UserStory.ProjectId == projectId)
+                    .Include(x => x.UserStory)
+                    .Include(x => x.Assignments.Where(a => a.ViewState))
+                        .ThenInclude(a => a.ApplicationUser)
+                    .Include(x => x.TaskLabels.Where(tl => tl.ViewState))
+                        .ThenInclude(tl => tl.Label)
+                    .AsQueryable();
+
+                if (assigneeId.HasValue)
+                    query = query.Where(x => x.Assignments.Any(a => a.ViewState && a.ApplicationUserId == assigneeId.Value));
+
+                if (priority.HasValue)
+                    query = query.Where(x => x.Priority == priority.Value);
+
+                if (type.HasValue)
+                    query = query.Where(x => x.Type == type.Value);
+
+                if (labelId.HasValue)
+                    query = query.Where(x => x.TaskLabels.Any(tl => tl.ViewState && tl.LabelId == labelId.Value));
+
+                return await query
+                    .OrderByDescending(x => x.CreatedDate)
+                    .ToListAsync();
+            }
     }
 }

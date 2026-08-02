@@ -34,7 +34,6 @@
         </div>
 
         <div style="display:flex;gap:10px;">
-
             <a asp-action="Index" asp-route-userStoryId="@Model.UserStoryId" class="back-link">
                 <i class="fa-solid fa-arrow-right"></i>
                 بازگشت
@@ -47,7 +46,6 @@
                     ویرایش
                 </a>
             }
-
         </div>
     </div>
 
@@ -96,7 +94,165 @@
         </div>
     </div>
 
-    <!-- ===== 👇 بخش جدید: افراد تخصیص‌یافته (Story 3) ===== -->
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-stopwatch"></i>
+            ثبت زمان
+            <span class="subtask-progress-text">(مجموع: @Model.TotalLoggedDisplay)</span>
+        </div>
+
+        @if (Model.MyActiveTimer != null)
+        {
+            <div class="timer-active-box">
+                <div class="timer-live-display" id="liveTimer" data-start="@Model.MyActiveTimer.StartTime.ToString("o")">
+                    ۰۰:۰۰:۰۰
+                </div>
+
+                <form asp-controller="TimeLog" asp-action="Stop" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.MyActiveTimer.Id" />
+                    <input type="hidden" name="taskItemId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-stop"></i>
+                        توقف تایمر
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <form asp-controller="TimeLog" asp-action="Start" method="post" class="timer-start-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    شروع تایمر
+                </button>
+            </form>
+        }
+
+        @if (Model.CanManage)
+        {
+            <form asp-controller="TimeLog" asp-action="AddManual" method="post" class="manual-timelog-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+
+                <div class="manual-timelog-fields">
+                    <input type="datetime-local" name="startTime" class="form-control" required />
+                    <input type="number" name="durationMinutes" min="1" max="1440" placeholder="مدت (دقیقه)" class="form-control" required />
+                    <input type="text" name="description" placeholder="توضیح (اختیاری)" class="form-control" />
+                    <button type="submit" class="btn btn-light">
+                        <i class="fa-solid fa-plus"></i>
+                        ثبت دستی
+                    </button>
+                </div>
+            </form>
+        }
+
+        @if (!Model.TimeLogs.Any())
+        {
+            <div class="team-empty-text">هنوز زمانی برای این Task ثبت نشده است.</div>
+        }
+        else
+        {
+            <div class="timelog-list">
+                @foreach (var log in Model.TimeLogs)
+                {
+                    <div class="timelog-item">
+                        <i class="fa-regular fa-clock"></i>
+                        <div class="timelog-info">
+                            <span class="timelog-user">
+                                @log.UserName
+                                @if (log.IsRunning)
+                                {
+                                    <span class="timelog-running-badge">درحال اجرا</span>
+                                }
+                            </span>
+                            <span class="timelog-meta">
+                                @log.StartTime.ToString("yyyy/MM/dd HH:mm")
+                                @if (!log.IsRunning)
+                                {
+                                    <text> — @(log.DurationMinutes) دقیقه</text>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(log.Description))
+                                {
+                                    <text> — @log.Description</text>
+                                }
+                            </span>
+                        </div>
+
+                        @if (log.CanDelete && !log.IsRunning)
+                        {
+                            <form asp-controller="TimeLog" asp-action="Delete" method="post" class="delete-timelog-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@log.Id" />
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-tags"></i>
+            Label ها
+        </div>
+
+        <div class="label-badge-list">
+            @if (!Model.Labels.Any())
+            {
+                <span class="team-empty-text">هیچ Label ای به این Task اضافه نشده است.</span>
+            }
+            else
+            {
+                @foreach (var label in Model.Labels)
+                {
+                    <span class="task-label-badge" style="background:@label.Color">
+                        @label.Name
+
+                        @if (Model.CanManage)
+                        {
+                            <form asp-controller="TaskLabel" asp-action="Remove" method="post" class="label-remove-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <input type="hidden" name="labelId" value="@label.Id" />
+                                <button type="submit"><i class="fa-solid fa-xmark"></i></button>
+                            </form>
+                        }
+                    </span>
+                }
+            }
+        </div>
+
+        @if (Model.CanManage && Model.AvailableLabels.Any())
+        {
+            <form asp-controller="TaskLabel" asp-action="Assign" method="post" class="label-assign-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <select name="labelId" class="form-control" required>
+                    <option value="">— انتخاب Label برای افزودن —</option>
+                    @foreach (var label in Model.AvailableLabels)
+                    {
+                        <option value="@label.Id">@label.Name</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    افزودن
+                </button>
+            </form>
+        }
+
+        <a asp-controller="Label" asp-action="Index" asp-route-projectId="@Model.ProjectId" class="label-manage-link">
+            <i class="fa-solid fa-gear"></i>
+            مدیریت Label های پروژه
+        </a>
+    </div>
+
     <div class="details-card">
         <div class="card-title">
             <i class="fa-solid fa-users"></i>
@@ -151,8 +307,94 @@
             </form>
         }
     </div>
-    <!-- ===== 👆 پایان بخش افراد تخصیص‌یافته ===== -->
-    <!-- ===== 👇 بخش SubTask (Story 2) ===== -->
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-list-check"></i>
+            Checklist ها
+        </div>
+
+        @if (!Model.Checklists.Any())
+        {
+            <div class="team-empty-text">هنوز Checklist ای برای این Task ثبت نشده است.</div>
+        }
+        else
+        {
+            @foreach (var checklist in Model.Checklists)
+            {
+                <div class="checklist-block">
+                    <div class="checklist-header">
+                        <span class="checklist-title">@checklist.Title</span>
+                        <span class="subtask-progress-text">(@checklist.CompletedItems از @checklist.TotalItems)</span>
+
+                        @if (Model.CanManage)
+                        {
+                            <form asp-controller="Checklist" asp-action="Delete" method="post" class="delete-checklist-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@checklist.Id" />
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        }
+                    </div>
+
+                    @if (checklist.TotalItems > 0)
+                    {
+                        <div class="subtask-progress-track">
+                            <div class="subtask-progress-fill" style="width:@checklist.ProgressPercent%"></div>
+                        </div>
+                    }
+
+                    <div class="subtask-list">
+                        @foreach (var item in checklist.Items)
+                        {
+                            <div class="subtask-item @(item.IsCompleted ? "completed" : "")" data-id="@item.Id">
+                                <label class="subtask-checkbox-wrap">
+                                    <input type="checkbox" class="checklist-item-toggle" data-id="@item.Id"
+                                           checked="@item.IsCompleted" disabled="@(!Model.CanManage)" />
+                                    <span class="subtask-title">@item.Title</span>
+                                </label>
+
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-controller="Checklist" asp-action="DeleteItem" method="post" class="delete-checklist-item-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                        <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.CanManage)
+                    {
+                        <form asp-controller="Checklist" asp-action="AddItem" method="post" class="subtask-quick-add">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="checklistId" value="@checklist.Id" />
+                            <input type="hidden" name="taskItemId" value="@Model.Id" />
+                            <i class="fa-solid fa-plus"></i>
+                            <input type="text" name="title" placeholder="افزودن آیتم جدید..." required maxlength="250" />
+                            <button type="submit">افزودن</button>
+                        </form>
+                    }
+                </div>
+            }
+        }
+
+        @if (Model.CanManage)
+        {
+            <form asp-controller="Checklist" asp-action="Create" method="post" class="checklist-create-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <i class="fa-solid fa-plus"></i>
+                <input type="text" name="title" placeholder="افزودن Checklist جدید... (مثلاً: مراحل تست)" required maxlength="200" />
+                <button type="submit">ایجاد Checklist</button>
+            </form>
+        }
+    </div>
+
     <div class="details-card">
         <div class="card-title">
             <i class="fa-solid fa-list-check"></i>
@@ -180,7 +422,6 @@
                 @foreach (var sub in Model.SubTasks)
                 {
                     <div class="subtask-item @(sub.IsCompleted ? "completed" : "")" data-id="@sub.Id">
-
                         <label class="subtask-checkbox-wrap">
                             <input type="checkbox"
                                    class="subtask-toggle"
@@ -202,7 +443,6 @@
                                 </button>
                             </form>
                         }
-
                     </div>
                 }
             </div>
@@ -219,7 +459,117 @@
             </form>
         }
     </div>
-    <!-- ===== 👆 پایان بخش SubTask ===== -->
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-paperclip"></i>
+            فایل‌های پیوست
+        </div>
+
+        @if (!Model.Attachments.Any())
+        {
+            <div class="team-empty-text">هنوز فایلی پیوست نشده است.</div>
+        }
+        else
+        {
+            <div class="attachment-list">
+                @foreach (var file in Model.Attachments)
+                {
+                    <div class="attachment-item">
+                        <i class="fa-solid fa-file"></i>
+                        <div class="attachment-info">
+                            <a href="@file.FilePath" target="_blank" class="attachment-name">@file.FileName</a>
+                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @file.CreateDate.ToString("yyyy/MM/dd")</span>
+                        </div>
+
+                        @if (file.CanDelete)
+                        {
+                            <form asp-controller="Attachment" asp-action="Delete" method="post" class="delete-attachment-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@file.Id" />
+                                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.CanManage)
+        {
+            <form asp-controller="Attachment" asp-action="Upload" method="post" enctype="multipart/form-data" class="attachment-upload-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskItemId" value="@Model.Id" />
+                <input type="file" name="file" required />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-upload"></i>
+                    آپلود
+                </button>
+            </form>
+        }
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-comments"></i>
+            نظرات
+            <span class="subtask-progress-text">(@Model.Comments.Count)</span>
+        </div>
+
+        @if (!Model.Comments.Any())
+        {
+            <div class="team-empty-text">هنوز نظری ثبت نشده است.</div>
+        }
+        else
+        {
+            <div class="comment-list">
+                @foreach (var comment in Model.Comments)
+                {
+                    <div class="comment-item">
+                        <div class="comment-avatar"><i class="fa-regular fa-circle-user"></i></div>
+                        <div class="comment-body">
+                            <div class="comment-header">
+                                <span class="comment-author">@comment.AuthorName</span>
+                                <span class="comment-date">
+                                    @comment.CreateDate.ToString("yyyy/MM/dd HH:mm")
+                                    @if (comment.IsEdited)
+                                    {
+                                        <span>(ویرایش‌شده)</span>
+                                    }
+                                </span>
+                            </div>
+                            <p class="comment-content">@comment.Content</p>
+
+                            @if (comment.CanDelete)
+                            {
+                                <form asp-controller="Comment" asp-action="Delete" method="post" class="delete-comment-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="commentId" value="@comment.Id" />
+                                    <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                    <button type="submit" class="comment-delete-btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                        حذف
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <form asp-controller="Comment" asp-action="Add" method="post" class="comment-add-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="taskItemId" value="@Model.Id" />
+            <textarea name="content" rows="2" class="form-control" placeholder="نظر خود را بنویسید..." required></textarea>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                ارسال نظر
+            </button>
+        </form>
+    </div>
+
     @if (Model.CanManage)
     {
         <div class="details-card">

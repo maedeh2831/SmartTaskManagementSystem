@@ -1,0 +1,83 @@
+﻿@model SmartTask.Web.Models.ViewModels.Label.LabelIndexViewModel
+
+@{
+    ViewData["Title"] = "Label های پروژه";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/label.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1>Label های @Model.ProjectName</h1>
+            <p>برچسب�های قابل استفاده روی Taskهای این پروژه را مدیریت کنید.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId"
+               class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+    </div>
+
+    @if (Model.CanManage)
+    {
+        <form asp-action="Create" method="post" class="label-create-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+            <input type="text" name="Name" placeholder="نام Label جدید..." required maxlength="100" />
+            <input type="color" name="Color" value="#2196F3" title="رنگ Label" />
+            <button type="submit">
+                <i class="fa-solid fa-plus"></i>
+                افزودن
+            </button>
+        </form>
+    }
+
+    @if (!Model.Labels.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-tags"></i>
+            <h3>هنوز Label ای برای این پروژه ثبت نشده است.</h3>
+        </div>
+    }
+    else
+    {
+        <div class="label-grid">
+            @foreach (var label in Model.Labels)
+            {
+                <div class="label-card">
+                    <span class="label-swatch" style="background:@label.Color"></span>
+                    <span class="label-name">@label.Name</span>
+
+                    @if (Model.CanManage)
+                    {
+                        <form asp-action="Delete" method="post" class="delete-label-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@label.Id" />
+                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                            <button type="submit" class="workspace-delete-btn">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/label.js" asp-append-version="true"></script>
+}

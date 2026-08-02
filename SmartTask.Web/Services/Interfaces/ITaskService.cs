@@ -11,5 +11,11 @@ namespace SmartTask.Web.Services.Interfaces
         Task<bool> CanManageTaskAsync(int taskId, int userId);
         Task ChangeStatusAsync(int taskId, TaskStatusType status);
         new Task DeleteAsync(int id);
+        Task<List<TaskItem>> GetProjectBoardAsync(
+        int projectId,
+        int? assigneeId = null,
+        TaskPriorityType? priority = null,
+        TaskType? type = null,
+        int? labelId = null);
     }
 }

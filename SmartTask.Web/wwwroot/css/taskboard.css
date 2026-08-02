@@ -1,0 +1,93 @@
+/* ==========================================================
+                SmartTask Task Board UI
+   ========================================================== */
+
+.board-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #fff;
+    border: 1px solid var(--gray100);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+}
+
+    .board-filter-bar select {
+        min-width: 140px;
+    }
+
+.board-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #B91C1C;
+    text-decoration: none;
+    margin-right: auto;
+}
+
+    .board-clear-filters:hover {
+        text-decoration: underline;
+    }
+
+.board-story-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--gray500);
+    background: var(--gray100);
+    padding: 3px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+}
+
+.board-label-mini-list {
+    display: flex;
+    gap: 4px;
+}
+
+.board-label-mini {
+    width: 14px;
+    height: 6px;
+    border-radius: 4px;
+}
+
+.board-assignee-list {
+    display: flex;
+    align-items: center;
+    gap: -6px;
+    margin-top: 4px;
+}
+
+.board-assignee-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    margin-right: -8px;
+}
+
+.board-assignee-more {
+    background: var(--gray500);
+}
+
+@media (max-width: 768px) {
+    .board-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .board-filter-bar select {
+            width: 100%;
+        }
+}

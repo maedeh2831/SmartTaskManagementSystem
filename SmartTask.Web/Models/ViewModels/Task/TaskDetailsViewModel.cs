@@ -23,14 +23,25 @@ public class TaskDetailsViewModel
 
     public bool CanManage { get; set; }
 
-    // Story 2: SubTasks
     public List<SubTaskItemViewModel> SubTasks { get; set; } = new();
     public int SubTasksTotal => SubTasks.Count;
     public int SubTasksCompleted => SubTasks.Count(x => x.IsCompleted);
     public int SubTasksProgressPercent =>
         SubTasksTotal == 0 ? 0 : (int)Math.Round((double)SubTasksCompleted / SubTasksTotal * 100);
 
-    // Story 3: Assignees
     public List<AssigneeOptionViewModel> Assignees { get; set; } = new();
     public List<AssigneeOptionViewModel> AvailableMembers { get; set; } = new();
+
+    public List<CommentViewModel> Comments { get; set; } = new();
+    public List<AttachmentViewModel> Attachments { get; set; } = new();
+    public List<LabelBadgeViewModel> Labels { get; set; } = new();
+    public List<LabelBadgeViewModel> AvailableLabels { get; set; } = new();
+    public List<ChecklistViewModel> Checklists { get; set; } = new();
+    public List<TimeLogItemViewModel> TimeLogs { get; set; } = new();
+    public ActiveTimerViewModel? MyActiveTimer { get; set; }
+    public int TotalLoggedMinutes { get; set; }
+    public string TotalLoggedDisplay =>
+        TotalLoggedMinutes >= 60
+            ? $"{TotalLoggedMinutes / 60} ساعت و {TotalLoggedMinutes % 60} دقیقه"
+            : $"{TotalLoggedMinutes} دقیقه";
 }
