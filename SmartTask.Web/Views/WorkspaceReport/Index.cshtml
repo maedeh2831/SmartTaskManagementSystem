@@ -1,0 +1,178 @@
+﻿@model SmartTask.Web.Models.ViewModels.Report.WorkspaceReportViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "گزارش‌ها";
+}
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/report.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>گزارش‌های @Model.WorkspaceName</h1>
+            <p>تحلیل عملکرد Task ها، زمان و اعضا در بازه دلخواه</p>
+        </div>
+        <form method="get" class="report-filter-form">
+            <input type="hidden" name="workspaceId" value="@Model.WorkspaceId" />
+            <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="report-date-input" />
+            <span>تا</span>
+            <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="report-date-input" />
+            <button type="submit" class="btn-report-filter"><i class="fa-solid fa-filter"></i> اعمال فیلتر</button>
+        </form>
+    </div>
+
+    <div class="report-stats-grid">
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalTasks</span>
+            <span class="report-stat-label">کل Task ها</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.CompletedTasks</span>
+            <span class="report-stat-label">تکمیل‌شده</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.CompletionRate%</span>
+            <span class="report-stat-label">نرخ تکمیل</span>
+        </div>
+        <div class="report-stat-card report-stat-danger">
+            <span class="report-stat-value">@Model.OverdueTasksCount</span>
+            <span class="report-stat-label">عقب‌افتاده</span>
+        </div>
+    </div>
+
+    <div class="report-tabs">
+        <button class="report-tab-btn active" data-tab="tasks">گزارش Task و بهره‌وری</button>
+        <button class="report-tab-btn" data-tab="team">گزارش تیمی و عضویت</button>
+    </div>
+
+    <div class="report-tab-panel active" id="tab-tasks">
+        <div class="report-charts-grid">
+            <div class="widget-card">
+                <div class="widget-header"><h3>وضعیت Task ها</h3></div>
+                <canvas id="taskStatusChart"></canvas>
+            </div>
+            <div class="widget-card">
+                <div class="widget-header"><h3>اولویت Task ها</h3></div>
+                <canvas id="taskPriorityChart"></canvas>
+            </div>
+            <div class="widget-card widget-card-wide">
+                <div class="widget-header"><h3>زمان ثبت‌شده به تفکیک پروژه (دقیقه)</h3></div>
+                <canvas id="timeLogChart"></canvas>
+            </div>
+        </div>
+
+        <div class="widget-card widget-card-wide">
+            <div class="widget-header"><h3>Task های عقب‌افتاده</h3></div>
+            @if (!Model.TopOverdueTasks.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <p>هیچ Task عقب‌افتاده‌ای وجود ندارد.</p>
+                </div>
+            }
+            else
+            {
+                <table class="report-table">
+                    <thead>
+                        <tr><th>عنوان</th><th>پروژه</th><th>موعد</th><th>روز تأخیر</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.TopOverdueTasks)
+                        {
+                            <tr>
+                                <td>@t.Title</td>
+                                <td>@t.ProjectName</td>
+                                <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
+                                <td><span class="report-badge-danger">@t.DaysOverdue روز</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <div class="report-tab-panel" id="tab-team">
+        <div class="widget-card widget-card-wide">
+            <div class="widget-header"><h3>حجم کاری اعضا</h3></div>
+            @if (!Model.MemberWorkload.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-users"></i>
+                    <p>هنوز داده‌ای ثبت نشده است.</p>
+                </div>
+            }
+            else
+            {
+                <table class="report-table">
+                    <thead>
+                        <tr><th>عضو</th><th>Task تخصیص‌یافته</th><th>تکمیل‌شده</th><th>زمان ثبت‌شده</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model.MemberWorkload)
+                        {
+                            <tr>
+                                <td>@m.FullName</td>
+                                <td>@m.AssignedTasksCount</td>
+                                <td>@m.CompletedTasksCount</td>
+                                <td>@((m.TotalMinutesLogged / 60.0).ToString("0.0")) ساعت</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="widget-card widget-card-wide">
+            <div class="widget-header"><h3>مقایسه پروژه‌ها</h3></div>
+            @if (!Model.ProjectComparison.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <p>پروژه‌ای برای مقایسه وجود ندارد.</p>
+                </div>
+            }
+            else
+            {
+                <div class="report-project-compare-list">
+                    @foreach (var p in Model.ProjectComparison)
+                    {
+                        <a href="@Url.Action("Index", "ProjectReport", new { projectId = p.ProjectId })" class="report-project-compare-row">
+                            <span class="report-project-dot" style="background:@p.Color"></span>
+                            <span class="report-project-name">@p.ProjectName</span>
+                            <div class="report-progress-bar">
+                                <div class="report-progress-fill" style="width:@p.CompletionPercentage%; background:@p.Color"></div>
+                            </div>
+                            <span class="report-project-percent">@p.CompletionPercentage%</span>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="report-export-actions">
+        <a href="@Url.Action("ExportPdf", new { workspaceId = Model.WorkspaceId, fromDate = Model.FromDate, toDate = Model.ToDate })" class="btn-export-pdf">
+            <i class="fa-solid fa-file-pdf"></i> خروجی PDF
+        </a>
+        <a href="@Url.Action("ExportExcel", new { workspaceId = Model.WorkspaceId, fromDate = Model.FromDate, toDate = Model.ToDate })" class="btn-export-excel">
+            <i class="fa-solid fa-file-excel"></i> خروجی Excel
+        </a>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script>
+        const reportData = {
+            taskStatus: @Html.Raw(JsonSerializer.Serialize(Model.TaskStatusChart)),
+            taskPriority: @Html.Raw(JsonSerializer.Serialize(Model.TaskPriorityChart)),
+            timeLog: @Html.Raw(JsonSerializer.Serialize(Model.TimeLogByProjectChart))
+        };
+    </script>
+    <script src="~/js/report.js" asp-append-version="true"></script>
+}

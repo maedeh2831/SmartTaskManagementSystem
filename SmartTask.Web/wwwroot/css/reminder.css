@@ -1,0 +1,220 @@
+/* ==========================================================
+                 SmartTask Reminder UI
+   ========================================================== */
+
+.reminder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reminder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FAFAFE;
+    border: 1px solid var(--gray100);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: box-shadow .2s ease;
+}
+
+    .reminder-item:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+
+    .reminder-item.past {
+        opacity: .75;
+    }
+
+        .reminder-item.past.sent {
+            background: #F0FDF4;
+            border-color: #DCFCE7;
+        }
+
+.reminder-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--gray100);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.reminder-item.past:not(.sent) .reminder-item-icon {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.reminder-item-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.reminder-item-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray700);
+    text-decoration: none;
+}
+
+    .reminder-item-title:hover {
+        color: var(--primary);
+    }
+
+.reminder-item-meta {
+    font-size: 11.5px;
+    color: var(--gray500);
+}
+
+.reminder-item-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.reminder-edit-btn,
+.reminder-delete-btn {
+    background: none;
+    border: none;
+    color: var(--gray500);
+    font-size: 12px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .reminder-edit-btn:hover {
+        background: #DBEAFE;
+        color: #1D4ED8;
+    }
+
+    .reminder-delete-btn:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+/* ===== Calendar ===== */
+.reminder-calendar-card {
+    padding: 20px;
+}
+
+.reminder-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.reminder-calendar-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray700);
+}
+
+.reminder-calendar-nav-btn {
+    background: var(--gray100);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--gray700);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s ease;
+}
+
+    .reminder-calendar-nav-btn:hover {
+        background: var(--gray100);
+        color: var(--primary);
+    }
+
+.reminder-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray500);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gray100);
+    margin-bottom: 8px;
+}
+
+.reminder-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.reminder-calendar-day {
+    min-height: 78px;
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+    .reminder-calendar-day:hover {
+        background: #FAFAFE;
+        border-color: var(--primary);
+    }
+
+    .reminder-calendar-day.empty {
+        border: none;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .reminder-calendar-day.today {
+        border-color: var(--primary);
+        background: #F5F5FF;
+    }
+
+.reminder-calendar-day-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray700);
+}
+
+.reminder-calendar-day-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.reminder-calendar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+    .reminder-calendar-dot.sent {
+        background: #15803D;
+    }
+
+@media (max-width: 768px) {
+    .reminder-calendar-day {
+        min-height: 50px;
+    }
+}

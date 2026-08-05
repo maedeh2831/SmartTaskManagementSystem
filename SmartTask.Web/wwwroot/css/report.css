@@ -1,0 +1,237 @@
+﻿/* ==========================================================
+                    SmartTask Report UI
+   ========================================================== */
+
+.report-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-date-input {
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--gray700);
+}
+
+.btn-report-filter {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-report-filter:hover {
+        background: var(--primary-light);
+    }
+
+.report-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.report-stat-card {
+    background: #fff;
+    border: 1px solid var(--gray100);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.report-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray700);
+}
+
+.report-stat-label {
+    font-size: 13px;
+    color: var(--gray500);
+}
+
+.report-stat-danger .report-stat-value {
+    color: #E11D48;
+}
+
+.report-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--gray100);
+    margin-bottom: 20px;
+}
+
+.report-tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray500);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: 0.2s;
+}
+
+    .report-tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+.report-tab-panel {
+    display: none;
+}
+
+    .report-tab-panel.active {
+        display: block;
+    }
+
+.report-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+    .report-table th {
+        text-align: right;
+        color: var(--gray500);
+        font-weight: 600;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--gray100);
+    }
+
+    .report-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--gray100);
+        color: var(--gray700);
+    }
+
+.report-badge-danger {
+    background: #FEE2E2;
+    color: #E11D48;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.report-project-compare-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.report-project-compare-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.report-project-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.report-project-name {
+    width: 150px;
+    font-size: 13px;
+    color: var(--gray700);
+    font-weight: 600;
+}
+
+.report-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--gray100);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.report-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+}
+
+.report-project-percent {
+    width: 45px;
+    text-align: left;
+    font-size: 13px;
+    color: var(--gray500);
+}
+
+.report-export-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-export-pdf,
+.btn-export-excel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-export-pdf {
+    background: #FEF2F2;
+    color: #DC2626;
+}
+
+    .btn-export-pdf:hover {
+        background: #FEE2E2;
+    }
+
+.btn-export-excel {
+    background: #F0FDF4;
+    color: #16A34A;
+}
+
+    .btn-export-excel:hover {
+        background: #DCFCE7;
+    }
+
+@media (max-width: 992px) {
+    .report-stats-grid,
+    .report-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.report-project-compare-row {
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 6px;
+    transition: 0.15s;
+}
+
+    .report-project-compare-row:hover {
+        background: var(--gray100);
+    }

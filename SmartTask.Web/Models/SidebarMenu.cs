@@ -71,6 +71,15 @@ namespace SmartTask.Web.Models
                 Category="تحلیل",
                 Icon="fa-solid fa-chart-line",
                 Controller="Report"
+            },
+
+            new()
+            {
+                Title="داشبورد مدیریت",
+                Category="سیستم",
+                Icon="fa-solid fa-shield-halved",
+                Controller="Admin",
+                RequiredRole="Admin"
             }
         };
     }

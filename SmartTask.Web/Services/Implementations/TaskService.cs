@@ -11,16 +11,37 @@ namespace SmartTask.Web.Services.Implementations
     {
         private readonly ApplicationDbContext _context;
         private readonly IUserStoryService _userStoryService;
+        private readonly INotificationService _notificationService;
+        private readonly IActivityLogService _activityLogService;
+        private readonly ICurrentUserService _currentUser;
 
         public TaskService(
             IGenericRepository<TaskItem> repository,
             IUnitOfWork unitOfWork,
             ApplicationDbContext context,
-            IUserStoryService userStoryService)
+            IUserStoryService userStoryService,
+            INotificationService notificationService,
+            IActivityLogService activityLogService,
+            ICurrentUserService currentUser)
             : base(repository, unitOfWork)
         {
             _context = context;
             _userStoryService = userStoryService;
+            _notificationService = notificationService;
+            _activityLogService = activityLogService;
+            _currentUser = currentUser;
+        }
+
+        public override async Task AddAsync(TaskItem entity)
+        {
+            await base.AddAsync(entity);
+            await _activityLogService.LogAsync(_currentUser.UserId, "ایجاد Task", $"Task «{entity.Title}» ایجاد شد.", entity.Id);
+        }
+
+        public override async Task UpdateAsync(TaskItem entity)
+        {
+            await base.UpdateAsync(entity);
+            await _activityLogService.LogAsync(_currentUser.UserId, "ویرایش Task", $"Task «{entity.Title}» ویرایش شد.", entity.Id);
         }
 
         public async Task<TaskItem?> GetDetailsAsync(int id)
@@ -80,6 +101,43 @@ namespace SmartTask.Web.Services.Implementations
                 task.CompletedDate = null;
 
             await _context.SaveChangesAsync();
+
+            var statusDisplay = GetStatusDisplay(status);
+
+            await _activityLogService.LogAsync(
+                _currentUser.UserId,
+                "تغییر وضعیت Task",
+                $"وضعیت Task «{task.Title}» به «{statusDisplay}» تغییر کرد.",
+                task.Id);
+
+            await NotifyStatusChangeAsync(task, statusDisplay);
+        }
+
+        private static string GetStatusDisplay(TaskStatusType status) => status switch
+        {
+            TaskStatusType.ToDo => "برای انجام",
+            TaskStatusType.InProgress => "درحال انجام",
+            TaskStatusType.InReview => "درحال بررسی",
+            TaskStatusType.Done => "انجام‌شده",
+            TaskStatusType.Cancelled => "لغو‌شده",
+            _ => status.ToString()
+        };
+
+        private async Task NotifyStatusChangeAsync(TaskItem task, string statusDisplay)
+        {
+            var assigneeIds = await _context.TaskAssignments
+                .Where(x => x.TaskItemId == task.Id && x.ViewState)
+                .Select(x => x.ApplicationUserId)
+                .ToListAsync();
+
+            foreach (var assigneeId in assigneeIds)
+            {
+                await _notificationService.CreateAsync(
+                    assigneeId,
+                    "تغییر وضعیت Task",
+                    $"وضعیت Task «{task.Title}» به «{statusDisplay}» تغییر کرد.",
+                    NotificationType.StatusChange);
+            }
         }
 
         public new async Task DeleteAsync(int id)
@@ -92,6 +150,8 @@ namespace SmartTask.Web.Services.Implementations
 
             task.ViewState = false;
             await _context.SaveChangesAsync();
+
+            await _activityLogService.LogAsync(_currentUser.UserId, "حذف Task", $"Task «{task.Title}» حذف شد.", task.Id);
         }
 
         public async Task<List<TaskItem>> GetProjectBoardAsync(
@@ -100,34 +160,34 @@ namespace SmartTask.Web.Services.Implementations
         TaskPriorityType? priority = null,
         TaskType? type = null,
         int? labelId = null)
-            {
-                var query = _context.TaskItems
-                    .Where(x =>
-                        x.ViewState &&
-                        x.UserStory.ViewState &&
-                        x.UserStory.ProjectId == projectId)
-                    .Include(x => x.UserStory)
-                    .Include(x => x.Assignments.Where(a => a.ViewState))
-                        .ThenInclude(a => a.ApplicationUser)
-                    .Include(x => x.TaskLabels.Where(tl => tl.ViewState))
-                        .ThenInclude(tl => tl.Label)
-                    .AsQueryable();
+        {
+            var query = _context.TaskItems
+                .Where(x =>
+                    x.ViewState &&
+                    x.UserStory.ViewState &&
+                    x.UserStory.ProjectId == projectId)
+                .Include(x => x.UserStory)
+                .Include(x => x.Assignments.Where(a => a.ViewState))
+                    .ThenInclude(a => a.ApplicationUser)
+                .Include(x => x.TaskLabels.Where(tl => tl.ViewState))
+                    .ThenInclude(tl => tl.Label)
+                .AsQueryable();
 
-                if (assigneeId.HasValue)
-                    query = query.Where(x => x.Assignments.Any(a => a.ViewState && a.ApplicationUserId == assigneeId.Value));
+            if (assigneeId.HasValue)
+                query = query.Where(x => x.Assignments.Any(a => a.ViewState && a.ApplicationUserId == assigneeId.Value));
 
-                if (priority.HasValue)
-                    query = query.Where(x => x.Priority == priority.Value);
+            if (priority.HasValue)
+                query = query.Where(x => x.Priority == priority.Value);
 
-                if (type.HasValue)
-                    query = query.Where(x => x.Type == type.Value);
+            if (type.HasValue)
+                query = query.Where(x => x.Type == type.Value);
 
-                if (labelId.HasValue)
-                    query = query.Where(x => x.TaskLabels.Any(tl => tl.ViewState && tl.LabelId == labelId.Value));
+            if (labelId.HasValue)
+                query = query.Where(x => x.TaskLabels.Any(tl => tl.ViewState && tl.LabelId == labelId.Value));
 
-                return await query
-                    .OrderByDescending(x => x.CreatedDate)
-                    .ToListAsync();
-            }
+            return await query
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
+        }
     }
 }

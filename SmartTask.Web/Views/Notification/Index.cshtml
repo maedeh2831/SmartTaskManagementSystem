@@ -1,0 +1,68 @@
+﻿@model SmartTask.Web.Models.ViewModels.Notification.NotificationIndexViewModel
+
+@{
+    ViewData["Title"] = "اعلان‌ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>اعلان‌ها</h1>
+            <p>@(Model.UnreadCount > 0 ? $"{Model.UnreadCount} اعلان خوانده‌نشده" : "همه اعلان‌ها خوانده شده‌اند")</p>
+        </div>
+
+        @if (Model.UnreadCount > 0)
+        {
+            <button type="button" id="markAllReadPageBtn" class="btn btn-light">
+                <i class="fa-solid fa-check-double"></i>
+                علامت‌گذاری همه به‌عنوان خوانده‌شده
+            </button>
+        }
+    </div>
+
+    <div class="details-card notification-center-card">
+        @if (!Model.Notifications.Any())
+        {
+            <div class="team-empty-text">
+                <i class="fa-regular fa-bell-slash"></i>
+                هنوز اعلانی برای شما ثبت نشده است.
+            </div>
+        }
+        else
+        {
+            <div class="notification-center-list" id="notificationCenterList">
+                @foreach (var item in Model.Notifications)
+                {
+                    <div class="notification-center-item @(item.IsRead ? "" : "unread")" data-id="@item.Id">
+                        <div class="notification-item-icon">
+                            <i class="@item.IconClass"></i>
+                        </div>
+                        <div class="notification-item-body">
+                            <span class="notification-item-title">@item.Title</span>
+                            <span class="notification-item-message">@item.Message</span>
+                            <span class="notification-item-time">@item.TimeAgoDisplay</span>
+                        </div>
+                        <div class="notification-item-actions">
+                            @if (!item.IsRead)
+                            {
+                                <button type="button" class="notification-read-btn" data-id="@item.Id" title="علامت‌گذاری به‌عنوان خوانده‌شده">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            }
+                            <button type="button" class="notification-delete-btn" data-id="@item.Id" title="حذف">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>

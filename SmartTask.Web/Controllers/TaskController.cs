@@ -23,6 +23,7 @@ public class TaskController : BaseController
     private readonly ITaskLabelService _taskLabelService;
     private readonly ILabelService _labelService;
     private readonly IChecklistService _checklistService;
+    private readonly ITimeLogService _timeLogService;
     private readonly ApplicationDbContext _context;
 
     public TaskController(
@@ -35,6 +36,7 @@ public class TaskController : BaseController
         ITaskLabelService taskLabelService,
         ILabelService labelService,
         IChecklistService checklistService,
+        ITimeLogService timeLogService,
         ICurrentUserService currentUser,
         ApplicationDbContext context)
         : base(currentUser)
@@ -48,6 +50,7 @@ public class TaskController : BaseController
         _taskLabelService = taskLabelService;
         _labelService = labelService;
         _checklistService = checklistService;
+        _timeLogService = timeLogService;
         _context = context;
     }
 

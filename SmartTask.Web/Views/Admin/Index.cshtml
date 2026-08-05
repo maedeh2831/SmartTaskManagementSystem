@@ -1,0 +1,99 @@
+﻿@model SmartTask.Web.Models.ViewModels.Admin.AdminDashboardViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "داشبورد مدیریت";
+}
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>داشبورد مدیریت سیستم</h1>
+            <p>آمار کلی SmartTask</p>
+        </div>
+    </div>
+
+    <div class="report-stats-grid">
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalUsers</span>
+            <span class="report-stat-label">کاربر</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalWorkspaces</span>
+            <span class="report-stat-label">فضای کاری</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalProjects</span>
+            <span class="report-stat-label">پروژه</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalTasks</span>
+            <span class="report-stat-label">Task</span>
+        </div>
+    </div>
+
+    <div class="home-dashboard-grid">
+        <div class="widget-card">
+            <div class="widget-header">
+                <h3>رشد کاربران (۷ روز اخیر)</h3>
+                <span class="admin-kpi-badge">+@Model.NewUsersLast7Days</span>
+            </div>
+            <canvas id="userGrowthChart"></canvas>
+        </div>
+        <div class="widget-card">
+            <div class="widget-header">
+                <h3>رشد فضاهای کاری (۷ روز اخیر)</h3>
+                <span class="admin-kpi-badge">+@Model.NewWorkspacesLast7Days</span>
+            </div>
+            <canvas id="workspaceGrowthChart"></canvas>
+        </div>
+    </div>
+
+    <div class="widget-card widget-card-wide">
+        <div class="widget-header"><h3>فعال‌ترین فضاهای کاری</h3></div>
+        @if (!Model.TopWorkspaces.Any())
+        {
+            <div class="widget-empty">
+                <i class="fa-solid fa-layer-group"></i>
+                <p>هنوز فضای کاری‌ای ثبت نشده است.</p>
+            </div>
+        }
+        else
+        {
+            <table class="report-table">
+                <thead>
+                    <tr><th>فضای کاری</th><th>پروژه‌ها</th><th>اعضا</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var w in Model.TopWorkspaces)
+                    {
+                        <tr>
+                            <td>
+                                <span class="home-workspace-dot" style="background:@w.Color"></span>
+                                @w.Name
+                            </td>
+                            <td>@w.ProjectsCount</td>
+                            <td>@w.MembersCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script>
+        const adminChartData = {
+            userGrowth: @Html.Raw(JsonSerializer.Serialize(Model.UserGrowthChart)),
+            workspaceGrowth: @Html.Raw(JsonSerializer.Serialize(Model.WorkspaceGrowthChart))
+        };
+    </script>
+    <script src="~/js/admin-dashboard.js" asp-append-version="true"></script>
+}

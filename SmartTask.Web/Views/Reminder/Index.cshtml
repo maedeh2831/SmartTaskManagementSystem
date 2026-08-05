@@ -1,0 +1,135 @@
+﻿@model SmartTask.Web.Models.ViewModels.Reminder.ReminderIndexViewModel
+
+@{
+    ViewData["Title"] = "یادآوری‌ها";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reminder.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>یادآوری‌ها</h1>
+            <p>یادآوری‌های خودتان برای Task های مختلف را مدیریت کنید.</p>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+            <a asp-action="Calendar" class="btn btn-light">
+                <i class="fa-solid fa-calendar-days"></i>
+                نمای تقویمی
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                یادآوری جدید
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-bell"></i>
+            یادآوری‌های پیش‌رو
+            <span class="subtask-progress-text">(@Model.UpcomingReminders.Count)</span>
+        </div>
+
+        @if (!Model.UpcomingReminders.Any())
+        {
+            <div class="team-empty-text">یادآوری پیش‌رویی ثبت نشده است.</div>
+        }
+        else
+        {
+            <div class="reminder-list">
+                @foreach (var item in Model.UpcomingReminders)
+                {
+                    <div class="reminder-item">
+                        <div class="reminder-item-icon">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="reminder-item-body">
+                            <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId" class="reminder-item-title">
+                                @item.Title
+                            </a>
+                            <span class="reminder-item-meta">
+                                Task: @item.TaskTitle — @item.ReminderDate.ToString("yyyy/MM/dd HH:mm")
+                            </span>
+                        </div>
+                        <div class="reminder-item-actions">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="reminder-edit-btn" title="ویرایش">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="delete-reminder-form">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="reminder-delete-btn" title="حذف">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            یادآوری‌های گذشته
+            <span class="subtask-progress-text">(@Model.PastReminders.Count)</span>
+        </div>
+
+        @if (!Model.PastReminders.Any())
+        {
+            <div class="team-empty-text">یادآوری گذشته‌ای وجود ندارد.</div>
+        }
+        else
+        {
+            <div class="reminder-list">
+                @foreach (var item in Model.PastReminders)
+                {
+                    <div class="reminder-item past @(item.IsSent ? "sent" : "")">
+                        <div class="reminder-item-icon">
+                            <i class="fa-solid @(item.IsSent ? "fa-check" : "fa-triangle-exclamation")"></i>
+                        </div>
+                        <div class="reminder-item-body">
+                            <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId" class="reminder-item-title">
+                                @item.Title
+                            </a>
+                            <span class="reminder-item-meta">
+                                Task: @item.TaskTitle — @item.ReminderDate.ToString("yyyy/MM/dd HH:mm")
+                                @(item.IsSent ? " — ارسال‌شده" : " — ارسال‌نشده")
+                            </span>
+                        </div>
+                        <div class="reminder-item-actions">
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="delete-reminder-form">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="reminder-delete-btn" title="حذف">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/reminder.js" asp-append-version="true"></script>
+}

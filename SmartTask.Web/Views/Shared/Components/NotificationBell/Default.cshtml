@@ -1,0 +1,62 @@
+﻿@model SmartTask.Web.Models.ViewModels.Shared.NotificationBellViewModel
+
+<form id="notificationAntiForgeryForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="dropdown notification-bell-wrapper">
+    <button class="notification-bell-btn" data-bs-toggle="dropdown" id="notificationBellBtn">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notification-badge @(Model.UnreadCount == 0 ? "d-none" : "")" id="notificationBadge">
+            @(Model.UnreadCount > 9 ? "9+" : Model.UnreadCount.ToString())
+        </span>
+    </button>
+
+    <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+        <div class="notification-dropdown-header">
+            <span>اعلان‌ها</span>
+            @if (Model.UnreadCount > 0)
+            {
+                <button type="button" id="markAllReadBtn" class="notification-mark-all-btn">
+                    <i class="fa-solid fa-check-double"></i>
+                    خواندن همه
+                </button>
+            }
+        </div>
+
+        <div class="notification-dropdown-list" id="notificationDropdownList">
+            @if (!Model.RecentNotifications.Any())
+            {
+                <div class="notification-empty">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    <span>اعلانی وجود ندارد</span>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in Model.RecentNotifications)
+                {
+                    <div class="notification-dropdown-item @(item.IsRead ? "" : "unread")" data-id="@item.Id">
+                        <div class="notification-item-icon">
+                            <i class="@item.IconClass"></i>
+                        </div>
+                        <div class="notification-item-body">
+                            <span class="notification-item-title">@item.Title</span>
+                            <span class="notification-item-message">@item.Message</span>
+                            <span class="notification-item-time">@item.TimeAgoDisplay</span>
+                        </div>
+                        @if (!item.IsRead)
+                        {
+                            <span class="notification-dot"></span>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <a asp-controller="Notification" asp-action="Index" class="notification-dropdown-footer">
+            مشاهده همه اعلان‌ها
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+    </div>
+</div>

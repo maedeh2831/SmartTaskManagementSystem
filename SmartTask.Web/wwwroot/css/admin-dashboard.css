@@ -1,0 +1,12 @@
+/* ==========================================================
+                 SmartTask Admin Dashboard UI
+   ========================================================== */
+
+.admin-kpi-badge {
+    background: #DCFCE7;
+    color: #16A34A;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}

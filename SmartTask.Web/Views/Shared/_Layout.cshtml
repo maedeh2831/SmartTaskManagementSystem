@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
 
 </head>
 
@@ -21,6 +22,8 @@
     <header class="main-header">
 
         <div class="header-actions">
+
+            @await Component.InvokeAsync("NotificationBell")
 
             @await Component.InvokeAsync("Header")
 
@@ -77,6 +80,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="~/js/site.js"></script>
+
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script src="~/js/notification.js" asp-append-version="true"></script>
 
     @if (TempData["Success"] != null)
     {

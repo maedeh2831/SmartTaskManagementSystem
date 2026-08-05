@@ -1,0 +1,61 @@
+﻿@model SmartTask.Web.Models.ViewModels.Activity.ActivityIndexViewModel
+
+@{
+    ViewData["Title"] = "فعالیت‌های من";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/activity.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>فعالیت‌های من</h1>
+            <p>تاریخچه کامل اقدامات شما روی Task های مختلف</p>
+        </div>
+    </div>
+
+    <div class="widget-card widget-card-wide">
+        <div class="widget-header">
+            <h3>تاریخچه فعالیت</h3>
+        </div>
+
+        @if (!Model.Activities.Any())
+        {
+            <div class="widget-empty">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <p>هنوز فعالیتی برای شما ثبت نشده است.</p>
+            </div>
+        }
+        else
+        {
+            <div class="activity-timeline">
+                @foreach (var item in Model.Activities)
+                {
+                    <div class="activity-row">
+                        <div class="activity-icon"><i class="@item.IconClass"></i></div>
+                        <div class="activity-info">
+                            <p>
+                                @item.Action
+                                @if (!string.IsNullOrWhiteSpace(item.TaskTitle))
+                                {
+                                    <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId">(@item.TaskTitle)</a>
+                                }
+                            </p>
+                            @if (!string.IsNullOrWhiteSpace(item.Description))
+                            {
+                                <span class="activity-desc">@item.Description</span>
+                            }
+                            <span>@item.ActivityDate.ToString("yyyy/MM/dd HH:mm")</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>

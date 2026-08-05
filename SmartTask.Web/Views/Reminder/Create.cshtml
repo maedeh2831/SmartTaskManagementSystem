@@ -1,0 +1,78 @@
+﻿@model SmartTask.Web.Models.ViewModels.Reminder.CreateReminderViewModel
+
+@{
+    ViewData["Title"] = "یادآوری جدید";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reminder.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>یادآوری جدید</h1>
+            <p>یک یادآوری برای یکی از Task هایی که به شما تخصیص یافته تنظیم کنید.</p>
+        </div>
+        <a asp-action="Index" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+    </div>
+
+    <div class="details-card">
+        @if (!Model.AvailableTasks.Any())
+        {
+            <div class="team-empty-text">
+                هیچ Task ای به شما تخصیص نیافته است، پس نمی‌توانید یادآوری بسازید.
+            </div>
+        }
+        else
+        {
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="TaskItemId" class="form-label"></label>
+                    <select asp-for="TaskItemId" class="form-control" required>
+                        <option value="">— انتخاب Task —</option>
+                        @foreach (var task in Model.AvailableTasks)
+                        {
+                            <option value="@task.Id">@task.Title</option>
+                        }
+                    </select>
+                    <span asp-validation-for="TaskItemId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" maxlength="250" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">تاریخ و ساعت یادآوری</label>
+                    <input type="datetime-local" name="ReminderDate" class="form-control" required />
+                    <span asp-validation-for="ReminderDate" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-bell"></i>
+                    ثبت یادآوری
+                </button>
+            </form>
+        }
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

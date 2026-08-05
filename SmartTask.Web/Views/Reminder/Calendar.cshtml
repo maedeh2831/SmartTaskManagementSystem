@@ -1,0 +1,78 @@
+﻿@model SmartTask.Web.Models.ViewModels.Reminder.ReminderCalendarViewModel
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "تقویم یادآوری‌ها";
+    var remindersJson = JsonSerializer.Serialize(Model.Reminders.Select(x => new
+    {
+        id = x.Id,
+        title = x.Title,
+        taskTitle = x.TaskTitle,
+        taskItemId = x.TaskItemId,
+        date = x.ReminderDate.ToString("yyyy-MM-dd"),
+        time = x.ReminderDate.ToString("HH:mm"),
+        isSent = x.IsSent
+    }));
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reminder.css" asp-append-version="true" />
+}
+
+<div class="workspace-details-page">
+
+    <div class="page-header">
+        <div>
+            <h1>تقویم یادآوری‌ها</h1>
+            <p>نمای ماهانه یادآوری‌های شما</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a asp-action="Index" class="btn btn-light">
+                <i class="fa-solid fa-list"></i>
+                نمای لیستی
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                یادآوری جدید
+            </a>
+        </div>
+    </div>
+
+    <div class="details-card reminder-calendar-card">
+        <div class="reminder-calendar-header">
+            <button type="button" id="calPrevBtn" class="reminder-calendar-nav-btn">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <span id="calMonthLabel" class="reminder-calendar-title"></span>
+            <button type="button" id="calNextBtn" class="reminder-calendar-nav-btn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <div class="reminder-calendar-weekdays">
+            <span>شنبه</span><span>یکشنبه</span><span>دوشنبه</span><span>سه‌شنبه</span>
+            <span>چهارشنبه</span><span>پنجشنبه</span><span>جمعه</span>
+        </div>
+
+        <div id="calendarGrid" class="reminder-calendar-grid"></div>
+    </div>
+
+    <div class="details-card" id="calendarDayDetails" style="display:none;">
+        <div class="card-title">
+            <i class="fa-solid fa-bell"></i>
+            یادآوری‌های <span id="calendarSelectedDate"></span>
+        </div>
+        <div class="reminder-list" id="calendarDayList"></div>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script>
+        window.reminderCalendarData = @Html.Raw(remindersJson);
+    </script>
+    <script src="~/js/reminder.js" asp-append-version="true"></script>
+}

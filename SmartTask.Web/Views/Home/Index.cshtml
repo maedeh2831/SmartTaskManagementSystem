@@ -1,8 +1,139 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SmartTask.Web.Models.ViewModels.Home.UserDashboardViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "داشبورد";
+}
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-dashboard.css" asp-append-version="true" />
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>خوش آمدید، @Model.FullName 👋</h1>
+            <p>خلاصه‌ای از کارها و فضاهای کاری شما</p>
+        </div>
+    </div>
+
+    <div class="report-stats-grid">
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalWorkspaces</span>
+            <span class="report-stat-label">فضای کاری</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalProjects</span>
+            <span class="report-stat-label">پروژه</span>
+        </div>
+        <div class="report-stat-card">
+            <span class="report-stat-value">@Model.TotalAssignedTasks</span>
+            <span class="report-stat-label">Task تخصیص‌یافته</span>
+        </div>
+        <div class="report-stat-card report-stat-danger">
+            <span class="report-stat-value">@Model.OverdueAssignedTasks</span>
+            <span class="report-stat-label">عقب‌افتاده</span>
+        </div>
+    </div>
+
+    <div class="home-dashboard-grid">
+        <div class="widget-card">
+            <div class="widget-header"><h3>وضعیت Task های من</h3></div>
+            <canvas id="myTaskStatusChart"></canvas>
+        </div>
+
+        <div class="widget-card">
+            <div class="widget-header"><h3>Task های نزدیک به موعد</h3></div>
+            @if (!Model.UpcomingTasks.Any())
+            {
+                <div class="widget-empty">
+                    <i class="fa-solid fa-mug-hot"></i>
+                    <p>هیچ Task نزدیک به موعدی نداری.</p>
+                </div>
+            }
+            else
+            {
+                <div class="home-upcoming-list">
+                    @foreach (var t in Model.UpcomingTasks)
+                    {
+                        <a asp-controller="Task" asp-action="Details" asp-route-id="@t.Id" class="home-upcoming-item">
+                            <div>
+                                <p>@t.Title</p>
+                                <span>@t.ProjectName</span>
+                            </div>
+                            <span class="home-upcoming-days">@t.DaysLeft روز مانده</span>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="widget-card widget-card-wide">
+        <div class="widget-header">
+            <h3>فضاهای کاری من</h3>
+            <a asp-controller="Workspace" asp-action="Index" class="widget-header-link">مشاهده همه</a>
+        </div>
+        @if (!Model.MyWorkspaces.Any())
+        {
+            <div class="widget-empty">
+                <i class="fa-solid fa-layer-group"></i>
+                <p>هنوز عضو هیچ فضای کاری‌ای نیستی.</p>
+            </div>
+        }
+        else
+        {
+            <div class="home-workspace-list">
+                @foreach (var w in Model.MyWorkspaces)
+                {
+                    <a asp-controller="Workspace" asp-action="Details" asp-route-id="@w.Id" class="home-workspace-item">
+                        <span class="home-workspace-dot" style="background:@w.Color"></span>
+                        <span class="home-workspace-name">@w.Name</span>
+                        <span class="home-workspace-meta">@w.ProjectsCount پروژه · @w.MembersCount عضو</span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="widget-card widget-card-wide">
+        <div class="widget-header"><h3>آخرین فعالیت‌های من</h3></div>
+        @if (!Model.RecentActivities.Any())
+        {
+            <div class="widget-empty">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <p>هنوز فعالیتی ثبت نشده است.</p>
+            </div>
+        }
+        else
+        {
+            <div class="activity-timeline">
+                @foreach (var item in Model.RecentActivities)
+                {
+                    <div class="activity-row">
+                        <div class="activity-icon"><i class="@item.IconClass"></i></div>
+                        <div class="activity-info">
+                            <p>
+                                @item.Action
+                                @if (!string.IsNullOrWhiteSpace(item.TaskTitle))
+                                {
+                                    <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId">(@item.TaskTitle)</a>
+                                }
+                            </p>
+                            <span>@item.ActivityDate.ToString("yyyy/MM/dd HH:mm")</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
+
+@section Scripts
+{
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script>
+        const homeChartData = @Html.Raw(JsonSerializer.Serialize(Model.TaskStatusChart));
+    </script>
+    <script src="~/js/home-dashboard.js" asp-append-version="true"></script>
+}

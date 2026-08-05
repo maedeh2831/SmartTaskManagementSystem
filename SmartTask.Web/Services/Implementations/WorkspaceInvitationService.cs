@@ -15,6 +15,7 @@ public class WorkspaceInvitationService
     private readonly IEmailService _emailService;
     private readonly IWorkspaceMemberService _workspaceMemberService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly INotificationService _notificationService;
 
     public WorkspaceInvitationService(
         IGenericRepository<WorkspaceInvitation> repository,
@@ -22,13 +23,15 @@ public class WorkspaceInvitationService
         ApplicationDbContext context,
         IEmailService emailService,
         IWorkspaceMemberService workspaceMemberService,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        INotificationService notificationService)
         : base(repository, unitOfWork)
     {
         _context = context;
         _emailService = emailService;
         _workspaceMemberService = workspaceMemberService;
         _httpContextAccessor = httpContextAccessor;
+        _notificationService = notificationService;
     }
 
     public async Task<List<WorkspaceInvitationViewModel>> GetPendingInvitationsAsync(int workspaceId)
@@ -184,7 +187,17 @@ public class WorkspaceInvitationService
         await _context.SaveChangesAsync();
 
         await SendInvitationEmailAsync(invitation, workspaceName, inviterName, isNewUser);
+
+        if (invitedUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                invitedUserId.Value,
+                "دعوت به فضای کاری",
+                $"{inviterName} شما را به فضای کاری «{workspaceName}» دعوت کرده است.",
+                NotificationType.Invitation);
+        }
     }
+    
 
     private async Task SendInvitationEmailAsync(
         WorkspaceInvitation invitation,

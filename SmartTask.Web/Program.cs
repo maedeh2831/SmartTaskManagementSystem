@@ -10,6 +10,8 @@ using SmartTask.Web.Services.Email;
 using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
+using SmartTask.Web.Hubs;
+using SmartTask.Web.Infrastructure.BackgroundJobs;
 
 namespace SmartTask.Web
 {
@@ -56,6 +58,8 @@ namespace SmartTask.Web
             builder.Services
            .AddControllersWithViews();
 
+            builder.Services.AddSignalR();
+
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminOnly", policy =>
@@ -87,6 +91,8 @@ namespace SmartTask.Web
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
             });
 
+            builder.Services.AddHostedService<ReminderBackgroundService>();
+
             // Repository
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -109,8 +115,13 @@ namespace SmartTask.Web
             builder.Services.AddScoped<ITaskLabelService, TaskLabelService>();
             builder.Services.AddScoped<IChecklistService, ChecklistService>();
             builder.Services.AddScoped<ITimeLogService, TimeLogService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IReminderService, ReminderService>();
             builder.Services.AddScoped<IBacklogService, BacklogService>();
+            builder.Services.AddScoped<IWorkspaceReportService, WorkspaceReportService>();
+            builder.Services.AddScoped<IProjectReportService, ProjectReportService>();
             builder.Services.AddScoped<ISubTaskService, SubTaskService>();
+            builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
             builder.Services.AddScoped<IUserStoryService, UserStoryService>();
             builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
             builder.Services.AddScoped<IProjectTeamService, ProjectTeamService>();
@@ -118,9 +129,16 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ISprintService, SprintService>();
             builder.Services.AddScoped<ITaskService, TaskService>();
+            builder.Services.AddScoped<IWorkspaceReportService, WorkspaceReportService>();
+            builder.Services.AddScoped<IProjectReportService, ProjectReportService>();
+            builder.Services.AddScoped<IReportExportService, ReportExportService>();
+            builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
+            builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddTransient<IEmailService, EmailService>();
+
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
             var app = builder.Build();
 
@@ -143,6 +161,8 @@ namespace SmartTask.Web
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapHub<NotificationHub>("/hubs/notification");
 
             using (var scope = app.Services.CreateScope())
             {
