@@ -45,6 +45,8 @@ namespace SmartTask.Web.Models.Entities
 
         public bool ViewState { get; set; } = true;
 
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
         // Navigation Properties
 
         public ICollection<WorkspaceMember> WorkspaceMemberships { get; set; } = new List<WorkspaceMember>();

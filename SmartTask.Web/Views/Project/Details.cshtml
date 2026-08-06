@@ -82,6 +82,16 @@
                     Task Board
                 </button>
             </a>
+            <a asp-controller="Offroad"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-route"></i>
+                    آفرود
+                </button>
+            </a>
             <a asp-controller="ProjectDashboard" asp-action="Index" asp-route-projectId="@Model.Id" class="workspace-filter" style="text-decoration:none;">
                 <button type="button">
                     <i class="fa-solid fa-gauge"></i>

@@ -1,0 +1,122 @@
+﻿/* ================= Offroad ================= */
+
+.offroad-form-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+    .offroad-form-row input[type="text"] {
+        flex: 2;
+        min-width: 220px;
+    }
+
+.offroad-select-sm {
+    flex: 1;
+    min-width: 140px;
+}
+
+.offroad-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.offroad-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    background: var(--gray50);
+    border-radius: 18px;
+    padding: 18px 22px;
+    transition: var(--transition);
+}
+
+    .offroad-row:hover {
+        background: var(--primary-light);
+    }
+
+    .offroad-row.done {
+        opacity: .6;
+    }
+
+        .offroad-row.done .offroad-row-main h4 {
+            text-decoration: line-through;
+        }
+
+.offroad-row-main h4 {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--gray900);
+}
+
+.offroad-row-main p {
+    font-size: 13px;
+    color: var(--gray500);
+    margin: 0 0 8px;
+}
+
+.offroad-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--gray500);
+}
+
+    .offroad-row-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+.offroad-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+    .offroad-row-actions select {
+        min-height: auto;
+        height: 42px;
+        padding: 6px 12px;
+        font-size: 12px;
+        width: auto;
+    }
+
+.offroad-priority-select.priority-urgent {
+    color: #B91C1C;
+    font-weight: 700;
+}
+
+.offroad-priority-select.priority-normal {
+    color: #4338CA;
+}
+
+.offroad-priority-select.priority-low {
+    color: var(--gray500);
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+
+    .offroad-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .offroad-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .offroad-row-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

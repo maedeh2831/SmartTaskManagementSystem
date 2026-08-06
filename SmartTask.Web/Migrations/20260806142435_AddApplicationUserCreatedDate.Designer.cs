@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTask.Web.Data.Context;
 
@@ -11,9 +12,11 @@ using SmartTask.Web.Data.Context;
 namespace SmartTask.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260806142435_AddApplicationUserCreatedDate")]
+    partial class AddApplicationUserCreatedDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -673,67 +676,6 @@ namespace SmartTask.Web.Migrations
                     b.HasIndex("ApplicationUserId", "IsRead");
 
                     b.ToTable("Notifications", (string)null);
-                });
-
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.OffroadTask", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AssignedToUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ChangeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ChangeUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("ViewState")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedToUserId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("OffroadTasks", (string)null);
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
@@ -1826,32 +1768,6 @@ namespace SmartTask.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.OffroadTask", b =>
-                {
-                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "AssignedToUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AssignedToUser");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>

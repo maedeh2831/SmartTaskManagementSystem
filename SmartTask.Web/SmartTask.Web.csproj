@@ -12,7 +12,6 @@
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="Common\Filters\" />
     <Folder Include="Repositories\Implementations\" />
     <Folder Include="Repositories\Interfaces\" />
     <Folder Include="wwwroot\fonts\Vazirmatn\" />

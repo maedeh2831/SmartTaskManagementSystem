@@ -29,7 +29,7 @@ namespace SmartTask.Web.Services.Implementations
             };
 
             var userDates = await _context.Users
-                .Select(x => x.CreateDate)
+                .Select(x => x.CreatedDate)
                 .ToListAsync();
 
             var workspaceDates = await _context.Workspaces

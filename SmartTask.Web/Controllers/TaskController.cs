@@ -25,21 +25,23 @@ public class TaskController : BaseController
     private readonly IChecklistService _checklistService;
     private readonly ITimeLogService _timeLogService;
     private readonly ApplicationDbContext _context;
+    private readonly ITaskBreakdownService _taskBreakdownService;
 
     public TaskController(
-        ITaskService taskService,
-        IUserStoryService userStoryService,
-        ISubTaskService subTaskService,
-        ITaskAssignmentService taskAssignmentService,
-        ICommentService commentService,
-        IAttachmentService attachmentService,
-        ITaskLabelService taskLabelService,
-        ILabelService labelService,
-        IChecklistService checklistService,
-        ITimeLogService timeLogService,
-        ICurrentUserService currentUser,
-        ApplicationDbContext context)
-        : base(currentUser)
+            ITaskService taskService,
+            IUserStoryService userStoryService,
+            ISubTaskService subTaskService,
+            ITaskAssignmentService taskAssignmentService,
+            ICommentService commentService,
+            IAttachmentService attachmentService,
+            ITaskLabelService taskLabelService,
+            ILabelService labelService,
+            IChecklistService checklistService,
+            ITimeLogService timeLogService,
+            ITaskBreakdownService taskBreakdownService,
+            ICurrentUserService currentUser,
+            ApplicationDbContext context)
+            : base(currentUser)
     {
         _taskService = taskService;
         _userStoryService = userStoryService;
@@ -51,6 +53,7 @@ public class TaskController : BaseController
         _labelService = labelService;
         _checklistService = checklistService;
         _timeLogService = timeLogService;
+        _taskBreakdownService = taskBreakdownService;
         _context = context;
     }
 
@@ -378,5 +381,59 @@ public class TaskController : BaseController
 
         await _taskService.ChangeStatusAsync(taskId, status);
         return Json(new { success = true });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateAiSubTasks(int taskId)
+    {
+        if (!await _taskService.CanManageTaskAsync(taskId, CurrentUser.UserId))
+            return Json(new { success = false, message = "شما اجازه مدیریت این Task را ندارید." });
+
+        try
+        {
+            var suggestions = await _taskBreakdownService.GenerateSubTasksAsync(taskId);
+
+            if (!suggestions.Any())
+                return Json(new { success = false, message = "هوش مصنوعی نتوانست پیشنهادی تولید کند. دوباره تلاش کنید." });
+
+            return Json(new { success = true, suggestions });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "خطا در ارتباط با سرویس هوش مصنوعی. لطفاً بعداً دوباره تلاش کنید." });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddAiSubTasks(int taskId, List<string> titles)
+    {
+        if (!await _taskService.CanManageTaskAsync(taskId, CurrentUser.UserId))
+        {
+            TempData["Error"] = "شما اجازه مدیریت این Task را ندارید.";
+            return RedirectToAction(nameof(Details), new { id = taskId });
+        }
+
+        if (titles == null || !titles.Any())
+        {
+            TempData["Warning"] = "هیچ زیروظیفه‌ای انتخاب نشده بود.";
+            return RedirectToAction(nameof(Details), new { id = taskId });
+        }
+
+        foreach (var title in titles.Where(t => !string.IsNullOrWhiteSpace(t)).Take(10))
+        {
+            await _subTaskService.AddAsync(new SmartTask.Web.Models.Entities.SubTaskItem
+            {
+                TaskItemId = taskId,
+                Title = title.Trim(),
+                IsCompleted = false,
+                CreatedDate = DateTime.Now,
+                ViewState = true
+            });
+        }
+
+        TempData["Success"] = $"{titles.Count} زیروظیفه با موفقیت اضافه شد.";
+        return RedirectToAction(nameof(Details), new { id = taskId });
     }
 }

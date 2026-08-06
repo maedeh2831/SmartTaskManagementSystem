@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
+using SmartTask.Web.Infrastructure.Services;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Project;
@@ -16,17 +17,20 @@ public class ProjectController : BaseController
     private readonly IProjectService _projectService;
     private readonly IWorkspaceMemberService _workspaceMemberService;
     private readonly ApplicationDbContext _context;
+    private readonly ICurrentContextService _currentContextService;
 
     public ProjectController(
         IProjectService projectService,
         IWorkspaceMemberService workspaceMemberService,
         ICurrentUserService currentUser,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        ICurrentContextService currentContextService)
         : base(currentUser)
     {
         _projectService = projectService;
         _workspaceMemberService = workspaceMemberService;
         _context = context;
+        _currentContextService = currentContextService;
     }
 
     public async Task<IActionResult> Index(int workspaceId)
@@ -89,6 +93,8 @@ public class ProjectController : BaseController
             TempData["Error"] = "شما عضو این Workspace نیستید.";
             return RedirectToAction("Index", "Workspace");
         }
+
+        _currentContextService.SetCurrentProject(id);
 
         var model = new ProjectDetailsViewModel
         {

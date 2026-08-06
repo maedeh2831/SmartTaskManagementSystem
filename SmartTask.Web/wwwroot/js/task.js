@@ -171,3 +171,89 @@
     }
 
 });
+(function () {
+    const aiBtn = document.getElementById("aiSuggestBtn");
+    if (!aiBtn) return;
+
+    const overlay = document.getElementById("aiModalOverlay");
+    const body = document.getElementById("aiModalBody");
+    const closeBtn = document.getElementById("aiModalClose");
+    const cancelBtn = document.getElementById("aiModalCancel");
+    const form = document.getElementById("aiSubTaskForm");
+    const hiddenInputsContainer = document.getElementById("aiHiddenInputs");
+    const taskId = aiBtn.dataset.taskId;
+    const token = document.querySelector('#aiSubTaskForm input[name="__RequestVerificationToken"]').value;
+
+    function openModal() { overlay.classList.add("active"); }
+    function closeModal() { overlay.classList.remove("active"); }
+
+    function renderLoading() {
+        body.innerHTML = `
+            <div class="ai-loading">
+                <div class="ai-spinner"></div>
+                <p>در حال تحلیل Task و تولید پیشنهادها...</p>
+            </div>`;
+    }
+
+    function renderError(message) {
+        body.innerHTML = `
+            <div class="ai-error">
+                <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                <p>${message}</p>
+            </div>`;
+    }
+
+    function renderSuggestions(suggestions) {
+        body.innerHTML = "";
+        suggestions.forEach(title => {
+            const row = document.createElement("label");
+            row.className = "ai-suggestion-item";
+            row.innerHTML = `
+                <input type="checkbox" class="ai-suggestion-checkbox" checked value="${title.replace(/"/g, "&quot;")}" />
+                <span>${title}</span>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    aiBtn.addEventListener("click", async function () {
+        openModal();
+        renderLoading();
+
+        try {
+            const response = await fetch("/Task/GenerateAiSubTasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `taskId=${taskId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                renderError(data.message || "خطایی رخ داد.");
+                return;
+            }
+
+            renderSuggestions(data.suggestions);
+        } catch (err) {
+            renderError("ارتباط با سرور برقرار نشد.");
+        }
+    });
+
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    form.addEventListener("submit", function () {
+        hiddenInputsContainer.innerHTML = "";
+        document.querySelectorAll(".ai-suggestion-checkbox:checked").forEach(cb => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "titles";
+            input.value = cb.value;
+            hiddenInputsContainer.appendChild(input);
+        });
+    });
+})();

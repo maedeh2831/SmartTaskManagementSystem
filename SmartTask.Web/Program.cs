@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SmartTask.Web.Common.Filters;
 using SmartTask.Web.Data.Context;
+using SmartTask.Web.Hubs;
+using SmartTask.Web.Infrastructure.BackgroundJobs;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Infrastructure.Repositories;
 using SmartTask.Web.Infrastructure.Seed;
@@ -10,8 +13,7 @@ using SmartTask.Web.Services.Email;
 using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
-using SmartTask.Web.Hubs;
-using SmartTask.Web.Infrastructure.BackgroundJobs;
+using SmartTask.Web.Services.AI;
 
 namespace SmartTask.Web
 {
@@ -134,11 +136,31 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IReportExportService, ReportExportService>();
             builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
             builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+            builder.Services.AddScoped<IOffroadTaskService, OffroadTaskService>();
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddTransient<IEmailService, EmailService>();
+            builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAI"));
+            builder.Services.AddHttpClient<IAiClientService, AiClientService>();
+            builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
 
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            builder.Services.AddScoped<ICurrentContextService, CurrentContextService>();
+
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<CurrentContextFilter>();
+            });
 
             var app = builder.Build();
 
@@ -153,6 +175,8 @@ namespace SmartTask.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthentication();
 

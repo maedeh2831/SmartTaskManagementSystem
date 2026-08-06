@@ -58,6 +58,9 @@ namespace SmartTask.Web.Data.Configurations
 
             builder.HasIndex(x => x.UserName)
                 .IsUnique();
+
+            builder.Property(x => x.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
         }
     }
 }

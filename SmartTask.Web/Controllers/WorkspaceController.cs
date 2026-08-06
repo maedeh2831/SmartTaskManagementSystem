@@ -19,17 +19,20 @@ public class WorkspaceController : BaseController
     private readonly IWorkspaceService _workspaceService;
     private readonly ApplicationDbContext _context;
     private readonly IFileUploadService _fileUploadService;
+    private readonly ICurrentContextService _currentContextService;
 
     public WorkspaceController(
         IWorkspaceService workspaceService,
         ICurrentUserService currentUser,
         ApplicationDbContext context,
-        IFileUploadService fileUploadService)
+        IFileUploadService fileUploadService,
+        ICurrentContextService currentContextService)
         : base(currentUser)
     {
         _workspaceService = workspaceService;
         _context = context;
         _fileUploadService = fileUploadService;
+        _currentContextService = currentContextService;
     }
 
     public async Task<IActionResult> Index()
@@ -70,6 +73,7 @@ public class WorkspaceController : BaseController
         if (workspace == null)
             return NotFound();
 
+        _currentContextService.SetCurrentWorkspace(id);
 
         var model = new WorkspaceDetailsViewModel
         {

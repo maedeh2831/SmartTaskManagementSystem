@@ -334,3 +334,18 @@ footer {
     text-align: center;
     font-size: 17px;
 }
+.sidebar-menu li.disabled a {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+    .sidebar-menu li.disabled a:hover {
+        background: transparent;
+        color: inherit;
+    }
+
+.menu-lock-icon {
+    margin-inline-start: auto;
+    font-size: 11px;
+    color: var(--gray400, #9ca3af);
+}
