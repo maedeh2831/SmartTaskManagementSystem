@@ -23,5 +23,7 @@ namespace SmartTask.Web.Models.Entities
         public Project Project { get; set; } = null!;
 
         public ApplicationUser ApplicationUser { get; set; } = null!;
+
+        public int WeeklyCapacityHours { get; set; } = 40;
     }
 }

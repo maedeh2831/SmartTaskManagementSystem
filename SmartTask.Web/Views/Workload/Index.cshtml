@@ -1,0 +1,105 @@
+﻿@model SmartTask.Web.Models.ViewModels.Workload.WorkloadIndexViewModel
+
+@{
+    ViewData["Title"] = "تحلیل بارکاری";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workload.css" asp-append-version="true" />
+}
+
+@Html.AntiForgeryToken()
+
+<div class="workspace-container" data-can-manage="@Model.CanManage.ToString().ToLower()">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1><i class="fa-solid fa-gauge-high"></i> تحلیل بارکاری — @Model.ProjectName</h1>
+            <p>وضعیت ظرفیت کاری اعضای تیم را بررسی و از اضافه‌بار کاری جلوگیری کنید.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="workload-tabs">
+        <button type="button" class="workload-tab-btn active" data-tab="sprint">
+            <i class="fa-solid fa-flag-checkered"></i>
+            اسپرینت فعال
+            @if (!Model.HasActiveSprint)
+            {
+                <span class="workload-tab-badge">غیرفعال</span>
+            }
+        </button>
+        <button type="button" class="workload-tab-btn" data-tab="project">
+            <i class="fa-solid fa-diagram-project"></i>
+            کل پروژه
+        </button>
+    </div>
+
+    <!-- ============ Sprint Tab ============ -->
+    <div class="workload-tab-panel" id="tab-sprint">
+
+        @if (!Model.HasActiveSprint)
+        {
+            <div class="workspace-empty">
+                <i class="fa-solid fa-flag-checkered"></i>
+                <h3>اسپرینت فعالی وجود ندارد.</h3>
+                <p>یک اسپرینت را فعال کنید تا بارکاری مربوط به آن را ببینید.</p>
+            </div>
+        }
+        else
+        {
+            <div class="details-card workload-sprint-info">
+                <i class="fa-solid fa-flag-checkered"></i>
+                <div>
+                    <strong>@Model.ActiveSprintName</strong>
+                    <span>پایان اسپرینت: @Model.ActiveSprintEndDate?.ToString("yyyy/MM/dd")</span>
+                </div>
+            </div>
+
+            @if (Model.SprintUnassignedHours > 0)
+            {
+                <div class="workload-unassigned-alert">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    @Model.SprintUnassignedHours ساعت از تسک‌های این اسپرینت هنوز به کسی تخصیص نیافته است.
+                </div>
+            }
+
+            @await Html.PartialAsync("_WorkloadList", Model.SprintWorkload)
+        }
+
+    </div>
+
+    <!-- ============ Project Tab ============ -->
+    <div class="workload-tab-panel" id="tab-project" style="display:none;">
+
+        @if (Model.ProjectUnassignedHours > 0)
+        {
+            <div class="workload-unassigned-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                @Model.ProjectUnassignedHours ساعت از تسک‌های باز این پروژه هنوز به کسی تخصیص نیافته است.
+            </div>
+        }
+
+        @await Html.PartialAsync("_WorkloadList", Model.ProjectWorkload)
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/workload.js" asp-append-version="true"></script>
+}

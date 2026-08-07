@@ -14,6 +14,9 @@ namespace SmartTask.Web.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<ProjectMember> builder)
         {
+            builder.Property(x => x.WeeklyCapacityHours)
+            .HasDefaultValue(40);
+
             builder.ToTable("ProjectMembers");
 
             builder.HasKey(x => x.Id);

@@ -1,0 +1,52 @@
+﻿@model List<SmartTask.Web.Models.ViewModels.Workload.WorkloadMemberViewModel>
+
+@if (!Model.Any())
+{
+    <div class="team-empty-text">عضوی برای نمایش وجود ندارد.</div>
+}
+else
+{
+    <div class="workload-card-grid">
+        @foreach (var member in Model)
+        {
+            <div class="workload-member-card status-@member.StatusLevel">
+
+                <div class="workload-member-header">
+                    <div class="owner-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div>
+                        <h4>@member.FullName</h4>
+                        <span class="team-role-badge role-@member.Role.ToString().ToLower()">@member.Role.GetDisplayName()</span>
+                    </div>
+
+                    <span class="workload-status-pill status-@member.StatusLevel">
+                        @(member.StatusLevel switch
+                        {
+                            "overloaded" => "اضافه‌بار",
+                            "balanced" => "نزدیک ظرفیت",
+                            _ => "متعادل"
+                        })
+            </span>
+        </div>
+
+                <div class="dashboard-bar-track workload-bar-track">
+                    <div class="dashboard-bar-fill workload-bar-fill status-@member.StatusLevel"
+                         style="width:@(Math.Min(member.UtilizationPercent, 100))%"></div>
+                </div>
+
+                <div class="workload-member-footer">
+                    <span>@member.AssignedHours از @member.CapacityHours ساعت (@member.UtilizationPercent%)</span>
+                    <span>@member.TaskCount تسک</span>
+                </div>
+
+                <form class="workload-capacity-form" data-member-id="@member.ProjectMemberId">
+                    <label>ظرفیت هفتگی:</label>
+                    <input type="number" min="1" max="80" class="workload-capacity-input" value="@member.CapacityHours" />
+                    <button type="button" class="workload-capacity-save"><i class="fa-solid fa-check"></i></button>
+                </form>
+
+            </div>
+        }
+    </div>
+}
