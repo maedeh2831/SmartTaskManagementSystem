@@ -26,6 +26,7 @@ public class TaskController : BaseController
     private readonly ITimeLogService _timeLogService;
     private readonly ApplicationDbContext _context;
     private readonly ITaskBreakdownService _taskBreakdownService;
+    private readonly ITaskDependencyService _taskDependencyService;
 
     public TaskController(
             ITaskService taskService,
@@ -39,6 +40,7 @@ public class TaskController : BaseController
             IChecklistService checklistService,
             ITimeLogService timeLogService,
             ITaskBreakdownService taskBreakdownService,
+            ITaskDependencyService taskDependencyService,
             ICurrentUserService currentUser,
             ApplicationDbContext context)
             : base(currentUser)
@@ -54,6 +56,7 @@ public class TaskController : BaseController
         _checklistService = checklistService;
         _timeLogService = timeLogService;
         _taskBreakdownService = taskBreakdownService;
+        _taskDependencyService = taskDependencyService;
         _context = context;
     }
 
@@ -217,6 +220,9 @@ public class TaskController : BaseController
             TotalLoggedMinutes = totalMinutes,
 
         };
+
+        vm.Dependency = await _taskDependencyService.GetWidgetAsync(id, currentUserId);
+        vm.CascadeInfo = await _taskDependencyService.GetCascadeInfoAsync(id);
 
         return View(vm);
     }

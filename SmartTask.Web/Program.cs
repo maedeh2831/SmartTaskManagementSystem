@@ -94,6 +94,7 @@ namespace SmartTask.Web
             });
 
             builder.Services.AddHostedService<ReminderBackgroundService>();
+            builder.Services.AddHostedService<OverdueCascadeBackgroundService>();
 
             // Repository
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -138,6 +139,7 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             builder.Services.AddScoped<IOffroadTaskService, OffroadTaskService>();
             builder.Services.AddScoped<IWorkloadAnalysisService, WorkloadAnalysisService>();
+            builder.Services.AddScoped<ITaskDependencyService, TaskDependencyService>();
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddTransient<IEmailService, EmailService>();

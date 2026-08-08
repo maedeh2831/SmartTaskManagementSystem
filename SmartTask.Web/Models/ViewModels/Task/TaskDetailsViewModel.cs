@@ -44,4 +44,6 @@ public class TaskDetailsViewModel
         TotalLoggedMinutes >= 60
             ? $"{TotalLoggedMinutes / 60} ساعت و {TotalLoggedMinutes % 60} دقیقه"
             : $"{TotalLoggedMinutes} دقیقه";
+
+    public SmartTask.Web.Models.ViewModels.Dependency.TaskDependencyWidgetViewModel Dependency { get; set; } = null!;
 }
