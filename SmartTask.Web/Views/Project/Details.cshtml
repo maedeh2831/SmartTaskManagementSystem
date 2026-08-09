@@ -92,6 +92,16 @@
                     بارکاری
                 </button>
             </a>
+            <a asp-controller="Dependency"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    ریسک وابستگی
+                </button>
+            </a>
             <a asp-controller="Offroad"
                asp-action="Index"
                asp-route-projectId="@Model.Id"

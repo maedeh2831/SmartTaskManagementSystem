@@ -50,7 +50,7 @@ public class BacklogController : BaseController
             .Include(x => x.ApplicationUser)
             .ToListAsync();
 
-        var contributorsMap = await _userStoryService.GetContributorsMapAsync(projectId); // 👈 جدید
+        var contributorsMap = await _userStoryService.GetContributorsMapAsync(projectId); 
 
         var vm = new BacklogIndexViewModel
         {
@@ -68,7 +68,7 @@ public class BacklogController : BaseController
                 Status = x.Status,
                 OwnerId = x.OwnerId,
                 OwnerName = x.Owner != null ? x.Owner.FullName : null,
-                Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>() // 👈 جدید
+                Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>() 
             }).ToList(),
             ProjectMembers = members.Select(x => new ProjectMemberOptionViewModel
             {

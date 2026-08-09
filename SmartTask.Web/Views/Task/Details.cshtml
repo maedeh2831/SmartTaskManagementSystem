@@ -397,6 +397,153 @@
 
     <div class="details-card">
         <div class="card-title">
+            <i class="fa-solid fa-diagram-project"></i>
+            وابستگی‌ها
+        </div>
+
+        @if (Model.CascadeInfo.Any())
+        {
+            <div class="cascade-info-box">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <div>
+                    <strong>موعد این Task به‌صورت خودکار تمدید شده است.</strong>
+                    <ul>
+                        @foreach (var info in Model.CascadeInfo)
+                        {
+                            <li>
+                                به‌دلیل تأخیر <strong>@info.DelayDaysApplied روزه</strong> در
+                                <a asp-action="Details" asp-route-id="@info.SourceTaskId">«@info.SourceTaskTitle»</a>
+                                — آخرین به‌روزرسانی: @info.AppliedDate.ToString("yyyy/MM/dd HH:mm")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        @if (Model.Dependency.DelayDays > 0)
+        {
+            <div class="dependency-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                این Task <strong>@Model.Dependency.DelayDays روز</strong> از موعدش گذشته.
+                @if (Model.Dependency.ImpactedTasks.Any(x => x.IsRequiredChain))
+                {
+                    <text> این تأخیر روی <strong>@Model.Dependency.ImpactedTasks.Count(x => x.IsRequiredChain) Task دیگر</strong> تأثیر مستقیم دارد.</text>
+                }
+            </div>
+        }
+
+        <div class="dependency-columns">
+
+            <div class="dependency-column">
+                <h5><i class="fa-solid fa-arrow-left-long"></i> این Task به این‌ها وابسته است</h5>
+
+                @if (!Model.Dependency.DependsOn.Any())
+                {
+                    <p class="team-empty-text">وابستگی‌ای ثبت نشده است.</p>
+                }
+                else
+                {
+                    @foreach (var dep in Model.Dependency.DependsOn)
+                    {
+                        <div class="dependency-chip">
+                            <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
+                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
+                            @if (!dep.IsRequired)
+                            {
+                                <span class="dependency-optional-badge">اختیاری</span>
+                            }
+
+                            @if (Model.Dependency.CanManage)
+                            {
+                                <form asp-controller="TaskDependency" asp-action="Remove" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@dep.Id" />
+                                    <input type="hidden" name="taskItemId" value="@Model.Id" />
+                                    <button type="submit" class="delete-dependency-btn"><i class="fa-solid fa-xmark"></i></button>
+                                </form>
+                            }
+                        </div>
+                    }
+                }
+
+                @if (Model.Dependency.CanManage && Model.Dependency.AvailableTasks.Any())
+                {
+                    <form asp-controller="TaskDependency" asp-action="Add" method="post" class="dependency-add-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="taskItemId" value="@Model.Id" />
+
+                        <select name="dependsOnTaskId" class="form-control" required>
+                            <option value="">— انتخاب Task —</option>
+                            @foreach (var t in Model.Dependency.AvailableTasks)
+                            {
+                                <option value="@t.Value">@t.Text</option>
+                            }
+                        </select>
+
+                        <label class="dependency-required-check">
+                            <input type="checkbox" name="isRequired" value="true" checked />
+                            وابستگی اجباری
+                        </label>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            افزودن
+                        </button>
+                    </form>
+                }
+            </div>
+
+            <div class="dependency-column">
+                <h5><i class="fa-solid fa-arrow-right-long"></i> این‌ها به این Task وابسته‌اند</h5>
+
+                @if (!Model.Dependency.Dependents.Any())
+                {
+                    <p class="team-empty-text">هیچ Task ای به این وابسته نیست.</p>
+                }
+                else
+                {
+                    @foreach (var dep in Model.Dependency.Dependents)
+                    {
+                        <div class="dependency-chip">
+                            <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
+                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
+                            @if (!dep.IsRequired)
+                            {
+                                <span class="dependency-optional-badge">اختیاری</span>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
+
+        @if (Model.Dependency.ImpactedTasks.Any())
+        {
+            <div class="dependency-impact-box">
+                <h5><i class="fa-solid fa-bolt"></i> نقشه تأثیر کامل (زنجیره‌ای)</h5>
+                <div class="dependency-impact-list">
+                    @foreach (var impacted in Model.Dependency.ImpactedTasks)
+                    {
+                        <div class="dependency-impact-item @(impacted.IsRequiredChain ? "required" : "optional")">
+                            <span class="dependency-depth-badge">سطح @impacted.Depth</span>
+                            <a asp-action="Details" asp-route-id="@impacted.TaskId">@impacted.Title</a>
+                            @if (impacted.IsRequiredChain && impacted.ProjectedDueDate.HasValue && impacted.ProjectedDueDate != impacted.OriginalDueDate)
+                            {
+                                <span class="dependency-projected-date">
+                                    موعد جدید تخمینی: @impacted.ProjectedDueDate.Value.ToString("yyyy/MM/dd")
+                                </span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="details-card">
+        <div class="card-title">
             <i class="fa-solid fa-list-check"></i>
             SubTask ها
             @if (Model.SubTasksTotal > 0)
