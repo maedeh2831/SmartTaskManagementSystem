@@ -395,6 +395,83 @@
         }
     </div>
 
+    <div class="details-card smart-priority-card">
+        <div class="card-title">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            اولویت پیشنهادی هوشمند
+        </div>
+
+        <div class="smart-priority-compare">
+            <div class="smart-priority-box">
+                <span>اولویت فعلی</span>
+                <strong class="backlog-priority-badge priority-@Model.SmartPriority.CurrentPriority.ToString().ToLower()">
+                    @Model.SmartPriority.CurrentPriority
+                </strong>
+            </div>
+
+            <i class="fa-solid fa-arrow-left-long smart-priority-arrow"></i>
+
+            <div class="smart-priority-box">
+                <span>اولویت پیشنهادی</span>
+                <strong class="backlog-priority-badge priority-@Model.SmartPriority.SuggestedPriority.ToString().ToLower()">
+                    @Model.SmartPriority.SuggestedPriority
+                </strong>
+            </div>
+
+            <div class="smart-priority-score">
+                <span>امتیاز کل</span>
+                <strong>@Model.SmartPriority.TotalScore / 100</strong>
+            </div>
+        </div>
+
+        <div class="smart-priority-breakdown">
+            <div class="smart-priority-bar-row">
+                <span>فوریت زمانی</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.UrgencyScore * 100 / 40)%;background:#F59E0B"></div></div>
+                <span>@Model.SmartPriority.UrgencyScore/40</span>
+            </div>
+            <div class="smart-priority-bar-row">
+                <span>تأثیر وابستگی</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.DependencyScore * 100 / 35)%;background:#EF4444"></div></div>
+                <span>@Model.SmartPriority.DependencyScore/35</span>
+            </div>
+            <div class="smart-priority-bar-row">
+                <span>ریسک کارکارگیر</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.WorkloadScore * 100 / 25)%;background:#8B5CF6"></div></div>
+                <span>@Model.SmartPriority.WorkloadScore/25</span>
+            </div>
+        </div>
+
+        @if (Model.SmartPriority.Reasons.Any())
+        {
+            <ul class="smart-priority-reasons">
+                @foreach (var reason in Model.SmartPriority.Reasons)
+                {
+                    <li><i class="fa-solid fa-circle-info"></i> @reason</li>
+                }
+            </ul>
+        }
+
+        @if (Model.SmartPriority.IsDifferent && Model.SmartPriority.CanApply)
+        {
+            <form asp-action="ApplySmartPriority" method="post" class="smart-priority-apply-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-check"></i>
+                    اعمال اولویت پیشنهادی
+                </button>
+            </form>
+        }
+        else if (!Model.SmartPriority.IsDifferent)
+        {
+            <div class="smart-priority-match">
+                <i class="fa-solid fa-circle-check"></i>
+                اولویت فعلی با پیشنهاد سیستم هم‌راستاست.
+            </div>
+        }
+    </div>
+
     <div class="details-card">
         <div class="card-title">
             <i class="fa-solid fa-diagram-project"></i>

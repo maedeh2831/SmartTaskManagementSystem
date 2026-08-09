@@ -21,4 +21,5 @@ public class ProjectDashboardViewModel
     public List<RoleDistributionItem> RoleDistribution { get; set; } = new();
     public List<RecentMemberViewModel> RecentMembers { get; set; } = new();
     public List<string> TeamNames { get; set; } = new();
+    public SmartTask.Web.Models.ViewModels.Health.ProjectHealthViewModel? Health { get; set; }
 }

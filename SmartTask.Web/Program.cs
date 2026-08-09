@@ -140,15 +140,19 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IOffroadTaskService, OffroadTaskService>();
             builder.Services.AddScoped<IWorkloadAnalysisService, WorkloadAnalysisService>();
             builder.Services.AddScoped<ITaskDependencyService, TaskDependencyService>();
+            builder.Services.AddScoped<IPriorityEngineService, PriorityEngineService>();
+            builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
+            builder.Services.AddScoped<ICurrentContextService, CurrentContextService>();
+            builder.Services.AddScoped<IDelayRiskService, DelayRiskService>();
+            builder.Services.AddScoped<IProjectHealthService, ProjectHealthService>();
+            builder.Services.AddScoped<ISprintReportAiService, SprintReportAiService>();
+
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAI"));
-            builder.Services.AddHttpClient<IAiClientService, AiClientService>();
-            builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
-
+            builder.Services.AddHttpClient<IAiClientService, AiClientService>();         
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
-
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
@@ -157,9 +161,6 @@ namespace SmartTask.Web
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-
-            builder.Services.AddScoped<ICurrentContextService, CurrentContextService>();
-
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<CurrentContextFilter>();

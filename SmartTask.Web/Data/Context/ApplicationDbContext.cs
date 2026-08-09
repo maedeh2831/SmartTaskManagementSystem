@@ -41,6 +41,7 @@ namespace SmartTask.Web.Data.Context
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
         public DbSet<Sprint> Sprints { get; set; }
+        public DbSet<SprintReport> SprintReports { get; set; }
         public DbSet<Backlog> Backlogs { get; set; }
         public DbSet<UserStory> UserStories { get; set; }
         public DbSet<TaskItem> TaskItems { get; set; }

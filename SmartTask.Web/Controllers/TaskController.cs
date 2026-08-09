@@ -27,6 +27,7 @@ public class TaskController : BaseController
     private readonly ApplicationDbContext _context;
     private readonly ITaskBreakdownService _taskBreakdownService;
     private readonly ITaskDependencyService _taskDependencyService;
+    private readonly IPriorityEngineService _priorityEngineService;
 
     public TaskController(
             ITaskService taskService,
@@ -41,6 +42,7 @@ public class TaskController : BaseController
             ITimeLogService timeLogService,
             ITaskBreakdownService taskBreakdownService,
             ITaskDependencyService taskDependencyService,
+            IPriorityEngineService priorityEngineService,
             ICurrentUserService currentUser,
             ApplicationDbContext context)
             : base(currentUser)
@@ -57,6 +59,7 @@ public class TaskController : BaseController
         _timeLogService = timeLogService;
         _taskBreakdownService = taskBreakdownService;
         _taskDependencyService = taskDependencyService;
+        _priorityEngineService = priorityEngineService;
         _context = context;
     }
 
@@ -223,6 +226,7 @@ public class TaskController : BaseController
 
         vm.Dependency = await _taskDependencyService.GetWidgetAsync(id, currentUserId);
         vm.CascadeInfo = await _taskDependencyService.GetCascadeInfoAsync(id);
+        vm.SmartPriority = await _priorityEngineService.GetSuggestionAsync(id, currentUserId);
 
         return View(vm);
     }
@@ -440,6 +444,23 @@ public class TaskController : BaseController
         }
 
         TempData["Success"] = $"{titles.Count} زیروظیفه با موفقیت اضافه شد.";
+        return RedirectToAction(nameof(Details), new { id = taskId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApplySmartPriority(int taskId)
+    {
+        try
+        {
+            await _priorityEngineService.ApplySuggestionAsync(taskId, CurrentUser.UserId);
+            TempData["Success"] = "اولویت پیشنهادی با موفقیت اعمال شد.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "شما اجازه این کار را ندارید.";
+        }
+
         return RedirectToAction(nameof(Details), new { id = taskId });
     }
 }

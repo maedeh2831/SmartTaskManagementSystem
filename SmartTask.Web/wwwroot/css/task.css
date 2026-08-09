@@ -1,4 +1,4 @@
-/* ==========================================================
+﻿/* ==========================================================
                     SmartTask Task UI
    ========================================================== */
 
@@ -760,4 +760,128 @@
     gap: 12px;
     padding: 18px 26px;
     border-top: 1px solid var(--gray100);
+}
+/* ================= Smart Priority ================= */
+
+.smart-priority-compare {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--gray100);
+}
+
+.smart-priority-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .smart-priority-box span {
+        font-size: 12px;
+        color: var(--gray500);
+    }
+
+.smart-priority-arrow {
+    color: var(--gray300);
+    font-size: 18px;
+}
+
+.smart-priority-score {
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+    .smart-priority-score span {
+        font-size: 12px;
+        color: var(--gray500);
+    }
+
+    .smart-priority-score strong {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--gray900);
+    }
+
+.smart-priority-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.smart-priority-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 50px;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--gray500);
+    font-weight: 600;
+}
+
+.smart-priority-reasons {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .smart-priority-reasons li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--gray700);
+        background: var(--gray50);
+        padding: 10px 14px;
+        border-radius: 12px;
+    }
+
+        .smart-priority-reasons li i {
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+.smart-priority-match {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #047857;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/*  Priority Badge */
+
+.backlog-priority-badge.priority-lowest {
+    background: var(--gray100);
+    color: var(--gray500);
+}
+
+.backlog-priority-badge.priority-low {
+    background: var(--gray100);
+    color: var(--gray500);
+}
+
+.backlog-priority-badge.priority-medium {
+    background: #E0E7FF;
+    color: #4338CA;
+}
+
+.backlog-priority-badge.priority-high {
+    background: #FFEDD5;
+    color: #C2410C;
+}
+
+.backlog-priority-badge.priority-highest {
+    background: #FEE2E2;
+    color: #B91C1C;
 }

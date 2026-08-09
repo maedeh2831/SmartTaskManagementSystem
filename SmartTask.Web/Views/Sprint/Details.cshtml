@@ -10,9 +10,12 @@
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprintreport.css" asp-append-version="true" />
 }
 
 <div class="workspace-details-page">
+    @Html.AntiForgeryToken()
 
     <div class="page-header">
         <div>
@@ -124,6 +127,28 @@
             هنوز User Story ای به این اسپرینت اضافه نشده است (این بخش در استوری بعدی تکمیل می‌شود).
         </div>
     </div>
+
+    @if (Model.Status == SprintStatusType.Completed)
+    {
+        <div class="details-card">
+            <div class="card-title">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                گزارش هوشمند پایان اسپرینت
+            </div>
+
+            <div id="sprintReportList" class="sprint-report-list" data-sprint-id="@Model.Id">
+                <div class="team-empty-text">در حال بارگذاری گزارش‌ها...</div>
+            </div>
+
+            @if (Model.CanManage)
+            {
+                <button type="button" id="generateSprintReportBtn" class="ai-suggest-btn" data-sprint-id="@Model.Id">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    تولید گزارش جدید
+                </button>
+            }
+        </div>
+    }
 
 </div>
 

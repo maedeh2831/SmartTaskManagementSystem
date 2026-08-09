@@ -1,0 +1,29 @@
+/*  Sprint AI Report  */
+
+.sprint-report-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.sprint-report-item {
+    background: var(--gray50);
+    border-radius: 16px;
+    padding: 18px 20px;
+}
+
+    .sprint-report-item p {
+        margin: 0 0 12px;
+        line-height: 1.9;
+        color: var(--gray700);
+        font-size: 14px;
+    }
+
+.sprint-report-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--gray400);
+    font-weight: 600;
+}
