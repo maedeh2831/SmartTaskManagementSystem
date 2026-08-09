@@ -49,13 +49,13 @@ namespace SmartTask.Web
             });
 
             // MVC
-            builder.Services
-            .AddAuthentication()
-            .AddGoogle(options =>
-            {
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-            });
+            //builder.Services
+            //.AddAuthentication()
+            //.AddGoogle(options =>
+            //{
+            //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+            //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+            //});
 
             builder.Services
            .AddControllersWithViews();
@@ -152,6 +152,11 @@ namespace SmartTask.Web
             builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAI"));
             builder.Services.AddHttpClient<IAiClientService, AiClientService>();         
+            builder.Services.AddHttpClient<IAiClientService, AiClientService>(client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(5);
+            }); builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
+
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDistributedMemoryCache();
