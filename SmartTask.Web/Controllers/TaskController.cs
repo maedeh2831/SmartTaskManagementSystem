@@ -5,6 +5,7 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Task;
+using SmartTask.Web.Services.AI;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
 using TaskEntity = SmartTask.Web.Models.Entities.TaskItem;

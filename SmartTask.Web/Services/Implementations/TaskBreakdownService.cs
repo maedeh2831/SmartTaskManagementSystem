@@ -15,29 +15,23 @@ public class TaskBreakdownService : ITaskBreakdownService
         _aiClient = aiClient;
     }
 
-    public async Task<List<string>> GenerateSubTasksAsync(int taskId)
+    public async Task<List<string>> GenerateSubTasksAsync(int taskId, CancellationToken cancellationToken = default)
     {
         var task = await _taskService.GetDetailsAsync(taskId);
-
         if (task == null)
             throw new InvalidOperationException("Task یافت نشد.");
 
-        var systemPrompt =
-            "تو یک دستیار مدیریت پروژه نرم‌افزاری هستی. وظیفه‌ات این است که یک Task را به زیروظایف (SubTask) عملی و قابل‌اجرا تجزیه کنی. " +
-            "خروجی را فقط و فقط به‌صورت یک آرایه JSON از رشته‌ها بازگردان، بدون هیچ توضیح اضافه، بدون Markdown، بدون ```. " +
-            "هر رشته باید عنوان کوتاه یک زیروظیفه به زبان فارسی باشد (حداکثر ۸ کلمه). بین ۳ تا ۷ زیروظیفه پیشنهاد بده.";
+        const string systemPrompt =
+         "/no_think فقط JSON array از رشته فارسی (۳ تا ۷ آیتم،هرکدام حداکثر ۸ کلمه) از زیروظایف Task برگردان. بدون توضیح، بدون Markdown.";
 
         var userPrompt =
-            $"عنوان Task: {task.Title}\n" +
-            $"توضیحات: {(string.IsNullOrWhiteSpace(task.Description) ? "ندارد" : task.Description)}\n" +
-            $"نوع: {task.Type}\n" +
-            $"اولویت: {task.Priority}\n\n" +
-            "لطفاً زیروظایف پیشنهادی را برای انجام این Task تولید کن.";
+            $"/no_think Task: {task.Title} | {(string.IsNullOrWhiteSpace(task.Description) ? "" : task.Description)} | نوع: {task.Type} | اولویت: {task.Priority}";
 
-        var rawResponse = await _aiClient.GetCompletionAsync(systemPrompt, userPrompt, temperature: 0.5);
-
+        var rawResponse = await _aiClient.GetCompletionAsync(systemPrompt, userPrompt, temperature: 0.5, cancellationToken);
         return ParseSubTaskTitles(rawResponse);
     }
+
+    private static readonly JsonSerializerOptions _parseOptions = new(JsonSerializerDefaults.Web);
 
     private static List<string> ParseSubTaskTitles(string raw)
     {
@@ -53,7 +47,7 @@ public class TaskBreakdownService : ITaskBreakdownService
 
         try
         {
-            var titles = JsonSerializer.Deserialize<List<string>>(cleaned);
+            var titles = JsonSerializer.Deserialize<List<string>>(cleaned, _parseOptions);
             return titles?
                 .Select(t => t.Trim())
                 .Where(t => !string.IsNullOrWhiteSpace(t))
