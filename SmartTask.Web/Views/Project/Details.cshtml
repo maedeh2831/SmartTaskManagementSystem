@@ -122,6 +122,16 @@
                     آفرود
                 </button>
             </a>
+            <a asp-controller="TaskTrade"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-right-left"></i>
+                    ترید تسک
+                </button>
+            </a>
             <a asp-controller="ProjectDashboard" asp-action="Index" asp-route-projectId="@Model.Id" class="workspace-filter" style="text-decoration:none;">
                 <button type="button">
                     <i class="fa-solid fa-gauge"></i>

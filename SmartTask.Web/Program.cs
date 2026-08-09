@@ -146,6 +146,7 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IDelayRiskService, DelayRiskService>();
             builder.Services.AddScoped<IProjectHealthService, ProjectHealthService>();
             builder.Services.AddScoped<ISprintReportAiService, SprintReportAiService>();
+            builder.Services.AddScoped<ITaskTradeService, TaskTradeService>();
 
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));

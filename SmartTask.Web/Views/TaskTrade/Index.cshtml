@@ -1,0 +1,150 @@
+﻿@model SmartTask.Web.Models.ViewModels.TaskTrade.TaskTradeIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "درخواست‌های ترید";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tasktrade.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1><i class="fa-solid fa-right-left"></i> درخواست‌های ترید — @Model.ProjectName</h1>
+            <p>مدیریت درخواست‌های مبادله و واگذاری تسک بین اعضای پروژه.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="workload-tabs">
+        <button type="button" class="workload-tab-btn active" data-tab="incoming">
+            <i class="fa-solid fa-inbox"></i>
+            دریافتی
+            @if (Model.Incoming.Any(x => x.Status == TradeRequestStatusType.Pending))
+            {
+                <span class="workload-tab-badge">@Model.Incoming.Count(x => x.Status == TradeRequestStatusType.Pending)</span>
+            }
+        </button>
+        <button type="button" class="workload-tab-btn" data-tab="outgoing">
+            <i class="fa-solid fa-paper-plane"></i>
+            ارسالی
+        </button>
+    </div>
+
+    <div class="trade-tab-panel" id="tab-incoming">
+        @if (!Model.Incoming.Any())
+        {
+            <div class="workspace-empty">
+                <i class="fa-solid fa-inbox"></i>
+                <h3>درخواستی دریافت نکرده‌اید.</h3>
+            </div>
+        }
+        else
+        {
+            @foreach (var r in Model.Incoming)
+            {
+                <div class="trade-card status-@r.Status.ToString().ToLower()">
+                    <div class="trade-card-main">
+                        <p><strong>@r.RequesterName</strong> درخواست کرده:</p>
+                        <div class="trade-swap-row">
+                            <span class="trade-task-chip">@r.RequesterTaskTitle</span>
+                            <i class="fa-solid fa-right-left"></i>
+                            <span class="trade-task-chip">@(r.TargetTaskTitle ?? "بدون تسک متقابل (واگذاری)")</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(r.Message))
+                        {
+                            <p class="trade-message">«@r.Message»</p>
+                        }
+                        <small>@r.CreateDate.ToString("yyyy/MM/dd HH:mm")</small>
+                    </div>
+
+                    @if (r.Status == TradeRequestStatusType.Pending)
+                    {
+                        <div class="trade-card-actions">
+                            <form asp-action="Accept" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> تأیید</button>
+                            </form>
+                            <form asp-action="Reject" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                <button type="submit" class="btn btn-light"><i class="fa-solid fa-xmark"></i> رد</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="trade-status-pill status-@r.Status.ToString().ToLower()">@r.Status.GetDisplayName()</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <div class="trade-tab-panel" id="tab-outgoing" style="display:none;">
+        @if (!Model.Outgoing.Any())
+        {
+            <div class="workspace-empty">
+                <i class="fa-solid fa-paper-plane"></i>
+                <h3>درخواستی ارسال نکرده‌اید.</h3>
+            </div>
+        }
+        else
+        {
+            @foreach (var r in Model.Outgoing)
+            {
+                <div class="trade-card status-@r.Status.ToString().ToLower()">
+                    <div class="trade-card-main">
+                        <p>درخواست شما به <strong>@r.TargetName</strong>:</p>
+                        <div class="trade-swap-row">
+                            <span class="trade-task-chip">@r.RequesterTaskTitle</span>
+                            <i class="fa-solid fa-right-left"></i>
+                            <span class="trade-task-chip">@(r.TargetTaskTitle ?? "بدون تسک متقابل (واگذاری)")</span>
+                        </div>
+                        <small>@r.CreateDate.ToString("yyyy/MM/dd HH:mm")</small>
+                    </div>
+
+                    @if (r.Status == TradeRequestStatusType.Pending)
+                    {
+                        <div class="trade-card-actions">
+                            <form asp-action="Cancel" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                <button type="submit" class="btn btn-light"><i class="fa-solid fa-ban"></i> لغو درخواست</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="trade-status-pill status-@r.Status.ToString().ToLower()">@r.Status.GetDisplayName()</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/tasktrade.js" asp-append-version="true"></script>
+}

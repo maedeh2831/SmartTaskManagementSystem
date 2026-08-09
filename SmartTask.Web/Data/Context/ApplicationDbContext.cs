@@ -49,6 +49,7 @@ namespace SmartTask.Web.Data.Context
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
         public DbSet<OffroadTask> OffroadTasks { get; set; }
         public DbSet<OverdueCascadeLog> OverdueCascadeLogs { get; set; }
+        public DbSet<TaskTradeRequest> TaskTradeRequests { get; set; }
 
         // Tracking
         public DbSet<Reminder> Reminders { get; set; }

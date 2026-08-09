@@ -287,6 +287,13 @@
                 }
             </div>
         }
+        @if (Model.IsCurrentUserAssignee && Model.TradeModal != null && Model.TradeModal.ProjectMembers.Any())
+        {
+            <button type="button" id="openTradeModalBtn" class="ai-suggest-btn" style="margin-top:14px;background:linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                <i class="fa-solid fa-right-left"></i>
+                درخواست ترید این تسک
+            </button>
+        }
 
         @if (Model.CanManage && Model.AvailableMembers.Any())
         {
@@ -841,6 +848,59 @@
         </form>
     </div>
 </div>
+
+@if (Model.TradeModal != null)
+{
+    <div class="ai-modal-overlay" id="tradeModalOverlay">
+        <div class="ai-modal">
+            <div class="ai-modal-header">
+                <h3><i class="fa-solid fa-right-left"></i> درخواست ترید تسک</h3>
+                <button type="button" id="tradeModalClose" class="ai-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form asp-controller="TaskTrade" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskId" value="@Model.TradeModal.TaskId" />
+                <input type="hidden" name="projectId" value="@Model.TradeModal.ProjectId" />
+
+                <div class="ai-modal-body">
+
+                    <div class="form-group">
+                        <label>عضو مقابل</label>
+                        <select name="targetUserId" id="tradeTargetUserSelect" class="form-control" required>
+                            <option value="">— انتخاب عضو —</option>
+                            @foreach (var m in Model.TradeModal.ProjectMembers)
+                            {
+                                <option value="@m.Value">@m.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تسک درخواستی از طرف مقابل (اختیاری — خالی = واگذاری ساده)</label>
+                        <select name="targetTaskId" id="tradeTargetTaskSelect" class="form-control" disabled>
+                            <option value="">— ابتدا عضو را انتخاب کنید —</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>یادداشت (اختیاری)</label>
+                        <textarea name="message" class="form-control" rows="2" placeholder="مثلاً: چون این هفته درگیر پروژه دیگه‌ای هستم..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="ai-modal-footer">
+                    <button type="button" id="tradeModalCancel" class="btn btn-light">انصراف</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        ارسال درخواست
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
 
 @section Scripts
 {

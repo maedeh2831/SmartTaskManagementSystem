@@ -16,13 +16,15 @@ public class AiClientService : IAiClientService
         _httpClient = httpClient;
         _settings = settings.Value;
     }
-
+	
     public async Task<string> GetCompletionAsync(
         string systemPrompt,
         string userPrompt,
         double temperature = 0.7,
         CancellationToken cancellationToken = default)
     {
+    try 
+	{	        
         var requestBody = new
         {
             model = _settings.Model,
@@ -76,5 +78,12 @@ public class AiClientService : IAiClientService
             .GetString();
 
         return content ?? string.Empty;
+
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
     }
 }

@@ -29,6 +29,7 @@ public class TaskController : BaseController
     private readonly ITaskBreakdownService _taskBreakdownService;
     private readonly ITaskDependencyService _taskDependencyService;
     private readonly IPriorityEngineService _priorityEngineService;
+    private readonly ITaskTradeService _taskTradeService;
 
     public TaskController(
             ITaskService taskService,
@@ -44,6 +45,7 @@ public class TaskController : BaseController
             ITaskBreakdownService taskBreakdownService,
             ITaskDependencyService taskDependencyService,
             IPriorityEngineService priorityEngineService,
+            ITaskTradeService taskTradeService,
             ICurrentUserService currentUser,
             ApplicationDbContext context)
             : base(currentUser)
@@ -61,6 +63,7 @@ public class TaskController : BaseController
         _taskBreakdownService = taskBreakdownService;
         _taskDependencyService = taskDependencyService;
         _priorityEngineService = priorityEngineService;
+        _taskTradeService = taskTradeService;
         _context = context;
     }
 
@@ -228,6 +231,10 @@ public class TaskController : BaseController
         vm.Dependency = await _taskDependencyService.GetWidgetAsync(id, currentUserId);
         vm.CascadeInfo = await _taskDependencyService.GetCascadeInfoAsync(id);
         vm.SmartPriority = await _priorityEngineService.GetSuggestionAsync(id, currentUserId);
+        vm.IsCurrentUserAssignee = assignees.Any(x => x.Id == currentUserId);
+
+        if (vm.IsCurrentUserAssignee)
+            vm.TradeModal = await _taskTradeService.GetModalDataAsync(id, currentUserId);
 
         return View(vm);
     }

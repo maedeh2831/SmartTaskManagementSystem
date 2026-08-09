@@ -48,4 +48,6 @@ public class TaskDetailsViewModel
     public SmartTask.Web.Models.ViewModels.Dependency.TaskDependencyWidgetViewModel Dependency { get; set; } = null!;
     public List<SmartTask.Web.Models.ViewModels.Dependency.CascadeInfoViewModel> CascadeInfo { get; set; } = new();
     public SmartTask.Web.Models.ViewModels.Priority.SmartPriorityViewModel SmartPriority { get; set; } = null!;
+    public bool IsCurrentUserAssignee { get; set; }
+    public SmartTask.Web.Models.ViewModels.TaskTrade.TradeModalDataViewModel? TradeModal { get; set; }
 }

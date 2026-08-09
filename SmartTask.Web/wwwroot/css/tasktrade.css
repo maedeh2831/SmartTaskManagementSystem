@@ -1,0 +1,91 @@
+.trade-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    margin-bottom: 16px;
+    border-right: 4px solid var(--gray300);
+    flex-wrap: wrap;
+}
+
+    .trade-card.status-pending {
+        border-right-color: #F59E0B;
+    }
+
+    .trade-card.status-accepted {
+        border-right-color: #10B981;
+    }
+
+    .trade-card.status-rejected,
+    .trade-card.status-cancelled {
+        border-right-color: #EF4444;
+        opacity: .7;
+    }
+
+.trade-card-main p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--gray900);
+}
+
+.trade-swap-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+    .trade-swap-row i {
+        color: var(--primary);
+    }
+
+.trade-task-chip {
+    background: var(--gray50);
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray700);
+}
+
+.trade-message {
+    font-size: 12px;
+    color: var(--gray500);
+    font-style: italic;
+    margin: 0 0 8px !important;
+}
+
+.trade-card-main small {
+    font-size: 11px;
+    color: var(--gray400);
+}
+
+.trade-card-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.trade-status-pill {
+    padding: 6px 16px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+    .trade-status-pill.status-accepted {
+        background: #D1FAE5;
+        color: #047857;
+    }
+
+    .trade-status-pill.status-rejected,
+    .trade-status-pill.status-cancelled {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
