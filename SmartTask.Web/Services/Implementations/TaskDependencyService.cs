@@ -154,6 +154,43 @@ public class TaskDependencyService : ITaskDependencyService
             .ToList();
     }
 
+    public async Task<DependencyGraphViewModel> GetDependencyGraphAsync(int projectId)
+    {
+        var tasks = await _context.TaskItems
+            .Where(t => t.UserStory.ProjectId == projectId && t.ViewState)
+            .Select(t => new { t.Id, t.Title, t.Status, t.DueDate })
+            .ToListAsync();
+
+        var taskIds = tasks.Select(t => t.Id).ToHashSet();
+
+        var dependencies = await _context.TaskDependencies
+            .Where(d => taskIds.Contains(d.TaskItemId) && taskIds.Contains(d.DependsOnTaskItemId))
+            .ToListAsync();
+
+        var riskyTaskIds = (await GetProjectRiskOverviewAsync(projectId))
+            .Select(r => r.TaskId)
+            .ToHashSet();
+
+        var nodes = tasks.Select(t => new DependencyGraphNodeViewModel
+        {
+            Id = t.Id,
+            Title = t.Title,
+            IsDone = t.Status == TaskStatusType.Done || t.Status == TaskStatusType.Cancelled,
+            IsOverdue = t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.Now.Date
+                && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled,
+            IsAtRisk = riskyTaskIds.Contains(t.Id)
+        }).ToList();
+
+        var edges = dependencies.Select(d => new DependencyGraphEdgeViewModel
+        {
+            SourceTaskId = d.DependsOnTaskItemId,
+            TargetTaskId = d.TaskItemId,
+            IsRequired = d.IsRequired
+        }).ToList();
+
+        return new DependencyGraphViewModel { Nodes = nodes, Edges = edges };
+    }
+
     // Private Helpers 
 
     private static int CalculateDelayDays(TaskItem task)

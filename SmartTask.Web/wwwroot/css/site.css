@@ -369,3 +369,33 @@ body.auth-body {
         text-align: center;
     }
 }
+/* ================================
+   HEADER USER AVATAR
+   ================================ */
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    max-width: 42px;
+    max-height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-avatar-image {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    max-width: 42px;
+    max-height: 42px;
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+}

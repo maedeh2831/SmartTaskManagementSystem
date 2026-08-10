@@ -23,17 +23,10 @@
 
         <div class="header-actions">
 
-            @await Component.InvokeAsync("NotificationBell")
-
             @await Component.InvokeAsync("Header")
 
-            <button class="icon-btn">
-                <i class="fa-regular fa-bell"></i>
-            </button>
-
-            <button class="icon-btn">
-                <i class="fa-regular fa-envelope"></i>
-            </button>
+            @await Component.InvokeAsync("NotificationBell")
+         
 
         </div>       
 

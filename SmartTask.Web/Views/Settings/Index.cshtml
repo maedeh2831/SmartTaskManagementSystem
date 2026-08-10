@@ -1,0 +1,284 @@
+﻿@using SmartTask.Web.Models.Enums
+@model SmartTask.Web.Models.ViewModels.Settings.SettingsViewModel
+
+@{
+    ViewData["Title"] = "تنظیمات";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+}
+
+<div class="settings-page">
+
+    <div class="settings-page-header">
+
+        <div>
+            <span class="settings-eyebrow">حساب کاربری</span>
+            <h1>تنظیمات</h1>
+            <p>ترجیحات و تنظیمات حساب خود را مدیریت کنید.</p>
+        </div>
+
+        <a asp-controller="Home" asp-action="Index" class="settings-back-btn">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+
+    </div>
+
+    <div class="settings-layout">
+
+        <div class="settings-tabs" id="settingsTabs">
+            <button type="button" class="settings-tab-btn" data-tab="account">
+                <i class="fa-regular fa-user"></i>
+                <span>حساب</span>
+            </button>
+            <button type="button" class="settings-tab-btn" data-tab="notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>اعلان‌ها</span>
+            </button>
+            <button type="button" class="settings-tab-btn" data-tab="appearance">
+                <i class="fa-solid fa-palette"></i>
+                <span>ظاهر</span>
+            </button>
+            <button type="button" class="settings-tab-btn" data-tab="security">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>امنیت</span>
+            </button>
+            <button type="button" class="settings-tab-btn" data-tab="workspace">
+                <i class="fa-solid fa-building"></i>
+                <span>Workspace</span>
+            </button>
+        </div>
+
+        <div class="settings-content">
+
+            <!-- Account -->
+            <section class="settings-tab-panel" data-tab-panel="account">
+                <form asp-controller="Settings" asp-action="UpdateAccount" method="post" class="settings-card">
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>تنظیمات حساب</h2>
+                            <p>زبان، منطقه زمانی و نحوه‌ی نمایش نام خود را تنظیم کنید.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-grid">
+
+                        <div class="settings-field">
+                            <label asp-for="Account.Language"></label>
+                            <select asp-for="Account.Language"
+                                    asp-items="Html.GetEnumSelectList<LanguageType>()"
+                                    class="settings-select"></select>
+                        </div>
+
+                        <div class="settings-field">
+                            <label asp-for="Account.TimeZone"></label>
+                            <div class="settings-input-wrapper readonly">
+                                <input asp-for="Account.TimeZone" class="settings-input" readonly />
+                            </div>
+                        </div>
+
+                        <div class="settings-field">
+                            <label asp-for="Account.DateFormat"></label>
+                            <select asp-for="Account.DateFormat"
+                                    asp-items="Html.GetEnumSelectList<DateFormatType>()"
+                                    class="settings-select"></select>
+                        </div>
+
+                        <div class="settings-field settings-switch-field">
+                            <label asp-for="Account.ShowFullName">نمایش نام کامل</label>
+                            <label class="settings-switch">
+                                <input asp-for="Account.ShowFullName" type="checkbox" />
+                                <span class="settings-switch-slider"></span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="settings-save-bar">
+                        <div class="settings-save-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            تغییرات بعد از ذخیره اعمال می‌شوند.
+                        </div>
+                        <button type="submit" class="settings-save-btn">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Notifications -->
+            <section class="settings-tab-panel" data-tab-panel="notifications">
+                <form asp-controller="Settings" asp-action="UpdateNotifications" method="post" class="settings-card">
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>اعلان‌ها</h2>
+                            <p>مشخص کنید چه اعلان‌هایی برای شما ارسال شود.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-notification-list">
+                        @for (int i = 0; i < Model.Notifications.Count; i++)
+                        {
+                            <div class="settings-notification-item">
+                                <input type="hidden" asp-for="Notifications[i].NotificationType" />
+                                <input type="hidden" asp-for="Notifications[i].Title" />
+                                <span>@Model.Notifications[i].Title</span>
+                                <label class="settings-switch">
+                                    <input asp-for="Notifications[i].IsEnabled" type="checkbox" />
+                                    <span class="settings-switch-slider"></span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="settings-save-bar">
+                        <div class="settings-save-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            تغییرات بعد از ذخیره اعمال می‌شوند.
+                        </div>
+                        <button type="submit" class="settings-save-btn">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Appearance -->
+            <section class="settings-tab-panel" data-tab-panel="appearance">
+                <form asp-controller="Settings" asp-action="UpdateAppearance" method="post" class="settings-card">
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>ظاهر</h2>
+                            <p>نحوه‌ی نمایش رابط کاربری SmartTask را شخصی‌سازی کنید.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-grid">
+
+                        <div class="settings-field">
+                            <label asp-for="Appearance.Theme"></label>
+                            <select asp-for="Appearance.Theme"
+                                    asp-items="Html.GetEnumSelectList<ThemeType>()"
+                                    class="settings-select"></select>
+                        </div>
+
+                        <div class="settings-field">
+                            <label asp-for="Appearance.TaskDensity"></label>
+                            <select asp-for="Appearance.TaskDensity"
+                                    asp-items="Html.GetEnumSelectList<TaskDensityType>()"
+                                    class="settings-select"></select>
+                        </div>
+
+                    </div>
+
+                    <div class="settings-save-bar">
+                        <div class="settings-save-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            تغییرات بعد از ذخیره اعمال می‌شوند.
+                        </div>
+                        <button type="submit" class="settings-save-btn">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره تغییرات
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Security -->
+            <section class="settings-tab-panel" data-tab-panel="security">
+                <div class="settings-card">
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>امنیت حساب</h2>
+                            <p>عملیات مربوط به امنیت حساب کاربری شما.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-security-list">
+
+                        <a asp-controller="Account" asp-action="ChangePassword" class="settings-security-link">
+                            <div class="settings-security-link-info">
+                                <i class="fa-solid fa-key"></i>
+                                <span>تغییر رمز عبور</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+
+                        <span class="settings-security-link disabled">
+                            <div class="settings-security-link-info">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>خروج از همه دستگاه‌ها</span>
+                            </div>
+                            <span class="settings-badge-soon">به‌زودی</span>
+                        </span>
+
+                        <span class="settings-security-link disabled">
+                            <div class="settings-security-link-info">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>ورودهای اخیر</span>
+                            </div>
+                            <span class="settings-badge-soon">به‌زودی</span>
+                        </span>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workspace -->
+            <section class="settings-tab-panel" data-tab-panel="workspace">
+                <form asp-controller="Settings" asp-action="UpdateDefaultWorkspace" method="post" class="settings-card">
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>Workspace</h2>
+                            <p>Workspace پیش‌فرض خود را برای ورود سریع‌تر انتخاب کنید.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-grid">
+                        <div class="settings-field full-width">
+                            <label for="workspaceId">Workspace پیش‌فرض</label>
+                            <select name="workspaceId" id="workspaceId" class="settings-select">
+                                <option value="">— انتخاب نشده —</option>
+                                @foreach (var ws in Model.Workspace.Workspaces)
+                                {
+                                    <option value="@ws.Value" selected="@(ws.Value == Model.Workspace.DefaultWorkspaceId?.ToString())">
+                                        @ws.Text
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-save-bar">
+                        <div class="settings-save-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            برای مدیریت اعضا و تنظیمات کامل هر Workspace، به صفحه‌ی تنظیمات همان Workspace مراجعه کنید.
+                        </div>
+                        <button type="submit" class="settings-save-btn">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/settings.js" asp-append-version="true"></script>
+}

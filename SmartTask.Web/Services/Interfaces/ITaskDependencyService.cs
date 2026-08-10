@@ -10,4 +10,5 @@ public interface ITaskDependencyService
     Task<List<DependencyRiskItemViewModel>> GetProjectRiskOverviewAsync(int projectId);
     Task<List<ImpactedTaskViewModel>> GetImpactedTasksAsync(int taskId, int delayDays);
     Task<List<CascadeInfoViewModel>> GetCascadeInfoAsync(int taskId);
+    Task<DependencyGraphViewModel> GetDependencyGraphAsync(int projectId);
 }

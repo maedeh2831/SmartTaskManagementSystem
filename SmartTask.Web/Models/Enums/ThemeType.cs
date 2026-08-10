@@ -14,6 +14,9 @@ namespace SmartTask.Web.Models.Enums
         Light = 1,
 
         [Display(Name = "تیره")]
-        Dark = 2
+        Dark = 2,
+
+        [Display(Name = "سیستم")]
+        System = 3
     }
 }

@@ -38,6 +38,11 @@ namespace SmartTask.Web.Models.Entities
         public ThemeType Theme { get; set; } = ThemeType.Light;
 
         public string TimeZone { get; set; } = "Asia/Tehran";
+        public DateFormatType DateFormat { get; set; } = DateFormatType.Jalali;
+        public bool ShowFullName { get; set; } = true;
+        public TaskDensityType TaskDensity { get; set; } = TaskDensityType.Comfortable;
+        public int? DefaultWorkspaceId { get; set; }
+        public Workspace? DefaultWorkspace { get; set; }
 
         public string? ChangeUser { get; set; }
 
@@ -68,5 +73,6 @@ namespace SmartTask.Web.Models.Entities
         public ICollection<ActivityLog> ActivityLogs { get; set; } = new HashSet<ActivityLog>();
 
         public virtual ICollection<TimeLog> TimeLogs { get; set; } = new HashSet<TimeLog>();
+        public ICollection<UserNotificationPreference> NotificationPreferences { get; set; } = new List<UserNotificationPreference>();
     }
 }

@@ -54,10 +54,10 @@ namespace SmartTask.Web.Data.Context
         // Tracking
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<TimeLog> TimeLogs { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

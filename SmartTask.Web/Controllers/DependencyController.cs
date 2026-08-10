@@ -50,4 +50,14 @@ public class DependencyController : BaseController
 
         return View(vm);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GraphData(int projectId)
+    {
+        if (!await _projectMemberService.IsMemberAsync(projectId, CurrentUser.UserId))
+            return Forbid();
+
+        var graph = await _dependencyService.GetDependencyGraphAsync(projectId);
+        return Json(graph);
+    }
 }

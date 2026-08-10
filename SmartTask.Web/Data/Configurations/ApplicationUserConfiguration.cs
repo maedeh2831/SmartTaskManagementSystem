@@ -61,6 +61,11 @@ namespace SmartTask.Web.Data.Configurations
 
             builder.Property(x => x.CreatedDate)
                 .HasDefaultValueSql("GETDATE()");
+
+            builder.HasOne(u => u.DefaultWorkspace)
+                   .WithMany()
+                   .HasForeignKey(u => u.DefaultWorkspaceId)
+                   .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
