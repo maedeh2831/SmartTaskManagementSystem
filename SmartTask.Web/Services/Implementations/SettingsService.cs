@@ -59,7 +59,6 @@ namespace SmartTask.Web.Services.Implementations
                     Language = user.Language,
                     TimeZone = user.TimeZone,
                     DateFormat = user.DateFormat,
-                    ShowFullName = user.ShowFullName
                 },
                 Appearance = new AppearanceSettingsViewModel
                 {
@@ -83,7 +82,6 @@ namespace SmartTask.Web.Services.Implementations
             user.Language = model.Language;
             user.TimeZone = model.TimeZone;
             user.DateFormat = model.DateFormat;
-            user.ShowFullName = model.ShowFullName;
             user.ChangeDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

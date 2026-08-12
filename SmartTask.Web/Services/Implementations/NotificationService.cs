@@ -45,6 +45,9 @@ namespace SmartTask.Web.Services.Implementations
 
         public async Task CreateAsync(int userId, string title, string message, NotificationType type)
         {
+            if (!await IsNotificationEnabledAsync(userId, type))
+                return;
+
             var notification = new Notification
             {
                 ApplicationUserId = userId,
@@ -72,6 +75,17 @@ namespace SmartTask.Web.Services.Implementations
                     createdDate = notification.CreatedDate,
                     unreadCount
                 });
+        }
+
+        private async Task<bool> IsNotificationEnabledAsync(int userId, NotificationType type)
+        {
+            if (type == NotificationType.System || type == NotificationType.Reminder)
+                return true;
+
+            var preference = await _context.UserNotificationPreferences
+                .FirstOrDefaultAsync(x => x.ApplicationUserId == userId && x.NotificationType == type);
+
+            return preference?.IsEnabled ?? true;
         }
 
         public async Task<bool> CanManageNotificationAsync(int id, int userId)

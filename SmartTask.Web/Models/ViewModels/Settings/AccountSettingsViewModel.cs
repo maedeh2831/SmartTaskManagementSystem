@@ -13,7 +13,5 @@ namespace SmartTask.Web.Models.ViewModels.Settings
         [Display(Name = "فرمت تاریخ")]
         public DateFormatType DateFormat { get; set; }
 
-        [Display(Name = "نمایش نام کامل")]
-        public bool ShowFullName { get; set; }
     }
 }

@@ -1,11 +1,30 @@
-﻿<!DOCTYPE html>
+﻿@inject SmartTask.Web.Infrastructure.Interfaces.ICurrentUserService CurrentUserService
+@{
+    var themePreference = "system";
+    if (CurrentUserService.IsAuthenticated && CurrentUserService.CurrentUser != null)
+    {
+        themePreference = CurrentUserService.CurrentUser.Theme.ToString().ToLower();
+    }
+}
+
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <script>
+        (function () {
+            var stored = "@themePreference";
+            var theme = stored;
+            if (stored === "system" || !stored) {
+                theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-theme", theme);
+            document.documentElement.setAttribute("data-theme-preference", stored || "system");
+        })();
+    </script>
     <title>@ViewData["Title"] - SmartTask</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />

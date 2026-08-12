@@ -1,4 +1,4 @@
-/*  Task Details Widget  */
+/*  dependency css  */
 
 .dependency-alert {
     display: flex;
@@ -130,7 +130,7 @@
 }
 
     .dependency-impact-item.required {
-        border-right-color: #EF4444;
+        border-right-color: var(--danger);
     }
 
     .dependency-impact-item.optional {
@@ -170,11 +170,11 @@
 }
 
 .dependency-risk-card {
-    background: #fff;
+    background: var(--card);
     border-radius: 20px;
     padding: 20px 24px;
     box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
-    border-right: 4px solid #EF4444;
+    border-right: 4px solid var(--danger);
 }
 
 .dependency-risk-header {
@@ -184,19 +184,19 @@
     margin-bottom: 14px;
 }
 
-.dependency-risk-header h4 {
-    margin: 0 0 4px;
-    font-size: 15px;
-}
+    .dependency-risk-header h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+    }
 
-.dependency-risk-header h4 a {
-    color: var(--gray900);
-    text-decoration: none;
-}
+        .dependency-risk-header h4 a {
+            color: var(--gray900);
+            text-decoration: none;
+        }
 
-.dependency-risk-header h4 a:hover {
-    color: var(--primary);
-}
+            .dependency-risk-header h4 a:hover {
+                color: var(--primary);
+            }
 
 .dependency-risk-delay {
     font-size: 12px;
@@ -350,7 +350,7 @@
         height: 34px;
         border-radius: 10px;
         border: 1px solid var(--gray100);
-        background: #fff;
+        background: var(--card);
         color: var(--gray500);
     }
 
@@ -363,7 +363,7 @@
     width: 100%;
     height: 520px;
     border-radius: 20px;
-    background: #fff;
+    background: var(--card);
     box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
 }
 

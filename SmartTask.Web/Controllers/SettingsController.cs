@@ -48,10 +48,10 @@ namespace SmartTask.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateNotifications(List<NotificationPreferenceItemViewModel> model)
+        public async Task<IActionResult> UpdateNotifications(List<NotificationPreferenceItemViewModel> Notifications)
         {
             var userId = int.Parse(_userManager.GetUserId(User)!);
-            await _settingsService.UpdateNotificationsAsync(userId, model);
+            await _settingsService.UpdateNotificationsAsync(userId, Notifications);
             TempData["Success"] = "تنظیمات اعلان‌ها با موفقیت ذخیره شد.";
             return RedirectToAction(nameof(Index));
         }

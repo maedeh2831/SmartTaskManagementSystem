@@ -1,7 +1,12 @@
+/*Site css*/
+
 :root {
     --primary: #6366F1;
     --primary-dark: #4F46E5;
+    --primary-darker: #4338CA;
+    --primary-light: #EEF2FF;
     --secondary: #8B5CF6;
+    --accent: #06B6D4;
     --success: #10B981;
     --danger: #EF4444;
     --warning: #F59E0B;
@@ -10,15 +15,49 @@
     --border: #E2E8F0;
     --text: #0F172A;
     --muted: #64748B;
+    --gray50: #F8FAFC;
+    --gray100: #F1F5F9;
+    --gray200: #E2E8F0;
+    --gray300: #CBD5E1;
+    --gray400: #94A3B8;
+    --gray500: #64748B;
+    --gray600: #475569;
+    --gray700: #334155;
+    --gray800: #1E293B;
+    --gray900: #0F172A;
+    --auth-gradient-1: #667eea;
+    --auth-gradient-2: #764ba2;
     --radius: 24px;
     --shadow: 0 20px 50px rgba(15,23,42,.12);
+    --primary-border: #C7D2FE;
+    --primary-mid: #818CF8;
+    --primary-glow: rgba(99, 102, 241, .15);
+    --shadow-sm: 0 8px 30px rgba(15, 23, 42, .04);
+
+}
+[data-theme="dark"] {
+    --bg: #0B1220;
+    --card: #111827;
+    --border: #1F2937;
+    --text: #E2E8F0;
+    --muted: #94A3B8;
+    --gray50: #0B1220;
+    --gray100: #111827;
+    --gray200: #1F2937;
+    --gray300: #334155;
+    --gray400: #64748B;
+    --gray500: #94A3B8;
+    --gray600: #CBD5E1;
+    --gray700: #E2E8F0;
+    --gray800: #F1F5F9;
+    --gray900: #F8FAFC;
+    --primary-light: rgba(99, 102, 241, .16);
+    --primary-border: rgba(99, 102, 241, .35);
+    --shadow: 0 20px 50px rgba(0, 0, 0, .45);
+    --shadow-sm: 0 8px 30px rgba(0, 0, 0, .35);
 }
 
-
-/* =========================
-   Fonts
-========================= */
-
+/* Fonts */
 
 @font-face {
     font-family: "Vazirmatn";
@@ -26,13 +65,11 @@
     font-weight: 400;
 }
 
-
 @font-face {
     font-family: "Vazirmatn";
     src: url('/fonts/Vazirmatn/Vazirmatn-Medium.woff2');
     font-weight: 500;
 }
-
 
 @font-face {
     font-family: "Vazirmatn";
@@ -42,10 +79,7 @@
 
 
 
-/* =========================
-   Global
-========================= */
-
+/* Global */
 
 html {
     font-size: 14px;
@@ -53,14 +87,15 @@ html {
     min-height: 100%;
 }
 
-
 @media(min-width:768px) {
 
+    
     html {
         font-size: 16px;
     }
-}
 
+    
+}
 
 body {
     margin: 0;
@@ -86,16 +121,15 @@ a {
 }
 
 
-    .btn:hover {
-        transform: translateY(-2px);
-    }
+.btn:hover {
+    transform: translateY(-2px);
+}
 
 
 
-/* =========================
-   Inputs
-========================= */
 
+
+/* Inputs */
 
 .form-control {
     height: 52px;
@@ -107,27 +141,27 @@ a {
 
 
 
-    .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 .25rem rgba(99,102,241,.15);
-    }
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 .25rem rgba(99,102,241,.15);
+}
+
+
 
 
 
 .form-label {
     font-weight: 600;
-    color: #475569;
+    color: var(--gray600);
 }
 
 
 
-/* =========================
-   Authentication
-========================= */
-
+/* Authentication */
 
 body.auth-body {
-    background: linear-gradient( 135deg, #667eea, #764ba2 );
+    background: linear-gradient( 135deg, var(--auth-gradient-1), var(--auth-gradient-2) );
 }
 
 
@@ -150,28 +184,30 @@ body.auth-body {
 
 
 
-    .auth-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 35px 80px rgba(0,0,0,.22);
-    }
+
+.auth-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 35px 80px rgba(0,0,0,.22);
+}
 
 
 
-    .auth-card h2 {
-        color: #1E293B;
-        font-weight: 700;
-    }
+.auth-card h2 {
+    color: var(--gray800);
+    font-weight: 700;
+}
 
 
 
-    .auth-card p {
-        color: var(--muted);
-    }
+.auth-card p {
+    color: var(--muted);
+}
+
+
 
 
 
 /* Auth Button */
-
 
 .auth-btn {
     height: 54px;
@@ -186,15 +222,17 @@ body.auth-body {
 
 
 
-    .auth-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(99,102,241,.35);
-    }
+
+.auth-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(99,102,241,.35);
+}
+
+
 
 
 
 /* Auth Links */
-
 
 .auth-card a {
     color: var(--primary);
@@ -204,7 +242,6 @@ body.auth-body {
 
 
 /* Icon Circle */
-
 
 .auth-icon {
     width: 80px;
@@ -223,43 +260,43 @@ body.auth-body {
 
 /* Animation */
 
-
 @keyframes slideUp {
+     from
+
+{
+    opacity: 0;
+    transform: translateY(30px);
+}
 
 
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 
 
-
-/* =========================
-   Mobile
-========================= */
-
+/* Mobile */
 
 @media(max-width:768px) {
+     .auth-card
 
-
-    .auth-card {
-        padding: 30px 24px;
-        border-radius: 24px;
-    }
+{
+    padding: 30px 24px;
+    border-radius: 24px;
 }
-/*==================== FOOTER ====================*/
+
+
+}
+
+/*FOOTER */
 
 .main-footer {
-    background: #fff;
-    border-top: 1px solid #e5e7eb;
+    background: var(--card);
+    border-top: 1px solid var(--border);
     padding: 18px 35px;
 }
 
@@ -286,7 +323,7 @@ body.auth-body {
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background: linear-gradient(135deg,#4f46e5,#06b6d4);
+    background: linear-gradient(135deg, var(--primary-dark), var(--accent));
     color: white;
     display: flex;
     justify-content: center;
@@ -297,25 +334,28 @@ body.auth-body {
 .footer-title {
     font-size: 20px;
     font-weight: 700;
-    color: #334155;
+    color: var(--gray700);
 }
 
 .footer-subtitle {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--gray400);
 }
 
 .footer-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #64748b;
+    color: var(--muted);
     font-size: 14px;
 }
 
-    .footer-item strong {
-        color: #334155;
-    }
+
+.footer-item strong {
+    color: var(--gray700);
+}
+
+
 
 .status-dot {
     width: 10px;
@@ -330,26 +370,33 @@ body.auth-body {
     text-align: left;
 }
 
-    .footer-copy small {
-        color: #94a3b8;
-    }
 
-    .footer-copy strong {
-        color: #4f46e5;
-    }
+.footer-copy small {
+    color: var(--gray400);
+}
 
-/*==================== Responsive ====================*/
+.footer-copy strong {
+    color: var(--primary-dark);
+}
+
+
+
+/* Responsive */
 
 @media(max-width:1100px) {
+     .footer-content
 
-    .footer-content {
-        flex-wrap: wrap;
-        gap: 25px;
-    }
+{
+    flex-wrap: wrap;
+    gap: 25px;
+}
+
+
 }
 
 @media(max-width:768px) {
 
+    
     .main-footer {
         padding: 20px;
     }
@@ -368,10 +415,11 @@ body.auth-body {
         align-items: center;
         text-align: center;
     }
+
+    
 }
-/* ================================
-   HEADER USER AVATAR
-   ================================ */
+
+/* HEADER USER AVATAR */
 
 .user-avatar {
     width: 42px;
