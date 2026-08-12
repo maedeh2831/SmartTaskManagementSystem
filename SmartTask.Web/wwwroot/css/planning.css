@@ -3,7 +3,7 @@
    ========================================================== */
 
 .planning-capacity-bar {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 14px;
     padding: 16px 20px;
@@ -55,7 +55,7 @@
 }
 
 .planning-column {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 16px;
     padding: 14px;
@@ -99,7 +99,7 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 12px;
     padding: 12px;

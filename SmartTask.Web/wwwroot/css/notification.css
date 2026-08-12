@@ -94,7 +94,7 @@
 
     .notification-dropdown-item:hover,
     .notification-center-item:hover {
-        background: #FAFAFE;
+        background: var(--bg);
     }
 
     .notification-dropdown-item.unread,

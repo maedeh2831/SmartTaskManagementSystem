@@ -35,7 +35,7 @@
 
     .project-status-badge.status-planning {
         background: #E0E7FF;
-        color: #4338CA;
+        color: var(--primary-darker);
     }
 
     .project-status-badge.status-active {
@@ -84,7 +84,7 @@
 
     .project-priority-badge.priority-medium {
         background: #E0E7FF;
-        color: #4338CA;
+        color: var(--primary-darker);
     }
 
     .project-priority-badge.priority-high {
@@ -176,7 +176,7 @@
 }
 
 .team-detail-card {
-    background: #fff;
+    background: var(--card);
     border-radius: 20px;
     padding: 24px;
     box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
@@ -196,7 +196,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    background: #fff;
+    background: var(--card);
     border-radius: 18px;
     padding: 18px 20px;
     box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));

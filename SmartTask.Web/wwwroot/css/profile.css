@@ -15,7 +15,7 @@
 
 .profile-eyebrow {
     display: block;
-    color: #6366f1;
+    color: var(--primary);
     font-size: 13px;
     font-weight: 700;
     margin-bottom: 8px;
@@ -23,14 +23,14 @@
 
 .profile-page-header h1 {
     margin: 0;
-    color: #0f172a;
+    color: var(--text);
     font-size: 30px;
     font-weight: 800;
 }
 
 .profile-page-header p {
     margin: 8px 0 0;
-    color: #64748b;
+    color: var(--muted);
     font-size: 14px;
 }
 
@@ -40,17 +40,17 @@
     gap: 8px;
     padding: 10px 16px;
     border-radius: 12px;
-    color: #475569;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    color: var(--gray600);
+    background: var(--card);
+    border: 1px solid var(--border);
     text-decoration: none;
     transition: .2s ease;
 }
 
     .profile-back-btn:hover {
-        color: #4f46e5;
-        border-color: #c7d2fe;
-        background: #eef2ff;
+        color: var(--primary-dark);
+        border-color: var(--primary-border);
+        background: var(--primary-light);
     }
 
 
@@ -66,8 +66,8 @@
 /* CARD */
 
 .profile-card {
-    background: #fff;
-    border: 1px solid #e8edf3;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 22px;
     padding: 24px;
     box-shadow: 0 8px 30px rgba(15, 23, 42, .04);
@@ -82,14 +82,14 @@
 
     .profile-card-header h2 {
         margin: 0;
-        color: #0f172a;
+        color: var(--text);
         font-size: 18px;
         font-weight: 800;
     }
 
     .profile-card-header p {
         margin: 7px 0 0;
-        color: #94a3b8;
+        color: var(--gray400);
         font-size: 13px;
         line-height: 1.8;
     }
@@ -101,8 +101,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #eef2ff;
-    color: #4f46e5;
+    background: var(--primary-light);
+    color: var(--primary-dark);
 }
 
 
@@ -135,7 +135,7 @@
 
 .avatar-preview {
     object-fit: cover;
-    border: 5px solid #f1f5f9;
+    border: 5px solid var(--gray100);
     box-shadow: 0 10px 30px rgba(15, 23, 42, .12);
 }
 
@@ -143,10 +143,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient( 135deg, #eef2ff, #e0f2fe );
-    color: #6366f1;
+    background: linear-gradient( 135deg, var(--primary-light), #e0f2fe );
+    color: var(--primary);
     font-size: 50px;
-    border: 5px solid #f8fafc;
+    border: 5px solid var(--bg);
 }
 
 .avatar-actions {
@@ -167,8 +167,8 @@
 }
 
 .avatar-upload-btn {
-    background: #eef2ff;
-    color: #4f46e5;
+    background: var(--primary-light);
+    color: var(--primary-dark);
 }
 
     .avatar-upload-btn:hover {
@@ -187,7 +187,7 @@
 
 .avatar-help {
     margin-top: 17px;
-    color: #94a3b8;
+    color: var(--gray400);
     font-size: 11px;
 }
 
@@ -215,7 +215,7 @@
     .profile-field label {
         display: block;
         margin-bottom: 8px;
-        color: #334155;
+        color: var(--gray700);
         font-size: 13px;
         font-weight: 700;
     }
@@ -226,20 +226,20 @@
     align-items: center;
     gap: 11px;
     padding: 0 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 13px;
     transition: .2s ease;
 }
 
     .profile-input-wrapper:focus-within {
-        background: #fff;
-        border-color: #818cf8;
+        background: var(--card);
+        border-color: var(--primary-mid);
         box-shadow: 0 0 0 4px rgba(99,102,241,.09);
     }
 
     .profile-input-wrapper > i {
-        color: #94a3b8;
+        color: var(--gray400);
         width: 18px;
         text-align: center;
     }
@@ -250,18 +250,18 @@
     border: none;
     outline: none;
     background: transparent;
-    color: #1e293b;
+    color: var(--gray800);
     font-family: inherit;
     font-size: 13px;
 }
 
     .profile-input::placeholder,
     .profile-textarea::placeholder {
-        color: #a8b1bf;
+        color: var(--gray400);
     }
 
 .profile-input-wrapper.readonly {
-    background: #f1f5f9;
+    background: var(--gray100);
 }
 
     .profile-input-wrapper.readonly .profile-input {
@@ -286,11 +286,11 @@
     resize: vertical;
     min-height: 120px;
     padding: 14px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 13px;
     outline: none;
-    background: #f8fafc;
-    color: #1e293b;
+    background: var(--bg);
+    color: var(--gray800);
     font-family: inherit;
     font-size: 13px;
     line-height: 1.9;
@@ -298,15 +298,15 @@
 }
 
     .profile-textarea:focus {
-        background: #fff;
-        border-color: #818cf8;
+        background: var(--card);
+        border-color: var(--primary-mid);
         box-shadow: 0 0 0 4px rgba(99,102,241,.09);
     }
 
 .character-counter {
     margin-top: 6px;
     text-align: left;
-    color: #94a3b8;
+    color: var(--gray400);
     font-size: 11px;
 }
 
@@ -342,17 +342,18 @@
 
 .security-content h2 {
     margin: 0;
-    color: #0f172a;
+    color: var(--text);
     font-size: 16px;
     font-weight: 800;
 }
 
 .security-content p {
     margin: 5px 0 0;
-    color: #64748b;
+    color: var(--muted);
     font-size: 12px;
 }
 
+/* Always-dark action button by design (not theme-driven) — kept hardcoded on purpose */
 .security-btn {
     display: inline-flex;
     align-items: center;
@@ -383,9 +384,9 @@
     z-index: 20;
     margin-top: 20px;
     padding: 14px 18px;
-    background: rgba(255,255,255,.94);
+    background: var(--card);
     backdrop-filter: blur(15px);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 16px;
     box-shadow: 0 15px 40px rgba(15,23,42,.10);
     display: flex;
@@ -395,20 +396,20 @@
 }
 
     .profile-save-bar > div {
-        color: #64748b;
+        color: var(--muted);
         font-size: 12px;
     }
 
         .profile-save-bar > div i {
             margin-left: 5px;
-            color: #6366f1;
+            color: var(--primary);
         }
 
 .profile-save-btn {
     border: none;
     border-radius: 11px;
     padding: 11px 19px;
-    background: linear-gradient(135deg,#4f46e5,#6366f1);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
     color: white;
     font-family: inherit;
     font-size: 12px;
@@ -488,6 +489,7 @@
         justify-content: center;
     }
 }
+
 .user-avatar {
     width: 42px !important;
     height: 42px !important;

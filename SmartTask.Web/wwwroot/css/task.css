@@ -35,7 +35,7 @@
 }
 
 .task-column {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 16px;
     padding: 12px;
@@ -85,7 +85,7 @@
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 12px;
     padding: 12px;
@@ -395,7 +395,7 @@
 
 .comment-body {
     flex: 1;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 12px;
     padding: 10px 14px;
@@ -469,7 +469,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 10px;
     padding: 10px 14px;
@@ -567,7 +567,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 10px;
     padding: 10px 14px;
@@ -646,7 +646,7 @@
     }
 
 .ai-modal {
-    background: #fff;
+    background: var(--card);
     border-radius: 24px;
     width: 100%;
     max-width: 520px;
@@ -873,7 +873,7 @@
 
 .backlog-priority-badge.priority-medium {
     background: #E0E7FF;
-    color: #4338CA;
+    color: var(--primary-darker);
 }
 
 .backlog-priority-badge.priority-high {

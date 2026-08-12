@@ -28,20 +28,20 @@ namespace SmartTask.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateAccount(AccountSettingsViewModel model)
+        public async Task<IActionResult> UpdateAccount(AccountSettingsViewModel Account)
         {
             var userId = int.Parse(_userManager.GetUserId(User)!);
-            await _settingsService.UpdateAccountAsync(userId, model);
+            await _settingsService.UpdateAccountAsync(userId, Account);
             TempData["Success"] = "تنظیمات حساب با موفقیت ذخیره شد.";
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateAppearance(AppearanceSettingsViewModel model)
+        public async Task<IActionResult> UpdateAppearance(AppearanceSettingsViewModel Appearance)
         {
             var userId = int.Parse(_userManager.GetUserId(User)!);
-            await _settingsService.UpdateAppearanceAsync(userId, model);
+            await _settingsService.UpdateAppearanceAsync(userId, Appearance);
             TempData["Success"] = "تنظیمات ظاهری با موفقیت ذخیره شد.";
             return RedirectToAction(nameof(Index));
         }

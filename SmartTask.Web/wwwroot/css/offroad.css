@@ -94,7 +94,7 @@
 }
 
 .offroad-priority-select.priority-normal {
-    color: #4338CA;
+    color: var(--primary-darker);
 }
 
 .offroad-priority-select.priority-low {

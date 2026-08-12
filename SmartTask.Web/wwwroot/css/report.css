@@ -43,7 +43,7 @@
 }
 
 .report-stat-card {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 16px;
     padding: 18px 20px;
@@ -225,6 +225,7 @@
         grid-template-columns: 1fr;
     }
 }
+
 .report-project-compare-row {
     text-decoration: none;
     border-radius: 10px;
