@@ -76,7 +76,7 @@
                 <div class="sprint-progress-fill status-@Model.Status.ToString().ToLower()"
                      style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%"></div>
             </div>
-            <small>@Model.StartDate.ToString("yyyy/MM/dd") تا @Model.EndDate.ToString("yyyy/MM/dd") — ظرفیت @Model.Capacity Story Point</small>
+            <small>@Html.DisplayDate(Model.StartDate) تا @Html.DisplayDate(Model.EndDate) — ظرفیت @Model.Capacity Story Point</small>
         </div>
 
         @if (Model.CanManage)

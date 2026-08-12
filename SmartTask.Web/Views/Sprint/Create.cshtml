@@ -59,13 +59,13 @@
                     <div class="sprint-date-row">
                         <div class="form-group">
                             <label asp-for="StartDate"></label>
-                            <input asp-for="StartDate" id="sprintStart" type="date" class="form-control" />
+                            <input asp-date-for="StartDate" id="sprintStart" class="form-control" />
                             <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
 
                         <div class="form-group">
                             <label asp-for="EndDate"></label>
-                            <input asp-for="EndDate" id="sprintEnd" type="date" class="form-control" />
+                            <input asp-date-for="EndDate" id="sprintEnd" class="form-control" />
                             <span asp-validation-for="EndDate" class="text-danger"></span>
                         </div>
                     </div>

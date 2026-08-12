@@ -148,6 +148,7 @@ namespace SmartTask.Web
             builder.Services.AddScoped<ISprintReportAiService, SprintReportAiService>();
             builder.Services.AddScoped<ITaskTradeService, TaskTradeService>();
             builder.Services.AddScoped<ISettingsService, SettingsService>();
+            builder.Services.AddScoped<IDateFormatService, DateFormatService>();
 
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
