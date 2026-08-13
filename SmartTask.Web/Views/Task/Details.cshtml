@@ -78,17 +78,17 @@
             </div>
             <div>
                 <span class="userstory-info-label">تاریخ شروع</span>
-                <span>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+                <span>@Html.DisplayDate(Model.StartDate, "—")</span>
             </div>
             <div>
                 <span class="userstory-info-label">موعد انجام</span>
-                <span>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+                <span>@Html.DisplayDate(Model.DueDate, "—")</span>
             </div>
             @if (Model.CompletedDate.HasValue)
             {
                 <div>
                     <span class="userstory-info-label">تاریخ تکمیل</span>
-                    <span>@Model.CompletedDate.Value.ToString("yyyy/MM/dd")</span>
+                    <span>@Html.DisplayDate(Model.CompletedDate)</span>
                 </div>
             }
         </div>
@@ -138,7 +138,7 @@
                 <input type="hidden" name="taskItemId" value="@Model.Id" />
 
                 <div class="manual-timelog-fields">
-                    <input type="datetime-local" name="startTime" class="form-control" required />
+                    <input asp-date-name="startTime" asp-include-time="true" class="form-control" required />
                     <input type="number" name="durationMinutes" min="1" max="1440" placeholder="مدت (دقیقه)" class="form-control" required />
                     <input type="text" name="description" placeholder="توضیح (اختیاری)" class="form-control" />
                     <button type="submit" class="btn btn-light">
@@ -169,7 +169,7 @@
                                 }
                             </span>
                             <span class="timelog-meta">
-                                @log.StartTime.ToString("yyyy/MM/dd HH:mm")
+                                @Html.DisplayDate(log.StartTime, includeTime: true)
                                 @if (!log.IsRunning)
                                 {
                                     <text> — @(log.DurationMinutes) دقیقه</text>
@@ -287,6 +287,13 @@
                 }
             </div>
         }
+        @if (Model.IsCurrentUserAssignee && Model.TradeModal != null && Model.TradeModal.ProjectMembers.Any())
+        {
+            <button type="button" id="openTradeModalBtn" class="ai-suggest-btn" style="margin-top:14px;background:linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                <i class="fa-solid fa-right-left"></i>
+                درخواست ترید این تسک
+            </button>
+        }
 
         @if (Model.CanManage && Model.AvailableMembers.Any())
         {
@@ -395,6 +402,83 @@
         }
     </div>
 
+    <div class="details-card smart-priority-card">
+        <div class="card-title">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            اولویت پیشنهادی هوشمند
+        </div>
+
+        <div class="smart-priority-compare">
+            <div class="smart-priority-box">
+                <span>اولویت فعلی</span>
+                <strong class="backlog-priority-badge priority-@Model.SmartPriority.CurrentPriority.ToString().ToLower()">
+                    @Model.SmartPriority.CurrentPriority
+                </strong>
+            </div>
+
+            <i class="fa-solid fa-arrow-left-long smart-priority-arrow"></i>
+
+            <div class="smart-priority-box">
+                <span>اولویت پیشنهادی</span>
+                <strong class="backlog-priority-badge priority-@Model.SmartPriority.SuggestedPriority.ToString().ToLower()">
+                    @Model.SmartPriority.SuggestedPriority
+                </strong>
+            </div>
+
+            <div class="smart-priority-score">
+                <span>امتیاز کل</span>
+                <strong>@Model.SmartPriority.TotalScore / 100</strong>
+            </div>
+        </div>
+
+        <div class="smart-priority-breakdown">
+            <div class="smart-priority-bar-row">
+                <span>فوریت زمانی</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.UrgencyScore * 100 / 40)%;background:#F59E0B"></div></div>
+                <span>@Model.SmartPriority.UrgencyScore/40</span>
+            </div>
+            <div class="smart-priority-bar-row">
+                <span>تأثیر وابستگی</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.DependencyScore * 100 / 35)%;background:#EF4444"></div></div>
+                <span>@Model.SmartPriority.DependencyScore/35</span>
+            </div>
+            <div class="smart-priority-bar-row">
+                <span>ریسک کارکارگیر</span>
+                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.WorkloadScore * 100 / 25)%;background:#8B5CF6"></div></div>
+                <span>@Model.SmartPriority.WorkloadScore/25</span>
+            </div>
+        </div>
+
+        @if (Model.SmartPriority.Reasons.Any())
+        {
+            <ul class="smart-priority-reasons">
+                @foreach (var reason in Model.SmartPriority.Reasons)
+                {
+                    <li><i class="fa-solid fa-circle-info"></i> @reason</li>
+                }
+            </ul>
+        }
+
+        @if (Model.SmartPriority.IsDifferent && Model.SmartPriority.CanApply)
+        {
+            <form asp-action="ApplySmartPriority" method="post" class="smart-priority-apply-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-check"></i>
+                    اعمال اولویت پیشنهادی
+                </button>
+            </form>
+        }
+        else if (!Model.SmartPriority.IsDifferent)
+        {
+            <div class="smart-priority-match">
+                <i class="fa-solid fa-circle-check"></i>
+                اولویت فعلی با پیشنهاد سیستم هم‌راستاست.
+            </div>
+        }
+    </div>
+
     <div class="details-card">
         <div class="card-title">
             <i class="fa-solid fa-diagram-project"></i>
@@ -413,7 +497,7 @@
                             <li>
                                 به‌دلیل تأخیر <strong>@info.DelayDaysApplied روزه</strong> در
                                 <a asp-action="Details" asp-route-id="@info.SourceTaskId">«@info.SourceTaskTitle»</a>
-                                — آخرین به‌روزرسانی: @info.AppliedDate.ToString("yyyy/MM/dd HH:mm")
+                                — آخرین به‌روزرسانی: @Html.DisplayDate(info.AppliedDate, includeTime: true)
                             </li>
                         }
                     </ul>
@@ -532,7 +616,7 @@
                             @if (impacted.IsRequiredChain && impacted.ProjectedDueDate.HasValue && impacted.ProjectedDueDate != impacted.OriginalDueDate)
                             {
                                 <span class="dependency-projected-date">
-                                    موعد جدید تخمینی: @impacted.ProjectedDueDate.Value.ToString("yyyy/MM/dd")
+                                    موعد جدید تخمینی: @Html.DisplayDate(impacted.ProjectedDueDate)
                                 </span>
                             }
                         </div>
@@ -634,7 +718,7 @@
                         <i class="fa-solid fa-file"></i>
                         <div class="attachment-info">
                             <a href="@file.FilePath" target="_blank" class="attachment-name">@file.FileName</a>
-                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @file.CreateDate.ToString("yyyy/MM/dd")</span>
+                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @Html.DisplayDate(file.CreateDate)</span>
                         </div>
 
                         @if (file.CanDelete)
@@ -687,7 +771,7 @@
                             <div class="comment-header">
                                 <span class="comment-author">@comment.AuthorName</span>
                                 <span class="comment-date">
-                                    @comment.CreateDate.ToString("yyyy/MM/dd HH:mm")
+                                    @Html.DisplayDate(comment.CreateDate, includeTime: true)
                                     @if (comment.IsEdited)
                                     {
                                         <span>(ویرایش‌شده)</span>
@@ -764,6 +848,59 @@
         </form>
     </div>
 </div>
+
+@if (Model.TradeModal != null)
+{
+    <div class="ai-modal-overlay" id="tradeModalOverlay">
+        <div class="ai-modal">
+            <div class="ai-modal-header">
+                <h3><i class="fa-solid fa-right-left"></i> درخواست ترید تسک</h3>
+                <button type="button" id="tradeModalClose" class="ai-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form asp-controller="TaskTrade" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="taskId" value="@Model.TradeModal.TaskId" />
+                <input type="hidden" name="projectId" value="@Model.TradeModal.ProjectId" />
+
+                <div class="ai-modal-body">
+
+                    <div class="form-group">
+                        <label>عضو مقابل</label>
+                        <select name="targetUserId" id="tradeTargetUserSelect" class="form-control" required>
+                            <option value="">— انتخاب عضو —</option>
+                            @foreach (var m in Model.TradeModal.ProjectMembers)
+                            {
+                                <option value="@m.Value">@m.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تسک درخواستی از طرف مقابل (اختیاری — خالی = واگذاری ساده)</label>
+                        <select name="targetTaskId" id="tradeTargetTaskSelect" class="form-control" disabled>
+                            <option value="">— ابتدا عضو را انتخاب کنید —</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>یادداشت (اختیاری)</label>
+                        <textarea name="message" class="form-control" rows="2" placeholder="مثلاً: چون این هفته درگیر پروژه دیگه‌ای هستم..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="ai-modal-footer">
+                    <button type="button" id="tradeModalCancel" class="btn btn-light">انصراف</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        ارسال درخواست
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
 
 @section Scripts
 {

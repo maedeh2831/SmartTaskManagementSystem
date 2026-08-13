@@ -64,7 +64,7 @@
                                 @item.Title
                             </a>
                             <span class="reminder-item-meta">
-                                Task: @item.TaskTitle — @item.ReminderDate.ToString("yyyy/MM/dd HH:mm")
+                                Task: @item.TaskTitle — @Html.DisplayDate(item.ReminderDate, includeTime: true)
                             </span>
                         </div>
                         <div class="reminder-item-actions">
@@ -109,7 +109,7 @@
                                 @item.Title
                             </a>
                             <span class="reminder-item-meta">
-                                Task: @item.TaskTitle — @item.ReminderDate.ToString("yyyy/MM/dd HH:mm")
+                                Task: @item.TaskTitle — @Html.DisplayDate(item.ReminderDate, includeTime: true)
                                 @(item.IsSent ? " — ارسال‌شده" : " — ارسال‌نشده")
                             </span>
                         </div>

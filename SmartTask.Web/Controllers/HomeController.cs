@@ -25,6 +25,13 @@ namespace SmartTask.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
+            var defaultWorkspaceId = CurrentUser.CurrentUser?.DefaultWorkspaceId;
+
+            if (defaultWorkspaceId.HasValue)
+            {
+                return RedirectToAction("Index", "WorkspaceDashboard", new { workspaceId = defaultWorkspaceId.Value });
+            }
+
             var model = await _userDashboardService.GetDashboardAsync(CurrentUser.UserId);
             return View(model);
         }

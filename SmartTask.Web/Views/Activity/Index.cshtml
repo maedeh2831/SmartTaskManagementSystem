@@ -50,7 +50,7 @@
                             {
                                 <span class="activity-desc">@item.Description</span>
                             }
-                            <span>@item.ActivityDate.ToString("yyyy/MM/dd HH:mm")</span>
+                            <span>@Html.DisplayDate(item.ActivityDate, includeTime: true)</span>
                         </div>
                     </div>
                 }

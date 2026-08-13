@@ -104,7 +104,7 @@
                                  sprint.Status == SprintStatusType.Cancelled ? 0 :
                                  sprint.ProgressPercent)%"></div>
                             </div>
-                            <small>@sprint.StartDate.ToString("yyyy/MM/dd") تا @sprint.EndDate.ToString("yyyy/MM/dd")</small>
+                              <small>@Html.DisplayDate(sprint.StartDate) تا @Html.DisplayDate(sprint.EndDate)</small>
                         </div>
 
                         <div class="workspace-info">
@@ -122,7 +122,7 @@
 
                     <div class="workspace-card-footer">
 
-                        <small>ایجاد شده: @sprint.StartDate.ToString("yyyy/MM/dd")</small>
+                        <small>ایجاد شده: @Html.DisplayDate(sprint.StartDate)</small>
 
                         <div class="workspace-actions">
 

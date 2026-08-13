@@ -70,7 +70,7 @@
                     </div>
 
                     <div class="workspace-card-footer">
-                        <small>@item.CreateDate.ToString("yyyy/MM/dd")</small>
+                        <small>@Html.DisplayDate(item.CreateDate)</small>
 
                         <div class="workspace-actions">
                             <a asp-controller="WorkspaceReport"

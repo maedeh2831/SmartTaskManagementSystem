@@ -43,6 +43,69 @@
 
     </div>
 
+    @if (Model.Health != null)
+    {
+        <div class="health-score-card status-@Model.Health.HealthLevel">
+
+            <div class="health-score-main">
+                <i class="@Model.Health.HealthIcon health-score-icon"></i>
+                <div>
+                    <div class="health-score-number">@Model.Health.HealthScore<span>/100</span></div>
+                    <div class="health-score-label">شاخص سلامت پروژه — @Model.Health.HealthLevelDisplay</div>
+                </div>
+            </div>
+
+            <div class="health-score-breakdown">
+
+                <div class="health-factor">
+                    <div class="dashboard-donut-wrap health-mini-donut">
+                        <svg viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                            <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.ScheduleHealth"></circle>
+                        </svg>
+                        <span>@Model.Health.ScheduleHealth</span>
+                    </div>
+                    <span>زمان‌بندی</span>
+                </div>
+
+                <div class="health-factor">
+                    <div class="dashboard-donut-wrap health-mini-donut">
+                        <svg viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                            <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.WorkloadHealth"></circle>
+                        </svg>
+                        <span>@Model.Health.WorkloadHealth</span>
+                    </div>
+                    <span>بارکاری</span>
+                </div>
+
+                <div class="health-factor">
+                    <div class="dashboard-donut-wrap health-mini-donut">
+                        <svg viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                            <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.DependencyHealth"></circle>
+                        </svg>
+                        <span>@Model.Health.DependencyHealth</span>
+                    </div>
+                    <span>وابستگی</span>
+                </div>
+
+                <div class="health-factor">
+                    <div class="dashboard-donut-wrap health-mini-donut">
+                        <svg viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                            <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.DeliveryHealth"></circle>
+                        </svg>
+                        <span>@Model.Health.DeliveryHealth</span>
+                    </div>
+                    <span>پیشرفت واقعی</span>
+                </div>
+
+            </div>
+
+        </div>
+    }
+
     <!-- Stat Cards -->
     <div class="team-stat-grid dashboard-stat-grid">
 
@@ -173,7 +236,7 @@
                                 <strong>@member.FullName</strong>
                                 <span>با نقش @member.Role.GetDisplayName() به پروژه پیوست</span>
                             </div>
-                            <small>@member.JoinedDate.ToString("yyyy/MM/dd")</small>
+                            <small>@Html.DisplayDate(member.JoinedDate)</small>
                         </div>
                     }
                 </div>

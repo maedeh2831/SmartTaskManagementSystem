@@ -47,7 +47,7 @@
                     {
                         <span><i class="fa-solid fa-globe"></i> عمومی</span>
                     }
-                    <span><i class="fa-solid fa-calendar"></i> @Model.CreateDate.ToString("yyyy/MM/dd")</span>
+                    <span><i class="fa-solid fa-calendar"></i> @Html.DisplayDate(Model.CreateDate)</span>
                     <span><i class="fa-solid fa-users"></i> @Model.Members.Count عضو</span>
                 </div>
             </div>

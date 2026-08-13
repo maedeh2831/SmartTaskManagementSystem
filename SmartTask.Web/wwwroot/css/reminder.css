@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #FAFAFE;
+    background: var(--bg);
     border: 1px solid var(--gray100);
     border-radius: 12px;
     padding: 12px 16px;
@@ -175,7 +175,7 @@
 }
 
     .reminder-calendar-day:hover {
-        background: #FAFAFE;
+        background: var(--bg);
         border-color: var(--primary);
     }
 

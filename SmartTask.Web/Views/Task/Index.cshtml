@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "تسک‌های " + Model.UserStoryTitle;
 }
-
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 @section Styles
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
@@ -118,7 +118,7 @@
                                             }
                                             @if (task.DueDate.HasValue)
                                             {
-                                                <span><i class="fa-regular fa-calendar"></i> @task.DueDate.Value.ToString("MM/dd")</span>
+                                                <span><i class="fa-regular fa-calendar"></i> @DateFormatService.ToShortDisplayString(task.DueDate.Value)</span>
                                             }
                                         </div>
                                     }

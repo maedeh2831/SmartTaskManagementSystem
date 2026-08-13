@@ -102,6 +102,16 @@
                     ریسک وابستگی
                 </button>
             </a>
+            <a asp-controller="DelayRisk"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-chart-line"></i>
+                    پیش‌بینی ریسک
+                </button>
+            </a>
             <a asp-controller="Offroad"
                asp-action="Index"
                asp-route-projectId="@Model.Id"
@@ -110,6 +120,16 @@
                 <button type="button">
                     <i class="fa-solid fa-route"></i>
                     آفرود
+                </button>
+            </a>
+            <a asp-controller="TaskTrade"
+               asp-action="Index"
+               asp-route-projectId="@Model.Id"
+               class="workspace-filter"
+               style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-right-left"></i>
+                    ترید تسک
                 </button>
             </a>
             <a asp-controller="ProjectDashboard" asp-action="Index" asp-route-projectId="@Model.Id" class="workspace-filter" style="text-decoration:none;">
@@ -179,15 +199,15 @@
             <div class="project-timeline-row">
                 <div>
                     <span>تاریخ شروع</span>
-                    <strong>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                    <strong>@Html.DisplayDate(Model.StartDate, "تعیین نشده")</strong>
                 </div>
                 <div>
                     <span>موعد تحویل</span>
-                    <strong>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                    <strong>@Html.DisplayDate(Model.DueDate, "تعیین نشده")</strong>
                 </div>
                 <div>
                     <span>تاریخ پایان</span>
-                    <strong>@(Model.EndDate?.ToString("yyyy/MM/dd") ?? "-")</strong>
+                    <strong>@Html.DisplayDate(Model.EndDate, "-")</strong>
                 </div>
             </div>
         </div>

@@ -66,5 +66,7 @@ namespace SmartTask.Web.Infrastructure.Services
 
         public bool IsAdmin
             => ClaimsUser.IsInRole("Admin");
+
+        public string? Avatar => _user?.Avatar;
     }
 }

@@ -1,0 +1,96 @@
+﻿@model SmartTask.Web.Models.ViewModels.Risk.DelayRiskViewModel
+
+@{
+    ViewData["Title"] = "پیش‌بینی ریسک تأخیر";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/delayrisk.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    @Html.AntiForgeryToken()
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1><i class="fa-solid fa-triangle-exclamation"></i> پیش‌بینی ریسک تأخیر — @Model.ProjectName</h1>
+            <p>تحلیل ترکیبی از بارکاری، وابستگی‌ها و روند تأخیرهای اخیر پروژه.</p>
+        </div>
+
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
+                <button type="button">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت به پروژه
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="risk-gauge-card">
+
+        <div class="dashboard-donut-wrap risk-donut-wrap">
+            <svg viewBox="0 0 120 120" class="dashboard-donut" data-progress="@Model.RiskScore">
+                <circle cx="60" cy="60" r="52" class="donut-track"></circle>
+                <circle cx="60" cy="60" r="52" class="donut-value risk-donut-value status-@Model.RiskLevel"></circle>
+            </svg>
+            <div class="dashboard-donut-label">
+                <strong>@Model.RiskScore</strong>
+                <span>از ۱۰۰</span>
+            </div>
+        </div>
+
+        <div class="risk-gauge-info">
+            <span class="risk-level-pill status-@Model.RiskLevel">سطح ریسک: @Model.RiskLevelDisplay</span>
+
+            <div class="risk-factor-list">
+                <div class="risk-factor-row">
+                    <span>Task های عقب‌افتاده</span>
+                    <strong>@Model.OverdueTasksCount از @Model.TotalOpenTasksCount</strong>
+                </div>
+                <div class="risk-factor-row">
+                    <span>اعضای اضافه‌بار</span>
+                    <strong>@Model.OverloadedMembersCount از @Model.TotalMembersCount</strong>
+                </div>
+                <div class="risk-factor-row">
+                    <span>زنجیره‌های پرریسک وابستگی</span>
+                    <strong>@Model.RiskyDependencyChainsCount</strong>
+                </div>
+                <div class="risk-factor-row">
+                    <span>تمدید خودکار (۷ روز اخیر)</span>
+                    <strong>@Model.RecentCascadeCount</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="details-card ai-narrative-card">
+        <div class="card-title">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            تحلیل هوشمند وضعیت پروژه
+        </div>
+
+        <div id="narrativeBox" class="ai-narrative-box">
+            <p class="team-empty-text">برای دریافت تحلیل هوشمند این پروژه، دکمه زیر را بزنید.</p>
+        </div>
+
+        <button type="button" id="generateNarrativeBtn" class="ai-suggest-btn" data-project-id="@Model.ProjectId">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            تولید تحلیل هوشمند
+        </button>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/delayrisk.js" asp-append-version="true"></script>
+}

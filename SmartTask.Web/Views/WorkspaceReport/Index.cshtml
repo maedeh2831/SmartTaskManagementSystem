@@ -17,9 +17,9 @@
         </div>
         <form method="get" class="report-filter-form">
             <input type="hidden" name="workspaceId" value="@Model.WorkspaceId" />
-            <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="report-date-input" />
+            <input asp-date-name="fromDate" asp-date-value="@Model.FromDate" class="report-date-input" />
             <span>تا</span>
-            <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="report-date-input" />
+            <input asp-date-name="toDate" asp-date-value="@Model.ToDate" class="report-date-input" />
             <button type="submit" class="btn-report-filter"><i class="fa-solid fa-filter"></i> اعمال فیلتر</button>
         </form>
     </div>
@@ -85,7 +85,7 @@
                             <tr>
                                 <td>@t.Title</td>
                                 <td>@t.ProjectName</td>
-                                <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
+                                <td>@Html.DisplayDate(t.DueDate)</td>
                                 <td><span class="report-badge-danger">@t.DaysOverdue روز</span></td>
                             </tr>
                         }

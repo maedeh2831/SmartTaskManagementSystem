@@ -1,6 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    // ===== Delete Sprint =====
+    //  Delete Sprint 
     document.querySelectorAll(".delete-sprint-form").forEach(form => {
         form.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -19,7 +19,7 @@
         });
     });
 
-    // ===== Activate Sprint =====
+    //  Activate Sprint 
     document.querySelectorAll(".activate-sprint-form").forEach(form => {
         form.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -38,7 +38,7 @@
         });
     });
 
-    // ===== Complete Sprint =====
+    //  Complete Sprint 
     document.querySelectorAll(".complete-sprint-form").forEach(form => {
         form.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -57,7 +57,7 @@
         });
     });
 
-    // ===== Live Search (Sprint Index) =====
+    //  Live Search (Sprint Index) 
     const searchInput = document.getElementById("sprintSearchInput");
     const grid = document.getElementById("sprintGrid");
 
@@ -71,7 +71,7 @@
         });
     }
 
-    // ===== Live Preview (Create Sprint) =====
+    //  Live Preview (Create Sprint)
     const nameInput = document.getElementById("sprintName");
     const goalInput = document.getElementById("sprintGoal");
     const startInput = document.getElementById("sprintStart");
@@ -91,7 +91,8 @@
 
     if (goalInput && previewGoal) {
         goalInput.addEventListener("input", () => {
-            previewGoal.innerText = goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
+            previewGoal.innerText =
+                goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
         });
     }
 
@@ -103,19 +104,133 @@
 
     function updateDuration() {
         if (!startInput || !endInput || !previewDuration) return;
-        const start = new Date(startInput.value);
-        const end = new Date(endInput.value);
+
+        const startValue = startInput.value;
+        const endValue = endInput.value;
+
+        if (!startValue || !endValue) {
+            previewDuration.innerText = "مدت اسپرینت";
+            return;
+        }
+
+        const start = new Date(startValue);
+        const end = new Date(endValue);
+
         if (!isNaN(start) && !isNaN(end) && end > start) {
-            const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
+            const days = Math.round(
+                (end - start) / (1000 * 60 * 60 * 24)
+            );
+
             previewDuration.innerText = `${days} روز`;
         }
-        // اجازه نمی‌دهیم تاریخ پایان قبل از تاریخ شروع انتخاب شود
-        if (startInput.value) {
-            endInput.min = startInput.value;
+
+        if (startValue) {
+            endInput.min = startValue;
         }
     }
 
-    if (startInput) startInput.addEventListener("change", updateDuration);
-    if (endInput) endInput.addEventListener("change", updateDuration);
+    if (startInput) {
+        startInput.addEventListener("change", updateDuration);
+    }
+
+    if (endInput) {
+        endInput.addEventListener("change", updateDuration);
+    }
+
+    if (startInput || endInput) {
+
+        let lastStartValue = startInput ? startInput.value : "";
+        let lastEndValue = endInput ? endInput.value : "";
+
+        setInterval(() => {
+
+            const currentStartValue = startInput
+                ? startInput.value
+                : "";
+
+            const currentEndValue = endInput
+                ? endInput.value
+                : "";
+
+            if (
+                currentStartValue !== lastStartValue ||
+                currentEndValue !== lastEndValue
+            ) {
+                lastStartValue = currentStartValue;
+                lastEndValue = currentEndValue;
+
+                updateDuration();
+            }
+
+        }, 200);
+    }
 
 });
+(function () {
+    const list = document.getElementById("sprintReportList");
+    if (!list) return;
+
+    const sprintId = list.dataset.sprintId;
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+    function renderReports(reports) {
+        if (!reports || !reports.length) {
+            list.innerHTML = `<div class="team-empty-text">هنوز گزارشی برای این اسپرینت تولید نشده است.</div>`;
+            return;
+        }
+
+        list.innerHTML = reports.map(r => `
+            <div class="sprint-report-item">
+                <p>${r.content}</p>
+                <div class="sprint-report-meta">
+                    <span>تولیدشده توسط: ${r.generatedByName}</span>
+                    <span>${new Date(r.generatedDate).toLocaleDateString("fa-IR")}</span>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    async function loadReports() {
+        try {
+            const response = await fetch(`/SprintReport/GetReports?sprintId=${sprintId}`);
+            const data = await response.json();
+            renderReports(data.reports);
+        } catch (err) {
+            list.innerHTML = `<div class="team-empty-text">خطا در بارگذاری گزارش‌ها.</div>`;
+        }
+    }
+
+    loadReports();
+
+    const generateBtn = document.getElementById("generateSprintReportBtn");
+    if (generateBtn) {
+        generateBtn.addEventListener("click", async function () {
+            generateBtn.disabled = true;
+            list.innerHTML = `
+                <div class="ai-loading">
+                    <div class="ai-spinner"></div>
+                    <p>در حال تحلیل عملکرد اسپرینت و نگارش گزارش...</p>
+                </div>`;
+
+            try {
+                const response = await fetch("/SprintReport/Generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `sprintId=${sprintId}&__RequestVerificationToken=${encodeURIComponent(token || "")}`
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    list.innerHTML = `<div class="ai-error"><i class="fa-solid fa-triangle-exclamation"></i><p>${data.message}</p></div>`;
+                } else {
+                    await loadReports();
+                }
+            } catch (err) {
+                list.innerHTML = `<div class="ai-error"><i class="fa-solid fa-triangle-exclamation"></i><p>ارتباط با سرور برقرار نشد.</p></div>`;
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    }
+})();

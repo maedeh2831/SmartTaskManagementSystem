@@ -19,7 +19,8 @@ namespace SmartTask.Web.ViewComponents
             {
                 FullName = _currentUser.FullName,
                 Email = _currentUser.Email,
-                IsAdmin = _currentUser.IsAdmin
+                IsAdmin = _currentUser.IsAdmin,
+                Avatar = _currentUser.Avatar
             };
 
             return View(model);

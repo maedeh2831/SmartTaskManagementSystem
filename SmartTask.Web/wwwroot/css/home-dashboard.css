@@ -1,7 +1,4 @@
-﻿/* ==========================================================
-                 SmartTask Home Dashboard UI
-   ========================================================== */
-
+﻿/*   SmartTask Home Dashboard UI css */
 .home-dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

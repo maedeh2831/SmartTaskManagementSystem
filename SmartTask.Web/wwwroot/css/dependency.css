@@ -1,4 +1,4 @@
-/*  Task Details Widget  */
+/*  dependency css  */
 
 .dependency-alert {
     display: flex;
@@ -130,7 +130,7 @@
 }
 
     .dependency-impact-item.required {
-        border-right-color: #EF4444;
+        border-right-color: var(--danger);
     }
 
     .dependency-impact-item.optional {
@@ -170,11 +170,11 @@
 }
 
 .dependency-risk-card {
-    background: #fff;
+    background: var(--card);
     border-radius: 20px;
     padding: 20px 24px;
     box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
-    border-right: 4px solid #EF4444;
+    border-right: 4px solid var(--danger);
 }
 
 .dependency-risk-header {
@@ -184,19 +184,19 @@
     margin-bottom: 14px;
 }
 
-.dependency-risk-header h4 {
-    margin: 0 0 4px;
-    font-size: 15px;
-}
+    .dependency-risk-header h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+    }
 
-.dependency-risk-header h4 a {
-    color: var(--gray900);
-    text-decoration: none;
-}
+        .dependency-risk-header h4 a {
+            color: var(--gray900);
+            text-decoration: none;
+        }
 
-.dependency-risk-header h4 a:hover {
-    color: var(--primary);
-}
+            .dependency-risk-header h4 a:hover {
+                color: var(--primary);
+            }
 
 .dependency-risk-delay {
     font-size: 12px;
@@ -264,3 +264,112 @@
         font-weight: 700;
         text-decoration: underline;
     }
+/* Graph Tabs */
+
+.dependency-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0 16px;
+    border-bottom: 1px solid var(--gray100);
+}
+
+.dependency-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray500);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+}
+
+    .dependency-tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+/* Graph View */
+
+.dependency-graph-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.dependency-graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--gray500);
+}
+
+    .dependency-graph-legend span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+.dependency-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+    .dependency-legend-dot.normal {
+        background: var(--primary);
+    }
+
+    .dependency-legend-dot.overdue {
+        background: #C2410C;
+    }
+
+    .dependency-legend-dot.risk {
+        background: #EF4444;
+    }
+
+    .dependency-legend-dot.done {
+        background: var(--gray300);
+    }
+
+.dependency-graph-actions {
+    display: flex;
+    gap: 8px;
+}
+
+    .dependency-graph-actions button {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        border: 1px solid var(--gray100);
+        background: var(--card);
+        color: var(--gray500);
+    }
+
+        .dependency-graph-actions button:hover {
+            background: var(--gray50);
+            color: var(--primary);
+        }
+
+.dependency-graph-canvas {
+    width: 100%;
+    height: 520px;
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+}
+
+.dependency-graph-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray400);
+    font-size: 13px;
+}

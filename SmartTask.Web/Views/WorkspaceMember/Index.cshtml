@@ -167,9 +167,9 @@
                         </div>
 
                         <div class="member-actions">
-                            <span class="expiry-info">
-                                تا @invitation.ExpiryDate.ToString("yyyy/MM/dd")
-                            </span>
+                        <span class="expiry-info">
+                            تا @Html.DisplayDate(invitation.ExpiryDate)
+                        </span>
 
                             <form asp-action="CancelInvitation" method="post" class="cancel-invitation-form">
                                 @Html.AntiForgeryToken()

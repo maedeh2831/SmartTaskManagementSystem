@@ -41,6 +41,7 @@ namespace SmartTask.Web.Data.Context
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
         public DbSet<Sprint> Sprints { get; set; }
+        public DbSet<SprintReport> SprintReports { get; set; }
         public DbSet<Backlog> Backlogs { get; set; }
         public DbSet<UserStory> UserStories { get; set; }
         public DbSet<TaskItem> TaskItems { get; set; }
@@ -48,14 +49,15 @@ namespace SmartTask.Web.Data.Context
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
         public DbSet<OffroadTask> OffroadTasks { get; set; }
         public DbSet<OverdueCascadeLog> OverdueCascadeLogs { get; set; }
+        public DbSet<TaskTradeRequest> TaskTradeRequests { get; set; }
 
         // Tracking
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<TimeLog> TimeLogs { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

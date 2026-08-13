@@ -1,0 +1,351 @@
+﻿@model SmartTask.Web.Models.ViewModels.Account.ProfileViewModel
+
+@{
+    ViewData["Title"] = "پروفایل من";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+
+    <div class="profile-page-header">
+
+        <div>
+            <span class="profile-eyebrow">
+                حساب کاربری
+            </span>
+
+            <h1>
+                پروفایل من
+            </h1>
+
+            <p>
+                اطلاعات شخصی و مشخصات حساب خود را مدیریت کنید.
+            </p>
+        </div>
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="profile-back-btn">
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+            بازگشت
+        </a>
+
+    </div>
+
+
+    <form asp-action="Profile"
+          method="post"
+          enctype="multipart/form-data"
+          id="profileForm">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger profile-validation">
+        </div>
+
+
+        <div class="profile-grid">
+
+
+            <!-- Avatar Card -->
+            <div class="profile-card avatar-card">
+
+                <div class="profile-card-header">
+
+                    <div>
+                        <h2>تصویر پروفایل</h2>
+
+                        <p>
+                            تصویری انتخاب کنید که در بخش‌های مختلف SmartTask نمایش داده شود.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="avatar-section">
+
+                    <div class="avatar-preview-wrapper">
+
+                        <img id="avatarPreview"
+                             src="@Model.AvatarUrl"
+                             alt="@Model.FirstName @Model.LastName"
+                             class="avatar-preview" />
+
+                    </div>
+
+
+                    <div class="avatar-actions">
+
+                        <label for="avatarInput"
+                               class="avatar-upload-btn">
+
+                            <i class="fa-solid fa-camera"></i>
+
+                            تغییر تصویر
+
+                        </label>
+
+                        <input asp-for="NewAvatar"
+                               type="file"
+                               id="avatarInput"
+                               class="d-none"
+                               accept=".jpg,.jpeg,.png,.webp" />
+
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Avatar))
+                        {
+                            <button type="button"
+                                    id="removeAvatarButton"
+                                    class="avatar-remove-btn">
+                                <i class="fa-regular fa-trash-can"></i>
+                                حذف تصویر
+                            </button>
+                        }
+
+                    </div>
+
+                    <span asp-validation-for="NewAvatar"
+                          class="text-danger">
+                    </span>
+
+
+                    <div class="avatar-help">
+                        <i class="fa-solid fa-circle-info"></i>
+                        JPG، PNG یا WEBP — حداکثر ۲ مگابایت
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Personal Information -->
+            <div class="profile-card">
+
+                <div class="profile-card-header">
+
+                    <div>
+                        <h2>اطلاعات شخصی</h2>
+
+                        <p>
+                            اطلاعاتی که در حساب کاربری شما نمایش داده می‌شود.
+                        </p>
+                    </div>
+
+                    <div class="profile-card-icon">
+                        <i class="fa-regular fa-id-card"></i>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-form-grid">
+
+                    <div class="profile-field">
+
+                        <label asp-for="FirstName"></label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fa-regular fa-user"></i>
+
+                            <input asp-for="FirstName"
+                                   class="profile-input"
+                                   placeholder="نام خود را وارد کنید" />
+
+                        </div>
+
+                        <span asp-validation-for="FirstName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <label asp-for="LastName"></label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fa-regular fa-user"></i>
+
+                            <input asp-for="LastName"
+                                   class="profile-input"
+                                   placeholder="نام خانوادگی خود را وارد کنید" />
+
+                        </div>
+
+                        <span asp-validation-for="LastName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field full-width">
+
+                        <label asp-for="Email"></label>
+
+                        <div class="profile-input-wrapper readonly">
+
+                            <i class="fa-regular fa-envelope"></i>
+
+                            <input asp-for="Email"
+                                   class="profile-input"
+                                   readonly />
+
+                            <span class="verified-badge">
+
+                                <i class="fa-solid fa-check"></i>
+
+                                تایید شده
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-field full-width">
+
+                        <label asp-for="JobTitle"></label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fa-solid fa-briefcase"></i>
+
+                            <input asp-for="JobTitle"
+                                   class="profile-input"
+                                   placeholder="مثلاً مدیر پروژه" />
+
+                        </div>
+
+                        <span asp-validation-for="JobTitle"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-field full-width">
+
+                        <label asp-for="Bio"></label>
+
+                        <textarea asp-for="Bio"
+                                  class="profile-textarea"
+                                  rows="5"
+                                  placeholder="کمی درباره خودتان بنویسید..."></textarea>
+
+                        <div class="character-counter">
+
+                            <span id="bioCounter">
+                                @(Model.Bio?.Length ?? 0)
+                            </span>
+
+                            / 500
+
+                        </div>
+
+                        <span asp-validation-for="Bio"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Security -->
+            <div class="profile-card security-card">
+
+                <div class="security-content">
+
+                    <div class="security-icon">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h2>امنیت حساب</h2>
+
+                        <p>
+                            برای حفظ امنیت حساب، رمز عبور خود را به صورت دوره‌ای تغییر دهید.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <a asp-action="ChangePassword"
+                   class="security-btn">
+
+                    تغییر رمز عبور
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="profile-save-bar">
+
+            <div>
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                تغییرات شما بعد از ذخیره اعمال می‌شوند.
+
+            </div>
+
+            <button type="submit"
+                    class="profile-save-btn">
+
+                <i class="fa-solid fa-check"></i>
+
+                ذخیره تغییرات
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    @if (!string.IsNullOrWhiteSpace(Model.Avatar))
+    {
+        <form id="removeAvatarForm"
+              asp-controller="Account"
+              asp-action="RemoveAvatar"
+              method="post"
+              class="d-none">
+
+            @Html.AntiForgeryToken()
+
+        </form>
+    }
+
+</div>
+
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/profile.js" asp-append-version="true"></script>
+}

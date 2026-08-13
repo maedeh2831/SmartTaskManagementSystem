@@ -120,4 +120,32 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
         member.ChangeDate = DateTime.Now;
         await _context.SaveChangesAsync();
     }
+
+    public async Task<int> GetUserUtilizationAsync(int projectId, int userId)
+    {
+        var member = await _context.ProjectMembers
+            .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.ApplicationUserId == userId && x.ViewState);
+
+        if (member == null)
+            return 0;
+
+        var openTasks = await _context.TaskItems
+            .Where(t => t.UserStory.ProjectId == projectId
+                && t.ViewState
+                && t.Status != TaskStatusType.Done
+                && t.Status != TaskStatusType.Cancelled
+                && t.Assignments.Any(a => a.ApplicationUserId == userId))
+            .Include(t => t.Assignments)
+            .ToListAsync();
+
+        double assignedHours = 0;
+        foreach (var task in openTasks)
+        {
+            var assigneeCount = task.Assignments.Count;
+            assignedHours += assigneeCount > 0 ? (double)task.Estimate / assigneeCount : 0;
+        }
+
+        var capacity = member.WeeklyCapacityHours <= 0 ? 1 : member.WeeklyCapacityHours;
+        return (int)Math.Round(assignedHours / capacity * 100);
+    }
 }

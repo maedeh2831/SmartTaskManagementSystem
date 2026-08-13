@@ -11,15 +11,18 @@ public class ProjectDashboardController : BaseController
     private readonly IProjectDashboardService _projectDashboardService;
     private readonly IProjectService _projectService;
     private readonly IWorkspaceMemberService _workspaceMemberService;
+    private readonly IProjectHealthService _projectHealthService;
 
     public ProjectDashboardController(
         IProjectDashboardService projectDashboardService,
         IProjectService projectService,
         IWorkspaceMemberService workspaceMemberService,
+        IProjectHealthService projectHealthService,
         ICurrentUserService currentUser)
         : base(currentUser)
     {
         _projectDashboardService = projectDashboardService;
+        _projectHealthService = projectHealthService;
         _projectService = projectService;
         _workspaceMemberService = workspaceMemberService;
     }
@@ -27,12 +30,10 @@ public class ProjectDashboardController : BaseController
     public async Task<IActionResult> Index(int projectId)
     {
         var dashboard = await _projectDashboardService.GetDashboardAsync(projectId);
-
         if (dashboard == null)
             return NotFound();
 
         var project = await _projectService.GetByIdAsync(projectId);
-
         if (project == null)
             return NotFound();
 
@@ -43,6 +44,7 @@ public class ProjectDashboardController : BaseController
         }
 
         ViewBag.WorkspaceId = project.WorkspaceId;
+        dashboard.Health = await _projectHealthService.GetHealthAsync(projectId, CurrentUser.UserId);
 
         return View(dashboard);
     }

@@ -9,17 +9,18 @@ namespace SmartTask.Web.Services.Implementations
     public class AdminDashboardService : IAdminDashboardService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDateFormatService _dateFormatService;
 
-        public AdminDashboardService(ApplicationDbContext context)
+        public AdminDashboardService(ApplicationDbContext context, IDateFormatService dateFormatService)
         {
             _context = context;
+            _dateFormatService = dateFormatService;
         }
 
         public async Task<AdminDashboardViewModel> GetDashboardAsync()
         {
             var now = DateTime.Now.Date;
             var fromDate = now.AddDays(-6);
-
             var model = new AdminDashboardViewModel
             {
                 TotalUsers = await _context.Users.CountAsync(),
@@ -47,13 +48,12 @@ namespace SmartTask.Web.Services.Implementations
             {
                 userChart.Add(new ChartPointViewModel
                 {
-                    Label = day.ToString("MM/dd"),
+                    Label = _dateFormatService.ToShortDisplayString(day),
                     Value = userDates.Count(d => d.Date == day)
                 });
-
                 workspaceChart.Add(new ChartPointViewModel
                 {
-                    Label = day.ToString("MM/dd"),
+                    Label = _dateFormatService.ToShortDisplayString(day),
                     Value = workspaceDates.Count(d => d.Date == day)
                 });
             }

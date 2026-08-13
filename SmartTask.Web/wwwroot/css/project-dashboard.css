@@ -1,6 +1,4 @@
-/* ==========================================================
-                SmartTask Project Dashboard UI
-   ========================================================== */
+/*  SmartTask Project Dashboard UI */
 
 .dashboard-stat-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -27,7 +25,7 @@
         align-self: flex-start;
     }
 
-/* ================= Donut Chart ================= */
+/*  Donut Chart  */
 
 .dashboard-donut-wrap {
     position: relative;
@@ -94,7 +92,7 @@
         color: #B91C1C;
     }
 
-/* ================= Bar Chart ================= */
+/*  Bar Chart  */
 
 .dashboard-bar-list {
     display: flex;
@@ -162,7 +160,7 @@
     flex-shrink: 0;
 }
 
-/* ================= Activity List ================= */
+/*  Activity List  */
 
 .dashboard-activity-list {
     display: flex;
@@ -206,7 +204,7 @@
     white-space: nowrap;
 }
 
-/* ================= Responsive ================= */
+/*  Responsive  */
 
 @media (max-width: 992px) {
     .dashboard-stat-grid {
@@ -217,5 +215,153 @@
 @media (max-width: 768px) {
     .dashboard-charts-grid {
         grid-template-columns: 1fr;
+    }
+}
+/*  Project Health Score  */
+
+.health-score-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    margin-bottom: 24px;
+    border-right: 6px solid var(--gray300);
+    flex-wrap: wrap;
+}
+
+    .health-score-card.status-excellent {
+        border-right-color: #10B981;
+    }
+
+    .health-score-card.status-good {
+        border-right-color: #22C55E;
+    }
+
+    .health-score-card.status-fair {
+        border-right-color: #F59E0B;
+    }
+
+    .health-score-card.status-poor {
+        border-right-color: #EF4444;
+    }
+
+.health-score-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.health-score-icon {
+    font-size: 42px;
+    color: var(--primary);
+}
+
+.health-score-card.status-excellent .health-score-icon,
+.health-score-card.status-good .health-score-icon {
+    color: #10B981;
+}
+
+.health-score-card.status-fair .health-score-icon {
+    color: #F59E0B;
+}
+
+.health-score-card.status-poor .health-score-icon {
+    color: #EF4444;
+}
+
+.health-score-number {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--gray900);
+    line-height: 1;
+}
+
+    .health-score-number span {
+        font-size: 16px;
+        color: var(--gray400);
+        font-weight: 700;
+    }
+
+.health-score-label {
+    font-size: 13px;
+    color: var(--gray500);
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+.health-score-breakdown {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.health-factor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+    .health-factor > span {
+        font-size: 11px;
+        color: var(--gray500);
+        font-weight: 700;
+    }
+
+.health-mini-donut {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin: 0;
+}
+
+    .health-mini-donut svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+.health-mini-track {
+    fill: none;
+    stroke: var(--gray100);
+    stroke-width: 6;
+}
+
+.health-mini-value {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 150.8;
+    stroke-dashoffset: 150.8;
+    transition: stroke-dashoffset 1s ease;
+}
+
+.health-mini-donut span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gray900);
+}
+
+/*  Responsive  */
+
+@media (max-width: 768px) {
+    .health-score-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .health-score-breakdown {
+        width: 100%;
+        justify-content: space-between;
     }
 }

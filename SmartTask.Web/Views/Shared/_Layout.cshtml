@@ -1,17 +1,42 @@
-﻿<!DOCTYPE html>
+﻿@inject SmartTask.Web.Infrastructure.Interfaces.ICurrentUserService CurrentUserService
+@{
+    var themePreference = "system";
+    var isJalaliDate = false;
+    if (CurrentUserService.IsAuthenticated && CurrentUserService.CurrentUser != null)
+    {
+        themePreference = CurrentUserService.CurrentUser.Theme.ToString().ToLower();
+        isJalaliDate = CurrentUserService.CurrentUser.DateFormat == SmartTask.Web.Models.Enums.DateFormatType.Jalali;
+    }
+}
+
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <script>
+        (function () {
+            var stored = "@themePreference";
+            var theme = stored;
+            if (stored === "system" || !stored) {
+                theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-theme", theme);
+            document.documentElement.setAttribute("data-theme-preference", stored || "system");
+        })();
+    </script>
     <title>@ViewData["Title"] - SmartTask</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    @if (isJalaliDate)
+    {
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/css/persian-datepicker.min.css" />
+    }
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
 
@@ -23,17 +48,10 @@
 
         <div class="header-actions">
 
-            @await Component.InvokeAsync("NotificationBell")
-
             @await Component.InvokeAsync("Header")
 
-            <button class="icon-btn">
-                <i class="fa-regular fa-bell"></i>
-            </button>
-
-            <button class="icon-btn">
-                <i class="fa-regular fa-envelope"></i>
-            </button>
+            @await Component.InvokeAsync("NotificationBell")
+         
 
         </div>       
 
@@ -74,6 +92,12 @@
     @await Component.InvokeAsync("Footer")
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @if (isJalaliDate)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/persian-date@latest/dist/persian-date.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+        <script src="~/js/date-picker-init.js" asp-append-version="true"></script>
+    }
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
