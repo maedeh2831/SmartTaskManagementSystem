@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Common\Exceptions\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
