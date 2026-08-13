@@ -34,7 +34,8 @@ namespace SmartTask.Web.Data.Configurations
 
             // Indexes
             builder.HasIndex(x => new { x.WorkspaceId, x.Name })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[ViewState] = 1");
 
             // Relationships
             builder.HasOne(x => x.Workspace)
