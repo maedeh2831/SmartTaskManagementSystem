@@ -16,5 +16,13 @@ namespace SmartTask.Web.Common.Extensions
 
         public static IHtmlContent DisplayDate(this IHtmlHelper html, DateTime date, bool includeTime = false)
             => html.DisplayDate((DateTime?)date, includeTime);
+
+        public static IHtmlContent DisplayDate(this IHtmlHelper html, DateTime? date, string emptyText, bool includeTime = false)
+        {
+            if (!date.HasValue)
+                return new HtmlString(emptyText);
+
+            return html.DisplayDate(date.Value, includeTime);
+        }
     }
 }

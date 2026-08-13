@@ -63,11 +63,10 @@
                         </span>
                     }
 
-
-                    <span>
-                        <i class="fa-solid fa-calendar"></i>
-                        @Model.CreateDate.ToString("yyyy/MM/dd")
-                    </span>
+                <span>
+                    <i class="fa-solid fa-calendar"></i>
+                    @Html.DisplayDate(Model.CreateDate)
+                </span>
 
                 </div>
 

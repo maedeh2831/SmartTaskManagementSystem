@@ -199,15 +199,15 @@
             <div class="project-timeline-row">
                 <div>
                     <span>تاریخ شروع</span>
-                    <strong>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                    <strong>@Html.DisplayDate(Model.StartDate, "تعیین نشده")</strong>
                 </div>
                 <div>
                     <span>موعد تحویل</span>
-                    <strong>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "تعیین نشده")</strong>
+                    <strong>@Html.DisplayDate(Model.DueDate, "تعیین نشده")</strong>
                 </div>
                 <div>
                     <span>تاریخ پایان</span>
-                    <strong>@(Model.EndDate?.ToString("yyyy/MM/dd") ?? "-")</strong>
+                    <strong>@Html.DisplayDate(Model.EndDate, "-")</strong>
                 </div>
             </div>
         </div>

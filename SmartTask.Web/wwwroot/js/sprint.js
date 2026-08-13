@@ -71,7 +71,7 @@
         });
     }
 
-    //  Live Preview (Create Sprint) 
+    //  Live Preview (Create Sprint)
     const nameInput = document.getElementById("sprintName");
     const goalInput = document.getElementById("sprintGoal");
     const startInput = document.getElementById("sprintStart");
@@ -91,7 +91,8 @@
 
     if (goalInput && previewGoal) {
         goalInput.addEventListener("input", () => {
-            previewGoal.innerText = goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
+            previewGoal.innerText =
+                goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
         });
     }
 
@@ -103,20 +104,66 @@
 
     function updateDuration() {
         if (!startInput || !endInput || !previewDuration) return;
-        const start = new Date(startInput.value);
-        const end = new Date(endInput.value);
+
+        const startValue = startInput.value;
+        const endValue = endInput.value;
+
+        if (!startValue || !endValue) {
+            previewDuration.innerText = "مدت اسپرینت";
+            return;
+        }
+
+        const start = new Date(startValue);
+        const end = new Date(endValue);
+
         if (!isNaN(start) && !isNaN(end) && end > start) {
-            const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
+            const days = Math.round(
+                (end - start) / (1000 * 60 * 60 * 24)
+            );
+
             previewDuration.innerText = `${days} روز`;
         }
-        //  تاریخ پایان قبل از تاریخ شروع انتخاب نمیشود
-        if (startInput.value) {
-            endInput.min = startInput.value;
+
+        if (startValue) {
+            endInput.min = startValue;
         }
     }
 
-    if (startInput) startInput.addEventListener("change", updateDuration);
-    if (endInput) endInput.addEventListener("change", updateDuration);
+    if (startInput) {
+        startInput.addEventListener("change", updateDuration);
+    }
+
+    if (endInput) {
+        endInput.addEventListener("change", updateDuration);
+    }
+
+    if (startInput || endInput) {
+
+        let lastStartValue = startInput ? startInput.value : "";
+        let lastEndValue = endInput ? endInput.value : "";
+
+        setInterval(() => {
+
+            const currentStartValue = startInput
+                ? startInput.value
+                : "";
+
+            const currentEndValue = endInput
+                ? endInput.value
+                : "";
+
+            if (
+                currentStartValue !== lastStartValue ||
+                currentEndValue !== lastEndValue
+            ) {
+                lastStartValue = currentStartValue;
+                lastEndValue = currentEndValue;
+
+                updateDuration();
+            }
+
+        }, 200);
+    }
 
 });
 (function () {

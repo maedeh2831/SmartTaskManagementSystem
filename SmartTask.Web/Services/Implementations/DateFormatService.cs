@@ -38,5 +38,16 @@ namespace SmartTask.Web.Services.Implementations
             var day = _persianCalendar.GetDayOfMonth(date);
             return $"{year:D4}/{month:D2}/{day:D2}";
         }
+
+        public string ToShortDisplayString(DateTime date)
+        {
+            if (IsJalali)
+            {
+                var month = _persianCalendar.GetMonth(date);
+                var day = _persianCalendar.GetDayOfMonth(date);
+                return $"{month:D2}/{day:D2}";
+            }
+            return date.ToString("MM/dd");
+        }
     }
 }

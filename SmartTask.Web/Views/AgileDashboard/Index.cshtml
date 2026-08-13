@@ -1,5 +1,6 @@
 ﻿@model SmartTask.Web.Models.ViewModels.AgileDashboard.AgileDashboardViewModel
 @using SmartTask.Web.Models.Enums
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 
 @{
     ViewData["Title"] = "داشبورد Agile";
@@ -159,11 +160,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script>
         window.__burndownData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BurndownPoints.Select(p => new {
-            date = p.Date.ToString("MM/dd"),
+            date = DateFormatService.ToShortDisplayString(p.Date),
             ideal = p.IdealRemaining,
             actual = p.ActualRemaining
         })));
-
         window.__velocityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.VelocityPoints));
     </script>
     <script src="~/js/agile-dashboard.js" asp-append-version="true"></script>

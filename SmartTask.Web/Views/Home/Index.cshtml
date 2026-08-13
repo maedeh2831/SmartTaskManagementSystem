@@ -120,7 +120,7 @@
                                     <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId">(@item.TaskTitle)</a>
                                 }
                             </p>
-                            <span>@item.ActivityDate.ToString("yyyy/MM/dd HH:mm")</span>
+                            <span>@Html.DisplayDate(item.ActivityDate, includeTime: true)</span>
                         </div>
                     </div>
                 }

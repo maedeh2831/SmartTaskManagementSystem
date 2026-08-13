@@ -78,17 +78,17 @@
             </div>
             <div>
                 <span class="userstory-info-label">تاریخ شروع</span>
-                <span>@(Model.StartDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+                <span>@Html.DisplayDate(Model.StartDate, "—")</span>
             </div>
             <div>
                 <span class="userstory-info-label">موعد انجام</span>
-                <span>@(Model.DueDate?.ToString("yyyy/MM/dd") ?? "—")</span>
+                <span>@Html.DisplayDate(Model.DueDate, "—")</span>
             </div>
             @if (Model.CompletedDate.HasValue)
             {
                 <div>
                     <span class="userstory-info-label">تاریخ تکمیل</span>
-                    <span>@Model.CompletedDate.Value.ToString("yyyy/MM/dd")</span>
+                    <span>@Html.DisplayDate(Model.CompletedDate)</span>
                 </div>
             }
         </div>
@@ -138,7 +138,7 @@
                 <input type="hidden" name="taskItemId" value="@Model.Id" />
 
                 <div class="manual-timelog-fields">
-                    <input type="datetime-local" name="startTime" class="form-control" required />
+                    <input asp-date-name="startTime" asp-include-time="true" class="form-control" required />
                     <input type="number" name="durationMinutes" min="1" max="1440" placeholder="مدت (دقیقه)" class="form-control" required />
                     <input type="text" name="description" placeholder="توضیح (اختیاری)" class="form-control" />
                     <button type="submit" class="btn btn-light">
@@ -169,7 +169,7 @@
                                 }
                             </span>
                             <span class="timelog-meta">
-                                @log.StartTime.ToString("yyyy/MM/dd HH:mm")
+                                @Html.DisplayDate(log.StartTime, includeTime: true)
                                 @if (!log.IsRunning)
                                 {
                                     <text> — @(log.DurationMinutes) دقیقه</text>
@@ -497,7 +497,7 @@
                             <li>
                                 به‌دلیل تأخیر <strong>@info.DelayDaysApplied روزه</strong> در
                                 <a asp-action="Details" asp-route-id="@info.SourceTaskId">«@info.SourceTaskTitle»</a>
-                                — آخرین به‌روزرسانی: @info.AppliedDate.ToString("yyyy/MM/dd HH:mm")
+                                — آخرین به‌روزرسانی: @Html.DisplayDate(info.AppliedDate, includeTime: true)
                             </li>
                         }
                     </ul>
@@ -616,7 +616,7 @@
                             @if (impacted.IsRequiredChain && impacted.ProjectedDueDate.HasValue && impacted.ProjectedDueDate != impacted.OriginalDueDate)
                             {
                                 <span class="dependency-projected-date">
-                                    موعد جدید تخمینی: @impacted.ProjectedDueDate.Value.ToString("yyyy/MM/dd")
+                                    موعد جدید تخمینی: @Html.DisplayDate(impacted.ProjectedDueDate)
                                 </span>
                             }
                         </div>
@@ -718,7 +718,7 @@
                         <i class="fa-solid fa-file"></i>
                         <div class="attachment-info">
                             <a href="@file.FilePath" target="_blank" class="attachment-name">@file.FileName</a>
-                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @file.CreateDate.ToString("yyyy/MM/dd")</span>
+                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @Html.DisplayDate(file.CreateDate)</span>
                         </div>
 
                         @if (file.CanDelete)
@@ -771,7 +771,7 @@
                             <div class="comment-header">
                                 <span class="comment-author">@comment.AuthorName</span>
                                 <span class="comment-date">
-                                    @comment.CreateDate.ToString("yyyy/MM/dd HH:mm")
+                                    @Html.DisplayDate(comment.CreateDate, includeTime: true)
                                     @if (comment.IsEdited)
                                     {
                                         <span>(ویرایش‌شده)</span>

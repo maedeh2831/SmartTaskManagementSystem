@@ -1,6 +1,6 @@
 ﻿@model SmartTask.Web.Models.ViewModels.TaskBoard.TaskBoardViewModel
 @using SmartTask.Web.Models.Enums
-
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 @{
     ViewData["Title"] = "Task Board";
 }
@@ -196,7 +196,7 @@
                                         }
                                         @if (task.DueDate.HasValue)
                                         {
-                                            <span><i class="fa-regular fa-calendar"></i> @task.DueDate.Value.ToString("MM/dd")</span>
+                                            <span><i class="fa-regular fa-calendar"></i> @DateFormatService.ToShortDisplayString(task.DueDate.Value)</span>
                                         }
                                     </div>
 

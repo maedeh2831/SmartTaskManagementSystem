@@ -153,16 +153,10 @@
 
 
                     <div class="workspace-card-footer">
-
-
                         <small>
-                            @item.CreateDate.ToString("yyyy/MM/dd")
+                            @Html.DisplayDate(item.CreateDate)
                         </small>
-
-
                         <div class="workspace-actions">
-
-
                             <a asp-controller="Workspace"
                                asp-action="Details"
                                asp-route-id="@item.Id"
@@ -173,34 +167,20 @@
 
                             </a>
 
-
-
                             <form asp-controller="Workspace"
                                   asp-action="Delete"
                                   asp-route-id="@item.Id"
                                   method="post"
                                   class="delete-form">
 
-
                                 @Html.AntiForgeryToken()
 
-
                                 <button class="workspace-delete-btn">
-
                                     <i class="fa-solid fa-trash"></i>
-
                                 </button>
-
-
                             </form>
-
-
                         </div>
-
-
                     </div>
-
-
                 </div>
                 }
 
@@ -212,6 +192,5 @@
 {
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 }

@@ -105,7 +105,7 @@
                             {
                                 <span class="project-due-date">
                                     <i class="fa-regular fa-calendar"></i>
-                                    @project.DueDate.Value.ToString("yyyy/MM/dd")
+                                    @Html.DisplayDate(project.DueDate)
                                 </span>
                             }
                         </div>
@@ -125,7 +125,7 @@
 
                     <div class="workspace-card-footer">
 
-                        <small>@project.CreateDate.ToString("yyyy/MM/dd")</small>
+                        <small>@Html.DisplayDate(project.CreateDate)</small>
 
                         <div class="workspace-actions">
 

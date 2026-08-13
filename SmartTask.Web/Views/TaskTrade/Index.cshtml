@@ -70,7 +70,7 @@
                         {
                             <p class="trade-message">«@r.Message»</p>
                         }
-                        <small>@r.CreateDate.ToString("yyyy/MM/dd HH:mm")</small>
+                        <small>@Html.DisplayDate(r.CreateDate, includeTime: true)</small>
                     </div>
 
                     @if (r.Status == TradeRequestStatusType.Pending)
@@ -119,7 +119,7 @@
                             <i class="fa-solid fa-right-left"></i>
                             <span class="trade-task-chip">@(r.TargetTaskTitle ?? "بدون تسک متقابل (واگذاری)")</span>
                         </div>
-                        <small>@r.CreateDate.ToString("yyyy/MM/dd HH:mm")</small>
+                        <small>@Html.DisplayDate(r.CreateDate, includeTime: true)</small>
                     </div>
 
                     @if (r.Status == TradeRequestStatusType.Pending)

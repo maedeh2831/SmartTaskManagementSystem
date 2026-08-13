@@ -236,7 +236,7 @@
                                 <strong>@member.FullName</strong>
                                 <span>با نقش @member.Role.GetDisplayName() به پروژه پیوست</span>
                             </div>
-                            <small>@member.JoinedDate.ToString("yyyy/MM/dd")</small>
+                            <small>@Html.DisplayDate(member.JoinedDate)</small>
                         </div>
                     }
                 </div>

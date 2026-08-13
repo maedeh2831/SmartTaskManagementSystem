@@ -1,6 +1,6 @@
 ﻿@model SmartTask.Web.Models.ViewModels.Reminder.ReminderCalendarViewModel
 @using System.Text.Json
-
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 @{
     ViewData["Title"] = "تقویم یادآوری‌ها";
     var remindersJson = JsonSerializer.Serialize(Model.Reminders.Select(x => new
@@ -56,7 +56,7 @@
             <span>چهارشنبه</span><span>پنجشنبه</span><span>جمعه</span>
         </div>
 
-        <div id="calendarGrid" class="reminder-calendar-grid"></div>
+        <div id="calendarGrid" class="reminder-calendar-grid" data-date-format="@(DateFormatService.IsJalali ? "jalali" : "gregorian")"></div>
     </div>
 
     <div class="details-card" id="calendarDayDetails" style="display:none;">

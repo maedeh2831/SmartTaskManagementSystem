@@ -65,7 +65,7 @@
                 <i class="fa-solid fa-flag-checkered"></i>
                 <div>
                     <strong>@Model.ActiveSprintName</strong>
-                    <span>پایان اسپرینت: @Model.ActiveSprintEndDate?.ToString("yyyy/MM/dd")</span>
+                    <span>پایان اسپرینت: @Html.DisplayDate(Model.ActiveSprintEndDate)</span>
                 </div>
             </div>
 

@@ -108,13 +108,12 @@
                     <div class="sprint-date-row">
                         <div class="form-group">
                             <label asp-for="StartDate"></label>
-                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <input asp-date-for="StartDate" class="form-control" />
                             <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
-
                         <div class="form-group">
                             <label asp-for="DueDate"></label>
-                            <input asp-for="DueDate" type="date" class="form-control" />
+                            <input asp-date-for="DueDate" class="form-control" />
                             <span asp-validation-for="DueDate" class="text-danger"></span>
                         </div>
                     </div>
