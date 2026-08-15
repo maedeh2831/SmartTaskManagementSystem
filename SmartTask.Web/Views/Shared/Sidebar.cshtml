@@ -2,11 +2,29 @@
 @using SmartTask.Web.Models.Enums
 @using SmartTask.Web.Models.Navigation
 @using SmartTask.Web.Infrastructure.Interfaces
+@using SmartTask.Web.Services.Interfaces
 @inject ICurrentContextService CurrentContext
+@inject ICurrentUserService CurrentUser
+@inject IChatService ChatService
 @{
     var controllerName = ViewContext.RouteData.Values["Controller"]?.ToString();
     var menus = SidebarMenu.Items
-        .Where(x => string.IsNullOrEmpty(x.RequiredRole) || User.IsInRole(x.RequiredRole));
+        .Where(x => string.IsNullOrEmpty(x.RequiredRole) || User.IsInRole(x.RequiredRole))
+        .ToList();
+
+    // نشان پیام‌های خوانده‌نشده روی منوی گفتگو
+    if (CurrentUser.IsAuthenticated)
+    {
+        var unread = await ChatService.GetTotalUnreadCountAsync(CurrentUser.UserId);
+
+        if (unread > 0)
+        {
+            var chatItem = menus.FirstOrDefault(x => x.Controller == "Chat");
+            if (chatItem != null)
+                chatItem.Badge = unread > 99 ? "99+" : unread.ToString();
+        }
+    }
+
     var groups = menus.GroupBy(x => x.Category);
 }
 <ul class="sidebar-menu">

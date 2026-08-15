@@ -65,6 +65,14 @@ namespace SmartTask.Web.Models
             },
             new()
             {
+                Title="گفتگو",
+                Category="مدیریت",
+                Icon="fa-solid fa-comments",
+                Controller="Chat",
+                RequiresContext = ContextRequirementType.None
+            },
+            new()
+            {
                 Title="گزارش‌ها",
                 Category="تحلیل",
                 Icon="fa-solid fa-chart-line",
