@@ -133,3 +133,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 });
+
+window.SmartTask = window.SmartTask || {};
+SmartTask.toggleSidebarGroup = function (linkEl) {
+    var li = linkEl.closest("li.has-children");
+    if (li) {
+        li.classList.toggle("open");
+    }
+    return false;
+};

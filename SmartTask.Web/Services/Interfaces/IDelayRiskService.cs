@@ -1,4 +1,5 @@
 ﻿using SmartTask.Web.Models.ViewModels.Risk;
+using SmartTask.Web.Models.ViewModels.Search;
 
 namespace SmartTask.Web.Services.Interfaces;
 

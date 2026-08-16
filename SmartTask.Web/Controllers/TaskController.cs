@@ -471,4 +471,33 @@ public class TaskController : BaseController
 
         return RedirectToAction(nameof(Details), new { id = taskId });
     }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuickCreate(int userStoryId, string title, TaskPriorityType priority = TaskPriorityType.Medium)
+    {
+        if (!await _userStoryService.CanManageStoryAsync(userStoryId, CurrentUser.UserId))
+            return Json(new { success = false, message = "شما اجازه ساخت Task در این User Story را ندارید." });
+
+        if (string.IsNullOrWhiteSpace(title))
+            return Json(new { success = false, message = "عنوان Task الزامی است." });
+
+        if (await _taskService.ExistsByTitleAsync(userStoryId, title))
+            return Json(new { success = false, message = "Task ای با این عنوان قبلاً وجود دارد." });
+
+        var task = new TaskEntity
+        {
+            UserStoryId = userStoryId,
+            Title = title.Trim(),
+            Priority = priority,
+            Status = TaskStatusType.ToDo,
+            CreatedDate = DateTime.Now,
+            ViewState = true
+        };
+
+        await _taskService.AddAsync(task);
+
+        return Json(new { success = true, taskId = task.Id, url = Url.Action(nameof(Details), new { id = task.Id }) });
+    }
 }
