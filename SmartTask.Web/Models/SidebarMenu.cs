@@ -130,6 +130,19 @@ namespace SmartTask.Web.Models
             // ===== گزارش‌ها (گروه مستقل، تب داخلی Workspace/Project) =====
             new()
             {
+                Title="گفتگو",
+                Category="مدیریت",
+                Icon="fa-solid fa-comments",
+                Controller="Chat",
+                RequiresContext = ContextRequirementType.None
+            },
+            new()
+            {
+                Title="گزارش‌ها",
+                Category="تحلیل",
+                Icon="fa-solid fa-chart-line",
+                Controller="Report",
+                RequiresContext = ContextRequirementType.None
                 Title = "گزارش‌ها",
                 Category = "گزارش‌ها",
                 Icon = "fa-solid fa-chart-pie",
