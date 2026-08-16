@@ -1,53 +1,43 @@
-﻿<div class="modal fade" id="quickAddModal" tabindex="-1" aria-hidden="true">
+﻿<div class="modal fade" id="taskQuickAddModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content quick-add-modal">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fa-solid fa-bolt"></i>
-                    افزودن سریع Task
+                    Task جدید
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
-
                 <div class="quick-add-steps">
-                    <span class="step active" data-step="1"><i class="fa-solid fa-folder-open"></i> پروژه</span>
-                    <span class="step" data-step="2"><i class="fa-solid fa-bookmark"></i> User Story</span>
-                    <span class="step" data-step="3"><i class="fa-solid fa-square-check"></i> جزئیات</span>
+                    <span class="step active" data-step="1"><i class="fa-solid fa-bookmark"></i> User Story</span>
+                    <span class="step" data-step="2"><i class="fa-solid fa-square-check"></i> جزئیات</span>
                 </div>
 
-                <div class="quick-add-step" id="qaStep1">
-                    <input type="text" id="qaProjectFilter" class="qa-filter-input" placeholder="جستجوی پروژه..." />
-                    <div class="qa-project-list" id="qaProjectList">
+                <div class="quick-add-step" id="tqaStep1">
+                    <input type="text" id="tqaStoryFilter" class="qa-filter-input" placeholder="جستجوی User Story..." />
+                    <div class="qa-story-list" id="tqaStoryList">
                         <div class="qa-loading">در حال بارگذاری...</div>
                     </div>
                 </div>
 
-                <div class="quick-add-step d-none" id="qaStep2">
+                <div class="quick-add-step d-none" id="tqaStep2">
                     <button type="button" class="qa-back-btn" data-back="1">
-                        <i class="fa-solid fa-arrow-right"></i> بازگشت به پروژه‌ها
-                    </button>
-                    <input type="text" id="qaStoryFilter" class="qa-filter-input" placeholder="جستجوی User Story..." />
-                    <div class="qa-story-list" id="qaStoryList"></div>
-                </div>
-
-                <div class="quick-add-step d-none" id="qaStep3">
-                    <button type="button" class="qa-back-btn" data-back="2">
                         <i class="fa-solid fa-arrow-right"></i> بازگشت به User Story‌ها
                     </button>
-                    <form id="qaTaskForm">
+                    <form id="tqaTaskForm">
                         <div class="qa-field">
                             <label>عنوان Task</label>
-                            <input type="text" id="qaTaskTitle" required maxlength="200" placeholder="مثلاً: پیاده‌سازی صفحه ورود" autocomplete="off" />
+                            <input type="text" id="tqaTaskTitle" required maxlength="200" placeholder="مثلاً: پیاده‌سازی صفحه ورود" autocomplete="off" />
                         </div>
                         <div class="qa-field">
                             <label>اولویت</label>
-                            <select id="qaTaskPriority">
+                            <select id="tqaTaskPriority">
+                                <option value="Lowest">خیلی کم</option>
                                 <option value="Low">کم</option>
                                 <option value="Medium" selected>متوسط</option>
                                 <option value="High">زیاد</option>
-                                <option value="Critical">بحرانی</option>
+                                <option value="Highest">خیلی زیاد</option>
                             </select>
                         </div>
                         <button type="submit" class="qa-submit-btn">
@@ -56,7 +46,6 @@
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>

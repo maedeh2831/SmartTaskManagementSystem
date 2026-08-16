@@ -71,63 +71,18 @@
         });
     }
 
-    //  Live Preview (Create Sprint)
-    const nameInput = document.getElementById("sprintName");
-    const goalInput = document.getElementById("sprintGoal");
-    const startInput = document.getElementById("sprintStart");
-    const endInput = document.getElementById("sprintEnd");
-    const capacityInput = document.getElementById("sprintCapacity");
-
-    const previewName = document.getElementById("previewName");
-    const previewGoal = document.getElementById("previewGoal");
-    const previewDuration = document.getElementById("previewDuration");
-    const previewCapacity = document.getElementById("previewCapacity");
-
-    if (nameInput && previewName) {
-        nameInput.addEventListener("input", () => {
-            previewName.innerText = nameInput.value || "اسپرینت جدید";
-        });
-    }
-
-    if (goalInput && previewGoal) {
-        goalInput.addEventListener("input", () => {
-            previewGoal.innerText =
-                goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
-        });
-    }
-
-    if (capacityInput && previewCapacity) {
-        capacityInput.addEventListener("input", () => {
-            previewCapacity.innerText = `${capacityInput.value || 0} ظرفیت`;
-        });
-    }
-
-    function updateDuration() {
-        if (!startInput || !endInput || !previewDuration) return;
-
-        const startValue = startInput.value;
-        const endValue = endInput.value;
-
-        if (!startValue || !endValue) {
-            previewDuration.innerText = "مدت اسپرینت";
-            return;
+        //  Date Sync (Create/Edit Sprint) — تاریخ پایان نباید قبل از تاریخ شروع باشد
+        const startInput = document.getElementById("sprintStart");
+        const endInput = document.getElementById("sprintEnd");
+    
+        function updateDuration() {
+            if (!startInput || !endInput) return;
+            
+                const startValue = startInput.value;
+            if (startValue) {
+                    endInput.min = startValue;
+                }
         }
-
-        const start = new Date(startValue);
-        const end = new Date(endValue);
-
-        if (!isNaN(start) && !isNaN(end) && end > start) {
-            const days = Math.round(
-                (end - start) / (1000 * 60 * 60 * 24)
-            );
-
-            previewDuration.innerText = `${days} روز`;
-        }
-
-        if (startValue) {
-            endInput.min = startValue;
-        }
-    }
 
     if (startInput) {
         startInput.addEventListener("change", updateDuration);
@@ -165,7 +120,46 @@
         }, 200);
     }
 
+    // ===== Sprint Details — Tabs =====
+    const sprintTabs = document.querySelectorAll(".sprint-tab[data-tab]");
+    const sprintPanes = document.querySelectorAll(".sprint-tab-pane");
+
+    sprintTabs.forEach(tab => {
+        tab.addEventListener("click", function () {
+            sprintTabs.forEach(t => t.classList.remove("active"));
+            sprintPanes.forEach(p => p.classList.remove("active"));
+
+            this.classList.add("active");
+            const pane = document.getElementById("tab-" + this.dataset.tab);
+            if (pane) pane.classList.add("active");
+
+            if (this.dataset.tab === "planning" && this.dataset.lazyUrl && !this.dataset.loaded) {
+                fetch(this.dataset.lazyUrl)
+                    .then(res => res.text())
+                    .then(html => {
+                        pane.innerHTML = html;
+                        this.dataset.loaded = "true";
+                        if (window.SmartTask && typeof window.SmartTask.initPlanning === "function") {
+                            window.SmartTask.initPlanning(pane);
+                        }
+                    })
+                    .catch(() => {
+                        pane.innerHTML = '<div class="team-empty-text">خطا در بارگذاری برنامه‌ریزی.</div>';
+                    });
+            }
+        });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedTab = urlParams.get("tab");
+    if (requestedTab) {
+        const targetTab = document.querySelector(`.sprint-tab[data-tab="${requestedTab}"]`);
+        if (targetTab) targetTab.click();
+    }
+
 });
+
+
 (function () {
     const list = document.getElementById("sprintReportList");
     if (!list) return;

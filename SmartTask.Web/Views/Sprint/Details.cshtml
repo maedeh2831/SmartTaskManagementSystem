@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sprintreport.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/planning.css" asp-append-version="true" />
 }
 
 <div class="workspace-details-page">
@@ -19,7 +21,7 @@
 
     <div class="page-header">
         <div>
-            <h1>
+            <h1 class="sprint-title-row">
                 @Model.Name
                 <span class="sprint-status-badge status-@Model.Status.ToString().ToLower()">
                     @(Model.Status switch
@@ -35,124 +37,177 @@
             <p>پروژه: @Model.ProjectName</p>
         </div>
 
-        <div style="display:flex;gap:10px;">
+        <div class="sprint-header-actions">
 
-            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
-                <i class="fa-solid fa-arrow-right"></i>
-                بازگشت
-            </a>
+    <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
 
-            @if (Model.CanManage)
+    @if (Model.CanManage)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="icon-btn" title="ویرایش اسپرینت">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-sprint-form">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="icon-btn icon-btn-danger" title="حذف اسپرینت">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+    }
+
+</div>
+    </div>
+
+    <!-- ===== Tabs ===== -->
+    <div class="sprint-tabs" role="tablist">
+        <button type="button" class="sprint-tab active" data-tab="overview">
+            <i class="fa-solid fa-bullseye"></i>
+            نمای کلی
+        </button>
+        <button type="button" class="sprint-tab" data-tab="stories">
+            <i class="fa-solid fa-list-check"></i>
+            User Story ها
+            <span class="sprint-tab-count">@Model.Stories.Count</span>
+        </button>
+        @if (Model.CanManage)
+        {
+            <button type="button" class="sprint-tab" data-tab="planning"
+                    data-lazy-url="@Url.Action("PlanningTab", new { id = Model.Id })">
+                <i class="fa-solid fa-diagram-project"></i>
+                برنامه‌ریزی
+            </button>
+        }
+        <a asp-controller="AgileDashboard" asp-action="Index" asp-route-projectId="@Model.ProjectId" asp-route-sprintId="@Model.Id"
+           class="sprint-tab sprint-tab-external">
+            <i class="fa-solid fa-chart-line"></i>
+            داشبورد Agile
+            <i class="fa-solid fa-arrow-up-left-from-square sprint-tab-external-icon"></i>
+        </a>
+    </div>
+
+    <!-- ===== Tab Panes ===== -->
+    <div class="sprint-tab-panes">
+
+        <div class="sprint-tab-pane active" id="tab-overview">
+
+            <div class="details-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-bullseye"></i>
+                    هدف اسپرینت
+                </div>
+
+                <p>@(string.IsNullOrWhiteSpace(Model.Goal) ? "هدفی برای این اسپرینت تعیین نشده است." : Model.Goal)</p>
+
+                <div class="sprint-progress-wrap" style="margin-top:16px;">
+                    <div class="sprint-progress-bar">
+                        <div class="sprint-progress-fill status-@Model.Status.ToString().ToLower()"
+                             style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%"></div>
+                    </div>
+                    <small>@Html.DisplayDate(Model.StartDate) تا @Html.DisplayDate(Model.EndDate) — ظرفیت @Model.Capacity Story Point</small>
+                </div>
+
+                @if (Model.CanManage && (Model.Status == SprintStatusType.Planning || Model.Status == SprintStatusType.Active))
+                {
+                    <div class="sprint-action-buttons">
+                        @if (Model.Status == SprintStatusType.Planning)
+                        {
+                            <form asp-action="Activate" asp-route-id="@Model.Id" method="post" class="activate-sprint-form">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-play"></i>
+                                    فعال‌سازی اسپرینت
+                                </button>
+                            </form>
+                        }
+                        @if (Model.Status == SprintStatusType.Active)
+                        {
+                            <form asp-action="Complete" asp-route-id="@Model.Id" method="post" class="complete-sprint-form">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-light">
+                                    <i class="fa-solid fa-flag-checkered"></i>
+                                    بستن اسپرینت
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+
+            @if (Model.Status == SprintStatusType.Completed)
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    ویرایش
-                </a>
-                <a asp-controller="AgileDashboard" asp-action="Index" asp-route-projectId="@Model.ProjectId" asp-route-sprintId="@Model.Id" class="btn btn-light">
-                    <i class="fa-solid fa-chart-line"></i>
-                    داشبورد Agile
-                </a>
-                <a asp-action="Planning" asp-route-id="@Model.Id" class="btn btn-primary">
-                    <i class="fa-solid fa-list-check"></i>
-                    برنامه‌ریزی اسپرینت
-                </a>
+                <div class="details-card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        گزارش هوشمند پایان اسپرینت
+                    </div>
 
+                    <div id="sprintReportList" class="sprint-report-list" data-sprint-id="@Model.Id">
+                        <div class="team-empty-text">در حال بارگذاری گزارش‌ها...</div>
+                    </div>
+
+                    @if (Model.CanManage)
+                    {
+                        <button type="button" id="generateSprintReportBtn" class="ai-suggest-btn" data-sprint-id="@Model.Id">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            تولید گزارش جدید
+                        </button>
+                    }
+                </div>
             }
 
         </div>
-    </div>
 
-    <div class="details-card">
-
-        <div class="card-title">
-            <i class="fa-solid fa-bullseye"></i>
-            هدف اسپرینت
-        </div>
-
-        <p>@(string.IsNullOrWhiteSpace(Model.Goal) ? "هدفی برای این اسپرینت تعیین نشده است." : Model.Goal)</p>
-
-        <div class="sprint-progress-wrap" style="margin-top:16px;">
-            <div class="sprint-progress-bar">
-                <div class="sprint-progress-fill status-@Model.Status.ToString().ToLower()"
-                     style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%"></div>
+        <div class="sprint-tab-pane" id="tab-stories">
+            <div class="details-card">
+                @if (!Model.Stories.Any())
+                {
+                    <div class="team-empty-text">
+                        هنوز User Story‌ای به این اسپرینت اضافه نشده است. از تب «برنامه‌ریزی» می‌توانید از Backlog اضافه کنید.
+                    </div>
+                }
+                else
+                {
+                    <div class="sprint-story-list">
+                        @foreach (var story in Model.Stories)
+                        {
+                            <div class="sprint-story-row">
+                                <a asp-controller="UserStory" asp-action="Details" asp-route-id="@story.Id" class="sprint-story-title">
+                                    @story.Title
+                                </a>
+                                <span class="backlog-sp-badge">@story.StoryPoint SP</span>
+                                <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">@story.Priority</span>
+                                <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">@story.Status</span>
+                                <span class="sprint-story-owner">
+                                    <i class="fa-regular fa-circle-user"></i>
+                                    @(story.OwnerName ?? "—")
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
-            <small>@Html.DisplayDate(Model.StartDate) تا @Html.DisplayDate(Model.EndDate) — ظرفیت @Model.Capacity Story Point</small>
         </div>
 
         @if (Model.CanManage)
         {
-            <div class="sprint-action-buttons">
-
-                @if (Model.Status == SprintStatusType.Planning)
-                {
-                    <form asp-action="Activate" asp-route-id="@Model.Id" method="post" class="activate-sprint-form">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-play"></i>
-                            فعال‌سازی اسپرینت
-                        </button>
-                    </form>
-                }
-
-                @if (Model.Status == SprintStatusType.Active)
-                {
-                    <form asp-action="Complete" asp-route-id="@Model.Id" method="post" class="complete-sprint-form">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-light">
-                            <i class="fa-solid fa-flag-checkered"></i>
-                            بستن اسپرینت
-                        </button>
-                    </form>
-                }
-
-                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-sprint-form">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fa-solid fa-trash"></i>
-                        حذف اسپرینت
-                    </button>
-                </form>
-
+            <div class="sprint-tab-pane" id="tab-planning">
+                <div class="sprint-tab-loading">
+                    <div class="ai-spinner"></div>
+                    <p>در حال بارگذاری برنامه‌ریزی...</p>
+                </div>
             </div>
         }
 
     </div>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-list-check"></i>
-            User Story های این اسپرینت
-        </div>
-        <div class="team-empty-text">
-            هنوز User Story ای به این اسپرینت اضافه نشده است (این بخش در استوری بعدی تکمیل می‌شود).
-        </div>
-    </div>
-
-    @if (Model.Status == SprintStatusType.Completed)
-    {
-        <div class="details-card">
-            <div class="card-title">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                گزارش هوشمند پایان اسپرینت
-            </div>
-
-            <div id="sprintReportList" class="sprint-report-list" data-sprint-id="@Model.Id">
-                <div class="team-empty-text">در حال بارگذاری گزارش‌ها...</div>
-            </div>
-
-            @if (Model.CanManage)
-            {
-                <button type="button" id="generateSprintReportBtn" class="ai-suggest-btn" data-sprint-id="@Model.Id">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    تولید گزارش جدید
-                </button>
-            }
-        </div>
-    }
-
 </div>
 
 @section Scripts
 {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
     <script src="~/js/sprint.js" asp-append-version="true"></script>
+    <script src="~/js/planning.js" asp-append-version="true"></script>
 }

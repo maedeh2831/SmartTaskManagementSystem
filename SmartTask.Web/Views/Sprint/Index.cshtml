@@ -27,7 +27,7 @@
                 <input type="text" id="sprintSearchInput" placeholder="جستجوی اسپرینت..." />
             </div>
 
-            <div style="display:flex;gap:12px;">
+            <div class="sprint-header-actions">
 
                 <a asp-controller="Project"
                    asp-action="Details"
@@ -100,12 +100,12 @@
                             <div class="sprint-progress-bar">
                                 <div class="sprint-progress-fill status-@sprint.Status.ToString().ToLower()"
                                      style="width:@(
-                                 sprint.Status == SprintStatusType.Completed ? 100 :
-                                 sprint.Status == SprintStatusType.Cancelled ? 0 :
-                                 sprint.ProgressPercent)%"></div>
-                            </div>
-                              <small>@Html.DisplayDate(sprint.StartDate) تا @Html.DisplayDate(sprint.EndDate)</small>
-                        </div>
+                                                              sprint.Status == SprintStatusType.Completed ? 100 :
+                                                              sprint.Status == SprintStatusType.Cancelled ? 0 :
+                                                              sprint.ProgressPercent)%"></div>
+                    </div>
+                    <small>@Html.DisplayDate(sprint.StartDate) تا @Html.DisplayDate(sprint.EndDate)</small>
+                </div>
 
                         <div class="workspace-info">
                             <div>
@@ -122,7 +122,7 @@
 
                     <div class="workspace-card-footer">
 
-                        <small>ایجاد شده: @Html.DisplayDate(sprint.StartDate)</small>
+                        <small>تاریخ شروع: @Html.DisplayDate(sprint.StartDate)</small>
 
                         <div class="workspace-actions">
 

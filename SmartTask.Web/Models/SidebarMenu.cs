@@ -127,22 +127,20 @@ namespace SmartTask.Web.Models
                 }
             },
 
-            // ===== گزارش‌ها (گروه مستقل، تب داخلی Workspace/Project) =====
+            // ===== مدیریت =====
             new()
             {
-                Title="گفتگو",
-                Category="مدیریت",
-                Icon="fa-solid fa-comments",
-                Controller="Chat",
+                Title = "گفتگو",
+                Category = "مدیریت",
+                Icon = "fa-solid fa-comments",
+                Controller = "Chat",
+                Action = "Index",
                 RequiresContext = ContextRequirementType.None
             },
+
+            // ===== گزارش‌ها =====
             new()
             {
-                Title="گزارش‌ها",
-                Category="تحلیل",
-                Icon="fa-solid fa-chart-line",
-                Controller="Report",
-                RequiresContext = ContextRequirementType.None
                 Title = "گزارش‌ها",
                 Category = "گزارش‌ها",
                 Icon = "fa-solid fa-chart-pie",
@@ -150,17 +148,66 @@ namespace SmartTask.Web.Models
                 Children = new()
                 {
                     // --- سطح Workspace ---
-                    new() { Title = "داشبورد فضای کاری", Icon = "fa-solid fa-gauge", Controller = "WorkspaceDashboard", Action = "Index", RequiresContext = ContextRequirementType.Workspace },
-                    new() { Title = "گزارش فضای کاری", Icon = "fa-solid fa-chart-line", Controller = "WorkspaceReport", Action = "Index", RequiresContext = ContextRequirementType.Workspace },
+                    new()
+                    {
+                        Title = "داشبورد فضای کاری",
+                        Icon = "fa-solid fa-gauge",
+                        Controller = "WorkspaceDashboard",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Workspace
+                    },
+                    new()
+                    {
+                        Title = "گزارش فضای کاری",
+                        Icon = "fa-solid fa-chart-line",
+                        Controller = "WorkspaceReport",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Workspace
+                    },
+
                     // --- سطح Project ---
-                    new() { Title = "گزارش پروژه", Icon = "fa-solid fa-chart-area", Controller = "ProjectReport", Action = "Index", RequiresContext = ContextRequirementType.Project },
-                    new() { Title = "گزارش اسپرینت", Icon = "fa-solid fa-chart-simple", Controller = "SprintReport", Action = "Index", RequiresContext = ContextRequirementType.Project },
-                    new() { Title = "ریسک تأخیر", Icon = "fa-solid fa-triangle-exclamation", Controller = "DelayRisk", Action = "Index", RequiresContext = ContextRequirementType.Project },
-                    new() { Title = "بار کاری", Icon = "fa-solid fa-scale-balanced", Controller = "Workload", Action = "Index", RequiresContext = ContextRequirementType.Project },
-                    new() { Title = "وابستگی‌ها", Icon = "fa-solid fa-diagram-project", Controller = "Dependency", Action = "Index", RequiresContext = ContextRequirementType.Project },
+                    new()
+                    {
+                        Title = "گزارش پروژه",
+                        Icon = "fa-solid fa-chart-area",
+                        Controller = "ProjectReport",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Project
+                    },
+                    new()
+                    {
+                        Title = "گزارش اسپرینت",
+                        Icon = "fa-solid fa-chart-simple",
+                        Controller = "SprintReport",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Project
+                    },
+                    new()
+                    {
+                        Title = "ریسک تأخیر",
+                        Icon = "fa-solid fa-triangle-exclamation",
+                        Controller = "DelayRisk",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Project
+                    },
+                    new()
+                    {
+                        Title = "بار کاری",
+                        Icon = "fa-solid fa-scale-balanced",
+                        Controller = "Workload",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Project
+                    },
+                    new()
+                    {
+                        Title = "وابستگی‌ها",
+                        Icon = "fa-solid fa-diagram-project",
+                        Controller = "Dependency",
+                        Action = "Index",
+                        RequiresContext = ContextRequirementType.Project
+                    }
                 }
             },
-
             // ===== سیستم =====
             new()
             {

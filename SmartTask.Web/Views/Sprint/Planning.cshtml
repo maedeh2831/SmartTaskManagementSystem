@@ -58,8 +58,7 @@
 
                 @foreach (var story in Model.BacklogStories)
                 {
-                    <div class="planning-card" draggable="@(Model.CanManage ? "true" : "false")"
-                         data-id="@story.Id" data-points="@story.StoryPoint">
+                     <div class="planning-card" data-id="@story.Id" data-points="@story.StoryPoint">
 
                         @if (Model.CanManage)
                         {
@@ -95,8 +94,7 @@
 
                 @foreach (var story in Model.SprintStories)
                 {
-                    <div class="planning-card" draggable="@(Model.CanManage ? "true" : "false")"
-                         data-id="@story.Id" data-points="@story.StoryPoint">
+                     <div class="planning-card" data-id="@story.Id" data-points="@story.StoryPoint">
 
                         @if (Model.CanManage)
                         {
@@ -129,5 +127,6 @@
 @section Scripts
 {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <script src="~/js/sprint.js" asp-append-version="true"></script>
     <script src="~/js/planning.js" asp-append-version="true"></script>
 }

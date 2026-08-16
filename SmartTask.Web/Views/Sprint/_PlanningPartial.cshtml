@@ -1,0 +1,66 @@
+﻿@model SmartTask.Web.Models.ViewModels.Sprint.SprintPlanningViewModel
+<div class="planning-capacity-bar" id="capacityBar" data-capacity="@Model.Capacity">
+    <div class="planning-capacity-info">
+        <span>ظرفیت اسپرینت</span>
+        <strong id="capacityText">@Model.PlannedPoints از @Model.Capacity Story Point</strong>
+    </div>
+    <div class="planning-capacity-track">
+        <div class="planning-capacity-fill @(Model.CapacityPercent > 100 ? "over" : "")"
+             id="capacityFill"
+             style="width:@(Math.Min(Model.CapacityPercent, 100))%"></div>
+    </div>
+</div>
+<div class="planning-board">
+    <div class="planning-column">
+        <div class="planning-column-header">
+            <i class="fa-solid fa-layer-group"></i>
+            Product Backlog
+            <span class="planning-count" id="backlogCount">@Model.BacklogStories.Count</span>
+        </div>
+        <div class="planning-list" id="backlogColumn" data-sprint-id="@Model.SprintId" data-zone="backlog">
+            @foreach (var story in Model.BacklogStories)
+            {
+                <div class="planning-card"
+                     data-id="@story.Id" data-points="@story.StoryPoint">
+                    @if (Model.CanManage)
+                    {
+                        <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
+                    }
+                    <div class="planning-card-body">
+                        <span class="planning-card-title">@story.Title</span>
+                        <div class="planning-card-meta">
+                            <span class="backlog-sp-badge">@story.StoryPoint SP</span>
+                            <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">@story.Priority</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="planning-column">
+        <div class="planning-column-header sprint-header">
+            <i class="fa-solid fa-bolt"></i>
+            @Model.SprintName
+            <span class="planning-count" id="sprintCount">@Model.SprintStories.Count</span>
+        </div>
+        <div class="planning-list" id="sprintColumn" data-sprint-id="@Model.SprintId" data-zone="sprint">
+            @foreach (var story in Model.SprintStories)
+            {
+                <div class="planning-card"
+                     data-id="@story.Id" data-points="@story.StoryPoint">
+                    @if (Model.CanManage)
+                    {
+                        <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
+                    }
+                    <div class="planning-card-body">
+                        <span class="planning-card-title">@story.Title</span>
+                        <div class="planning-card-meta">
+                            <span class="backlog-sp-badge">@story.StoryPoint SP</span>
+                            <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">@story.Priority</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

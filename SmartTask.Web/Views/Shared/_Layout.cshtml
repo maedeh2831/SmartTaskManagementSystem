@@ -52,10 +52,6 @@
 
         <div class="header-actions">
 
-            <button type="button" class="icon-btn quick-add-trigger" data-quick-add-open title="افزودن سریع (Ctrl+K)">
-                <i class="fa-solid fa-plus"></i>
-            </button>
-
             @await Component.InvokeAsync("Header")
 
             @await Component.InvokeAsync("NotificationBell")
@@ -99,8 +95,6 @@
 
     @await Component.InvokeAsync("Footer")
 
-    <partial name="_QuickAddModal" />
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @if (isJalaliDate)
     {
@@ -119,7 +113,6 @@
     <script src="~/js/notification.js" asp-append-version="true"></script>
 
     <script src="~/js/global-search.js" asp-append-version="true"></script>
-    <script src="~/js/quick-add.js" asp-append-version="true"></script>
 
     @if (TempData["Success"] != null)
     {
