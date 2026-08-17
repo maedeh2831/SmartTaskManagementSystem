@@ -356,7 +356,8 @@ public class ChatService : IChatService
                 FullName = x.ApplicationUser.FullName,
                 Avatar = x.ApplicationUser.Avatar,
                 JobTitle = x.ApplicationUser.JobTitle,
-                Role = x.Role
+                Role = x.Role,
+                WebpushrSubscriberId = x.ApplicationUser.WebpushrSubscriberId
             })
             .ToListAsync();
 

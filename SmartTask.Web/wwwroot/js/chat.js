@@ -51,6 +51,7 @@
         membersList: document.getElementById("chatMembersList"),
         membersToggle: document.getElementById("chatMembersToggle"),
         membersClose: document.getElementById("chatMembersClose"),
+        testPushBtn: document.getElementById("chatTestPushBtn"),
         searchToggle: document.getElementById("chatSearchToggle"),
         searchBar: document.getElementById("chatSearchBar"),
         searchInput: document.getElementById("chatMessageSearch"),
@@ -914,6 +915,39 @@
 
         // ارسال پیام
         if (dom.sendBtn) dom.sendBtn.addEventListener("click", send);
+
+        // ارسال اعلان آزمایشی (تست تحویل پوش)
+        if (dom.testPushBtn) {
+            dom.testPushBtn.addEventListener("click", async function () {
+                if (!app.room || !connection || connection.state !== "Connected") {
+                    if (typeof showWarning === "function") showWarning("اتصال برقرار نیست.");
+                    return;
+                }
+
+                const btn = this;
+                btn.disabled = true;
+
+                try {
+                    await connection.invoke("TestPush", app.room.projectId);
+
+                    if (typeof Swal !== "undefined") {
+                        Swal.fire({
+                            icon: "success",
+                            title: "اعلان آزمایشی ارسال شد",
+                            text: "اگر مرورگر اعضا اشتراک داشته باشد، اعلان نمایش داده می‌شود.",
+                            confirmButtonText: "باشه",
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+                    }
+                } catch (err) {
+                    console.error("Test push failed:", err);
+                    if (typeof showError === "function") showError(err.message || "ارسال اعلان آزمایشی ناموفق بود.");
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        }
 
         if (dom.input) {
             dom.input.addEventListener("keydown", event => {

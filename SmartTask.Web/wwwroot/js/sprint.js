@@ -1,236 +1,215 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+// ==========================================================
+//                  SmartTask Sprint UI
+// ==========================================================
 
-    //  Delete Sprint 
-    document.querySelectorAll(".delete-sprint-form").forEach(form => {
-        form.addEventListener("submit", function (e) {
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ===== Tab System =====
+    const tabButtons = document.querySelectorAll(".sprint-tab[data-tab]");
+    const tabPanes = document.querySelectorAll(".sprint-tab-pane");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const targetTab = btn.dataset.tab;
+
+            // Switch active button
+            tabButtons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            // Switch active pane
+            tabPanes.forEach(pane => pane.classList.remove("active"));
+            const targetPane = document.getElementById("tab-" + targetTab);
+            if (targetPane) {
+                targetPane.classList.add("active");
+
+                // Lazy load if needed
+                if (btn.dataset.lazyUrl && !targetPane.dataset.loaded) {
+                    loadTabContent(targetPane, btn.dataset.lazyUrl);
+                }
+            }
+        });
+    });
+
+    // ===== Lazy Load Tab Content (for Planning tab) =====
+    function loadTabContent(pane, url) {
+        pane.dataset.loaded = "true";
+
+        fetch(url)
+            .then(r => {
+                if (!r.ok) throw new Error("Failed to load tab");
+                return r.text();
+            })
+            .then(html => {
+                pane.innerHTML = html;
+                // Initialize planning.js for this pane
+                if (window.SmartTask && window.SmartTask.initPlanning) {
+                    window.SmartTask.initPlanning(pane);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                pane.innerHTML = '<div class="workspace-empty"><i class="fa-solid fa-exclamation-triangle"></i><h3>خطا در بارگذاری محتوا</h3></div>';
+            });
+    }
+
+    // ===== Handle ?tab= Query String (for old Planning URL redirect) =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get("tab");
+    if (tabParam) {
+        const targetBtn = document.querySelector(`.sprint-tab[data-tab="${tabParam}"]`);
+        if (targetBtn) {
+            targetBtn.click();
+        }
+    }
+
+    // ===== More Actions Dropdown =====
+    const moreBtn = document.getElementById("sprintMoreBtn");
+    const moreMenu = document.getElementById("sprintMoreMenu");
+
+    if (moreBtn && moreMenu) {
+        moreBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            moreMenu.classList.toggle("active");
+        });
+
+        document.addEventListener("click", function () {
+            moreMenu.classList.remove("active");
+        });
+    }
+
+    // ===== Delete Sprint Confirmation =====
+    const deleteForm = document.querySelector(".delete-sprint-form");
+    if (deleteForm) {
+        deleteForm.addEventListener("submit", function (e) {
             e.preventDefault();
             Swal.fire({
                 title: "حذف اسپرینت",
-                text: "آیا از حذف این اسپرینت مطمئن هستید؟ این عملیات قابل بازگشت نیست.",
+                text: "آیا از حذف این اسپرینت مطمئن هستید؟ این عمل غیرقابل بازگشت است.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "بله، حذف کن",
                 cancelButtonText: "انصراف",
                 confirmButtonColor: "#EF4444",
                 cancelButtonColor: "#64748B"
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
+            }).then(result => {
+                if (result.isConfirmed) {
+                    deleteForm.submit();
+                }
             });
         });
-    });
+    }
 
-    //  Activate Sprint 
-    document.querySelectorAll(".activate-sprint-form").forEach(form => {
-        form.addEventListener("submit", function (e) {
+    // ===== Activate Sprint Confirmation =====
+    const activateForm = document.querySelector(".activate-sprint-form");
+    if (activateForm) {
+        activateForm.addEventListener("submit", function (e) {
             e.preventDefault();
             Swal.fire({
                 title: "فعال‌سازی اسپرینت",
-                text: "با فعال‌سازی این اسپرینت، اسپرینت فعال قبلی (در صورت وجود) به حالت برنامه‌ریزی برمی‌گردد.",
+                text: "آیا از فعال‌سازی این اسپرینت مطمئن هستید؟",
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonText: "بله، فعال کن",
                 cancelButtonText: "انصراف",
-                confirmButtonColor: "#5B5FEF",
+                confirmButtonColor: "#4F46E5",
                 cancelButtonColor: "#64748B"
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
+            }).then(result => {
+                if (result.isConfirmed) {
+                    activateForm.submit();
+                }
             });
         });
-    });
+    }
 
-    //  Complete Sprint 
-    document.querySelectorAll(".complete-sprint-form").forEach(form => {
-        form.addEventListener("submit", function (e) {
+    // ===== Complete Sprint Confirmation =====
+    const completeForm = document.querySelector(".complete-sprint-form");
+    if (completeForm) {
+        completeForm.addEventListener("submit", function (e) {
             e.preventDefault();
             Swal.fire({
                 title: "بستن اسپرینت",
-                text: "آیا از پایان‌دادن به این اسپرینت مطمئن هستید؟",
+                text: "آیا از بستن این اسپرینت و اتمام آن مطمئن هستید؟",
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonText: "بله، ببند",
                 cancelButtonText: "انصراف",
-                confirmButtonColor: "#5B5FEF",
+                confirmButtonColor: "#4F46E5",
                 cancelButtonColor: "#64748B"
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
-            });
-        });
-    });
-
-    //  Live Search (Sprint Index) 
-    const searchInput = document.getElementById("sprintSearchInput");
-    const grid = document.getElementById("sprintGrid");
-
-    if (searchInput && grid) {
-        searchInput.addEventListener("input", function () {
-            const term = searchInput.value.trim().toLowerCase();
-            grid.querySelectorAll(".sprint-card").forEach(card => {
-                const name = (card.dataset.name || "").toLowerCase();
-                card.style.display = name.includes(term) ? "" : "none";
+            }).then(result => {
+                if (result.isConfirmed) {
+                    completeForm.submit();
+                }
             });
         });
     }
 
-    //  Live Preview (Create Sprint)
-    const nameInput = document.getElementById("sprintName");
-    const goalInput = document.getElementById("sprintGoal");
-    const startInput = document.getElementById("sprintStart");
-    const endInput = document.getElementById("sprintEnd");
-    const capacityInput = document.getElementById("sprintCapacity");
-
-    const previewName = document.getElementById("previewName");
-    const previewGoal = document.getElementById("previewGoal");
-    const previewDuration = document.getElementById("previewDuration");
-    const previewCapacity = document.getElementById("previewCapacity");
-
-    if (nameInput && previewName) {
-        nameInput.addEventListener("input", () => {
-            previewName.innerText = nameInput.value || "اسپرینت جدید";
-        });
+    // ===== Sprint Report Loading (if tab-overview exists and sprint is completed) =====
+    const reportList = document.getElementById("sprintReportList");
+    if (reportList) {
+        loadSprintReports(reportList.dataset.sprintId);
     }
-
-    if (goalInput && previewGoal) {
-        goalInput.addEventListener("input", () => {
-            previewGoal.innerText =
-                goalInput.value || "هدف اسپرینت اینجا نمایش داده خواهد شد...";
-        });
-    }
-
-    if (capacityInput && previewCapacity) {
-        capacityInput.addEventListener("input", () => {
-            previewCapacity.innerText = `${capacityInput.value || 0} ظرفیت`;
-        });
-    }
-
-    function updateDuration() {
-        if (!startInput || !endInput || !previewDuration) return;
-
-        const startValue = startInput.value;
-        const endValue = endInput.value;
-
-        if (!startValue || !endValue) {
-            previewDuration.innerText = "مدت اسپرینت";
-            return;
-        }
-
-        const start = new Date(startValue);
-        const end = new Date(endValue);
-
-        if (!isNaN(start) && !isNaN(end) && end > start) {
-            const days = Math.round(
-                (end - start) / (1000 * 60 * 60 * 24)
-            );
-
-            previewDuration.innerText = `${days} روز`;
-        }
-
-        if (startValue) {
-            endInput.min = startValue;
-        }
-    }
-
-    if (startInput) {
-        startInput.addEventListener("change", updateDuration);
-    }
-
-    if (endInput) {
-        endInput.addEventListener("change", updateDuration);
-    }
-
-    if (startInput || endInput) {
-
-        let lastStartValue = startInput ? startInput.value : "";
-        let lastEndValue = endInput ? endInput.value : "";
-
-        setInterval(() => {
-
-            const currentStartValue = startInput
-                ? startInput.value
-                : "";
-
-            const currentEndValue = endInput
-                ? endInput.value
-                : "";
-
-            if (
-                currentStartValue !== lastStartValue ||
-                currentEndValue !== lastEndValue
-            ) {
-                lastStartValue = currentStartValue;
-                lastEndValue = currentEndValue;
-
-                updateDuration();
-            }
-
-        }, 200);
-    }
-
-});
-(function () {
-    const list = document.getElementById("sprintReportList");
-    if (!list) return;
-
-    const sprintId = list.dataset.sprintId;
-    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-
-    function renderReports(reports) {
-        if (!reports || !reports.length) {
-            list.innerHTML = `<div class="team-empty-text">هنوز گزارشی برای این اسپرینت تولید نشده است.</div>`;
-            return;
-        }
-
-        list.innerHTML = reports.map(r => `
-            <div class="sprint-report-item">
-                <p>${r.content}</p>
-                <div class="sprint-report-meta">
-                    <span>تولیدشده توسط: ${r.generatedByName}</span>
-                    <span>${new Date(r.generatedDate).toLocaleDateString("fa-IR")}</span>
-                </div>
-            </div>
-        `).join("");
-    }
-
-    async function loadReports() {
-        try {
-            const response = await fetch(`/SprintReport/GetReports?sprintId=${sprintId}`);
-            const data = await response.json();
-            renderReports(data.reports);
-        } catch (err) {
-            list.innerHTML = `<div class="team-empty-text">خطا در بارگذاری گزارش‌ها.</div>`;
-        }
-    }
-
-    loadReports();
 
     const generateBtn = document.getElementById("generateSprintReportBtn");
     if (generateBtn) {
-        generateBtn.addEventListener("click", async function () {
-            generateBtn.disabled = true;
-            list.innerHTML = `
-                <div class="ai-loading">
-                    <div class="ai-spinner"></div>
-                    <p>در حال تحلیل عملکرد اسپرینت و نگارش گزارش...</p>
-                </div>`;
-
-            try {
-                const response = await fetch("/SprintReport/Generate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: `sprintId=${sprintId}&__RequestVerificationToken=${encodeURIComponent(token || "")}`
-                });
-
-                const data = await response.json();
-
-                if (!data.success) {
-                    list.innerHTML = `<div class="ai-error"><i class="fa-solid fa-triangle-exclamation"></i><p>${data.message}</p></div>`;
-                } else {
-                    await loadReports();
-                }
-            } catch (err) {
-                list.innerHTML = `<div class="ai-error"><i class="fa-solid fa-triangle-exclamation"></i><p>ارتباط با سرور برقرار نشد.</p></div>`;
-            } finally {
-                generateBtn.disabled = false;
-            }
+        generateBtn.addEventListener("click", function () {
+            generateSprintReport(generateBtn.dataset.sprintId);
         });
     }
-})();
+
+});
+
+// ===== Sprint Report Functions =====
+function loadSprintReports(sprintId) {
+    const container = document.getElementById("sprintReportList");
+    if (!container) return;
+
+    fetch(`/SprintReport/List?sprintId=${sprintId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.length === 0) {
+                container.innerHTML = '<div class="team-empty-text">هنوز گزارشی تولید نشده است.</div>';
+            } else {
+                container.innerHTML = data.map(report => `
+                    <div class="sprint-report-card">
+                        <div class="sprint-report-header">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span>${report.title}</span>
+                            <small>${report.createDate}</small>
+                        </div>
+                        <div class="sprint-report-body">
+                            ${report.summary || "—"}
+                        </div>
+                    </div>
+                `).join("");
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<div class="team-empty-text">خطا در بارگذاری گزارش‌ها</div>';
+        });
+}
+
+function generateSprintReport(sprintId) {
+    const btn = document.getElementById("generateSprintReportBtn");
+    if (!btn) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...';
+
+    fetch(`/SprintReport/Generate?sprintId=${sprintId}`, { method: "POST" })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess("گزارش با موفقیت تولید شد.");
+                loadSprintReports(sprintId);
+            } else {
+                showError(data.message || "خطا در تولید گزارش");
+            }
+        })
+        .catch(() => {
+            showError("خطا در تولید گزارش");
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> تولید گزارش جدید';
+        });
+}

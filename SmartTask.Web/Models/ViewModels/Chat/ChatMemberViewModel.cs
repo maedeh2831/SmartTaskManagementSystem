@@ -24,5 +24,9 @@ namespace SmartTask.Web.Models.ViewModels.Chat
 
         /// <summary>آخرین حضور به‌صورت ISO-8601 (UTC). در صورت آنلاین بودن یا نامشخص بودن، null است.</summary>
         public string? LastSeen { get; set; }
+
+        public long? WebpushrSubscriberId { get; set; }
+
+
     }
 }

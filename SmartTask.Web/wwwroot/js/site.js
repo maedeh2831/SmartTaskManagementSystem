@@ -133,3 +133,38 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 });
+async function enablePushNotifications() {
+    if (!("Notification" in window)) {
+        console.error("Browser does not support notifications.");
+        return false;
+    }
+
+    if (Notification.permission === "granted") {
+        console.log("Notifications already enabled.");
+        return true;
+    }
+
+    if (Notification.permission === "denied") {
+        console.warn("Notifications are blocked by the browser.");
+        return false;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    console.log("Notification permission:", permission);
+
+    return permission === "granted";
+}
+document
+    .getElementById("notificationBellBtn")
+    ?.addEventListener("click", async function () {
+
+        const enabled = await enablePushNotifications();
+
+        if (enabled) {
+            console.log("Push notifications enabled.");
+            if (window.ensureWebpushrSubscription) {
+                window.ensureWebpushrSubscription();
+            }
+        }
+    });

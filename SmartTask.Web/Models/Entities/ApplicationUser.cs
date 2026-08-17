@@ -52,6 +52,12 @@ namespace SmartTask.Web.Models.Entities
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
+        /// <summary>
+        /// شناسه مشترک Webpushr برای ارسال Push Notification؛
+        /// در صورت عدم اشتراک کاربر در اعلان‌های وب، null است.
+        /// </summary>
+        public long? WebpushrSubscriberId { get; set; }
+
         // Navigation Properties
 
         public ICollection<WorkspaceMember> WorkspaceMemberships { get; set; } = new List<WorkspaceMember>();

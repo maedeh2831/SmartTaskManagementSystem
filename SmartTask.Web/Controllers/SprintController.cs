@@ -267,7 +267,14 @@ public class SprintController : BaseController
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    public async Task<IActionResult> Planning(int id)
+    // Planning page is now a tab inside Details — redirect old URL to keep bookmarks working
+    public IActionResult Planning(int id)
+    {
+        return RedirectToAction(nameof(Details), new { id, tab = "planning" });
+    }
+
+    // Lazy-loaded partial for the Planning tab inside Details
+    public async Task<IActionResult> PlanningPartial(int id)
     {
         var sprint = await _context.Sprints
             .Include(x => x.Project)
@@ -275,6 +282,9 @@ public class SprintController : BaseController
 
         if (sprint == null)
             return NotFound();
+
+        if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
+            return Forbid();
 
         var backlogStories = await _context.UserStories
             .Where(x => x.ProjectId == sprint.ProjectId && x.SprintId == null && x.ViewState)
@@ -295,7 +305,7 @@ public class SprintController : BaseController
             ProjectId = sprint.ProjectId,
             ProjectName = sprint.Project.Name,
             Capacity = sprint.Capacity,
-            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            CanManage = true, // access already verified above
             BacklogStories = backlogStories.Select(x => new PlanningStoryItemViewModel
             {
                 Id = x.Id,
@@ -316,7 +326,7 @@ public class SprintController : BaseController
             }).ToList()
         };
 
-        return View(vm);
+        return PartialView("_PlanningPartial", vm);
     }
 
     [HttpPost]

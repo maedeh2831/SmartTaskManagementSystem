@@ -690,5 +690,34 @@ namespace SmartTask.Web.Controllers
         }
 
 
+        /// <summary>
+        /// ثبت شناسه مشترک Webpushr (SID) برای کاربر جاری تا بتوان
+        /// اعلان‌های Push پیام چت را برای او ارسال کرد.
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveWebpushrSubscriber(
+            long sid)
+        {
+            if (sid <= 0)
+            {
+                return BadRequest(
+                    new { success = false, message = "SID نامعتبر است." });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Unauthorized();
+
+            user.WebpushrSubscriberId = sid;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return Json(new { success = result.Succeeded });
+        }
+
+
     }
 }
