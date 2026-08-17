@@ -26,6 +26,11 @@
                 <input type="text" id="boardSearchInput" placeholder="جستجوی Task..." />
             </div>
 
+            <button type="button" class="workspace-primary-btn" data-task-quick-add-open data-project-id="@Model.ProjectId">
+                <i class="fa-solid fa-plus"></i>
+                Task جدید
+            </button>
+
             <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId"
                class="workspace-filter" style="text-decoration:none;">
                 <button type="button">
@@ -235,8 +240,11 @@
     @Html.AntiForgeryToken()
 </form>
 
+<partial name="_TaskQuickAddModal" />
+
 @section Scripts
 {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
     <script src="~/js/taskboard.js" asp-append-version="true"></script>
+    <script src="~/js/task-quick-add.js" asp-append-version="true"></script>
 }

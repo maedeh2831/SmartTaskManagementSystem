@@ -67,6 +67,12 @@ public class SprintController : BaseController
         if (sprint == null)
             return NotFound();
 
+        var stories = await _context.UserStories
+            .Where(x => x.SprintId == id && x.ViewState)
+            .Include(x => x.Owner)
+            .OrderBy(x => x.Order)
+            .ToListAsync();
+
         var model = new SprintDetailsViewModel
         {
             Id = sprint.Id,
@@ -79,7 +85,16 @@ public class SprintController : BaseController
             Capacity = sprint.Capacity,
             Status = sprint.Status,
             CreateDate = sprint.CreatedDate,
-            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId)
+            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            Stories = stories.Select(x => new PlanningStoryItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                StoryPoint = x.StoryPoint,
+                Priority = x.Priority,
+                Status = x.Status,
+                OwnerName = x.Owner != null ? x.Owner.FullName : null
+            }).ToList()
         };
 
         return View(model);
@@ -276,12 +291,31 @@ public class SprintController : BaseController
     // Lazy-loaded partial for the Planning tab inside Details
     public async Task<IActionResult> PlanningPartial(int id)
     {
+        var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        if (sprint == null)
+            return NotFound();
+        return RedirectToAction(nameof(Details), new { id, tab = "planning" });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PlanningTab(int id)
+    {
+        var vm = await BuildPlanningViewModelAsync(id);
+
+        if (vm == null)
+            return NotFound();
+
+        return PartialView("_PlanningPartial", vm);
+    }
+
+    private async Task<SprintPlanningViewModel?> BuildPlanningViewModelAsync(int id)
+    {
         var sprint = await _context.Sprints
             .Include(x => x.Project)
             .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
 
         if (sprint == null)
-            return NotFound();
+            return null;
 
         if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
             return Forbid();
@@ -298,7 +332,7 @@ public class SprintController : BaseController
             .OrderBy(x => x.Order)
             .ToListAsync();
 
-        var vm = new SprintPlanningViewModel
+        return new SprintPlanningViewModel
         {
             SprintId = sprint.Id,
             SprintName = sprint.Name,

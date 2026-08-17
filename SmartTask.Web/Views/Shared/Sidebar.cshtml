@@ -26,69 +26,120 @@
     }
 
     var groups = menus.GroupBy(x => x.Category);
+
+    bool IsLocked(SidebarItem item) =>
+        (item.RequiresContext == ContextRequirementType.Workspace && CurrentContext.CurrentWorkspaceId == null)
+        || (item.RequiresContext == ContextRequirementType.Project && CurrentContext.CurrentProjectId == null);
 }
+
 <ul class="sidebar-menu">
     @foreach (var group in groups)
     {
-        <li class="sidebar-category">
-            @group.Key
-        </li>
+        <li class="sidebar-category">@group.Key</li>
+
         @foreach (var item in group)
         {
-            var isActive = controllerName == item.Controller;
-            var isLocked = (item.RequiresContext == ContextRequirementType.Workspace && CurrentContext.CurrentWorkspaceId == null)
-            || (item.RequiresContext == ContextRequirementType.Project && CurrentContext.CurrentProjectId == null);
+            var hasChildren = item.Children != null && item.Children.Any();
+            var isActive = !hasChildren && controllerName == item.Controller;
+            var isLocked = IsLocked(item);
 
-            <li class="@(isActive ? "active" : "") @(isLocked ? "disabled" : "")">
-                @if (isLocked)
-                {
-                    <a href="#"
-                       class="sidebar-locked-link"
-                       title="ابتدا یک @(item.RequiresContext == ContextRequirementType.Workspace ? "فضای کاری" : "پروژه") انتخاب کنید"
-                       onclick="return false;">
+            if (hasChildren)
+            {
+                var isChildActive = item.Children.Any(c => c.Controller == controllerName);
+                <li class="has-children @(isChildActive ? "open" : "") @(isLocked ? "disabled" : "")">
+                    <a href="#" class="sidebar-parent-link" onclick="return SmartTask.toggleSidebarGroup(this);">
                         <i class="@item.Icon"></i>
                         <span>@item.Title</span>
-                        <i class="fa-solid fa-lock menu-lock-icon"></i>
+                        <i class="fa-solid fa-chevron-down submenu-arrow"></i>
                     </a>
-                }
-                else if (item.RequiresContext == ContextRequirementType.Workspace)
-                {
-                    <a asp-controller="@item.Controller"
-                       asp-action="@item.Action"
-                       asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId">
-                        <i class="@item.Icon"></i>
-                        <span>@item.Title</span>
-                        @if (!string.IsNullOrEmpty(item.Badge))
+                    <ul class="sidebar-submenu">
+                        @foreach (var child in item.Children)
                         {
-                            <span class="menu-badge">@item.Badge</span>
+                            var childActive = controllerName == child.Controller;
+                            var childLocked = IsLocked(child);
+                            <li class="@(childActive ? "active" : "") @(childLocked ? "disabled" : "")">
+                                @if (childLocked)
+                                {
+                                    <a href="#" onclick="return false;" title="ابتدا یک پروژه انتخاب کنید">
+                                        <i class="@child.Icon"></i>
+                                        <span>@child.Title</span>
+                                        <i class="fa-solid fa-lock menu-lock-icon"></i>
+                                    </a>
+                                }
+                                else if (child.RequiresContext == ContextRequirementType.Project)
+                                {
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-projectId="@CurrentContext.CurrentProjectId">
+                                        <i class="@child.Icon"></i>
+                                        <span>@child.Title</span>
+                                    </a>
+                                }
+                                else if (child.RequiresContext == ContextRequirementType.Workspace)
+                                {
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId">
+                                        <i class="@child.Icon"></i>
+                                        <span>@child.Title</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action">
+                                        <i class="@child.Icon"></i>
+                                        <span>@child.Title</span>
+                                    </a>
+                                }
+                            </li>
                         }
-                    </a>
-                }
-                else if (item.RequiresContext == ContextRequirementType.Project)
-                {
-                    <a asp-controller="@item.Controller"
-                       asp-action="@item.Action"
-                       asp-route-projectId="@CurrentContext.CurrentProjectId">
-                        <i class="@item.Icon"></i>
-                        <span>@item.Title</span>
-                        @if (!string.IsNullOrEmpty(item.Badge))
-                        {
-                            <span class="menu-badge">@item.Badge</span>
-                        }
-                    </a>
-                }
-                else
-                {
-                    <a asp-controller="@item.Controller" asp-action="@item.Action">
-                        <i class="@item.Icon"></i>
-                        <span>@item.Title</span>
-                        @if (!string.IsNullOrEmpty(item.Badge))
-                        {
-                            <span class="menu-badge">@item.Badge</span>
-                        }
-                    </a>
-                }
-            </li>
+                    </ul>
+                </li>
+            }
+            else
+            {
+                <li class="@(isActive ? "active" : "") @(isLocked ? "disabled" : "")">
+                    @if (isLocked)
+                    {
+                        <a href="#" class="sidebar-locked-link"
+                           title="ابتدا یک @(item.RequiresContext == ContextRequirementType.Workspace ? "فضای کاری" : "پروژه") انتخاب کنید"
+                           onclick="return false;">
+                            <i class="@item.Icon"></i>
+                            <span>@item.Title</span>
+                            <i class="fa-solid fa-lock menu-lock-icon"></i>
+                        </a>
+                    }
+                    else if (item.RequiresContext == ContextRequirementType.Workspace)
+                    {
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId">
+                            <i class="@item.Icon"></i>
+                            <span>@item.Title</span>
+                            @if (!string.IsNullOrEmpty(item.Badge))
+                            {
+                                <span class="menu-badge">@item.Badge</span>
+                            }
+                        </a>
+                    }
+                    else if (item.RequiresContext == ContextRequirementType.Project)
+                    {
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-projectId="@CurrentContext.CurrentProjectId">
+                            <i class="@item.Icon"></i>
+                            <span>@item.Title</span>
+                            @if (!string.IsNullOrEmpty(item.Badge))
+                            {
+                                <span class="menu-badge">@item.Badge</span>
+                            }
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="@item.Controller" asp-action="@item.Action">
+                            <i class="@item.Icon"></i>
+                            <span>@item.Title</span>
+                            @if (!string.IsNullOrEmpty(item.Badge))
+                            {
+                                <span class="menu-badge">@item.Badge</span>
+                            }
+                        </a>
+                    }
+                </li>
+            }
         }
     }
 </ul>

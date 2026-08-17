@@ -2,6 +2,7 @@
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Risk;
+using SmartTask.Web.Models.ViewModels.Search;
 using SmartTask.Web.Services.AI;
 using SmartTask.Web.Services.Interfaces;
 

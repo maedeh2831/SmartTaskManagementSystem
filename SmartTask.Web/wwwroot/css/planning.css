@@ -614,3 +614,9 @@
         transition: none !important;
     }
 }
+.planning-empty-hint {
+    text-align: center;
+    color: var(--gray400);
+    font-size: 12.5px;
+    padding: 24px 0;
+}
