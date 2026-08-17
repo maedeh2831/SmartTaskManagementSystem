@@ -9,6 +9,9 @@
     <link rel="stylesheet"
           href="~/css/workspace.css"
           asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/workspace-pages.css"
+          asp-append-version="true" />
 }
 
 <div class="workspace-container">
@@ -38,7 +41,7 @@
 
             </div>
 
-            <div style="display:flex;gap:12px;">
+            <div class="workspace-hero-actions">
 
                 <div class="workspace-filter">
 
@@ -78,6 +81,19 @@
             <p>
                 اولین فضای کاری خود را ایجاد کنید.
             </p>
+
+            <div class="workspace-empty-action">
+
+                <a asp-action="Create"
+                   class="workspace-primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    ایجاد فضای کاری
+
+                </a>
+
+            </div>
 
         </div>
     }

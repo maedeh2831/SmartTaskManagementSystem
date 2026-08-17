@@ -300,6 +300,9 @@ public class SprintController : BaseController
     [HttpGet]
     public async Task<IActionResult> PlanningTab(int id)
     {
+        if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
+            return Forbid();
+
         var vm = await BuildPlanningViewModelAsync(id);
 
         if (vm == null)
@@ -316,9 +319,6 @@ public class SprintController : BaseController
 
         if (sprint == null)
             return null;
-
-        if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
-            return Forbid();
 
         var backlogStories = await _context.UserStories
             .Where(x => x.ProjectId == sprint.ProjectId && x.SprintId == null && x.ViewState)
@@ -339,7 +339,7 @@ public class SprintController : BaseController
             ProjectId = sprint.ProjectId,
             ProjectName = sprint.Project.Name,
             Capacity = sprint.Capacity,
-            CanManage = true, // access already verified above
+            CanManage = true, // access verified in the action
             BacklogStories = backlogStories.Select(x => new PlanningStoryItemViewModel
             {
                 Id = x.Id,
@@ -359,8 +359,6 @@ public class SprintController : BaseController
                 OwnerName = x.Owner != null ? x.Owner.FullName : null
             }).ToList()
         };
-
-        return PartialView("_PlanningPartial", vm);
     }
 
     [HttpPost]
