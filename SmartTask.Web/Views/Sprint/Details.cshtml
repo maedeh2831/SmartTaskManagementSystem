@@ -12,6 +12,36 @@
         SprintStatusType.Cancelled  => "لغو شده",
         _                           => "-"
     };
+    var statusIcon = Model.Status switch
+    {
+        SprintStatusType.Planning   => "fa-flag",
+        SprintStatusType.Active     => "fa-bolt",
+        SprintStatusType.Completed  => "fa-flag-checkered",
+        SprintStatusType.Cancelled  => "fa-ban",
+        _                           => "fa-circle"
+    };
+
+    // Cycle ring: elapsed time as an arc, days remaining in the center
+    var ringPercent = Model.Status switch
+    {
+        SprintStatusType.Completed  => 100,
+        SprintStatusType.Cancelled  => 0,
+        _                           => Model.ProgressPercent
+    };
+    var ringIsIcon = Model.Status == SprintStatusType.Completed
+                  || Model.Status == SprintStatusType.Cancelled;
+    var ringIcon = Model.Status == SprintStatusType.Completed ? "fa-check" : "fa-xmark";
+    var ringNumber = Model.Status == SprintStatusType.Active
+        ? (Model.TotalDays - Model.ElapsedDays).ToString()
+        : Model.TotalDays.ToString();
+    var ringLabel = Model.Status switch
+    {
+        SprintStatusType.Planning   => "روز برنامه",
+        SprintStatusType.Active     => "روز مانده",
+        SprintStatusType.Completed  => "تمام شد",
+        SprintStatusType.Cancelled  => "لغو شد",
+        _                           => "-"
+    };
 }
 
 @section Styles
@@ -25,9 +55,36 @@
 <div class="workspace-container">
     @Html.AntiForgeryToken()
 
-    <!-- ===== Hero Header ===== -->
-    <div class="workspace-hero">
+    <!-- ===== Hero ===== -->
+    <div class="workspace-hero sprint-detail-hero">
+
+        <div class="sprint-detail-ring" title="پیشرفت زمان اسپرینت">
+            <svg class="sprint-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="sprint-ring-track" cx="60" cy="60" r="50"></circle>
+                <circle class="sprint-ring-fill status-@statusClass"
+                        cx="60" cy="60" r="50"
+                        stroke-dasharray="314.2"
+                        data-percent="@ringPercent"
+                        transform="rotate(-90 60 60)"></circle>
+            </svg>
+            <div class="sprint-ring-center status-@statusClass">
+                @if (ringIsIcon)
+                {
+                    <strong class="sprint-ring-num"><i class="fa-solid @ringIcon"></i></strong>
+                }
+                else
+                {
+                    <strong class="sprint-ring-num fa-digits">@ringNumber</strong>
+                }
+                <span class="sprint-ring-label">@ringLabel</span>
+            </div>
+        </div>
+
         <div class="workspace-hero-content">
+            <div class="sprint-eyebrow">
+                <i class="fa-solid fa-folder"></i>
+                پروژهٔ @Model.ProjectName
+            </div>
             <h1>
                 @Model.Name
                 @if (Model.CanManage)
@@ -37,24 +94,33 @@
                         <i class="fa-solid fa-pen"></i>
                     </a>
                 }
-                <span class="sprint-status-badge status-@statusClass">@statusLabel</span>
+                <span class="sprint-status-badge status-@statusClass">
+                    <i class="fa-solid @statusIcon"></i>
+                    @statusLabel
+                </span>
             </h1>
-            <p>
-                پروژه: @Model.ProjectName
-                &nbsp;|&nbsp;
-                @Html.DisplayDate(Model.StartDate) تا @Html.DisplayDate(Model.EndDate)
-                &nbsp;|&nbsp;
-                ظرفیت @Model.Capacity SP
-            </p>
+            <div class="sprint-hero-meta">
+                <span>
+                    <i class="fa-regular fa-calendar"></i>
+                    @Html.DisplayDate(Model.StartDate) تا @Html.DisplayDate(Model.EndDate)
+                </span>
+                <span>
+                    <i class="fa-solid fa-gauge-high"></i>
+                    ظرفیت <strong class="fa-digits">@Model.Capacity</strong> Story Point
+                </span>
+                <span>
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <strong class="fa-digits">@Model.ElapsedDays</strong> از <strong class="fa-digits">@Model.TotalDays</strong> روز
+                </span>
+            </div>
         </div>
 
-        <div class="workspace-toolbar">
+        <div class="workspace-toolbar sprint-hero-actions">
+
             <a asp-action="Index" asp-route-projectId="@Model.ProjectId"
-               class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت
-                </button>
+               class="workspace-filter">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت
             </a>
 
             @if (Model.CanManage)
@@ -76,21 +142,29 @@
                     </div>
                 </div>
             }
+
         </div>
+
     </div>
 
-    <!-- ===== Progress Bar (below hero) ===== -->
-    <div class="sprint-progress-wrap sprint-header-progress">
-        <div class="sprint-progress-bar">
+    <!-- ===== Time progress strip ===== -->
+    <div class="sprint-progress-strip">
+        <span class="sprint-progress-label">
+            <i class="fa-solid fa-hourglass-half"></i>
+            پیشرفت زمان
+            <strong class="fa-digits">@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%</strong>
+        </span>
+        <div class="sprint-progress-track">
             <div class="sprint-progress-fill status-@statusClass"
-                 style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%">
-            </div>
+                 style="width:@(Model.Status == SprintStatusType.Completed ? 100 : Model.ProgressPercent)%"></div>
         </div>
-        <small>@Model.ProgressPercent% — @Model.ElapsedDays از @Model.TotalDays روز</small>
+        <span class="sprint-progress-days">
+            <strong class="fa-digits">@Model.ElapsedDays</strong> از <strong class="fa-digits">@Model.TotalDays</strong> روز سپری شده
+        </span>
     </div>
 
     <!-- ===== Tab Bar ===== -->
-    <div class="sprint-tabs">
+    <div class="sprint-tabs" id="sprintTabs">
         <button class="sprint-tab active" data-tab="overview">
             <i class="fa-solid fa-bullseye"></i>
             نمای کلی
@@ -115,6 +189,7 @@
             داشبورد Agile
             <i class="fa-solid fa-arrow-up-right-from-square sprint-tab-ext-icon"></i>
         </a>
+        <span class="sprint-tab-indicator" id="sprintTabIndicator"></span>
     </div>
 
     <!-- ===== Tab: نمای کلی ===== -->
@@ -128,6 +203,30 @@
             <p>@(string.IsNullOrWhiteSpace(Model.Goal)
                   ? "هدفی برای این اسپرینت تعیین نشده است."
                   : Model.Goal)</p>
+        </div>
+
+        <div class="sprint-stat-grid">
+            <div class="sprint-stat">
+                <i class="fa-solid fa-calendar-days"></i>
+                <div>
+                    <strong class="fa-digits">@Model.TotalDays</strong>
+                    <span>روز مدت دوره</span>
+                </div>
+            </div>
+            <div class="sprint-stat">
+                <i class="fa-solid fa-hourglass-half"></i>
+                <div>
+                    <strong class="fa-digits">@Model.ElapsedDays</strong>
+                    <span>روز سپری شده</span>
+                </div>
+            </div>
+            <div class="sprint-stat">
+                <i class="fa-solid fa-gauge-high"></i>
+                <div>
+                    <strong class="fa-digits">@Model.Capacity</strong>
+                    <span>ظرفیت (Story Point)</span>
+                </div>
+            </div>
         </div>
 
         @if (Model.CanManage)
@@ -160,7 +259,7 @@
 
         @if (Model.Status == SprintStatusType.Completed)
         {
-            <div class="details-card" style="margin-top:16px;">
+            <div class="details-card">
                 <div class="card-title">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     گزارش هوشمند پایان اسپرینت
@@ -186,10 +285,16 @@
     <div class="sprint-tab-pane" id="tab-stories">
         <div class="workspace-empty">
             <i class="fa-solid fa-list-check"></i>
-            <h3>هنوز User Story ای به این اسپرینت اضافه نشده است.</h3>
+            <h3>User Story های این اسپرینت از تب برنامه‌ریزی مدیریت می‌شوند</h3>
+            <p>داستان‌های کاربری را از Product Backlog انتخاب و به این اسپرینت اضافه کنید.</p>
             @if (Model.CanManage)
             {
-                <p>از تب <strong>برنامه‌ریزی</strong> User Story ها را به این اسپرینت اضافه کنید.</p>
+                <div class="workspace-empty-action">
+                    <button type="button" id="goToPlanningBtn" class="workspace-primary-btn">
+                        <i class="fa-solid fa-diagram-project"></i>
+                        رفتن به برنامه‌ریزی
+                    </button>
+                </div>
             }
         </div>
     </div>
