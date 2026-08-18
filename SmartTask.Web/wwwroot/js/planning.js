@@ -1,20 +1,37 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+// ==========================================================
+//            SmartTask - Sprint Planning board
+// ==========================================================
 
-    const backlogColumn = document.getElementById("backlogColumn");
-    const sprintColumn = document.getElementById("sprintColumn");
-    const capacityFill = document.getElementById("capacityFill");
-    const capacityText = document.getElementById("capacityText");
-    const sprintCount = document.getElementById("sprintCount");
-    const backlogCount = document.getElementById("backlogCount");
-    const capacityBar = document.getElementById("capacityBar");
+window.SmartTask = window.SmartTask || {};
+
+// Converts Latin digits to Persian digits (0-9 -> ۰-۹)
+function toFaDigits(str) {
+    var fa = "۰۱۲۳۴۵۶۷۸۹";
+    return String(str).replace(/[0-9]/g, function (d) { return fa[+d]; });
+}
+
+// scope: element containing the board (or document for the standalone page)
+SmartTask.initPlanning = function (scope) {
+    scope = scope || document;
+
+    const backlogColumn = scope.querySelector("#backlogColumn");
+    const sprintColumn = scope.querySelector("#sprintColumn");
+    const capacityFill = scope.querySelector("#capacityFill");
+    const capacityText = scope.querySelector("#capacityText");
+    const sprintCount = scope.querySelector("#sprintCount");
+    const backlogCount = scope.querySelector("#backlogCount");
+    const capacityBar = scope.querySelector("#capacityBar");
 
     if (!backlogColumn || !sprintColumn || typeof Sortable === "undefined") return;
 
     const sprintId = sprintColumn.dataset.sprintId;
-    const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
 
+    // Anti-forgery token: prefer the dedicated form, fall back to any
+    // token already rendered on the page (e.g. the Details page hero).
     function getToken() {
-        return token ? token.value : "";
+        const el = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')
+            || document.querySelector('input[name="__RequestVerificationToken"]');
+        return el ? el.value : "";
     }
 
     function updateCapacityUI() {
@@ -26,16 +43,16 @@
         let totalPoints = 0;
         sprintCards.forEach(c => totalPoints += parseInt(c.dataset.points, 10) || 0);
 
-        sprintCount.innerText = sprintCards.length;
-        backlogCount.innerText = backlogCards.length;
-        capacityText.innerText = `${totalPoints} از ${capacity} Story Point`;
+        sprintCount.innerText = toFaDigits(sprintCards.length);
+        backlogCount.innerText = toFaDigits(backlogCards.length);
+        capacityText.innerText = `${toFaDigits(totalPoints)} از ${toFaDigits(capacity)} Story Point`;
 
         const percent = capacity > 0 ? Math.round((totalPoints / capacity) * 100) : 0;
         capacityFill.style.width = `${Math.min(percent, 100)}%`;
         capacityFill.classList.toggle("over", percent > 100);
     }
 
-    async function postAction(url, storyId) {
+    async function postAction(url, storyId, item, originalParent, originalNextSibling) {
         const formData = new FormData();
         formData.append("storyId", storyId);
         formData.append("sprintId", sprintId);
@@ -47,6 +64,13 @@
             if (!response.ok) {
                 const text = await response.text();
                 console.error(`Server error [${response.status}] on ${url}:`, text);
+
+                // Rollback: restore card to original position
+                if (originalParent && item) {
+                    originalParent.insertBefore(item, originalNextSibling);
+                    updateCapacityUI();
+                }
+
                 Swal.fire({
                     icon: "error",
                     title: `خطا (${response.status})`,
@@ -61,6 +85,13 @@
             return true;
         } catch (err) {
             console.error("Network error:", err);
+
+            // Rollback: restore card to original position
+            if (originalParent && item) {
+                originalParent.insertBefore(item, originalNextSibling);
+                updateCapacityUI();
+            }
+
             Swal.fire({
                 icon: "error",
                 title: "خطای شبکه",
@@ -74,14 +105,18 @@
     // ===== وقتی آیتمی وارد ستون Sprint می‌شود (از Backlog اومده) =====
     function onAddToSprint(evt) {
         const storyId = evt.item.dataset.id;
-        postAction("/Sprint/AssignToSprint", storyId);
+        const originalParent = evt.from;
+        const originalNextSibling = evt.item.nextSibling;
+        postAction("/Sprint/AssignToSprint", storyId, evt.item, originalParent, originalNextSibling);
         updateCapacityUI();
     }
 
     // ===== وقتی آیتمی وارد ستون Backlog می‌شود (از Sprint اومده) =====
     function onAddToBacklog(evt) {
         const storyId = evt.item.dataset.id;
-        postAction("/Sprint/RemoveFromSprintPlanning", storyId);
+        const originalParent = evt.from;
+        const originalNextSibling = evt.item.nextSibling;
+        postAction("/Sprint/RemoveFromSprintPlanning", storyId, evt.item, originalParent, originalNextSibling);
         updateCapacityUI();
     }
 
@@ -106,5 +141,10 @@
     });
 
     updateCapacityUI();
+};
 
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.getElementById("backlogColumn")) {
+        SmartTask.initPlanning(document);
+    }
 });

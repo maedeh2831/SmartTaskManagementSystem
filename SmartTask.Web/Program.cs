@@ -49,13 +49,13 @@ namespace SmartTask.Web
             });
 
             // MVC
-            builder.Services
-            .AddAuthentication()
-            .AddGoogle(options =>
-            {
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-            });
+            //builder.Services
+            //.AddAuthentication()
+            //.AddGoogle(options =>
+            //{
+            //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+            //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+            //});
 
             builder.Services
            .AddControllersWithViews();
@@ -94,6 +94,7 @@ namespace SmartTask.Web
             });
 
             builder.Services.AddHostedService<ReminderBackgroundService>();
+            builder.Services.AddHostedService<OverdueCascadeBackgroundService>();
 
             // Repository
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -138,15 +139,33 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             builder.Services.AddScoped<IOffroadTaskService, OffroadTaskService>();
             builder.Services.AddScoped<IWorkloadAnalysisService, WorkloadAnalysisService>();
+            builder.Services.AddScoped<ITaskDependencyService, TaskDependencyService>();
+            builder.Services.AddScoped<IPriorityEngineService, PriorityEngineService>();
+            builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
+            builder.Services.AddScoped<ICurrentContextService, CurrentContextService>();
+            builder.Services.AddScoped<IDelayRiskService, DelayRiskService>();
+            builder.Services.AddScoped<IProjectHealthService, ProjectHealthService>();
+            builder.Services.AddScoped<ISprintReportAiService, SprintReportAiService>();
+            builder.Services.AddScoped<ITaskTradeService, TaskTradeService>();
+            builder.Services.AddScoped<ISettingsService, SettingsService>();
+            builder.Services.AddScoped<IDateFormatService, DateFormatService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IWebpushrService, WebpushrService>();
+
+            // ردیابی حضور کاربران در حافظه؛ باید Singleton باشد.
+            builder.Services.AddSingleton<IPresenceTracker, PresenceTracker>();
+
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAI"));
-            builder.Services.AddHttpClient<IAiClientService, AiClientService>();
-            builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
+            builder.Services.AddHttpClient<IAiClientService, AiClientService>();         
+            builder.Services.AddHttpClient<IAiClientService, AiClientService>(client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(5);
+            }); builder.Services.AddScoped<ITaskBreakdownService, TaskBreakdownService>();
 
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
-
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
@@ -155,9 +174,6 @@ namespace SmartTask.Web
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-
-            builder.Services.AddScoped<ICurrentContextService, CurrentContextService>();
-
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<CurrentContextFilter>();
@@ -188,6 +204,8 @@ namespace SmartTask.Web
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<NotificationHub>("/hubs/notification");
+
+            app.MapHub<ChatHub>("/hubs/chat");
 
             using (var scope = app.Services.CreateScope())
             {

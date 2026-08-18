@@ -5,7 +5,7 @@
 </form>
 
 <div class="dropdown notification-bell-wrapper">
-    <button class="notification-bell-btn" data-bs-toggle="dropdown" id="notificationBellBtn">
+    <button class="icon-btn" data-bs-toggle="dropdown" id="notificationBellBtn">
         <i class="fa-regular fa-bell"></i>
         <span class="notification-badge @(Model.UnreadCount == 0 ? "d-none" : "")" id="notificationBadge">
             @(Model.UnreadCount > 9 ? "9+" : Model.UnreadCount.ToString())

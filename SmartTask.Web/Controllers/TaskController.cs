@@ -5,6 +5,7 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Task;
+using SmartTask.Web.Services.AI;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
 using TaskEntity = SmartTask.Web.Models.Entities.TaskItem;
@@ -26,6 +27,9 @@ public class TaskController : BaseController
     private readonly ITimeLogService _timeLogService;
     private readonly ApplicationDbContext _context;
     private readonly ITaskBreakdownService _taskBreakdownService;
+    private readonly ITaskDependencyService _taskDependencyService;
+    private readonly IPriorityEngineService _priorityEngineService;
+    private readonly ITaskTradeService _taskTradeService;
 
     public TaskController(
             ITaskService taskService,
@@ -39,6 +43,9 @@ public class TaskController : BaseController
             IChecklistService checklistService,
             ITimeLogService timeLogService,
             ITaskBreakdownService taskBreakdownService,
+            ITaskDependencyService taskDependencyService,
+            IPriorityEngineService priorityEngineService,
+            ITaskTradeService taskTradeService,
             ICurrentUserService currentUser,
             ApplicationDbContext context)
             : base(currentUser)
@@ -54,6 +61,9 @@ public class TaskController : BaseController
         _checklistService = checklistService;
         _timeLogService = timeLogService;
         _taskBreakdownService = taskBreakdownService;
+        _taskDependencyService = taskDependencyService;
+        _priorityEngineService = priorityEngineService;
+        _taskTradeService = taskTradeService;
         _context = context;
     }
 
@@ -218,44 +228,74 @@ public class TaskController : BaseController
 
         };
 
+        vm.Dependency = await _taskDependencyService.GetWidgetAsync(id, currentUserId);
+        vm.CascadeInfo = await _taskDependencyService.GetCascadeInfoAsync(id);
+        vm.SmartPriority = await _priorityEngineService.GetSuggestionAsync(id, currentUserId);
+        vm.IsCurrentUserAssignee = assignees.Any(x => x.Id == currentUserId);
+
+        if (vm.IsCurrentUserAssignee)
+            vm.TradeModal = await _taskTradeService.GetModalDataAsync(id, currentUserId);
+
         return View(vm);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create(int userStoryId)
     {
-        if (!await _userStoryService.CanManageStoryAsync(userStoryId, CurrentUser.UserId))
+        if (!await _userStoryService.CanManageStoryAsync(
+            userStoryId,
+            CurrentUser.UserId))
         {
-            TempData["Error"] = "شما اجازه ساخت Task در این User Story را ندارید.";
-            return RedirectToAction(nameof(Index), new { userStoryId });
+            return Forbid();
         }
 
-        return View(new CreateTaskViewModel { UserStoryId = userStoryId });
+        return PartialView(
+            "_CreateModal",
+            new CreateTaskViewModel
+            {
+                UserStoryId = userStoryId
+            });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateTaskViewModel model)
     {
-        if (!await _userStoryService.CanManageStoryAsync(model.UserStoryId, CurrentUser.UserId))
+        if (!await _userStoryService.CanManageStoryAsync(
+            model.UserStoryId,
+            CurrentUser.UserId))
         {
-            TempData["Error"] = "شما اجازه ساخت Task در این User Story را ندارید.";
-            return RedirectToAction(nameof(Index), new { userStoryId = model.UserStoryId });
+            return Json(new
+            {
+                success = false,
+                message = "شما اجازه ساخت Task در این User Story را ندارید."
+            });
         }
 
         if (!ModelState.IsValid)
-            return View(model);
-
-        if (await _taskService.ExistsByTitleAsync(model.UserStoryId, model.Title))
         {
-            ModelState.AddModelError("Title", "Task ای با این عنوان قبلاً وجود دارد.");
-            return View(model);
+            return Json(new
+            {
+                success = false,
+                message = "لطفاً اطلاعات وارد شده را بررسی کنید."
+            });
+        }
+
+        if (await _taskService.ExistsByTitleAsync(
+            model.UserStoryId,
+            model.Title))
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Task ای با این عنوان قبلاً وجود دارد."
+            });
         }
 
         var task = new TaskEntity
         {
             UserStoryId = model.UserStoryId,
-            Title = model.Title,
+            Title = model.Title.Trim(),
             Description = model.Description,
             Type = model.Type,
             Priority = model.Priority,
@@ -269,8 +309,13 @@ public class TaskController : BaseController
 
         await _taskService.AddAsync(task);
 
-        TempData["Success"] = "Task با موفقیت ایجاد شد.";
-        return RedirectToAction(nameof(Details), new { id = task.Id });
+        return Json(new
+        {
+            success = true,
+            taskId = task.Id,
+            url = Url.Action(nameof(Details), new { id = task.Id }),
+            message = "Task با موفقیت ایجاد شد."
+        });
     }
 
     [HttpGet]
@@ -435,5 +480,51 @@ public class TaskController : BaseController
 
         TempData["Success"] = $"{titles.Count} زیروظیفه با موفقیت اضافه شد.";
         return RedirectToAction(nameof(Details), new { id = taskId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApplySmartPriority(int taskId)
+    {
+        try
+        {
+            await _priorityEngineService.ApplySuggestionAsync(taskId, CurrentUser.UserId);
+            TempData["Success"] = "اولویت پیشنهادی با موفقیت اعمال شد.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "شما اجازه این کار را ندارید.";
+        }
+
+        return RedirectToAction(nameof(Details), new { id = taskId });
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuickCreate(int userStoryId, string title, TaskPriorityType priority = TaskPriorityType.Medium)
+    {
+        if (!await _userStoryService.CanManageStoryAsync(userStoryId, CurrentUser.UserId))
+            return Json(new { success = false, message = "شما اجازه ساخت Task در این User Story را ندارید." });
+
+        if (string.IsNullOrWhiteSpace(title))
+            return Json(new { success = false, message = "عنوان Task الزامی است." });
+
+        if (await _taskService.ExistsByTitleAsync(userStoryId, title))
+            return Json(new { success = false, message = "Task ای با این عنوان قبلاً وجود دارد." });
+
+        var task = new TaskEntity
+        {
+            UserStoryId = userStoryId,
+            Title = title.Trim(),
+            Priority = priority,
+            Status = TaskStatusType.ToDo,
+            CreatedDate = DateTime.Now,
+            ViewState = true
+        };
+
+        await _taskService.AddAsync(task);
+
+        return Json(new { success = true, taskId = task.Id, url = Url.Action(nameof(Details), new { id = task.Id }) });
     }
 }

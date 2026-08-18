@@ -10,6 +10,9 @@
     <link rel="stylesheet"
           href="~/css/workspace.css"
           asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/workspace-pages.css"
+          asp-append-version="true" />
 }
 
 
@@ -63,11 +66,10 @@
                         </span>
                     }
 
-
-                    <span>
-                        <i class="fa-solid fa-calendar"></i>
-                        @Model.CreateDate.ToString("yyyy/MM/dd")
-                    </span>
+                <span>
+                    <i class="fa-solid fa-calendar"></i>
+                    @Html.DisplayDate(Model.CreateDate)
+                </span>
 
                 </div>
 

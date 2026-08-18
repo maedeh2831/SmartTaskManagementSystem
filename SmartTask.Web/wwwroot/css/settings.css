@@ -1,0 +1,424 @@
+/* =========================
+   Settings Page
+========================= */
+
+.settings-page {
+    padding: 24px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.settings-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.settings-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.settings-page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 4px 0;
+    line-height: 1.6;
+}
+
+.settings-page-header p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.9;
+}
+
+.settings-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .settings-back-btn:hover {
+        background: var(--bg);
+        color: var(--text);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+    }
+
+.settings-back-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.settings-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* Tabs */
+.settings-tabs {
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 24px;
+}
+
+.settings-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: "Vazirmatn";
+    color: var(--muted);
+    cursor: pointer;
+    text-align: right;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .settings-tab-btn i {
+        width: 18px;
+        text-align: center;
+        color: var(--muted);
+    }
+
+    .settings-tab-btn:hover {
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .settings-tab-btn.active {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+    }
+
+        .settings-tab-btn.active i {
+            color: var(--primary-dark);
+        }
+
+    .settings-tab-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+/* Content */
+.settings-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.settings-tab-panel {
+    display: none;
+}
+
+    .settings-tab-panel.active {
+        display: block;
+    }
+
+.settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+}
+
+.settings-card-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px;
+}
+
+.settings-card-header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 20px;
+    line-height: 1.9;
+}
+
+.settings-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.settings-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.settings-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray600);
+    margin-bottom: 6px;
+}
+
+.settings-select,
+.settings-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: "Vazirmatn";
+    color: var(--text);
+    background: var(--card);
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+    .settings-select:focus,
+    .settings-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, .1);
+    }
+
+.settings-input-wrapper.readonly .settings-input {
+    background: var(--bg);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+/* Switch field */
+.settings-switch-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0 16px;
+    height: 48px;
+}
+
+    .settings-switch-field label:first-child {
+        margin: 0;
+    }
+
+.settings-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+    .settings-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.settings-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    transition: background .2s ease;
+}.settings-switch-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    right: 3px;
+    bottom: 3px;
+    background: var(--card);
+    border-radius: 50%;
+    transition: transform .2s ease;
+}
+
+.settings-switch input:checked + .settings-switch-slider {
+    background: var(--primary);
+}
+
+    .settings-switch input:checked + .settings-switch-slider::before {
+        transform: translateX(-18px);
+    }
+
+.settings-switch input:focus-visible + .settings-switch-slider {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Notification list */
+.settings-notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-notification-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--card);
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .settings-notification-item:hover {
+        background: var(--bg);
+    }
+
+/* Security list */
+.settings-security-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-security-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+    .settings-security-link:hover:not(.disabled) {
+        background: var(--bg);
+        color: var(--text);
+        transform: translateY(-1px);
+    }
+
+    .settings-security-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .settings-security-link.disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+.settings-security-link-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .settings-security-link-info i {
+        color: var(--primary);
+        width: 18px;
+        text-align: center;
+    }
+
+.settings-badge-soon {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg);
+    color: var(--muted);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+/* Save bar */
+.settings-save-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.settings-save-hint {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-save-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 22px;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: "Vazirmatn";
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .settings-save-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, .25);
+    }
+
+    .settings-save-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+@media (max-width: 768px) {
+    .settings-layout {
+        flex-direction: column;
+    }
+
+    .settings-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+        position: static;
+        width: 100%;
+    }
+
+    .settings-tab-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .settings-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-save-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

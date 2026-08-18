@@ -1,4 +1,14 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+// ==========================================================
+//            SmartTask — UserStory pages
+// ==========================================================
+
+// Converts Latin digits to Persian digits (0-9 -> ۰-۹)
+function toFaDigits(str) {
+    var fa = "۰۱۲۳۴۵۶۷۸۹";
+    return String(str).replace(/[0-9]/g, function (d) { return fa[+d]; });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
 
     // ===== Live Search (Index) =====
     const searchInput = document.getElementById("storySearchInput");
@@ -37,7 +47,7 @@
 
     if (pointInput && previewPoints) {
         pointInput.addEventListener("input", () => {
-            previewPoints.innerText = `${pointInput.value || 0} Story Point`;
+            previewPoints.innerText = `${toFaDigits(pointInput.value || 0)} Story Point`;
         });
     }
 

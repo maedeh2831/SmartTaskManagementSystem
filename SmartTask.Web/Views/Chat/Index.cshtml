@@ -1,0 +1,217 @@
+@model SmartTask.Web.Models.ViewModels.Chat.ChatIndexViewModel
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "گفتگوی پروژه‌ها";
+
+    // انکودر پیش‌فرض کاراکترهای < > & را escape می‌کند؛ برای درج امن داخل تگ script لازم است.
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+}
+
+<div class="chat-app" id="chatApp">
+
+    @* ===== لیست گفتگوها ===== *@
+    <aside class="chat-list-pane" id="chatListPane">
+
+        <div class="chat-list-header">
+            <h2><i class="fa-solid fa-comments"></i> گفتگوها</h2>
+            <span class="chat-list-count">@Model.Chats.Count گروه</span>
+        </div>
+
+        <div class="chat-list-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="chatListSearch" placeholder="جستجوی گروه..." autocomplete="off" />
+        </div>
+
+        <div class="chat-list" id="chatList">
+            @if (!Model.Chats.Any())
+            {
+                <div class="chat-empty-state">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p>هنوز عضو هیچ پروژه‌ای نیستید.</p>
+                    <a asp-controller="Workspace" asp-action="Index" class="chat-empty-link">رفتن به فضاهای کاری</a>
+                </div>
+            }
+            else
+            {
+                foreach (var chat in Model.Chats)
+                {
+                    var isActive = Model.ActiveRoom != null && Model.ActiveRoom.ProjectId == chat.ProjectId;
+
+                    <button type="button"
+                            class="chat-list-item @(isActive ? "active" : "")"
+                            data-project-id="@chat.ProjectId"
+                            data-project-name="@chat.ProjectName">
+
+                        <span class="chat-avatar" style="background:@(chat.Color ?? "#6366F1")">
+                            <i class="@(string.IsNullOrWhiteSpace(chat.Icon) ? "fa-solid fa-diagram-project" : chat.Icon)"></i>
+                        </span>
+
+                        <span class="chat-list-body">
+                            <span class="chat-list-top">
+                                <span class="chat-list-name">@chat.ProjectName</span>
+                                <span class="chat-list-time" data-time="@chat.LastMessageDate"></span>
+                            </span>
+                            <span class="chat-list-bottom">
+                                <span class="chat-list-preview">
+                                    @if (chat.LastMessagePreview != null)
+                                    {
+                                        <b>@chat.LastMessageSender:</b> @chat.LastMessagePreview
+                                    }
+                                    else
+                                    {
+                                        <i class="chat-list-muted">هنوز پیامی ارسال نشده</i>
+                                    }
+                                </span>
+                                <span class="chat-unread-badge @(chat.UnreadCount > 0 ? "" : "d-none")">
+                                    @(chat.UnreadCount > 99 ? "99+" : chat.UnreadCount.ToString())
+                                </span>
+                            </span>
+                        </span>
+
+                    </button>
+                }
+            }
+        </div>
+
+    </aside>
+
+    @* ===== اتاق گفتگو ===== *@
+    <section class="chat-room-pane" id="chatRoomPane">
+
+        @if (Model.ActiveRoom == null)
+        {
+            <div class="chat-no-room">
+                <i class="fa-solid fa-comment-dots"></i>
+                <h3>گفتگویی انتخاب نشده است</h3>
+                <p>برای شروع، یکی از گروه‌های پروژه را از فهرست انتخاب کنید.</p>
+            </div>
+        }
+        else
+        {
+            <header class="chat-room-header">
+
+                <button type="button" class="chat-back-btn" id="chatBackBtn" title="بازگشت به فهرست">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <span class="chat-avatar chat-avatar-lg" id="roomAvatar"
+                      style="background:@(Model.ActiveRoom.Color ?? "#6366F1")">
+                    <i class="@(string.IsNullOrWhiteSpace(Model.ActiveRoom.Icon) ? "fa-solid fa-diagram-project" : Model.ActiveRoom.Icon)"></i>
+                </span>
+
+                <div class="chat-room-title">
+                    <h3 id="roomName">@Model.ActiveRoom.ProjectName</h3>
+                    <span class="chat-room-status" id="roomStatus">
+                        <span id="roomMemberCount">@Model.ActiveRoom.Members.Count</span> عضو،
+                        <b id="roomOnlineCount">@Model.ActiveRoom.OnlineCount</b> آنلاین
+                    </span>
+                    <span class="chat-typing d-none" id="chatTyping"></span>
+                </div>
+
+                <div class="chat-room-actions">
+                    <button type="button" class="chat-icon-btn" id="chatTestPushBtn" title="ارسال اعلان آزمایشی برای تست پوش">
+                        <i class="fa-solid fa-bell"></i>
+                    </button>
+                    <button type="button" class="chat-icon-btn" id="chatSearchToggle" title="جستجو در پیام‌ها">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button type="button" class="chat-icon-btn" id="chatMembersToggle" title="اعضای گروه">
+                        <i class="fa-solid fa-users"></i>
+                    </button>
+                </div>
+
+            </header>
+
+            <div class="chat-search-bar d-none" id="chatSearchBar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="chatMessageSearch" placeholder="جستجو در پیام‌های این گروه..." autocomplete="off" />
+                <button type="button" class="chat-icon-btn" id="chatSearchClose"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-load-more d-none" id="chatLoadMore">
+                    <button type="button" id="chatLoadMoreBtn">پیام‌های قدیمی‌تر</button>
+                </div>
+                <div id="chatMessagesBody"></div>
+            </div>
+
+            <div class="chat-connection-banner d-none" id="chatConnectionBanner">
+                <i class="fa-solid fa-rotate"></i> در حال اتصال مجدد...
+            </div>
+
+            <footer class="chat-composer">
+
+                <div class="chat-reply-preview d-none" id="chatReplyPreview">
+                    <i class="fa-solid fa-reply"></i>
+                    <div class="chat-reply-body">
+                        <b id="chatReplyName"></b>
+                        <span id="chatReplyText"></span>
+                    </div>
+                    <button type="button" class="chat-icon-btn" id="chatReplyCancel"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="chat-composer-row">
+
+                    <button type="button" class="chat-icon-btn chat-attach-btn" id="chatAttachBtn" title="پیوست فایل">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+
+                    <input type="file" id="chatFileInput" class="d-none"
+                           accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z" />
+
+                    <textarea id="chatInput" rows="1" maxlength="4000"
+                              placeholder="پیام خود را بنویسید..."></textarea>
+
+                    <button type="button" class="chat-send-btn" id="chatSendBtn" title="ارسال">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+
+                </div>
+
+                <div class="chat-upload-progress d-none" id="chatUploadProgress">
+                    <span id="chatUploadName"></span>
+                    <div class="chat-progress-track"><div class="chat-progress-fill" id="chatProgressFill"></div></div>
+                </div>
+
+            </footer>
+        }
+
+    </section>
+
+    @* ===== اعضای گروه ===== *@
+    <aside class="chat-members-pane" id="chatMembersPane">
+        <div class="chat-members-header">
+            <h4><i class="fa-solid fa-users"></i> اعضای گروه</h4>
+            <button type="button" class="chat-icon-btn" id="chatMembersClose"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-members-list" id="chatMembersList"></div>
+    </aside>
+
+</div>
+
+<form id="chatAntiForgeryForm">@Html.AntiForgeryToken()</form>
+
+@section Scripts
+{
+    <script id="chatBootstrap" type="application/json">
+        @Html.Raw(JsonSerializer.Serialize(new
+        {
+            currentUserId = Model.CurrentUserId,
+            currentUserName = Model.CurrentUserName,
+            isJalali = Model.IsJalali,
+            activeRoom = Model.ActiveRoom
+        }, jsonOptions))
+    </script>
+
+    @* signalr.min.js پیش‌تر در _Layout بارگذاری شده است *@
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

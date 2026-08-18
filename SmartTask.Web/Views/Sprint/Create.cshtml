@@ -1,4 +1,4 @@
-﻿@model SmartTask.Web.Models.ViewModels.Sprint.CreateSprintViewModel
+@model SmartTask.Web.Models.ViewModels.Sprint.CreateSprintViewModel
 
 @{
     ViewData["Title"] = "اسپرینت جدید";
@@ -12,76 +12,194 @@
 
 <div class="workspace-create-page">
 
+    <!-- Page Header -->
     <div class="page-header">
-        <div>
-            <h1>ایجاد اسپرینت جدید</h1>
-            <p>یک چرخه Agile جدید برای این پروژه تعریف کنید.</p>
+
+        <div class="page-header-content">
+            <div class="page-header-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+
+            <div>
+                <h1>ایجاد اسپرینت جدید</h1>
+                <p>
+                    یک چرخهٔ کاری Agile جدید برای این پروژه تعریف کنید.
+                </p>
+            </div>
         </div>
 
-        <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+        <a asp-action="Index"
+           asp-route-projectId="@Model.ProjectId"
+           class="back-link">
             <i class="fa-solid fa-arrow-right"></i>
             بازگشت
         </a>
+
     </div>
 
+
+    <!-- Main Layout -->
     <div class="workspace-layout">
 
+        <!-- Form -->
         <div class="workspace-form">
 
             <div class="workspace-form-card">
 
                 <div class="form-title">
+
                     <div class="workspace-icon">
                         <i class="fa-solid fa-bolt"></i>
                     </div>
+
                     <div>
                         <h3>اطلاعات اسپرینت</h3>
-                        <p>اطلاعات زیر را تکمیل کنید.</p>
+                        <p>
+                            نام، هدف، بازهٔ زمانی و ظرفیت چرخه را مشخص کنید.
+                        </p>
                     </div>
+
                 </div>
 
-                <form asp-action="Create" method="post">
+
+                <form asp-action="Create"
+                      method="post"
+                      class="sprint-create-form">
 
                     <input asp-for="ProjectId" type="hidden" />
 
+
+                    <!-- Name -->
                     <div class="form-group">
+
                         <label asp-for="Name"></label>
-                        <input asp-for="Name" id="sprintName" class="form-control" placeholder="مثلاً Sprint 1" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+
+                        <div class="sprint-input-wrap">
+                            <i class="fa-solid fa-tag"></i>
+
+                            <input asp-for="Name"
+                                   id="sprintName"
+                                   class="form-control"
+                                   placeholder="مثلاً Sprint 1"
+                                   autocomplete="off" />
+                        </div>
+
+                        <span asp-validation-for="Name"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
+
+                    <!-- Goal -->
                     <div class="form-group">
+
                         <label asp-for="Goal"></label>
-                        <textarea asp-for="Goal" id="sprintGoal" rows="3" class="form-control" placeholder="هدف اصلی این اسپرینت چیست؟"></textarea>
-                        <span asp-validation-for="Goal" class="text-danger"></span>
+
+                        <div class="sprint-input-wrap sprint-textarea-wrap">
+                            <i class="fa-solid fa-bullseye"></i>
+
+                            <textarea asp-for="Goal"
+                                      id="sprintGoal"
+                                      rows="4"
+                                      class="form-control"
+                                      placeholder="هدف اصلی این اسپرینت چیست؟"></textarea>
+                        </div>
+
+                        <span asp-validation-for="Goal"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
+
+                    <!-- Dates -->
                     <div class="sprint-date-row">
+
                         <div class="form-group">
+
                             <label asp-for="StartDate"></label>
-                            <input asp-for="StartDate" id="sprintStart" type="date" class="form-control" />
-                            <span asp-validation-for="StartDate" class="text-danger"></span>
+
+                            <div class="sprint-input-wrap">
+                                <i class="fa-regular fa-calendar"></i>
+
+                                <input asp-date-for="StartDate"
+                                       id="sprintStart"
+                                       class="form-control" />
+                            </div>
+
+                            <span asp-validation-for="StartDate"
+                                  class="text-danger">
+                            </span>
+
                         </div>
+
 
                         <div class="form-group">
+
                             <label asp-for="EndDate"></label>
-                            <input asp-for="EndDate" id="sprintEnd" type="date" class="form-control" />
-                            <span asp-validation-for="EndDate" class="text-danger"></span>
+
+                            <div class="sprint-input-wrap">
+                                <i class="fa-regular fa-calendar-check"></i>
+
+                                <input asp-date-for="EndDate"
+                                       id="sprintEnd"
+                                       class="form-control" />
+                            </div>
+
+                            <span asp-validation-for="EndDate"
+                                  class="text-danger">
+                            </span>
+
                         </div>
+
                     </div>
 
+
+                    <!-- Capacity -->
                     <div class="form-group">
+
                         <label asp-for="Capacity"></label>
-                        <input asp-for="Capacity" id="sprintCapacity" type="number" min="1" max="999" class="form-control" />
-                        <span asp-validation-for="Capacity" class="text-danger"></span>
+
+                        <div class="sprint-input-wrap">
+                            <i class="fa-solid fa-gauge-high"></i>
+
+                            <input asp-for="Capacity"
+                                   id="sprintCapacity"
+                                   type="number"
+                                   min="1"
+                                   max="999"
+                                   class="form-control"
+                                   placeholder="مثلاً ۲۰" />
+                        </div>
+
+                        <div class="form-help">
+                            <i class="fa-solid fa-circle-info"></i>
+                            حداکثر تعداد Story Point قابل برنامه‌ریزی در این اسپرینت.
+                        </div>
+
+                        <span asp-validation-for="Capacity"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
+
+                    <!-- Actions -->
                     <div class="form-actions">
-                        <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-light">انصراف</a>
-                        <button type="submit" class="btn btn-primary">
+
+                        <a asp-action="Index"
+                           asp-route-projectId="@Model.ProjectId"
+                           class="workspace-secondary-btn">
+                            انصراف
+                        </a>
+
+                        <button type="submit"
+                                class="workspace-primary-btn">
                             <i class="fa-solid fa-plus"></i>
                             ایجاد اسپرینت
                         </button>
+
                     </div>
 
                 </form>
@@ -90,38 +208,150 @@
 
         </div>
 
-        <div class="workspace-preview">
+
+        <!-- Preview -->
+        <aside class="workspace-preview">
 
             <div class="preview-card">
 
-                <div class="preview-card-header">
-                    <div class="preview-logo sprint-preview-logo">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-                    <div>
-                        <h4 id="previewName">اسپرینت جدید</h4>
-                        <small id="previewDuration">۱۴ روز</small>
-                    </div>
+                <div class="preview-card-label">
+                    <i class="fa-solid fa-eye"></i>
+                    پیش‌نمایش اسپرینت
                 </div>
 
-                <div id="previewGoal" class="preview-description">
+
+                <div class="preview-header">
+
+                    <div class="sprint-ring-wrap sprint-preview-ring">
+
+                        <svg class="sprint-ring"
+                             viewBox="0 0 64 64"
+                             aria-hidden="true">
+
+                            <circle class="sprint-ring-track"
+                                    cx="32"
+                                    cy="32"
+                                    r="26">
+                            </circle>
+
+                            <circle class="sprint-ring-fill"
+                                    id="previewRingFill"
+                                    cx="32"
+                                    cy="32"
+                                    r="26"
+                                    stroke-dasharray="163.4"
+                                    data-percent="100"
+                                    transform="rotate(-90 32 32)">
+                            </circle>
+
+                        </svg>
+
+                        <div class="sprint-ring-center">
+
+                            <strong class="sprint-ring-num fa-digits"
+                                    id="previewRingNum">
+                                ۱۴
+                            </strong>
+
+                            <span class="sprint-ring-label">
+                                روز
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="preview-header-text">
+
+                        <span class="preview-status">
+                            <span></span>
+                            پیش‌نویس
+                        </span>
+
+                        <h4 id="previewName">
+                            اسپرینت جدید
+                        </h4>
+
+                        <small id="previewDuration">
+                            دورهٔ ۱۴ روزه
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div id="previewGoal"
+                     class="preview-description">
                     هدف اسپرینت اینجا نمایش داده خواهد شد...
                 </div>
 
+
+                <div class="preview-divider"></div>
+
+
                 <div class="preview-stats">
-                    <div>
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <span id="previewCapacity">۲۰ ظرفیت</span>
+
+                    <div class="preview-stat">
+
+                        <span class="preview-stat-icon">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </span>
+
+                        <div>
+                            <small>ظرفیت</small>
+                            <strong id="previewCapacity">
+                                ۲۰ SP
+                            </strong>
+                        </div>
+
                     </div>
+
+
+                    <div class="preview-stat">
+
+                        <span class="preview-stat-icon">
+                            <i class="fa-solid fa-flag"></i>
+                        </span>
+
+                        <div>
+                            <small>وضعیت</small>
+                            <strong>
+                                در انتظار شروع
+                            </strong>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
+
+            <!-- Helpful note -->
+            <div class="preview-tip">
+
+                <span class="preview-tip-icon">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </span>
+
+                <div>
+                    <strong>نکته</strong>
+                    <p>
+                        ظرفیت اسپرینت را بر اساس توان واقعی تیم
+                        در طول یک چرخهٔ کاری تعیین کنید.
+                    </p>
+                </div>
+
+            </div>
+
+        </aside>
 
     </div>
 
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

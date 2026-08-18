@@ -1,12 +1,10 @@
-/* ==========================================================
-                    SmartTask Backlog UI (Grid)
-   ========================================================== */
+/*  SmartTask Backlog UI (Grid) css */
 
 .backlog-quick-add {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 14px;
     padding: 12px 18px;
@@ -42,9 +40,9 @@
             background: var(--primary-light);
         }
 
-/* ===== Table Container ===== */
+/*  Table Container  */
 .backlog-table-wrap {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--gray100);
     border-radius: 16px;
     overflow: auto;
@@ -77,7 +75,7 @@
     }
 
         .backlog-table tbody tr.backlog-row:hover {
-            background: #FAFAFE;
+            background: rgba(99,102,241,.05);
         }
 
     .backlog-table td {
@@ -117,7 +115,7 @@
     color: var(--gray500);
 }
 
-/* ===== Badges (readonly mode) ===== */
+/*  Badges (readonly mode)  */
 .backlog-sp-badge,
 .backlog-bv-badge {
     display: inline-flex;
@@ -142,7 +140,7 @@
     display: inline-block;
 }
 
-/* ===== Inline Select (editable mode) ===== */
+/*  Inline Select (editable mode)  */
 .backlog-inline-form {
     display: inline-block;
 }
@@ -157,11 +155,10 @@
     font-weight: 700;
     cursor: pointer;
     outline: none;
-    background: #fff;
+    background: var(--card);
     max-width: 150px;
 }
 
-/* Status colors */
 .status-new {
     background: var(--gray100);
     color: var(--gray700);
@@ -187,7 +184,6 @@
     color: #6D28D9;
 }
 
-/* Priority colors */
 .priority-lowest, .priority-low {
     color: #15803D;
 }
@@ -218,7 +214,7 @@
     text-align: center;
 }
 
-/* ===== SortableJS states ===== */
+/*  SortableJS states  */
 .backlog-ghost {
     opacity: .4;
     background: var(--gray100);

@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.ViewModels.Account;
 using SmartTask.Web.Services.Email;
-using System.Security.Claims;
+using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Interfaces;
+using System.Security.Claims;
 
 namespace SmartTask.Web.Controllers
 {
@@ -14,16 +17,22 @@ namespace SmartTask.Web.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailService _emailService;
         private readonly IWorkspaceInvitationService _invitationService;
+        private readonly ICurrentUserService _currentUser;
+        private readonly IFileUploadService _fileUploadService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailService emailService,
-            IWorkspaceInvitationService invitationService)
+            IWorkspaceInvitationService invitationService,
+            ICurrentUserService currentUser,
+            IFileUploadService fileUploadService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _invitationService = invitationService;
+            _currentUser = currentUser;
+            _fileUploadService = fileUploadService;
         }
 
         [HttpGet]
@@ -475,6 +484,238 @@ namespace SmartTask.Web.Controllers
             TempData["Error"] = "لینک تایید نامعتبر یا منقضی شده است.";
 
             return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return RedirectToAction(nameof(Login));
+
+            var model = new ProfileViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email ?? "",
+                JobTitle = user.JobTitle,
+                Bio = user.Bio,
+                Avatar = user.Avatar
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return RedirectToAction(nameof(Login));
+
+            if (!ModelState.IsValid)
+            {
+                model.Email = user.Email ?? "";
+                model.Avatar = user.Avatar;
+
+                return View(model);
+            }
+
+            user.FirstName = model.FirstName.Trim();
+            user.LastName = model.LastName.Trim();
+            user.JobTitle = string.IsNullOrWhiteSpace(model.JobTitle)
+                ? null
+                : model.JobTitle.Trim();
+            user.Bio = string.IsNullOrWhiteSpace(model.Bio)
+                ? null
+                : model.Bio.Trim();
+
+            if (model.NewAvatar != null)
+            {
+                var allowedExtensions = new[]
+                {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
+                var extension =
+                    Path.GetExtension(model.NewAvatar.FileName)
+                        .ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.NewAvatar),
+                        "فرمت تصویر مجاز نیست.");
+
+                    model.Email = user.Email ?? "";
+                    model.Avatar = user.Avatar;
+
+                    return View(model);
+                }
+
+                if (model.NewAvatar.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.NewAvatar),
+                        "حجم تصویر نباید بیشتر از 2 مگابایت باشد.");
+
+                    model.Email = user.Email ?? "";
+                    model.Avatar = user.Avatar;
+
+                    return View(model);
+                }
+
+                var oldAvatar = user.Avatar;
+
+                user.Avatar = await _fileUploadService.SaveFileAsync(
+                    model.NewAvatar,
+                    "avatars");
+
+                if (!string.IsNullOrWhiteSpace(oldAvatar))
+                {
+                    _fileUploadService.DeleteFile(oldAvatar);
+                }
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+
+                model.Email = user.Email ?? "";
+                model.Avatar = user.Avatar;
+
+                return View(model);
+            }
+
+            TempData["Success"] = "پروفایل شما با موفقیت بروزرسانی شد.";
+
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveAvatar()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return RedirectToAction(nameof(Login));
+
+            if (!string.IsNullOrWhiteSpace(user.Avatar))
+            {
+                _fileUploadService.DeleteFile(user.Avatar);
+
+                user.Avatar = null;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    TempData["Error"] =
+                        "حذف تصویر پروفایل انجام نشد.";
+
+                    return RedirectToAction(nameof(Profile));
+                }
+            }
+
+            TempData["Success"] =
+                "تصویر پروفایل حذف شد.";
+
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(
+            ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Challenge();
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                model.CurrentPassword,
+                model.NewPassword
+            );
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] =
+                    "رمز عبور شما با موفقیت تغییر کرد.";
+
+                return RedirectToAction(nameof(Profile));
+            }
+
+            foreach (var error in result.Errors)
+            {
+                if (error.Code == "PasswordMismatch")
+                {
+                    ModelState.AddModelError(
+                        nameof(model.CurrentPassword),
+                        "رمز عبور فعلی صحیح نیست."
+                    );
+                }
+                else
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        error.Description
+                    );
+                }
+            }
+
+            return View(model);
+        }
+
+
+        /// <summary>
+        /// ثبت شناسه مشترک Webpushr (SID) برای کاربر جاری تا بتوان
+        /// اعلان‌های Push پیام چت را برای او ارسال کرد.
+        /// </summary>
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveWebpushrSubscriber(
+            long sid)
+        {
+            if (sid <= 0)
+            {
+                return BadRequest(
+                    new { success = false, message = "SID نامعتبر است." });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Unauthorized();
+
+            user.WebpushrSubscriberId = sid;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return Json(new { success = result.Succeeded });
         }
 
 

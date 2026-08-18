@@ -1,78 +1,205 @@
 /* ==========================================================
-                    SmartTask UserStory UI
+   SmartTask — UserStory UI
+   ==========================================================
+   Flat, RTL-first, workspace-consistent. This file is loaded
+   by UserStory views AND Backlog/Index, so all rules here must
+   keep both pages coherent. workspace-pages.css (loaded after)
+   supplies the shared hero/button/form/preview language.
    ========================================================== */
 
-.userstory-preview-logo {
-    background: var(--primary);
+/* ================= Table (Index) ================= */
+
+.backlog-table-wrap {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    overflow: auto;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
 }
 
-.userstory-form-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+.backlog-table thead th {
+    background: var(--gray50);
+    color: var(--gray500);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 12px 14px;
+    text-align: right;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--gray200);
 }
 
-@media (max-width: 768px) {
-    .userstory-form-row {
-        grid-template-columns: 1fr;
+.backlog-table tbody tr.backlog-row {
+    border-top: 1px solid var(--gray100);
+    transition: background .15s ease;
+}
+
+    .backlog-table tbody tr.backlog-row:hover {
+        background: var(--primary-light);
     }
-}
 
-.story-title-link {
+.backlog-table td {
+    padding: 11px 14px;
+    vertical-align: middle;
     color: var(--gray700);
-    font-weight: 600;
-    text-decoration: none;
+    font-size: 13px;
 }
 
-    .story-title-link:hover {
-        color: var(--primary);
-        text-decoration: underline;
-    }
+.col-title {
+    max-width: 320px;
+    white-space: normal !important;
+}
+
+/* ================= Story badges (Index + Details) ================= */
+
+.backlog-status-badge,
+.backlog-priority-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.backlog-sp-badge,
+.backlog-bv-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    padding: 4px 9px;
+    border-radius: 8px;
+    background: var(--gray100);
+    color: var(--gray700);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* Status tints — same palette across Backlog & UserStory */
+.status-new {
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+.status-ready {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.status-inprogress {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.status-done {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.status-closed {
+    background: #EDE9FE;
+    color: #6D28D9;
+}
+
+/* Priority tints */
+.priority-lowest,
+.priority-low {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.priority-medium {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.priority-high,
+.priority-highest {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* ================= Sprint tag ================= */
 
 .userstory-sprint-tag {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 20px;
-    background: #EEF2FF;
+    background: var(--primary-light);
     color: var(--primary);
     font-size: 11px;
     font-weight: 700;
 }
 
 .userstory-no-sprint {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--gray500);
 }
+
+/* ================= Title link ================= */
+
+.story-title-link {
+    color: var(--gray800);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .2s ease;
+}
+
+    .story-title-link:hover {
+        color: var(--primary);
+    }
+
+/* ================= Inline edit ================= */
 
 .userstory-edit-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--gray200);
     border-radius: 8px;
-    background: var(--gray100);
-    color: var(--gray700);
+    background: var(--card);
+    color: var(--gray500);
     text-decoration: none;
-    transition: background .2s ease;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
     .userstory-edit-btn:hover {
         background: var(--primary);
+        border-color: var(--primary);
         color: #fff;
+        transform: translateY(-1px);
     }
+
+    .userstory-edit-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+/* ================= Details info grid ================= */
 
 .userstory-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 18px;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
     .userstory-info-grid > div {
         display: flex;
         flex-direction: column;
         gap: 6px;
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .userstory-info-grid span:last-child {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray800);
     }
 
 .userstory-info-label {
@@ -80,3 +207,23 @@
     color: var(--gray500);
     font-weight: 600;
 }
+
+/* ================= Forms (Create / Edit) ================= */
+
+.userstory-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+    .userstory-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================= Reduced motion ================= */
+
+

@@ -40,7 +40,8 @@ namespace SmartTask.Web.Data.Configurations
 
             // Indexes
             builder.HasIndex(x => new { x.ProjectId, x.Name })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[ViewState] = 1");
 
             // Relationships
             builder.HasOne(x => x.Project)

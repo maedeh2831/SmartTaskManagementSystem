@@ -427,6 +427,7 @@ textarea.form-control {
         min-width: 150px;
         border-radius: 16px;
         font-weight: 700;
+        align-content: center !important;
     }
 /*==================================================
                 Validation

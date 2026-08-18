@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/offroad.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
 }
 
 <div class="workspace-container">
@@ -58,7 +59,7 @@
                     }
                 </select>
 
-                <input type="date" name="DueDate" class="form-control offroad-select-sm" />
+                <input asp-date-name="DueDate" class="form-control offroad-select-sm" />
 
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i>
@@ -102,7 +103,7 @@
                                 }
                                 @if (task.DueDate.HasValue)
                                 {
-                                    <span><i class="fa-regular fa-calendar"></i> موعد: @task.DueDate.Value.ToString("yyyy/MM/dd")</span>
+                                    <span><i class="fa-regular fa-calendar"></i> موعد: @Html.DisplayDate(task.DueDate)</span>
                                 }
                             </div>
                         </div>

@@ -67,6 +67,12 @@ public class SprintController : BaseController
         if (sprint == null)
             return NotFound();
 
+        var stories = await _context.UserStories
+            .Where(x => x.SprintId == id && x.ViewState)
+            .Include(x => x.Owner)
+            .OrderBy(x => x.Order)
+            .ToListAsync();
+
         var model = new SprintDetailsViewModel
         {
             Id = sprint.Id,
@@ -79,7 +85,16 @@ public class SprintController : BaseController
             Capacity = sprint.Capacity,
             Status = sprint.Status,
             CreateDate = sprint.CreatedDate,
-            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId)
+            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            Stories = stories.Select(x => new PlanningStoryItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                StoryPoint = x.StoryPoint,
+                Priority = x.Priority,
+                Status = x.Status,
+                OwnerName = x.Owner != null ? x.Owner.FullName : null
+            }).ToList()
         };
 
         return View(model);
@@ -267,14 +282,43 @@ public class SprintController : BaseController
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    public async Task<IActionResult> Planning(int id)
+    // Planning page is now a tab inside Details — redirect old URL to keep bookmarks working
+    public IActionResult Planning(int id)
+    {
+        return RedirectToAction(nameof(Details), new { id, tab = "planning" });
+    }
+
+    // Lazy-loaded partial for the Planning tab inside Details
+    public async Task<IActionResult> PlanningPartial(int id)
+    {
+        var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        if (sprint == null)
+            return NotFound();
+        return RedirectToAction(nameof(Details), new { id, tab = "planning" });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PlanningTab(int id)
+    {
+        if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
+            return Forbid();
+
+        var vm = await BuildPlanningViewModelAsync(id);
+
+        if (vm == null)
+            return NotFound();
+
+        return PartialView("_PlanningPartial", vm);
+    }
+
+    private async Task<SprintPlanningViewModel?> BuildPlanningViewModelAsync(int id)
     {
         var sprint = await _context.Sprints
             .Include(x => x.Project)
             .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
 
         if (sprint == null)
-            return NotFound();
+            return null;
 
         var backlogStories = await _context.UserStories
             .Where(x => x.ProjectId == sprint.ProjectId && x.SprintId == null && x.ViewState)
@@ -288,14 +332,14 @@ public class SprintController : BaseController
             .OrderBy(x => x.Order)
             .ToListAsync();
 
-        var vm = new SprintPlanningViewModel
+        return new SprintPlanningViewModel
         {
             SprintId = sprint.Id,
             SprintName = sprint.Name,
             ProjectId = sprint.ProjectId,
             ProjectName = sprint.Project.Name,
             Capacity = sprint.Capacity,
-            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            CanManage = true, // access verified in the action
             BacklogStories = backlogStories.Select(x => new PlanningStoryItemViewModel
             {
                 Id = x.Id,
@@ -315,8 +359,6 @@ public class SprintController : BaseController
                 OwnerName = x.Owner != null ? x.Owner.FullName : null
             }).ToList()
         };
-
-        return View(vm);
     }
 
     [HttpPost]

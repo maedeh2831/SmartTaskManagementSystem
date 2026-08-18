@@ -6,7 +6,11 @@
             data-bs-toggle="dropdown">
 
         <div class="user-avatar">
-            <i class="fa-solid fa-user"></i>
+
+            <img src="@Model.AvatarUrl"
+                 alt="@Model.FullName"
+                 class="user-avatar-image" />
+
         </div>
 
         <div class="text-end">
@@ -40,15 +44,22 @@
 
         <!-- پروفایل -->
         <li>
-            <a class="dropdown-item" href="#">
+            <a asp-controller="Account"
+               asp-action="Profile"
+               class="dropdown-item">
+
                 <i class="fa-regular fa-user"></i>
-                پروفایل
+
+                <span>پروفایل من</span>
+
             </a>
         </li>
 
         <!-- تنظیمات -->
         <li>
-            <a class="dropdown-item" href="#">
+            <a asp-controller="Settings"
+               asp-action="Index"
+               class="dropdown-item">
                 <i class="fa-solid fa-gear"></i>
                 تنظیمات
             </a>

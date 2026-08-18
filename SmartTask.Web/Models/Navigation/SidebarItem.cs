@@ -11,6 +11,7 @@ namespace SmartTask.Web.Models.Navigation
         public string? Badge { get; set; }
         public string Category { get; set; } = "";
         public string? RequiredRole { get; set; }
-        public ContextRequirementType RequiresContext { get; set; } = ContextRequirementType.None; // 👈 جدید
+        public ContextRequirementType RequiresContext { get; set; } = ContextRequirementType.None;
+        public List<SidebarItem> Children { get; set; } = new();
     }
 }

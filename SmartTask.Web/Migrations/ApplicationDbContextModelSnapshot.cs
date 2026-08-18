@@ -243,6 +243,12 @@ namespace SmartTask.Web.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<int>("DateFormat")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DefaultWorkspaceId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -303,6 +309,12 @@ namespace SmartTask.Web.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ShowFullName")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TaskDensity")
+                        .HasColumnType("int");
+
                     b.Property<int>("Theme")
                         .HasColumnType("int");
 
@@ -322,7 +334,12 @@ namespace SmartTask.Web.Migrations
                     b.Property<bool>("ViewState")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("WebpushrSubscriberId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultWorkspaceId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -438,6 +455,119 @@ namespace SmartTask.Web.Migrations
                         .IsUnique();
 
                     b.ToTable("Backlogs", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AttachmentName")
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
+
+                    b.Property<string>("AttachmentPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long?>("AttachmentSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EditedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToMessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReplyToMessageId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("ProjectId", "Id");
+
+                    b.ToTable("ChatMessages", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatReadState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplicationUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastReadDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LastReadMessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ProjectId", "ApplicationUserId")
+                        .IsUnique();
+
+                    b.ToTable("ChatReadStates", (string)null);
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Checklist", b =>
@@ -736,6 +866,51 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("OffroadTasks", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.OverdueCascadeLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AppliedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DelayDaysApplied")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ImpactedTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImpactedTaskId");
+
+                    b.HasIndex("SourceTaskId", "ImpactedTaskId")
+                        .IsUnique();
+
+                    b.ToTable("OverdueCascadeLogs", (string)null);
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -805,7 +980,8 @@ namespace SmartTask.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("WorkspaceId", "Key")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ViewState] = 1");
 
                     b.ToTable("Projects", (string)null);
                 });
@@ -1009,9 +1185,55 @@ namespace SmartTask.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ViewState] = 1");
 
                     b.ToTable("Sprints", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SprintReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GeneratedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("GeneratedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SprintId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneratedByUserId");
+
+                    b.HasIndex("SprintId");
+
+                    b.ToTable("SprintReports", (string)null);
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.SubTaskItem", b =>
@@ -1265,6 +1487,69 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("TaskLabels", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.TaskTradeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequesterTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequesterUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ResponseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("RequesterTaskId");
+
+                    b.HasIndex("RequesterUserId");
+
+                    b.HasIndex("TargetTaskId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("TaskTradeRequests", (string)null);
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Team", b =>
                 {
                     b.Property<int>("Id")
@@ -1317,7 +1602,8 @@ namespace SmartTask.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("WorkspaceId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ViewState] = 1");
 
                     b.ToTable("Teams", (string)null);
                 });
@@ -1422,6 +1708,31 @@ namespace SmartTask.Web.Migrations
                     b.HasIndex("TaskItemId", "ApplicationUserId");
 
                     b.ToTable("TimeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserNotificationPreference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplicationUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NotificationType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId", "NotificationType")
+                        .IsUnique();
+
+                    b.ToTable("UserNotificationPreferences");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStory", b =>
@@ -1740,6 +2051,16 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("TaskItem");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Workspace", "DefaultWorkspace")
+                        .WithMany()
+                        .HasForeignKey("DefaultWorkspaceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("DefaultWorkspace");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Attachment", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
@@ -1766,6 +2087,51 @@ namespace SmartTask.Web.Migrations
                         .HasForeignKey("SmartTask.Web.Models.Entities.Backlog", "ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ChatMessage", "ReplyToMessage")
+                        .WithMany("Replies")
+                        .HasForeignKey("ReplyToMessageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("ReplyToMessage");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatReadState", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Project");
                 });
@@ -1859,6 +2225,25 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.OverdueCascadeLog", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.TaskItem", "ImpactedTask")
+                        .WithMany()
+                        .HasForeignKey("ImpactedTaskId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.TaskItem", "SourceTask")
+                        .WithMany()
+                        .HasForeignKey("SourceTaskId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ImpactedTask");
+
+                    b.Navigation("SourceTask");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
@@ -1936,6 +2321,25 @@ namespace SmartTask.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SprintReport", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "GeneratedByUser")
+                        .WithMany()
+                        .HasForeignKey("GeneratedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.Sprint", "Sprint")
+                        .WithMany()
+                        .HasForeignKey("SprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GeneratedByUser");
+
+                    b.Navigation("Sprint");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.SubTaskItem", b =>
@@ -2017,6 +2421,48 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("TaskItem");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.TaskTradeRequest", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.TaskItem", "RequesterTask")
+                        .WithMany()
+                        .HasForeignKey("RequesterTaskId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "RequesterUser")
+                        .WithMany()
+                        .HasForeignKey("RequesterUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.TaskItem", "TargetTask")
+                        .WithMany()
+                        .HasForeignKey("TargetTaskId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("RequesterTask");
+
+                    b.Navigation("RequesterUser");
+
+                    b.Navigation("TargetTask");
+
+                    b.Navigation("TargetUser");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Team", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
@@ -2064,6 +2510,17 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("TaskItem");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserNotificationPreference", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany("NotificationPreferences")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStory", b =>
@@ -2163,6 +2620,8 @@ namespace SmartTask.Web.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("NotificationPreferences");
+
                     b.Navigation("Notifications");
 
                     b.Navigation("ProjectMemberships");
@@ -2181,6 +2640,11 @@ namespace SmartTask.Web.Migrations
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Backlog", b =>
                 {
                     b.Navigation("UserStories");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatMessage", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Checklist", b =>

@@ -15,5 +15,5 @@ public class TeamDetailsViewModel
     public List<TeamMemberViewModel> Members { get; set; } = new();
     public List<ProjectTeamItemViewModel> Projects { get; set; } = new(); // 👈 جایگزین ProjectNames
     public List<SelectListItem> AvailableWorkspaceMembers { get; set; } = new();
-    public List<SelectListItem> AvailableProjects { get; set; } = new(); // 👈 جدید
+    public List<SelectListItem> AvailableProjects { get; set; } = new(); 
 }

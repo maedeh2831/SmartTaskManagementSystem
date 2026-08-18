@@ -1,21 +1,30 @@
 /* ==========================================================
-                SmartTask Task Board UI
+   SmartTask — Task Board
+   ==========================================================
+   Flat, RTL-first, workspace-consistent. Loaded AFTER task.css,
+   so the kanban overrides here win at equal specificity and
+   bring the columns/cards onto the design language without
+   touching the shared task.css used by Task Details etc.
    ========================================================== */
+
+/* ================= Filter bar ================= */
 
 .board-filter-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    background: #fff;
-    border: 1px solid var(--gray100);
-    border-radius: 14px;
-    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 12px 14px;
     margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
 }
 
     .board-filter-bar select {
         min-width: 140px;
+        width: auto;
     }
 
 .board-clear-filters {
@@ -23,22 +32,151 @@
     align-items: center;
     gap: 6px;
     font-size: 12px;
+    font-weight: 600;
     color: #B91C1C;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    padding: 7px 12px;
+    border-radius: 8px;
     text-decoration: none;
     margin-right: auto;
+    transition: background .2s ease, color .2s ease;
 }
 
     .board-clear-filters:hover {
-        text-decoration: underline;
+        background: #FEE2E2;
+        color: #B91C1C;
+        text-decoration: none;
     }
+
+/* ================= Kanban columns ================= */
+
+.task-column {
+    background: var(--bg);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 200px;
+}
+
+.task-column-header {
+    font-size: 13px;
+    padding: 6px 6px 12px;
+    border-bottom: 1px solid var(--gray200);
+    margin-bottom: 10px;
+}
+
+    .task-column-header i {
+        color: var(--gray400);
+    }
+
+/* Column count badge (planning.css isn't loaded on this page) */
+.planning-count {
+    min-width: 26px;
+    height: 22px;
+    padding: 0 8px;
+    margin-right: auto;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 60px;
+}
+
+/* ================= Cards ================= */
+
+.task-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 12px;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+    .task-card:hover {
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+        transform: translateY(-2px);
+        border-color: var(--primary-border);
+    }
+
+.task-drag-handle {
+    cursor: grab;
+    color: var(--gray400);
+    font-size: 12px;
+    margin-top: 4px;
+    transition: color .2s ease;
+}
+
+    .task-card:hover .task-drag-handle {
+        color: var(--primary);
+    }
+
+    .task-drag-handle:active {
+        cursor: grabbing;
+    }
+
+.task-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray800);
+    text-decoration: none;
+    line-height: 1.7;
+}
+
+    .task-card-title:hover {
+        color: var(--primary);
+    }
+
+.task-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Priority badge base (backlog.css isn't loaded on this page) */
+.backlog-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.task-card-footer {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--gray500);
+    flex-wrap: wrap;
+}
+
+    .task-card-footer i {
+        color: var(--gray400);
+    }
+
+/* ================= Story tag / labels / assignees ================= */
 
 .board-story-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 11px;
-    color: var(--gray500);
-    background: var(--gray100);
+    color: var(--gray600);
+    background: var(--primary-light);
     padding: 3px 10px;
     border-radius: 20px;
     align-self: flex-start;
@@ -58,7 +196,6 @@
 .board-assignee-list {
     display: flex;
     align-items: center;
-    gap: -6px;
     margin-top: 4px;
 }
 
@@ -73,13 +210,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #fff;
+    border: 2px solid var(--card);
     margin-right: -8px;
 }
 
 .board-assignee-more {
     background: var(--gray500);
 }
+
+/* ================= Sortable states ================= */
+
+.task-ghost {
+    opacity: .4;
+    background: var(--primary-light);
+    border: 1px dashed var(--primary);
+}
+
+.task-chosen {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* ================= Responsive ================= */
 
 @media (max-width: 768px) {
     .board-filter-bar {
@@ -90,4 +242,18 @@
         .board-filter-bar select {
             width: 100%;
         }
+
+    .board-clear-filters {
+        margin-right: 0;
+        justify-content: center;
+    }
+}
+
+/* ================= Reduced motion ================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .task-drag-handle {
+        transition: none !important;
+    }
 }

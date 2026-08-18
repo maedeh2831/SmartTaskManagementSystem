@@ -1,0 +1,117 @@
+﻿/*  DelayRisk Gauge css  */
+.risk-gauge-card {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.risk-donut-wrap {
+    flex-shrink: 0;
+}
+
+.risk-donut-value.status-low {
+    stroke: #10B981;
+}
+
+.risk-donut-value.status-medium {
+    stroke: #F59E0B;
+}
+
+.risk-donut-value.status-high {
+    stroke: #F97316;
+}
+
+.risk-donut-value.status-critical {
+    stroke: #EF4444;
+}
+
+.risk-gauge-info {
+    flex: 1;
+    min-width: 260px;
+}
+
+.risk-level-pill {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+    .risk-level-pill.status-low {
+        background: #D1FAE5;
+        color: #047857;
+    }
+
+    .risk-level-pill.status-medium {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+    .risk-level-pill.status-high {
+        background: #FFEDD5;
+        color: #C2410C;
+    }
+
+    .risk-level-pill.status-critical {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+.risk-factor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.risk-factor-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--gray500);
+    font-weight: 600;
+}
+
+    .risk-factor-row strong {
+        color: var(--gray900);
+    }
+/*  AI Narrative  */
+.ai-narrative-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-narrative-box {
+    background: var(--gray50);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+}
+
+    .ai-narrative-box p {
+        margin: 0;
+        line-height: 1.9;
+        color: var(--gray700);
+        font-size: 14px;
+    }
+
+.ai-narrative-card .ai-suggest-btn {
+    align-self: flex-start;
+}
+/*  Responsive  */
+@media (max-width: 768px) {
+    .risk-gauge-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}

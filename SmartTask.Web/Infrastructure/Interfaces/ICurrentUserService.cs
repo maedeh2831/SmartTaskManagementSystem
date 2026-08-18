@@ -15,5 +15,7 @@ namespace SmartTask.Web.Infrastructure.Interfaces
         bool IsAuthenticated { get; }
 
         bool IsAdmin { get; }
+
+        string? Avatar { get; }
     }
 }

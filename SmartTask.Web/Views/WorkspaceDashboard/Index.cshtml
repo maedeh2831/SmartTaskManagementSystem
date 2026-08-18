@@ -9,6 +9,7 @@
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
 }
 
 <div class="dashboard-page">
@@ -106,7 +107,7 @@
                                 <h4>@project.Name</h4>
                                 <span>@project.Status.GetDisplayName()</span>
                             </div>
-                            <span class="recent-project-date">@project.CreateDate.ToString("yyyy/MM/dd")</span>
+                            <span class="recent-project-date">@Html.DisplayDate(project.CreateDate)</span>
                         </div>
                     }
                 </div>
@@ -173,7 +174,7 @@
                             <div class="activity-icon"><i class="@activity.Icon"></i></div>
                             <div class="activity-info">
                                 <p>@activity.Title</p>
-                                <span>@activity.CreateDate.ToString("yyyy/MM/dd HH:mm")</span>
+                                <span>@Html.DisplayDate(activity.CreateDate, includeTime: true)</span>
                             </div>
                         </div>
                     }

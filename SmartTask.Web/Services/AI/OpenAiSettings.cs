@@ -2,7 +2,7 @@
 
 public class OpenAiSettings
 {
-    public string ApiKey { get; set; } = null!;
-    public string Model { get; set; } = "gpt-4o-mini";
-    public string BaseUrl { get; set; } = "https://api.openai.com/v1/chat/completions";
+    public string ApiKey { get; set; } = "";
+    public string Model { get; set; } = "qwen/qwen3-4b";
+    public string BaseUrl { get; set; } = "http://92.246.145.99:1234/v1/chat/completions";
 }

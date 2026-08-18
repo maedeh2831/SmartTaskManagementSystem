@@ -1,4 +1,13 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿// Sidebar submenu expand/collapse — used by Sidebar.cshtml's parent links.
+window.SmartTask = window.SmartTask || {};
+
+SmartTask.toggleSidebarGroup = function (link) {
+    const li = link.closest("li.has-children");
+    if (li) li.classList.toggle("open");
+    return false;
+};
+
+document.addEventListener("DOMContentLoaded", function () {
 
     const sidebarToggle = document.getElementById("sidebarToggle");
     const sidebar = document.getElementById("sidebar");
@@ -133,3 +142,38 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 });
+async function enablePushNotifications() {
+    if (!("Notification" in window)) {
+        console.error("Browser does not support notifications.");
+        return false;
+    }
+
+    if (Notification.permission === "granted") {
+        console.log("Notifications already enabled.");
+        return true;
+    }
+
+    if (Notification.permission === "denied") {
+        console.warn("Notifications are blocked by the browser.");
+        return false;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    console.log("Notification permission:", permission);
+
+    return permission === "granted";
+}
+document
+    .getElementById("notificationBellBtn")
+    ?.addEventListener("click", async function () {
+
+        const enabled = await enablePushNotifications();
+
+        if (enabled) {
+            console.log("Push notifications enabled.");
+            if (window.ensureWebpushrSubscription) {
+                window.ensureWebpushrSubscription();
+            }
+        }
+    });

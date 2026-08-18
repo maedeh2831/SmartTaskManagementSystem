@@ -1,19 +1,156 @@
-﻿<!DOCTYPE html>
+﻿@inject SmartTask.Web.Infrastructure.Interfaces.ICurrentUserService CurrentUserService
+@{
+    var themePreference = "system";
+    var isJalaliDate = false;
+    if (CurrentUserService.IsAuthenticated && CurrentUserService.CurrentUser != null)
+    {
+        themePreference = CurrentUserService.CurrentUser.Theme.ToString().ToLower();
+        isJalaliDate = CurrentUserService.CurrentUser.DateFormat == SmartTask.Web.Models.Enums.DateFormatType.Jalali;
+    }
+}
+
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <script>
+        (function () {
+            var stored = "@themePreference";
+            var theme = stored;
+            if (stored === "system" || !stored) {
+                theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-theme", theme);
+            document.documentElement.setAttribute("data-theme-preference", stored || "system");
+        })();
+    </script>
+    
     <title>@ViewData["Title"] - SmartTask</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    @if (isJalaliDate)
+    {
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/css/persian-datepicker.min.css" />
+    }
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+    <!-- Webpushr -->
+    <form id="webpushrAntiForgeryForm" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+    <script>
+        (function (w, d) {
+            w._wpx = w._wpx || {};
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://cdn.webpushr.com/app.min.js';
+            var h = d.getElementsByTagName('script')[0];
+            h.parentNode.insertBefore(s, h);
+        })(window, document);
+        webpushr('setup', { 'key': '7b8acf774ea9e965e393120da0b7d643' });
+
+        // خواندن توکن ضد-جعل از فرم مخصوص Webpushr (تابع سراسری)
+        function webpushrToken() {
+            var el = document.querySelector(
+                '#webpushrAntiForgeryForm input[name="__RequestVerificationToken"]');
+            return el ? el.value : "";
+        }
+
+        // ذخیره SID در سرور (فرم‌دیتا تا با پارامتر long sid در کنترلر bind شود)
+        function saveWebpushrSubscriber(sid) {
+            if (!sid) return;
+            var form = new FormData();
+            form.append("sid", sid);
+            form.append("__RequestVerificationToken", webpushrToken());
+            fetch("/Account/SaveWebpushrSubscriber", {
+                method: "POST",
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                body: form
+            }).catch(function (err) {
+                console.error("Failed to save Webpushr subscriber id:", err);
+            });
+        }
+
+        window.ensureWebpushrSubscription = function () {
+            if (typeof webpushr === "undefined") {
+                console.error("Webpushr SDK not loaded.");
+                return;
+            }
+            webpushr('fetch_id', function (sid) {
+                if (!sid) {
+                    console.warn("Webpushr subscriber id not available yet.");
+                    return;
+                }
+                saveWebpushrSubscriber(sid);
+            });
+        };
+    </script>
+    <!-- end webpushr code -->
+
+    <script>
+        // دیاگنوستیک: وضعیت پوش در این مرورگر را در کنسول چاپ می‌کند
+        window.webpushrDiagnostic = function () {
+            var info = {
+                permission: (typeof Notification !== "undefined") ? Notification.permission : "n/a",
+                hasWebpushr: typeof webpushr !== "undefined",
+                hasServiceWorker: typeof navigator !== "undefined" && "serviceWorker" in navigator,
+                userAgent: navigator.userAgent
+            };
+
+            var done = function () {
+                console.log("[Webpushr Diagnostic]", JSON.stringify(info, null, 2));
+            };
+
+            if (info.hasServiceWorker) {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    info.serviceWorkers = regs.map(function (r) {
+                        return {
+                            scope: r.scope,
+                            active: !!(r.active && r.active.state === "activated")
+                        };
+                    });
+                    done();
+                });
+            } else {
+                done();
+            }
+
+            if (typeof webpushr !== "undefined") {
+                webpushr('fetch_id', function (sid) {
+                    console.log("[Webpushr Diagnostic] fetch_id =>", sid);
+                });
+            }
+
+            return info;
+        };
+    </script>
+
+    <script>
+        // فقط یک مسیر پرامپت وجود داشته باشد (پرامپت خود وب‌پشر)،
+        // تا کاربر دو بار اجازه نگیرد و سهواً دکمه Block را نزند.
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+                if (typeof webpushr === "undefined") return;
+
+                if (Notification.permission === "granted") {
+                    // قبلاً اجازه داده شده؛ مطمئن شو SID ثبت شده است
+                    webpushr('fetch_id', function (sid) {
+                        if (sid) saveWebpushrSubscriber(sid);
+                    });
+                } else if (Notification.permission === "default") {
+                    // اشتراک را فعال کن؛ وب‌پشر پرامپت خودش را نشان می‌دهد
+                    window.ensureWebpushrSubscription && window.ensureWebpushrSubscription();
+                }
+            }, 1500);
+        });
+    </script>
 
 </head>
 
@@ -23,17 +160,10 @@
 
         <div class="header-actions">
 
-            @await Component.InvokeAsync("NotificationBell")
-
             @await Component.InvokeAsync("Header")
 
-            <button class="icon-btn">
-                <i class="fa-regular fa-bell"></i>
-            </button>
-
-            <button class="icon-btn">
-                <i class="fa-regular fa-envelope"></i>
-            </button>
+            @await Component.InvokeAsync("NotificationBell")
+         
 
         </div>       
 
@@ -74,6 +204,12 @@
     @await Component.InvokeAsync("Footer")
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @if (isJalaliDate)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/persian-date@latest/dist/persian-date.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+        <script src="~/js/date-picker-init.js" asp-append-version="true"></script>
+    }
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -109,5 +245,4 @@
 
 
 </body>
-
 </html>

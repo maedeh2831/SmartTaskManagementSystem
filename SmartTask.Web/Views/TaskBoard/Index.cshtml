@@ -1,6 +1,6 @@
 ﻿@model SmartTask.Web.Models.ViewModels.TaskBoard.TaskBoardViewModel
 @using SmartTask.Web.Models.Enums
-
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 @{
     ViewData["Title"] = "Task Board";
 }
@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/taskboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
 }
 
 <div class="workspace-container">
@@ -25,6 +26,11 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="boardSearchInput" placeholder="جستجوی Task..." />
             </div>
+
+            <button type="button" class="workspace-primary-btn" data-task-quick-add-open data-project-id="@Model.ProjectId">
+                <i class="fa-solid fa-plus"></i>
+                Task جدید
+            </button>
 
             <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId"
                class="workspace-filter" style="text-decoration:none;">
@@ -185,7 +191,15 @@
                                         })
                             </span>
                             <span class="backlog-priority-badge priority-@task.Priority.ToString().ToLower()">
-                                @task.Priority
+                                @(task.Priority switch
+                                {
+                                    TaskPriorityType.Lowest => "خیلی کم",
+                                    TaskPriorityType.Low => "کم",
+                                    TaskPriorityType.Medium => "متوسط",
+                                    TaskPriorityType.High => "زیاد",
+                                    TaskPriorityType.Highest => "خیلی زیاد",
+                                    _ => "-"
+                                })
                             </span>
                         </div>
 
@@ -196,7 +210,7 @@
                                         }
                                         @if (task.DueDate.HasValue)
                                         {
-                                            <span><i class="fa-regular fa-calendar"></i> @task.DueDate.Value.ToString("MM/dd")</span>
+                                            <span><i class="fa-regular fa-calendar"></i> @DateFormatService.ToShortDisplayString(task.DueDate.Value)</span>
                                         }
                                     </div>
 
@@ -235,8 +249,11 @@
     @Html.AntiForgeryToken()
 </form>
 
+<partial name="_TaskQuickAddModal" />
+
 @section Scripts
 {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
     <script src="~/js/taskboard.js" asp-append-version="true"></script>
+    <script src="~/js/task-quick-add.js" asp-append-version="true"></script>
 }
