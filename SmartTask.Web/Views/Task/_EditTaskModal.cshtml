@@ -1,29 +1,29 @@
-﻿@model SmartTask.Web.Models.ViewModels.Task.CreateTaskViewModel
+﻿@model SmartTask.Web.Models.ViewModels.Task.EditTaskViewModel
 @using SmartTask.Web.Models.Enums
 
 <div class="task-modal-backdrop"
-     data-task-modal="createTaskModal">
+     data-task-modal="editTaskModal">
 
     <div class="task-create-modal"
          role="dialog"
          aria-modal="true"
-         aria-labelledby="createTaskModalTitle">
+         aria-labelledby="editTaskModalTitle">
 
         <div class="task-modal-header">
 
             <div class="task-modal-heading">
 
                 <div class="task-modal-icon">
-                    <i class="fa-solid fa-list-check"></i>
+                    <i class="fa-solid fa-pen-to-square"></i>
                 </div>
 
                 <div>
-                    <h2 id="createTaskModalTitle">
-                        ایجاد Task جدید
+                    <h2 id="editTaskModalTitle">
+                        ویرایش Task
                     </h2>
 
                     <p>
-                        یک وظیفه اجرایی برای این User Story تعریف کنید.
+                        اطلاعات این Task را به‌روزرسانی کنید.
                     </p>
                 </div>
 
@@ -41,7 +41,7 @@
         </div>
 
 
-        <form asp-action="Create"
+        <form asp-action="Edit"
               asp-controller="Task"
               method="post"
               class="task-create-form"
@@ -50,6 +50,7 @@
 
             @Html.AntiForgeryToken()
 
+            <input asp-for="Id" type="hidden" />
             <input asp-for="UserStoryId" type="hidden" />
 
 
@@ -111,7 +112,7 @@
 
                         @foreach (TaskType t in Enum.GetValues(typeof(TaskType)))
                         {
-                            <option value="@t">
+                            <option value="@t" selected="@(t == Model.Type)">
                                 @(t switch
                                 {
                                     TaskType.Task => "Task",
@@ -140,7 +141,7 @@
 
                         @foreach (TaskPriorityType p in Enum.GetValues(typeof(TaskPriorityType)))
                         {
-                            <option value="@p">
+                            <option value="@p" selected="@(p == Model.Priority)">
                                 @(p switch
                                 {
                                     TaskPriorityType.Lowest => "خیلی کم",
@@ -157,6 +158,40 @@
 
                 </div>
 
+
+                <div class="task-form-field">
+
+                    <label asp-for="Status">
+                        وضعیت
+                    </label>
+
+                    <select asp-for="Status"
+                            class="form-control">
+
+                        @foreach (TaskStatusType s in Enum.GetValues(typeof(TaskStatusType)))
+                        {
+                            <option value="@s" selected="@(s == Model.Status)">
+                                @(s switch
+                                {
+                                    TaskStatusType.ToDo => "برای انجام",
+                                    TaskStatusType.InProgress => "درحال انجام",
+                                    TaskStatusType.InReview => "درحال بررسی",
+                                    TaskStatusType.Done => "انجام‌شده",
+                                    TaskStatusType.Cancelled => "لغو‌شده",
+                                    _ => "-"
+                                })
+                        </option>
+                                                }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Estimate -->
+            <div class="task-form-grid task-form-grid-dates">
 
                 <div class="task-form-field">
 
@@ -182,6 +217,8 @@
                     </span>
 
                 </div>
+
+                <div class="task-form-field"></div>
 
             </div>
 
@@ -249,8 +286,8 @@
                 <button type="submit"
                         class="task-modal-submit">
 
-                    <i class="fa-solid fa-plus"></i>
-                    <span>ایجاد Task</span>
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>ذخیره تغییرات</span>
 
                 </button>
 

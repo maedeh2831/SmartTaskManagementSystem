@@ -1,25 +1,12 @@
-/* ==========================================================
-   SmartTask — Workspace Pages
-   ==========================================================
-   Design-language pass for the Workspace family (Index,
-   Details, Create/Edit, Settings, Members, Invite, Dashboard,
-   Report). Loaded AFTER workspace.css / page-specific files so
-   every rule here wins at equal specificity.
-
-   Flat fills, 8-12px radii, white cards on gray workspace,
-   gray200 borders, hover lift, RTL-first.
-   ========================================================== */
+/* SmartTask — Workspace Pages*/
 
 :root {
-    /* Bring the shared tokens in line with the design system */
     --radius: 12px;
     --radius-sm: 10px;
     --radius-lg: 16px;
 }
 
-/* ==========================================================
-   Page scaffolding — heroes & headers
-   ========================================================== */
+/*  Page scaffolding — heroes & headers */
 
 .workspace-hero {
     display: flex;
@@ -416,9 +403,7 @@
         font-size: 11px;
     }
 
-/* ==========================================================
-   Workspace Details
-   ========================================================== */
+/*  Workspace Details */
 
 .details-logo {
     width: 64px;
@@ -491,8 +476,6 @@
             font-weight: 600;
         }
 
-/* Project key chip on flat heroes (the old translucent-white
-   pill was designed for the gradient hero and disappears on white) */
 .workspace-hero .project-key-badge {
     background: var(--primary-light);
     color: var(--primary);
@@ -574,9 +557,7 @@
         font-size: 12px;
     }
 
-/* ==========================================================
-   Forms & preview
-   ========================================================== */
+/* Forms & preview */
 
 .workspace-form-card,
 .settings-card {
@@ -688,7 +669,7 @@ textarea.form-control {
     }
 }
 
-/* ---------- Color & visibility pickers ---------- */
+/*  Color & visibility pickers  */
 
 .workspace-colors span {
     border-radius: 50%;
@@ -715,7 +696,7 @@ textarea.form-control {
     color: var(--primary);
 }
 
-/* ---------- Preview card ---------- */
+/*  Preview card  */
 
 .preview-card {
     background: var(--card);
@@ -793,9 +774,7 @@ textarea.form-control {
             font-size: 13px;
         }
 
-/* ==========================================================
-   Empty states
-   ========================================================== */
+/* Empty states */
 
 .workspace-empty {
     background: var(--card);
@@ -848,9 +827,7 @@ textarea.form-control {
     justify-content: center;
 }
 
-/* ==========================================================
-   Members page
-   ========================================================== */
+/*  Members page  */
 
 .members-header .workspace-create-btn {
     margin-top: 0;
@@ -928,7 +905,6 @@ textarea.form-control {
     border: 1px dashed var(--gray300);
 }
 
-/* Stacked (narrow) layout: info full-width, role + actions on one aligned line */
 @media (max-width: 768px) {
 
     .member-row {
@@ -1004,9 +980,7 @@ textarea.form-control {
     border: 1px solid var(--gray200);
 }
 
-/* ==========================================================
-   Workspace dashboard
-   ========================================================== */
+/*   Workspace dashboard */
 
 .stats-grid {
     gap: 16px;
@@ -1076,9 +1050,7 @@ textarea.form-control {
     color: var(--primary);
 }
 
-/* ==========================================================
-   Workspace settings
-   ========================================================== */
+/*  Workspace settings  */
 
 .settings-header {
     margin-bottom: 24px;
@@ -1137,9 +1109,7 @@ textarea.form-control {
     font-size: 13px;
 }
 
-/* ==========================================================
-   Workspace report
-   ========================================================== */
+/*  Workspace report  */
 
 .report-stat-card {
     border-radius: 12px;
@@ -1168,9 +1138,7 @@ textarea.form-control {
     width: 130px;
 }
 
-/* ==========================================================
-   Responsive
-   ========================================================== */
+/*   Responsive */
 
 @media (max-width: 768px) {
     .details-header,
@@ -1193,9 +1161,3 @@ textarea.form-control {
         width: 100%;
     }
 }
-
-/* ==========================================================
-   Reduced motion
-   ========================================================== */
-
-

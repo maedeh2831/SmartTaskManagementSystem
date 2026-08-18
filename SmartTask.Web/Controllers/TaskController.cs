@@ -239,23 +239,11 @@ public class TaskController : BaseController
         return View(vm);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Create(int userStoryId)
-    {
-        if (!await _userStoryService.CanManageStoryAsync(
-            userStoryId,
-            CurrentUser.UserId))
-        {
-            return Forbid();
-        }
-
-        return PartialView(
-            "_CreateModal",
-            new CreateTaskViewModel
-            {
-                UserStoryId = userStoryId
-            });
-    }
+    // ==========================================================
+    //  Create — کاملاً از طریق مودال (بدون صفحه‌ی مجزا)
+    //  مودال به‌صورت استاتیک داخل Index.cshtml رندر می‌شود،
+    //  بنابراین اکشن GET جداگانه‌ای لازم نیست.
+    // ==========================================================
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -318,36 +306,11 @@ public class TaskController : BaseController
         });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Edit(int id)
-    {
-        var task = await _context.TaskItems.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (task == null)
-            return NotFound();
-
-        if (!await _taskService.CanManageTaskAsync(id, CurrentUser.UserId))
-        {
-            TempData["Error"] = "شما اجازه ویرایش این Task را ندارید.";
-            return RedirectToAction(nameof(Details), new { id });
-        }
-
-        var model = new EditTaskViewModel
-        {
-            Id = task.Id,
-            UserStoryId = task.UserStoryId,
-            Title = task.Title,
-            Description = task.Description,
-            Type = task.Type,
-            Priority = task.Priority,
-            Status = task.Status,
-            Estimate = task.Estimate,
-            StartDate = task.StartDate,
-            DueDate = task.DueDate
-        };
-
-        return View(model);
-    }
+    // ==========================================================
+    //  Edit — کاملاً از طریق مودال (بدون صفحه‌ی مجزا)
+    //  مودال با داده‌های فعلی Task، به‌صورت استاتیک داخل
+    //  Details.cshtml رندر می‌شود، پس اکشن GET لازم نیست.
+    // ==========================================================
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -355,25 +318,43 @@ public class TaskController : BaseController
     {
         if (!await _taskService.CanManageTaskAsync(model.Id, CurrentUser.UserId))
         {
-            TempData["Error"] = "شما اجازه ویرایش این Task را ندارید.";
-            return RedirectToAction(nameof(Details), new { id = model.Id });
+            return Json(new
+            {
+                success = false,
+                message = "شما اجازه ویرایش این Task را ندارید."
+            });
         }
 
         if (!ModelState.IsValid)
-            return View(model);
+        {
+            return Json(new
+            {
+                success = false,
+                message = "لطفاً اطلاعات وارد شده را بررسی کنید."
+            });
+        }
 
         var task = await _context.TaskItems.FirstOrDefaultAsync(x => x.Id == model.Id);
 
         if (task == null)
-            return NotFound();
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Task مورد نظر یافت نشد."
+            });
+        }
 
         if (await _taskService.ExistsByTitleAsync(task.UserStoryId, model.Title, model.Id))
         {
-            ModelState.AddModelError("Title", "Task ای با این عنوان قبلاً وجود دارد.");
-            return View(model);
+            return Json(new
+            {
+                success = false,
+                message = "Task ای با این عنوان قبلاً وجود دارد."
+            });
         }
 
-        task.Title = model.Title;
+        task.Title = model.Title.Trim();
         task.Description = model.Description;
         task.Type = model.Type;
         task.Priority = model.Priority;
@@ -388,10 +369,18 @@ public class TaskController : BaseController
         else if (model.Status != TaskStatusType.Done)
             task.CompletedDate = null;
 
-        await _context.SaveChangesAsync();
+        // نکته: قبلاً این بخش مستقیم از _context.SaveChangesAsync() استفاده می‌کرد
+        // و باعث می‌شد ویرایش Task هیچ‌وقت در Activity Log ثبت نشود.
+        // با فراخوانی _taskService.UpdateAsync این مشکل رفع شده است.
+        await _taskService.UpdateAsync(task);
 
-        TempData["Success"] = "Task با موفقیت ویرایش شد.";
-        return RedirectToAction(nameof(Details), new { id = task.Id });
+        return Json(new
+        {
+            success = true,
+            taskId = task.Id,
+            url = Url.Action(nameof(Details), new { id = task.Id }),
+            message = "Task با موفقیت ویرایش شد."
+        });
     }
 
     [HttpPost]

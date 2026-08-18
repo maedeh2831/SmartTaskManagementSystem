@@ -7,33 +7,6 @@
    insights, dependency) > Create/Edit Modal > Responsive
    ========================================================== */
 
-/* ==========================================================
-   Design tokens
-   (maps the redesign's ad-hoc --surface/--text-* names onto
-   the app's real tokens so this page follows the same theme,
-   including dark mode)
-   ========================================================== */
-
-:root {
-    --surface: var(--card);
-    --surface-secondary: var(--gray50);
-    --border-color: var(--gray200);
-    --text-primary: var(--gray800);
-    --text-secondary: var(--gray700);
-    --text-muted: var(--gray500);
-}
-
-
-/* ==========================================================
-   Create / Edit Form
-   ========================================================== */
-
-.task-form-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
 
 /* ==========================================================
    KANBAN BOARD (Task/Index)
@@ -101,6 +74,8 @@
         opacity: .9;
     }
 
+    /* Status Colors */
+
     .task-column-header.status-todo {
         color: var(--gray700);
     }
@@ -140,6 +115,8 @@
         .task-column-header.status-cancelled::before {
             background: #EF4444;
         }
+
+    /* Column Counter */
 
     .task-column-header .planning-count {
         display: inline-flex;
@@ -235,6 +212,11 @@
     cursor: grabbing;
 }
 
+
+/* ==========================================================
+   Task Body / Title / Meta
+   ========================================================== */
+
 .task-card-body {
     display: flex;
     flex-direction: column;
@@ -311,8 +293,12 @@
         color: #B45309;
     }
 
-/* Priority badge — used on kanban cards AND the task details
-   header/insights tab; one definition, shared everywhere */
+
+/* ==========================================================
+   Priority Badge
+   (تعریف واحد — قبلاً سه بار با رنگ‌های متفاوت تعریف شده بود)
+   ========================================================== */
+
 .backlog-priority-badge {
     display: inline-flex;
     align-items: center;
@@ -327,26 +313,22 @@
 
     .backlog-priority-badge.priority-lowest,
     .backlog-priority-badge.priority-low {
-        background: var(--gray50);
-        border: 1px solid var(--gray100);
+        background: var(--gray100);
         color: var(--gray500);
     }
 
     .backlog-priority-badge.priority-medium {
-        background: #EEF2FF;
-        border: 1px solid #C7D2FE;
+        background: #E0E7FF;
         color: var(--primary-darker);
     }
 
     .backlog-priority-badge.priority-high {
-        background: #FFF7ED;
-        border: 1px solid #FED7AA;
+        background: #FFEDD5;
         color: #C2410C;
     }
 
     .backlog-priority-badge.priority-highest {
-        background: #FEF2F2;
-        border: 1px solid #FECACA;
+        background: #FEE2E2;
         color: #B91C1C;
     }
 
@@ -420,6 +402,11 @@
     background: var(--primary-light);
 }
 
+
+/* ==========================================================
+   Kanban Responsive
+   ========================================================== */
+
 @media (max-width: 1400px) {
     .task-kanban {
         grid-template-columns: repeat(3, minmax(240px, 1fr));
@@ -469,6 +456,11 @@
     }
 }
 
+
+/* ==========================================================
+   Accessibility / Reduced Motion
+   ========================================================== */
+
 .task-card-title:focus-visible,
 .task-drag-handle:focus-visible {
     outline: 2px solid var(--primary);
@@ -498,23 +490,33 @@
 
 
 /* ==========================================================
-   AI TASK BREAKDOWN (modal, shared by kanban + details)
+   ثبت دستی زمان — فقط اینجا تعریف شده (تکراری نیست)
    ========================================================== */
+
+.manual-timelog-form {
+    padding: 14px 0;
+    border-top: 1px dashed var(--gray100);
+    border-bottom: 1px dashed var(--gray100);
+    margin-bottom: 14px;
+}
+
+
+/* ================= AI Task Breakdown (+ Trade Modal reuse) ================= */
 
 .ai-suggest-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    margin-right: auto;
+    padding: 8px 18px;
     border: none;
-    border-radius: 10px;
-    background: var(--primary);
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary), #7679ff);
     color: #fff;
-    font-family: inherit;
-    font-size: 13px;
     font-weight: 700;
-    cursor: pointer;
-    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    font-size: 13px;
+    box-shadow: 0 10px 25px rgba(91,95,239,.25);
+    transition: var(--transition);
 }
 
     .ai-suggest-btn:hover {
@@ -656,7 +658,8 @@
 
 
 /* ==========================================================
-   TASK DETAILS PAGE
+   CREATE / EDIT TASK MODAL
+   (کلاس‌های مشترک بین مودال ایجاد و ویرایش Task)
    ========================================================== */
 
 .task-details-page {
@@ -672,10 +675,456 @@
 .task-page-header {
     background: var(--card);
     border: 1px solid var(--gray200);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, .20);
+    transform: translateY(10px) scale(.98);
+    transition: transform .22s ease, opacity .22s ease;
+}
+
+.task-modal-backdrop.is-open .task-create-modal {
+    transform: translateY(0) scale(1);
+}
+
+
+/* Modal Header */
+
+.task-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--gray100);
+}
+
+.task-modal-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.task-modal-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.task-modal-heading h2 {
+    margin: 0;
+    color: var(--gray800);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.task-modal-heading p {
+    margin: 5px 0 0;
+    color: var(--gray500);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.task-modal-close {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--gray400);
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+
+    .task-modal-close:hover {
+        background: var(--gray50);
+        color: var(--gray700);
+    }
+
+
+/* Modal Form */
+
+.task-create-form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 22px 24px;
+}
+
+.task-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.task-form-field-full {
+    margin-bottom: 18px;
+}
+
+.task-form-field label {
+    color: var(--gray700);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.task-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.task-form-grid-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+
+/* Inputs */
+
+.task-create-form .form-control {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 9px;
+    color: var(--gray800);
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+    .task-create-form .form-control:hover {
+        border-color: var(--gray300);
+    }
+
+    .task-create-form .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+.task-description-input {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.8;
+}
+
+
+/* Input With Icon */
+
+.task-input-wrapper,
+.task-date-wrapper {
+    position: relative;
+}
+
+    .task-input-wrapper > i,
+    .task-date-wrapper > i {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        color: var(--gray400);
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    .task-input-wrapper .form-control,
+    .task-date-wrapper .form-control {
+        padding-right: 35px;
+    }
+
+
+/* Estimate */
+
+.task-input-with-suffix {
+    position: relative;
+}
+
+    .task-input-with-suffix .form-control {
+        padding-left: 48px;
+    }
+
+    .task-input-with-suffix span {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        transform: translateY(-50%);
+        color: var(--gray400);
+        font-size: 10px;
+        font-weight: 700;
+        pointer-events: none;
+    }
+
+
+/* Validation */
+
+.task-create-form .text-danger {
+    color: #DC2626;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* Modal Footer */
+
+.task-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+    margin-top: 4px;
+    padding-top: 18px;
+    border-top: 1px solid var(--gray100);
+}
+
+.task-modal-cancel,
+.task-modal-submit {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.task-modal-cancel {
+    border: 1px solid var(--gray200);
+    background: var(--card);
+    color: var(--gray600);
+}
+
+    .task-modal-cancel:hover {
+        background: var(--gray50);
+        color: var(--gray800);
+    }
+
+.task-modal-submit {
+    border: 0;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, .20);
+}
+
+    .task-modal-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(99, 102, 241, .25);
+    }
+
+    .task-modal-submit:disabled,
+    .task-modal-cancel:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+
+/* Modal Responsive */
+
+@media (max-width: 700px) {
+
+    .task-modal-backdrop {
+        padding: 12px;
+    }
+
+    .task-create-modal {
+        max-height: calc(100vh - 24px);
+        border-radius: 16px;
+    }
+
+    .task-modal-header,
+    .task-create-form {
+        padding: 17px;
+    }
+
+    .task-form-grid,
+    .task-form-grid-dates {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .task-modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .task-modal-cancel,
+    .task-modal-submit {
+        width: 100%;
+    }
+}
+
+body.task-modal-open {
+    overflow: hidden;
+}
+
+
+/* ==========================================================
+   Kanban Page Header (Index.cshtml)
+   ========================================================== */
+
+.task-page-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.task-page-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.task-page-icon {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.task-page-title h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 850;
+    color: var(--gray800);
+}
+
+.task-page-title p {
+    margin: 5px 0 0;
+    color: var(--gray500);
+    font-size: 11px;
+}
+
+.task-story-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--gray200);
+    border-radius: 9px;
+    background: var(--card);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+    .task-story-back:hover {
+        background: var(--gray50);
+        border-color: var(--gray300);
+        color: var(--gray800);
+        transform: translateX(2px);
+    }
+
+.task-page-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 16px;
+}
+
+.task-create-trigger {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, .18);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+    .task-create-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(99, 102, 241, .25);
+    }
+
+@media (max-width: 700px) {
+
+    .task-page-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .task-story-back {
+        align-self: flex-start;
+    }
+
+    .task-page-title h1 {
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .task-page-title {
+        align-items: flex-start;
+    }
+
+    .task-page-icon {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+}
+/* =========================================================
+   TASK DETAILS PAGE
+   ========================================================= */
+
+.task-details-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
     padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, .03);
+}
+
+
+/* HEADER */
+
+.task-page-header {
+    background: var(--surface, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 18px;
 }
 
 .task-breadcrumb {
@@ -689,20 +1138,20 @@
     border-bottom: 1px solid var(--gray100);
 }
 
-    .task-breadcrumb a {
-        color: var(--text-secondary);
-        text-decoration: none;
-        transition: color .2s ease;
-    }
+.task-breadcrumb a {
+    color: var(--text-secondary, #4b5563);
+    text-decoration: none;
+    transition: color .2s ease;
+}
 
-        .task-breadcrumb a:hover {
-            color: var(--primary);
-        }
+.task-breadcrumb a:hover {
+    color: var(--primary, #6366f1);
+}
 
-    .task-breadcrumb i {
-        font-size: 9px;
-        opacity: .5;
-    }
+.task-breadcrumb i {
+    font-size: 9px;
+    opacity: .5;
+}
 
 .task-header-main {
     display: flex;
@@ -853,7 +1302,7 @@
 }
 
 
-/* ---------- Status badge ---------- */
+/* STATUS */
 
 .task-status-badge {
     display: inline-flex;
@@ -899,7 +1348,7 @@
 }
 
 
-/* ---------- Tabs ---------- */
+/* TABS */
 
 .task-tabs {
     margin-top: 12rem;
@@ -995,6 +1444,9 @@
     }
 }
 
+
+/* TAB CONTENT */
+
 .task-tab-content {
     min-width: 0;
 }
@@ -1006,6 +1458,10 @@
     .task-tab-pane.active {
         display: block;
         animation: taskTabFade .2s ease;
+    }
+
+    .task-tab-pane[hidden] {
+        display: none !important;
     }
 
     .task-tab-pane[hidden] {
@@ -1025,7 +1481,7 @@
 }
 
 
-/* ---------- Cards ---------- */
+/* CARDS */
 
 .details-card {
     background: var(--card);
@@ -1072,7 +1528,7 @@
 }
 
 
-/* ---------- Overview ---------- */
+/* OVERVIEW */
 
 .task-overview-grid {
     display: grid;
@@ -1151,11 +1607,11 @@
 
 .task-date-item strong {
     font-size: 13px;
-    color: var(--text-primary);
+    color: var(--text-primary, #111827);
 }
 
 
-/* ---------- Labels ---------- */
+/* LABELS */
 
 .label-badge-list {
     display: flex;
@@ -1204,7 +1660,7 @@
     }
 
 
-/* ---------- Assignees ---------- */
+/* ASSIGNEES */
 
 .assignee-list {
     display: flex;
@@ -1256,7 +1712,7 @@
     }
 
 
-/* ---------- Subtasks & checklist ---------- */
+/* SUBTASK / CHECKLIST */
 
 .subtask-progress-text {
     margin-right: 7px;
@@ -1416,7 +1872,7 @@
 }
 
 
-/* ---------- Time ---------- */
+/* TIME */
 
 .timer-active-box {
     display: flex;
@@ -1510,7 +1966,7 @@
 }
 
 
-/* ---------- Collaboration (attachments + comments) ---------- */
+/* COLLABORATION (Files + Comments) */
 
 .task-collaboration-grid {
     display: grid;
@@ -1672,7 +2128,7 @@
     }
 
 
-/* ---------- Insights: smart priority ---------- */
+/* INSIGHTS */
 
 .smart-feature-badge {
     padding: 4px 8px;
@@ -1815,10 +2271,7 @@
     font-size: 11px;
 }
 
-    .cascade-info-box ul {
-        margin: 7px 0 0;
-        padding-right: 17px;
-    }
+/* DEPENDENCY */
 
 .dependency-columns {
     display: grid;
@@ -2334,9 +2787,9 @@ body.task-modal-open {
     }
 
 
-/* ==========================================================
-   RESPONSIVE
-   ========================================================== */
+/* =========================
+   RESPONSIVE — Details Page
+========================= */
 
 @media (max-width: 1100px) {
     .task-summary {
@@ -2439,79 +2892,5 @@ body.task-modal-open {
 @media (max-width: 768px) {
     .task-form-row {
         grid-template-columns: 1fr;
-    }
-
-    .manual-timelog-fields {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 520px) {
-    .task-details-page {
-        padding: 12px;
-    }
-
-    .task-page-header {
-        padding: 16px;
-        border-radius: 12px;
-    }
-
-    .task-title-row h1 {
-        font-size: 20px;
-    }
-
-    .task-summary {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .task-summary-item {
-        min-height: 68px;
-        padding: 10px 12px;
-    }
-
-    .task-tabs {
-        top: 5px;
-    }
-
-    .task-tab-btn {
-        padding: 0 12px;
-    }
-
-        .task-tab-btn span:not(.task-tab-badge) {
-            display: none;
-        }
-
-    .details-card {
-        padding: 16px;
-    }
-
-    .label-assign-form,
-    .assignee-add-form,
-    .attachment-upload-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
-@media (max-width: 480px) {
-    .task-page-title {
-        align-items: flex-start;
-    }
-
-    .task-page-icon {
-        width: 40px;
-        height: 40px;
-        flex-basis: 40px;
-    }
-
-    .task-modal-footer {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .task-modal-cancel,
-    .task-modal-submit {
-        width: 100%;
     }
 }

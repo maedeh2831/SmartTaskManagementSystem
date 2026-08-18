@@ -19,12 +19,6 @@ main {
     min-height: calc(100vh - 140px);
 }
 
-footer {
-    height: 70px;
-    background: var(--card);
-    border-top: 1px solid var(--gray100);
-}
-
 /* HEADER */
 
 .main-header {
@@ -35,6 +29,9 @@ footer {
     align-items: center;
     justify-content: space-between;
     padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
 }
 
 .logo {
@@ -244,15 +241,11 @@ footer {
 }
 
 
-
 /* COLLAPSED */
 
 .sidebar.collapsed {
     width: 90px;
 }
-
-
-
 
 /* Hide Menu Text */
 .sidebar.collapsed .sidebar-menu a span:not(.menu-badge) {
@@ -260,13 +253,10 @@ footer {
 }
 
 
-
 /* Hide Badge */
-
 .sidebar.collapsed .menu-badge {
     display: none;
 }
-
 
 
 /* Center Icons */
@@ -277,14 +267,11 @@ footer {
 }
 
 
-
 /* Remove Active Margin Problem */
 
 .sidebar.collapsed .sidebar-menu li.active a {
     margin: 0 12px;
 }
-
-
 
 /* Hide Title */
 
@@ -293,15 +280,13 @@ footer {
 }
 
 
-
-
-
 /* Content */
 
 .content-area {
     flex: 1;
+    min-width: 0;
     padding: 35px;
-    transition: .3s ease;
+    transition: width .3s ease; 
 }
 
 /* Sidebar Category */

@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sidebarToggle && sidebar) {
 
         sidebarToggle.addEventListener("click", function () {
-
             sidebar.classList.toggle("collapsed");
 
         });

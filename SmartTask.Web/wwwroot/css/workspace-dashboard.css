@@ -1,6 +1,4 @@
-/* ==========================================================
-                Workspace Dashboard
-   ========================================================== */
+/* Workspace Dashboard */
 
 .dashboard-page {
     animation: fadeUp .4s ease;
@@ -22,7 +20,7 @@
     margin-top: 8px;
 }
 
-/* ===== Statistics Cards ===== */
+/*  Statistics Cards  */
 
 .stats-grid {
     display: grid;
@@ -42,10 +40,10 @@
     transition: var(--transition);
 }
 
-    .stat-card:hover {
-        box-shadow: var(--shadow);
-        transform: translateY(-3px);
-    }
+.stat-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-3px);
+}
 
 .stat-icon {
     width: 54px;
@@ -90,7 +88,7 @@
     font-size: 13px;
 }
 
-/* ===== Charts ===== */
+/*  Charts  */
 
 .charts-grid {
     display: grid;
@@ -131,7 +129,7 @@
         font-size: 30px;
     }
 
-/* ===== Widgets ===== */
+/*  Widgets  */
 
 .widgets-grid {
     display: grid;
@@ -316,7 +314,7 @@
     color: var(--gray400);
 }
 
-/* ===== Responsive ===== */
+/*  Responsive  */
 
 @media(max-width: 1024px) {
     .stats-grid {
