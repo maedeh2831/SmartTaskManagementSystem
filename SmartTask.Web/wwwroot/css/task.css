@@ -3218,3 +3218,125 @@ body.task-modal-open {
 .task-tab-pane[hidden] {
     display: none !important;
 }
+
+/* =========================================================
+   TASK DETAILS — DESIGN-SYSTEM ALIGNMENT
+   The redesign used ad-hoc tokens (--surface, --border-color,
+   --text-*) that don't exist in the app; their fallbacks are
+   light-theme-only and break dark mode. Map them onto the app
+   tokens and flatten the remaining glass / gradient / radius
+   violations so the page follows the SmartTask design language.
+   ========================================================= */
+
+:root {
+    --surface: var(--card);
+    --surface-secondary: var(--gray50);
+    --border-color: var(--border);
+    --text-primary: var(--text);
+    --text-secondary: var(--gray700);
+    --text-muted: var(--muted);
+}
+
+/* Header card: 18px -> 12px */
+
+.task-page-header {
+    border-radius: 12px;
+}
+
+/* Tabs: drop the glass (blur + color-mix), use the design
+   system's underline indicator on a flat bar */
+
+.task-tabs {
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 0;
+    border-bottom: 1px solid var(--gray200);
+    border-radius: 0;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.task-tab-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--gray500);
+}
+
+    .task-tab-btn:hover {
+        background: transparent;
+        color: var(--gray700);
+    }
+
+    .task-tab-btn.active {
+        background: transparent;
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        box-shadow: none;
+    }
+
+    .task-tab-btn.active .task-tab-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+/* Trade button: gradient -> solid purple fill */
+
+.task-trade-btn {
+    background: #8B5CF6;
+    background-image: none;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .task-trade-btn:hover {
+        background: #7C3AED;
+        background-image: none;
+        transform: translateY(-1px);
+    }
+
+/* Danger action button: readable fill on hover */
+
+.task-action-btn.danger:hover {
+    background: #EF4444;
+    border-color: #EF4444;
+    color: #fff;
+}
+
+/* Modals: radii 20-24px -> 12px, drop overlay blur */
+
+.ai-modal,
+.task-create-modal {
+    border-radius: 12px;
+}
+
+.ai-modal-overlay,
+.task-modal-backdrop {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.ai-suggestion-item {
+    border-radius: 12px;
+}
+
+/* Summary strip uses --border-color as the 1px gutters; keep
+   it consistent with the gray200 border language */
+
+.task-summary {
+    border-color: var(--gray200);
+}
+
+    .task-summary .task-summary-item {
+        background: var(--card);
+    }
