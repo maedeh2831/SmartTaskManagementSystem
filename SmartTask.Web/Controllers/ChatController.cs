@@ -31,12 +31,14 @@ public class ChatController : BaseController
     private readonly IFileUploadService _fileUploadService;
     private readonly IDateFormatService _dateFormatService;
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly IWebpushrService _webpushrService;
 
     public ChatController(
         IChatService chatService,
         IFileUploadService fileUploadService,
         IDateFormatService dateFormatService,
         IHubContext<ChatHub> hubContext,
+        IWebpushrService webpushrService,
         ICurrentUserService currentUser)
         : base(currentUser)
     {
@@ -44,6 +46,7 @@ public class ChatController : BaseController
         _fileUploadService = fileUploadService;
         _dateFormatService = dateFormatService;
         _hubContext = hubContext;
+        _webpushrService = webpushrService;
     }
 
     public async Task<IActionResult> Index(int? projectId)
@@ -175,6 +178,19 @@ public class ChatController : BaseController
         await _hubContext.Clients
             .Group(ChatHub.GetProjectGroupName(projectId))
             .SendAsync("ReceiveMessage", message);
+
+        // Push Notification برای سایر اعضا (متن خالی یعنی فقط فایل ارسال شده)
+        var pushBody = string.IsNullOrWhiteSpace(message.Content)
+            ? (message.Type == ChatMessageType.Image
+                ? "یک تصویر ارسال کرد"
+                : $"یک فایل ارسال کرد: {message.AttachmentName}")
+            : message.Content;
+
+        await _webpushrService.SendChatMessagePushAsync(
+            projectId,
+            userId,
+            message.SenderName,
+            pushBody);
 
         return Json(message);
     }

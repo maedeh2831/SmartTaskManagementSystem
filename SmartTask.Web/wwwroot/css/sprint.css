@@ -1,18 +1,1152 @@
-﻿/* ==========================================================
-                    SmartTask Sprint UI
+/* ==========================================================
+   SmartTask Sprint UI
+   ========================================================== */
+
+/* ==========================================================
+   Sprint Pages — Shared Scaffolding
+   (Hero, toolbar, buttons, cards, empty states, forms)
+   ========================================================== */
+
+/* ---------- Hero ---------- */
+
+.workspace-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+
+.workspace-hero-content {
+    flex: 1;
+    min-width: 260px;
+}
+
+    .workspace-hero-content h1 {
+        margin: 0 0 6px;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray900);
+        line-height: 1.6;
+    }
+
+    .workspace-hero-content p {
+        margin: 0;
+        color: var(--gray500);
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+.workspace-toolbar {
+    margin-bottom: 28px;
+    gap: 12px;
+}
+
+.workspace-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Search ---------- */
+
+.workspace-search {
+    width: min(420px, 100%);
+}
+
+    .workspace-search input {
+        height: 46px;
+        border: 1px solid var(--gray200);
+        border-radius: 10px;
+        background: var(--card);
+        box-shadow: none;
+        padding-right: 44px;
+        padding-left: 16px;
+        font-family: inherit;
+        color: var(--gray800);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .workspace-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+    .workspace-search i {
+        right: 15px;
+        font-size: 13px;
+    }
+
+/* ---------- Buttons ----------
+   Primary   : .workspace-primary-btn / .workspace-create-btn / .ai-suggest-btn
+   Secondary : .workspace-filter / .workspace-secondary-btn / .back-link
+   Flat fills, 8-12px radii, subtle lift on hover per design system.
+*/
+
+.workspace-primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .workspace-primary-btn:hover {
+        background: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(91, 95, 239, .28);
+    }
+
+    .workspace-primary-btn:active {
+        background: var(--primary-dark);
+        transform: translateY(0);
+    }
+
+    .workspace-primary-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .workspace-primary-btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+.workspace-create-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    height: auto;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .workspace-create-btn:hover {
+        background: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(91, 95, 239, .28);
+    }
+
+.workspace-filter,
+.workspace-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--gray700);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+    .workspace-filter:hover,
+    .workspace-secondary-btn:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+    }
+
+    .workspace-filter:active,
+    .workspace-secondary-btn:active {
+        transform: translateY(1px);
+    }
+
+    .workspace-filter:focus-visible,
+    .workspace-secondary-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+/* legacy: a button nested inside .workspace-filter */
+.workspace-filter button {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--gray700);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+    .back-link:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+    }
+
+.ai-suggest-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .ai-suggest-btn:hover {
+        background: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(91, 95, 239, .28);
+    }
+
+/* ---------- Cards on sprint pages ---------- */
+
+.workspace-card {
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    background: var(--card);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+    .workspace-card::before {
+        display: none;
+    }
+
+    .workspace-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+    }
+
+.sprint-card {
+    padding: 20px;
+}
+
+.workspace-open-btn {
+    border-radius: 10px;
+}
+
+.workspace-delete-btn {
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+/* ---------- Empty state ---------- */
+
+.workspace-empty {
+    background: var(--card);
+    backdrop-filter: none;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 56px 24px;
+    box-shadow: none;
+}
+
+    .workspace-empty i {
+        font-size: 30px;
+        margin-bottom: 0;
+        color: var(--primary);
+    }
+
+    .workspace-empty .workspace-empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 24px;
+    }
+
+        .workspace-empty .workspace-empty-icon i {
+            font-size: 24px;
+        }
+
+    .workspace-empty h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+    .workspace-empty p {
+        margin: 0 0 22px;
+        color: var(--gray500);
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+.workspace-empty-action {
+    display: flex;
+    justify-content: center;
+}
+
+/* ---------- Create / Edit page ---------- */
+
+.page-header {
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+    .page-header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray900);
+    }
+
+    .page-header p {
+        color: var(--gray500);
+        font-size: 13px;
+    }
+
+.page-header-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.page-header-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.workspace-layout {
+    gap: 24px;
+}
+
+.workspace-preview {
+    position: sticky;
+    top: 24px;
+}
+
+@media (max-width: 1200px) {
+    .workspace-preview {
+        position: static;
+    }
+}
+
+.workspace-form-card {
+    background: var(--card);
+    backdrop-filter: none;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+}
+
+.form-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+    .form-title h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+    .form-title p {
+        margin: 0;
+        color: var(--gray500);
+        font-size: 12px;
+    }
+
+.workspace-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 16px;
+}
+
+/* ---------- Form controls ---------- */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+    .form-group > label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray700);
+    }
+
+.form-control {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    min-height: 46px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--gray800);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+textarea.form-control {
+    min-height: 110px;
+    line-height: 1.8;
+}
+
+.form-control:focus {
+    background: var(--card);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--gray400);
+}
+
+.sprint-input-wrap {
+    position: relative;
+}
+
+    .sprint-input-wrap > i {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray400);
+        font-size: 13px;
+        pointer-events: none;
+    }
+
+    .sprint-input-wrap .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding-right: 40px;
+    }
+
+.sprint-textarea-wrap > i {
+    top: 16px;
+    transform: none;
+}
+
+.sprint-date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-help {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--gray400);
+}
+
+.form-actions {
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Create preview / Edit info ---------- */
+
+.preview-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    animation: none;
+}
+
+    .preview-card:hover {
+        transform: none;
+    }
+
+.preview-card-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray600);
+}
+
+    .preview-card-label i {
+        color: var(--primary);
+    }
+
+.sprint-preview-ring {
+    width: 56px;
+    height: 56px;
+}
+
+.preview-header {
+    gap: 14px;
+}
+
+.preview-header-text {
+    min-width: 0;
+}
+
+    .preview-header-text h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gray800);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .preview-header-text small {
+        color: var(--gray400);
+        font-size: 12px;
+    }
+
+.preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray500);
+}
+
+    .preview-status > span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+.preview-description {
+    margin-top: 18px;
+    padding: 14px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    color: var(--gray600);
+    font-size: 13px;
+    line-height: 1.9;
+    min-height: 72px;
+}
+
+.preview-divider {
+    height: 1px;
+    background: var(--gray100);
+    margin: 18px 0;
+}
+
+.preview-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.preview-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.preview-stat-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 13px;
+}
+
+    .preview-stat small {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--gray400);
+        font-size: 10px;
+    }
+
+    .preview-stat strong {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+.preview-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 14px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+}
+
+.preview-tip-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #FEF3C7;
+    color: #B45309;
+    font-size: 13px;
+}
+
+    .preview-tip strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: var(--gray700);
+    }
+
+    .preview-tip p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--gray500);
+        line-height: 1.8;
+    }
+
+.edit-info-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.edit-info-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 15px;
+}
+
+    .edit-info-block h4 {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+    .edit-info-block p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--gray500);
+        line-height: 1.8;
+    }
+
+.edit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.edit-field-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+}
+
+.edit-field-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--primary);
+    font-size: 12px;
+}
+
+    .edit-field-item small {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--gray400);
+        font-size: 10px;
+    }
+
+    .edit-field-item strong {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--gray700);
+    }
+
+/* Sprint Index — Eyebrow */
+.sprint-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+    .sprint-eyebrow i {
+        font-size: 10px;
+        opacity: 0.8;
+    }
+
+/* Sprint Card */
+.sprint-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sprint-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* Sprint Ring */
+.sprint-ring-wrap {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sprint-ring {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.sprint-ring-track,
+.sprint-ring-fill {
+    fill: none;
+    stroke-width: 5;
+}
+
+.sprint-ring-track {
+    stroke: var(--gray100);
+}
+
+.sprint-ring-fill {
+    stroke: var(--primary);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.35s ease;
+}
+
+    .sprint-ring-fill.status-active {
+        stroke: #22C55E;
+    }
+
+    .sprint-ring-fill.status-completed {
+        stroke: #8B5CF6;
+    }
+
+    .sprint-ring-fill.status-cancelled {
+        stroke: var(--gray300);
+    }
+
+.sprint-ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+    .sprint-ring-center.status-completed {
+        color: #8B5CF6;
+    }
+
+    .sprint-ring-center.status-cancelled {
+        color: var(--gray400);
+    }
+
+.sprint-ring-num {
+    color: var(--gray800);
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.sprint-ring-label {
+    margin-top: 2px;
+    color: var(--gray500);
+    font-size: 8px;
+    font-weight: 600;
+}
+
+/* Sprint Card Head */
+.sprint-card-head {
+    flex: 1;
+    min-width: 0;
+}
+
+.sprint-card-name {
+    margin: 8px 0 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+    .sprint-card-name a {
+        color: var(--gray800);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .sprint-card-name a:hover {
+            color: var(--primary);
+        }
+
+/* Sprint Card Goal */
+.sprint-card-goal {
+    margin: 0;
+    color: var(--gray600);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.sprint-card-goal-empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray400);
+    font-style: italic;
+}
+
+    .sprint-card-goal-empty i {
+        font-size: 12px;
+    }
+
+/* Sprint Card Meta */
+.sprint-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sprint-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+    .sprint-chip i {
+        font-size: 10px;
+        opacity: 0.8;
+    }
+
+    .sprint-chip strong {
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+/* Sprint Card Footer */
+.sprint-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--gray200);
+}
+
+.sprint-card-dates {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray500);
+    font-size: 11px;
+}
+
+    .sprint-card-dates i {
+        font-size: 10px;
+        opacity: 0.7;
+    }
+
+
+/* ==========================================================
+   Sprint Details Hero
+   ========================================================== */
+
+.sprint-detail-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.sprint-detail-ring {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+    .sprint-detail-ring .sprint-ring-num {
+        font-size: 28px;
+    }
+
+    .sprint-detail-ring .sprint-ring-label {
+        font-size: 10px;
+    }
+
+.sprint-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--gray600);
+}
+
+    .sprint-hero-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sprint-hero-meta i {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    .sprint-hero-meta strong {
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+.sprint-hero-actions {
+    margin-left: auto;
+}
+
+
+/* ==========================================================
+   Sprint Progress Strip
+   ========================================================== */
+
+.sprint-progress-strip {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    margin: -8px 0 24px;
+    border-radius: 10px;
+    background: var(--gray50);
+}
+
+.sprint-progress-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray700);
+    white-space: nowrap;
+}
+
+    .sprint-progress-label i {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    .sprint-progress-label strong {
+        color: var(--primary);
+    }
+
+.sprint-progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 20px;
+    background: var(--gray200);
+    overflow: hidden;
+}
+
+.sprint-progress-days {
+    font-size: 11px;
+    color: var(--gray500);
+    white-space: nowrap;
+}
+
+    .sprint-progress-days strong {
+        font-weight: 700;
+        color: var(--gray700);
+    }
+
+
+/* ==========================================================
+   Sprint Stats Grid
+   ========================================================== */
+
+.sprint-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.sprint-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--gray50);
+}
+
+    .sprint-stat > i {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .sprint-stat div {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sprint-stat strong {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+    .sprint-stat span {
+        font-size: 11px;
+        color: var(--gray500);
+    }
+
+
+/* ==========================================================
+   Sprint Details — Status Badges
    ========================================================== */
 
 .sprint-status-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-right: 10px;
-    padding: 5px 14px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    vertical-align: middle;
 }
+
+    .sprint-status-badge i {
+        font-size: 10px;
+    }
 
     .sprint-status-badge.status-planning {
         background: var(--gray100);
@@ -28,47 +1162,22 @@
         background: #EDE9FE;
         color: #6D28D9;
     }
+
     .sprint-status-badge.status-cancelled {
         background: #FEE2E2;
         color: #B91C1C;
     }
 
-.sprint-card-header {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-}
 
-    .sprint-card-header.status-active {
-        background: linear-gradient(135deg, #16A34A, #4ADE80);
-    }
-
-    .sprint-card-header.status-completed {
-        background: linear-gradient(135deg, #7C3AED, #A78BFA);
-    }
-
-.sprint-progress-wrap {
-    margin: 14px 0;
-}
-
-    .sprint-progress-wrap small {
-        display: block;
-        margin-top: 6px;
-        color: var(--gray500);
-        font-size: 12px;
-    }
-
-.sprint-progress-bar {
-    width: 100%;
-    height: 8px;
-    border-radius: 20px;
-    background: var(--gray100);
-    overflow: hidden;
-}
+/* ==========================================================
+   Sprint Progress Fill
+   ========================================================== */
 
 .sprint-progress-fill {
     height: 100%;
     border-radius: 20px;
     background: var(--primary);
-    transition: width .4s ease;
+    transition: width 0.4s ease;
 }
 
     .sprint-progress-fill.status-active {
@@ -79,15 +1188,10 @@
         background: #8B5CF6;
     }
 
-.sprint-date-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
 
-.sprint-preview-logo {
-    background: var(--primary);
-}
+/* ==========================================================
+   Sprint Action Buttons
+   ========================================================== */
 
 .sprint-action-buttons {
     display: flex;
@@ -96,177 +1200,278 @@
     flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
-    .sprint-date-row {
-        grid-template-columns: 1fr;
-    }
-}
 
-/* Dark mode fix — status badges */
-[data-theme="dark"] .sprint-status-badge.status-active {
-    background: rgba(34, 197, 94, .16);
-    color: #4ADE80;
-}
+/* ==========================================================
+   Sprint Details — Tab System
+   ========================================================== */
 
-[data-theme="dark"] .sprint-status-badge.status-completed {
-    background: rgba(139, 92, 246, .16);
-    color: #C4B5FD;
-}
-
-[data-theme="dark"] .sprint-status-badge.status-cancelled {
-    background: rgba(239, 68, 68, .16);
-    color: #FCA5A5;
-}
-/* ===== Sprint Details — Title Row & Header Actions ===== */
-.sprint-title-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.sprint-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.icon-btn-danger {
-    color: #EF4444;
-}
-
-    .icon-btn-danger:hover {
-        background: #FEE2E2;
-        color: #B91C1C;
-    }
-
-[data-theme="dark"] .icon-btn-danger:hover {
-    background: rgba(239, 68, 68, .16);
-    color: #FCA5A5;
-}
-
-/* ===== Sprint Tabs ===== */
 .sprint-tabs {
     display: flex;
-    gap: 6px;
-    border-bottom: 1px solid var(--gray100);
-    margin: 20px 0 22px;
-    overflow-x: auto;
+    gap: 8px;
+    border-bottom: 2px solid var(--gray200);
+    margin-bottom: 24px;
+    position: relative;
 }
 
 .sprint-tab {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 18px;
-    border: none;
+    padding: 12px 20px;
     background: none;
-    color: var(--gray500);
-    font-weight: 600;
+    border: none;
+    color: var(--gray600);
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s ease;
     text-decoration: none;
-    transition: .2s;
 }
 
     .sprint-tab:hover {
-        color: var(--primary-dark);
+        color: var(--gray900);
     }
 
     .sprint-tab.active {
-        color: var(--primary-dark);
-        border-bottom-color: var(--primary-dark);
+        color: var(--primary);
+        font-weight: 600;
     }
 
-.sprint-tab-count {
-    background: var(--gray100);
-    color: var(--gray700);
+    .sprint-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary);
+    }
+
+    .sprint-tab:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: -2px;
+        border-radius: 8px;
+    }
+
+.sprint-tab-external {
+    margin-right: auto;
+}
+
+.sprint-tab-ext-icon {
     font-size: 11px;
-    font-weight: 700;
-    padding: 1px 8px;
-    border-radius: 20px;
+    opacity: 0.7;
 }
 
-.sprint-tab.active .sprint-tab-count {
-    background: var(--primary-light);
-    color: var(--primary-dark);
+.sprint-tab-indicator {
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    background: var(--primary);
+    transition: all 0.3s ease;
 }
 
-.sprint-tab-external-icon {
-    font-size: 11px;
-    color: var(--gray400);
-}
-
-/* ===== Tab Panes ===== */
 .sprint-tab-pane {
     display: none;
 }
 
     .sprint-tab-pane.active {
         display: block;
-        animation: fadeInTab .2s ease;
     }
 
-@keyframes fadeInTab {
-    from {
-        opacity: 0;
-    }
 
-    to {
-        opacity: 1;
-    }
+/* ==========================================================
+   Sprint Details — Edit Inline
+   ========================================================== */
+
+.sprint-edit-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin: 0 6px;
+    background: var(--gray100);
+    border-radius: 6px;
+    color: var(--gray600);
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    vertical-align: middle;
 }
 
-.sprint-tab-loading {
+    .sprint-edit-inline:hover {
+        background: var(--gray200);
+        color: var(--gray800);
+        transform: translateY(-1px);
+    }
+
+
+/* ==========================================================
+   Sprint Details — More Actions Dropdown
+   ========================================================== */
+
+.sprint-more-actions {
+    position: relative;
+}
+
+.sprint-more-btn {
+    min-width: auto;
+    padding: 8px 12px;
+}
+
+.sprint-more-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+}
+
+    .sprint-more-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+.sprint-more-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 10px;
-    padding: 60px 0;
-    color: var(--gray400);
-    font-size: 13.5px;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--gray700);
+    font-size: 14px;
+    text-align: right;
+    cursor: pointer;
+    transition: background 0.15s ease;
 }
 
-/* ===== Sprint Story List (tab: User Story ها) ===== */
-.sprint-story-list {
+    .sprint-more-item:hover {
+        background: var(--gray100);
+    }
+
+    .sprint-more-item.danger {
+        color: #DC2626;
+    }
+
+    .sprint-more-item.danger:hover {
+        background: #FEE2E2;
+    }
+
+    .sprint-more-item:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: -2px;
+    }
+
+
+/* ==========================================================
+   Sprint Details — Planning Loading State
+   ========================================================== */
+
+.planning-loading {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-}
-
-.sprint-story-row {
-    display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 14px;
-    border: 1px solid var(--gray100);
-    border-radius: 12px;
-    flex-wrap: wrap;
-}
-
-.sprint-story-title {
-    flex: 1;
-    min-width: 160px;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.sprint-story-owner {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12.5px;
+    justify-content: center;
+    padding: 60px 20px;
     color: var(--gray500);
-    margin-right: auto;
+    gap: 12px;
+}
+
+    .planning-loading i {
+        font-size: 32px;
+    }
+
+
+/* ==========================================================
+   Responsive
+   ========================================================== */
+
+@media (max-width: 640px) {
+    .sprint-date-row {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-stats {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
-    .sprint-header-actions,
-    .sprint-title-row {
+    .sprint-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sprint-tab {
+        white-space: nowrap;
+        padding: 10px 16px;
+    }
+
+    .sprint-more-menu {
+        right: 0;
+        left: auto;
+    }
+
+    .sprint-card-top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .sprint-card-footer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .sprint-detail-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sprint-hero-actions {
+        margin-left: 0;
         width: 100%;
     }
+
+    .sprint-progress-strip {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .sprint-stat-grid {
+        grid-template-columns: 1fr;
+    }
 }
+
+/* ==========================================================
+   Reduced motion
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .workspace-card,
+    .workspace-primary-btn,
+    .workspace-create-btn,
+    .workspace-filter,
+    .workspace-secondary-btn,
+    .ai-suggest-btn,
+    .sprint-ring-fill,
+    .sprint-more-menu {
+        transition: none !important;
+    }
+}
+

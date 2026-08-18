@@ -1,66 +1,293 @@
-﻿@model SmartTask.Web.Models.ViewModels.Sprint.SprintPlanningViewModel
-<div class="planning-capacity-bar" id="capacityBar" data-capacity="@Model.Capacity">
-    <div class="planning-capacity-info">
-        <span>ظرفیت اسپرینت</span>
-        <strong id="capacityText">@Model.PlannedPoints از @Model.Capacity Story Point</strong>
-    </div>
-    <div class="planning-capacity-track">
-        <div class="planning-capacity-fill @(Model.CapacityPercent > 100 ? "over" : "")"
-             id="capacityFill"
-             style="width:@(Math.Min(Model.CapacityPercent, 100))%"></div>
-    </div>
-</div>
-<div class="planning-board">
-    <div class="planning-column">
-        <div class="planning-column-header">
-            <i class="fa-solid fa-layer-group"></i>
-            Product Backlog
-            <span class="planning-count" id="backlogCount">@Model.BacklogStories.Count</span>
-        </div>
-        <div class="planning-list" id="backlogColumn" data-sprint-id="@Model.SprintId" data-zone="backlog">
-            @foreach (var story in Model.BacklogStories)
-            {
-                <div class="planning-card"
-                     data-id="@story.Id" data-points="@story.StoryPoint">
-                    @if (Model.CanManage)
-                    {
-                        <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
-                    }
-                    <div class="planning-card-body">
-                        <span class="planning-card-title">@story.Title</span>
-                        <div class="planning-card-meta">
-                            <span class="backlog-sp-badge">@story.StoryPoint SP</span>
-                            <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">@story.Priority</span>
-                        </div>
-                    </div>
+@model SmartTask.Web.Models.ViewModels.Sprint.SprintPlanningViewModel
+@using SmartTask.Web.Models.Enums
+
+@{
+    var capacityPercent = Model.Capacity > 0
+        ? (Model.PlannedPoints * 100.0 / Model.Capacity)
+        : 0;
+
+    var isOverCapacity = capacityPercent > 100;
+    var remainingPoints = Model.Capacity - Model.PlannedPoints;
+}
+
+<div class="planning-wrapper">
+
+    <!-- Capacity -->
+    <section class="planning-capacity-card @(isOverCapacity ? "is-over-capacity" : "")"
+             id="capacityBar"
+             data-capacity="@Model.Capacity">
+
+        <div class="planning-capacity-top">
+
+            <div class="planning-capacity-heading">
+                <span class="planning-capacity-icon">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </span>
+
+                <div>
+                    <span class="planning-capacity-label">
+                        ظرفیت اسپرینت
+                    </span>
+
+                    <strong id="capacityText">
+                        <span class="fa-digits">@Model.PlannedPoints</span>
+                        از
+                        <span class="fa-digits">@Model.Capacity</span>
+                        Story Point
+                    </strong>
                 </div>
+            </div>
+
+            <div class="planning-capacity-status">
+
+                @if (isOverCapacity)
+                {
+                    <span class="planning-capacity-badge danger">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        ظرفیت تکمیل شده
+                    </span>
+                }
+                else
+                {
+                    <span class="planning-capacity-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span class="fa-digits">@Math.Max(remainingPoints, 0)</span>
+                        SP باقی‌مانده
+                    </span>
+                }
+
+            </div>
+        </div>
+
+        <div class="planning-capacity-track">
+            <div class="planning-capacity-fill @(isOverCapacity ? "over" : "")"
+                 id="capacityFill"
+                 style="width:@(Math.Min(capacityPercent, 100))%">
+            </div>
+        </div>
+
+        <div class="planning-capacity-footer">
+            <span>
+                <span class="fa-digits">@Math.Round(capacityPercent)</span>% استفاده شده
+            </span>
+
+            @if (isOverCapacity)
+            {
+                <span class="planning-capacity-over-text">
+                    <i class="fa-solid fa-arrow-up"></i>
+                    <span class="fa-digits">@Math.Abs(remainingPoints)</span>
+                    SP بیشتر از ظرفیت
+                </span>
             }
         </div>
-    </div>
-    <div class="planning-column">
-        <div class="planning-column-header sprint-header">
-            <i class="fa-solid fa-bolt"></i>
-            @Model.SprintName
-            <span class="planning-count" id="sprintCount">@Model.SprintStories.Count</span>
+
+    </section>
+
+
+    <!-- Hint -->
+    @if (Model.CanManage)
+    {
+        <div class="planning-hint">
+            <span class="planning-hint-icon">
+                <i class="fa-solid fa-up-down-left-right"></i>
+            </span>
+
+            <span>
+                داستان‌ها را با گرفتن دستهٔ کنار هر کارت جابه‌جا کنید.
+            </span>
         </div>
-        <div class="planning-list" id="sprintColumn" data-sprint-id="@Model.SprintId" data-zone="sprint">
-            @foreach (var story in Model.SprintStories)
-            {
-                <div class="planning-card"
-                     data-id="@story.Id" data-points="@story.StoryPoint">
-                    @if (Model.CanManage)
-                    {
-                        <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
-                    }
-                    <div class="planning-card-body">
-                        <span class="planning-card-title">@story.Title</span>
-                        <div class="planning-card-meta">
-                            <span class="backlog-sp-badge">@story.StoryPoint SP</span>
-                            <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">@story.Priority</span>
-                        </div>
+    }
+
+
+    <!-- Board -->
+    <div class="planning-board">
+
+        <!-- Backlog -->
+        <section class="planning-column">
+
+            <header class="planning-column-header">
+
+                <div class="planning-column-title">
+                    <span class="planning-column-icon backlog">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </span>
+
+                    <div>
+                        <strong>Product Backlog</strong>
+                        <small>داستان‌های آماده برای برنامه‌ریزی</small>
                     </div>
                 </div>
-            }
-        </div>
+
+                <span class="planning-count" id="backlogCount">
+                    <span class="fa-digits">@Model.BacklogStories.Count</span>
+                </span>
+
+            </header>
+
+
+            <div class="planning-list"
+                 id="backlogColumn"
+                 data-sprint-id="@Model.SprintId"
+                 data-zone="backlog">
+
+                @foreach (var story in Model.BacklogStories)
+                {
+                    <div class="planning-card"
+                         draggable="@(Model.CanManage ? "true" : "false")"
+                         data-id="@story.Id"
+                         data-points="@story.StoryPoint">
+
+                        @if (Model.CanManage)
+                        {
+                            <div class="planning-card-handle"
+                                 title="جابجایی داستان">
+                                <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
+                            </div>
+                        }
+
+                        <div class="planning-card-body">
+
+                            <div class="planning-card-main">
+                                <span class="planning-card-title">
+                                    @story.Title
+                                </span>
+                            </div>
+
+                            <div class="planning-card-meta">
+
+                                <span class="planning-sp-badge">
+                                    <strong class="fa-digits">
+                                        @story.StoryPoint
+                                    </strong>
+                                    <span>SP</span>
+                                </span>
+
+                                <span class="planning-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                    @story.Priority
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if (!Model.BacklogStories.Any())
+                {
+                    <div class="planning-empty-hint">
+                        <span class="planning-empty-icon">
+                            <i class="fa-solid fa-inbox"></i>
+                        </span>
+
+                        <strong>
+                            Backlog خالی است
+                        </strong>
+
+                        <span>
+                            User Story آماده‌ای برای نمایش وجود ندارد.
+                        </span>
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- Sprint -->
+        <section class="planning-column planning-column-sprint">
+
+            <header class="planning-column-header">
+
+                <div class="planning-column-title">
+                    <span class="planning-column-icon sprint">
+                        <i class="fa-solid fa-bolt"></i>
+                    </span>
+
+                    <div>
+                        <strong>@Model.SprintName</strong>
+                        <small>داستان‌های انتخاب‌شده برای اسپرینت</small>
+                    </div>
+                </div>
+
+                <span class="planning-count planning-count-sprint"
+                      id="sprintCount">
+                    <span class="fa-digits">@Model.SprintStories.Count</span>
+                </span>
+
+            </header>
+
+
+            <div class="planning-list"
+                 id="sprintColumn"
+                 data-sprint-id="@Model.SprintId"
+                 data-zone="sprint">
+
+                @foreach (var story in Model.SprintStories)
+                {
+                    <div class="planning-card"
+                         draggable="@(Model.CanManage ? "true" : "false")"
+                         data-id="@story.Id"
+                         data-points="@story.StoryPoint">
+
+                        @if (Model.CanManage)
+                        {
+                            <div class="planning-card-handle"
+                                 title="جابجایی داستان">
+                                <i class="fa-solid fa-grip-vertical planning-drag-handle"></i>
+                            </div>
+                        }
+
+                        <div class="planning-card-body">
+
+                            <div class="planning-card-main">
+                                <span class="planning-card-title">
+                                    @story.Title
+                                </span>
+                            </div>
+
+                            <div class="planning-card-meta">
+
+                                <span class="planning-sp-badge">
+                                    <strong class="fa-digits">
+                                        @story.StoryPoint
+                                    </strong>
+                                    <span>SP</span>
+                                </span>
+
+                                <span class="planning-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                    @story.Priority
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if (!Model.SprintStories.Any())
+                {
+                    <div class="planning-empty-hint planning-empty-sprint">
+                        <span class="planning-empty-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </span>
+
+                        <strong>
+                            اسپرینت هنوز خالی است
+                        </strong>
+
+                        <span>
+                            User Storyها را از Backlog به این قسمت بکشید.
+                        </span>
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
     </div>
+
 </div>

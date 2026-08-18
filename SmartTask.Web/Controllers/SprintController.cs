@@ -282,7 +282,14 @@ public class SprintController : BaseController
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    public async Task<IActionResult> Planning(int id)
+    // Planning page is now a tab inside Details — redirect old URL to keep bookmarks working
+    public IActionResult Planning(int id)
+    {
+        return RedirectToAction(nameof(Details), new { id, tab = "planning" });
+    }
+
+    // Lazy-loaded partial for the Planning tab inside Details
+    public async Task<IActionResult> PlanningPartial(int id)
     {
         var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
         if (sprint == null)
@@ -293,6 +300,9 @@ public class SprintController : BaseController
     [HttpGet]
     public async Task<IActionResult> PlanningTab(int id)
     {
+        if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
+            return Forbid();
+
         var vm = await BuildPlanningViewModelAsync(id);
 
         if (vm == null)
@@ -329,7 +339,7 @@ public class SprintController : BaseController
             ProjectId = sprint.ProjectId,
             ProjectName = sprint.Project.Name,
             Capacity = sprint.Capacity,
-            CanManage = await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId),
+            CanManage = true, // access verified in the action
             BacklogStories = backlogStories.Select(x => new PlanningStoryItemViewModel
             {
                 Id = x.Id,

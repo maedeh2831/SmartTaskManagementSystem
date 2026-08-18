@@ -150,6 +150,7 @@ namespace SmartTask.Web
             builder.Services.AddScoped<ISettingsService, SettingsService>();
             builder.Services.AddScoped<IDateFormatService, DateFormatService>();
             builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IWebpushrService, WebpushrService>();
 
             // ردیابی حضور کاربران در حافظه؛ باید Singleton باشد.
             builder.Services.AddSingleton<IPresenceTracker, PresenceTracker>();
