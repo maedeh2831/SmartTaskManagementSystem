@@ -1,4 +1,4 @@
-﻿@model SmartTask.Web.Models.ViewModels.Label.LabelIndexViewModel
+@model SmartTask.Web.Models.ViewModels.Label.LabelIndexViewModel
 
 @{
     ViewData["Title"] = "Label های پروژه";
@@ -12,66 +12,179 @@
 
 <div class="workspace-container">
 
-    <div class="workspace-hero">
-        <div class="workspace-hero-content">
+    <!-- =====================================================
+         Hero Header
+         ===================================================== -->
+    <div class="label-hero">
+
+        <div class="label-hero-content">
             <h1>Label های @Model.ProjectName</h1>
-            <p>برچسب�های قابل استفاده روی Taskهای این پروژه را مدیریت کنید.</p>
+            <p>برچسب‌های قابل استفاده روی Taskهای این پروژه را مدیریت کنید.</p>
         </div>
 
-        <div class="workspace-toolbar">
-            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId"
-               class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به پروژه
-                </button>
+        <div class="label-hero-actions">
+            <a asp-controller="Project"
+               asp-action="Details"
+               asp-route-id="@Model.ProjectId"
+               class="label-back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
             </a>
         </div>
+
     </div>
 
+
+    <!-- =====================================================
+         Create Form (only for managers)
+         ===================================================== -->
     @if (Model.CanManage)
     {
-        <form asp-action="Create" method="post" class="label-create-form">
+        <form asp-action="Create"
+              method="post"
+              class="label-create-form"
+              id="labelCreateForm">
+
             @Html.AntiForgeryToken()
             <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
-            <input type="text" name="Name" placeholder="نام Label جدید..." required maxlength="100" />
-            <input type="color" name="Color" value="#2196F3" title="رنگ Label" />
-            <button type="submit">
+
+            <div class="label-color-picker" title="انتخاب رنگ">
+                <input type="color"
+                       name="Color"
+                       id="labelColorInput"
+                       value="#5B5FEF"
+                       title="رنگ Label" />
+            </div>
+
+            <span class="label-color-preview"
+                  id="labelColorPreview"
+                  style="background:#5B5FEF"
+                  aria-hidden="true"></span>
+
+            <input type="text"
+                   name="Name"
+                   id="labelNameInput"
+                   class="label-name-input"
+                   placeholder="نام Label جدید..."
+                   required
+                   maxlength="100"
+                   autocomplete="off"
+                   aria-label="نام Label جدید" />
+
+            <button type="submit"
+                    class="label-create-btn"
+                    id="labelCreateBtn"
+                    aria-label="افزودن Label">
                 <i class="fa-solid fa-plus"></i>
                 افزودن
             </button>
+
         </form>
+
+        <div class="label-form-error" id="labelFormError">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="labelFormErrorText"></span>
+        </div>
     }
 
+
+    <!-- =====================================================
+         Toolbar: Search + Count
+         ===================================================== -->
+    @if (Model.Labels.Any())
+    {
+        <div class="label-toolbar">
+
+            <div class="label-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text"
+                       id="labelSearchInput"
+                       placeholder="جستجوی Label..."
+                       autocomplete="off"
+                       aria-label="جستجوی Label" />
+            </div>
+
+            <span class="label-count-badge">
+                <i class="fa-solid fa-tags" style="font-size:11px; opacity:.7;"></i>
+                <strong class="fa-digits">@Model.Labels.Count</strong>
+                Label
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         Label Grid
+         ===================================================== -->
     @if (!Model.Labels.Any())
     {
-        <div class="workspace-empty">
-            <i class="fa-solid fa-tags"></i>
-            <h3>هنوز Label ای برای این پروژه ثبت نشده است.</h3>
+        <div class="label-empty-state">
+            <div class="label-empty-icon">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+            <h3>هنوز Label‌ای ثبت نشده</h3>
+            <p>
+                اولین برچسب این پروژه را بسازید تا روی Taskها استفاده کنید.
+            </p>
         </div>
     }
     else
     {
-        <div class="label-grid">
+        <div class="label-grid" id="labelGrid">
             @foreach (var label in Model.Labels)
             {
-                <div class="label-card">
-                    <span class="label-swatch" style="background:@label.Color"></span>
+                <div class="label-card"
+                     data-id="@label.Id"
+                     data-name="@label.Name.ToLower()"
+                     data-color="@label.Color">
+
+                    <span class="label-swatch"
+                          style="background:@label.Color"
+                          aria-hidden="true"></span>
+
                     <span class="label-name">@label.Name</span>
 
                     @if (Model.CanManage)
                     {
-                        <form asp-action="Delete" method="post" class="delete-label-form">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@label.Id" />
-                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                            <button type="submit" class="workspace-delete-btn">
-                                <i class="fa-solid fa-trash"></i>
+                        <div class="label-card-actions">
+
+                            <button type="button"
+                                    class="label-edit-btn"
+                                    data-id="@label.Id"
+                                    data-name="@label.Name"
+                                    data-color="@label.Color"
+                                    title="ویرایش"
+                                    aria-label="ویرایش Label">
+                                <i class="fa-solid fa-pen"></i>
                             </button>
-                        </form>
+
+                            <form asp-action="Delete"
+                                  method="post"
+                                  class="delete-label-form"
+                                  style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@label.Id" />
+                                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                <button type="submit"
+                                        class="label-delete-btn"
+                                        title="حذف"
+                                        aria-label="حذف Label">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
                     }
+
                 </div>
             }
+        </div>
+
+        <div class="label-no-results" id="labelNoResults">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <strong>نتیجه‌ای یافت نشد</strong>
+            <span>عبارت جستجوی خود را تغییر دهید.</span>
         </div>
     }
 
@@ -79,5 +192,6 @@
 
 @section Scripts
 {
+    <partial name="_ValidationScriptsPartial" />
     <script src="~/js/label.js" asp-append-version="true"></script>
 }

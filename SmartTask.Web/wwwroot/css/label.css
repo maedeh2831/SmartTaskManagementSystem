@@ -1,67 +1,702 @@
-/*label css*/
+/* ==========================================================
+                 SmartTask Label UI
+   ========================================================== */
+
+/* ==========================================================
+   Label Hero Header
+   ========================================================== */
+
+.label-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+
+.label-hero-content {
+    flex: 1;
+    min-width: 260px;
+}
+
+    .label-hero-content h1 {
+        margin: 0 0 6px;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray900);
+        line-height: 1.6;
+    }
+
+    .label-hero-content p {
+        margin: 0;
+        color: var(--gray500);
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+.label-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Back link — consistent with sprint pattern */
+
+.label-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--gray700);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+    .label-back-link:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+    }
+
+    .label-back-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+
+/* ==========================================================
+   Search & Toolbar
+   ========================================================== */
+
+.label-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.label-search {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+}
+
+    .label-search input {
+        width: 100%;
+        height: 42px;
+        border: 1px solid var(--gray200);
+        border-radius: 10px;
+        background: var(--card);
+        padding-right: 40px;
+        padding-left: 14px;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--gray800);
+        box-shadow: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .label-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .label-search input::placeholder {
+            color: var(--gray400);
+        }
+
+    .label-search i {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray400);
+        font-size: 13px;
+        pointer-events: none;
+    }
+
+.label-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .label-count-badge strong {
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+
+/* ==========================================================
+   Create Form
+   ========================================================== */
+
 .label-create-form {
     display: flex;
     align-items: center;
     gap: 10px;
     background: var(--card);
-    border: 1px solid var(--gray100);
-    border-radius: 14px;
-    padding: 12px 18px;
-    margin-bottom: 20px;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 24px;
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
 
-    .label-create-form input[type="text"] {
-        flex: 1;
+    .label-create-form:focus-within {
+        border-color: var(--primary-border);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+/* Color picker wrapper */
+
+.label-color-picker {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--gray200);
+    cursor: pointer;
+    transition: border-color .2s ease, transform .15s ease;
+}
+
+    .label-color-picker:hover {
+        border-color: var(--gray400);
+        transform: scale(1.05);
+    }
+
+    .label-color-picker input[type="color"] {
+        position: absolute;
+        inset: -4px;
+        width: calc(100% + 8px);
+        height: calc(100% + 8px);
         border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+/* Color preview dot */
+
+.label-color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid var(--card);
+    box-shadow: 0 0 0 1px var(--gray200);
+    transition: background .2s ease, transform .2s ease;
+}
+
+/* Name input */
+
+.label-name-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--gray800);
+    padding: 8px 4px;
+}
+
+    .label-name-input::placeholder {
+        color: var(--gray400);
+    }
+
+    .label-name-input:focus {
         outline: none;
-        font-size: 14px;
     }
 
-    .label-create-form input[type="color"] {
-        width: 40px;
-        height: 36px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
+/* Submit button */
+
+.label-create-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
+    transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+    .label-create-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(91, 95, 239, .25);
     }
 
-    .label-create-form button {
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        padding: 8px 18px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
+    .label-create-btn:active {
+        transform: translateY(0);
     }
+
+    .label-create-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .label-create-btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Loading state */
+
+.label-create-btn.loading {
+    pointer-events: none;
+    opacity: .75;
+}
+
+    .label-create-btn.loading::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 6px;
+        border: 2px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: label-spin .6s linear infinite;
+    }
+
+@keyframes label-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Validation error state */
+
+.label-create-form.has-error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+}
+
+.label-form-error {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #FEF2F2;
+    color: #B91C1C;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .label-form-error.visible {
+        display: flex;
+    }
+
+    .label-form-error i {
+        font-size: 11px;
+    }
+
+
+/* ==========================================================
+   Label Grid
+   ========================================================== */
 
 .label-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
 }
+
+/* ==========================================================
+   Label Card
+   ========================================================== */
 
 .label-card {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: var(--card);
-    border: 1px solid var(--gray100);
-    border-radius: 12px;
-    padding: 12px 16px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    animation: label-fadeUp .35s ease;
 }
 
-.label-swatch {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    flex-shrink: 0;
+    .label-card:hover {
+        border-color: var(--gray300);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+        transform: translateY(-1px);
+    }
+
+@keyframes label-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
+
+/* Stagger animation for grid items */
+
+.label-card:nth-child(1) { animation-delay: 0ms; }
+.label-card:nth-child(2) { animation-delay: 30ms; }
+.label-card:nth-child(3) { animation-delay: 60ms; }
+.label-card:nth-child(4) { animation-delay: 90ms; }
+.label-card:nth-child(5) { animation-delay: 120ms; }
+.label-card:nth-child(6) { animation-delay: 150ms; }
+.label-card:nth-child(7) { animation-delay: 180ms; }
+.label-card:nth-child(8) { animation-delay: 210ms; }
+
+/* Color swatch */
+
+.label-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+    transition: transform .2s ease;
+}
+
+    .label-card:hover .label-swatch {
+        transform: scale(1.1);
+    }
+
+/* Label name */
 
 .label-name {
     flex: 1;
-    font-size: 13px;
+    min-width: 0;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--gray700);
+    color: var(--gray800);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Card actions — hidden by default, show on hover */
+
+.label-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+    .label-card:hover .label-card-actions {
+        opacity: 1;
+    }
+
+    /* Always show on touch devices */
+    @media (hover: none) {
+        .label-card-actions {
+            opacity: 1;
+        }
+    }
+
+.label-edit-btn,
+.label-delete-btn {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+
+.label-edit-btn {
+    color: var(--gray500);
+}
+
+    .label-edit-btn:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        transform: scale(1.1);
+    }
+
+.label-delete-btn {
+    color: var(--gray500);
+}
+
+    .label-delete-btn:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+        transform: scale(1.1);
+    }
+
+.label-edit-btn:focus-visible,
+.label-delete-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Delete animation */
+
+.label-card.removing {
+    animation: label-slideOut .3s ease forwards;
+}
+
+@keyframes label-slideOut {
+    to {
+        opacity: 0;
+        transform: scale(.9) translateY(-8px);
+    }
+}
+
+
+/* ==========================================================
+   Empty State
+   ========================================================== */
+
+.label-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 24px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+}
+
+.label-empty-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 24px;
+    margin-bottom: 18px;
+}
+
+.label-empty-state h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray800);
+}
+
+.label-empty-state p {
+    margin: 0;
+    color: var(--gray500);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* Filter no-results state */
+
+.label-no-results {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--gray500);
+}
+
+    .label-no-results.visible {
+        display: flex;
+    }
+
+    .label-no-results i {
+        font-size: 28px;
+        color: var(--gray400);
+        margin-bottom: 12px;
+    }
+
+    .label-no-results strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+        color: var(--gray700);
+    }
+
+    .label-no-results span {
+        font-size: 12px;
+    }
+
+
+/* ==========================================================
+   Inline Edit Mode
+   ========================================================== */
+
+.label-edit-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.label-edit-input {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 0 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--gray800);
+    background: var(--card);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+    .label-edit-input:focus {
+        outline: none;
+    }
+
+.label-edit-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.label-edit-save,
+.label-edit-cancel {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background .2s ease, color .2s ease;
+}
+
+.label-edit-save {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+    .label-edit-save:hover {
+        background: #15803D;
+        color: #fff;
+    }
+
+.label-edit-cancel {
+    background: var(--gray100);
+    color: var(--gray600);
+}
+
+    .label-edit-cancel:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+
+/* ==========================================================
+   Responsive
+   ========================================================== */
+
+@media (max-width: 768px) {
+    .label-hero {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .label-hero-actions {
+        width: 100%;
+    }
+
+    .label-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .label-search {
+        max-width: 100%;
+    }
+
+    .label-create-form {
+        flex-wrap: wrap;
+    }
+
+    .label-name-input {
+        min-width: 120px;
+    }
+
+    .label-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .label-card-actions {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .label-create-form {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .label-create-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* ==========================================================
+   Reduced Motion
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .label-card,
+    .label-card:hover,
+    .label-swatch,
+    .label-create-btn,
+    .label-edit-btn,
+    .label-delete-btn,
+    .label-color-picker {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
 }

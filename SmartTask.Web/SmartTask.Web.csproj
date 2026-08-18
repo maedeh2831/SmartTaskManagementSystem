@@ -13,6 +13,36 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Keep the unit-test project (nested under this folder) out of the web app's
+         default **/*.cs compile glob -->
+    <Compile Remove="SmartTask.Web.Tests/**/*.cs" />
+    <Compile Remove="SmartTask.Web.Tests\bin\**" />
+    <Compile Remove="SmartTask.Web.Tests\obj\**" />
+    <Content Remove="SmartTask.Web.Tests/**" />
+    <Content Remove="SmartTask.Web.Tests\bin\**" />
+    <Content Remove="SmartTask.Web.Tests\obj\**" />
+    <None Remove="SmartTask.Web.Tests/**" />
+    <None Remove="SmartTask.Web.Tests\bin\**" />
+    <None Remove="SmartTask.Web.Tests\obj\**" />
+    <EmbeddedResource Remove="SmartTask.Web.Tests/**" />
+    <EmbeddedResource Remove="SmartTask.Web.Tests\bin\**" />
+    <EmbeddedResource Remove="SmartTask.Web.Tests\obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="SmartTask.Web.Tests\Services\DateFormatServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\PriorityEngineServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\ProjectHealthServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\SprintServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\SubTaskServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\TaskDependencyServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\TaskServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\Services\WorkloadAnalysisServiceTests.cs" />
+    <Compile Include="SmartTask.Web.Tests\TestHelpers\TestDataBuilder.cs" />
+    <Compile Include="SmartTask.Web.Tests\TestHelpers\TestDbContextFactory.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Common\Exceptions\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
@@ -26,6 +56,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="SmartTask.Web.Tests\SmartTask.Web.Tests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.29" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
@@ -35,12 +69,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.28" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.28" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.28">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="QuestPDF" Version="2026.7.2" />
+    <PackageReference Include="xunit" Version="2.9.3" />
   </ItemGroup>
 
 </Project>

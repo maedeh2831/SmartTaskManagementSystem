@@ -39,7 +39,7 @@
                         <label asp-for="Email" class="form-label">
                         </label>
 
-                        <input asp-for="Email" class="form-control" placeholder="ایمیل" />
+                        <input asp-for="Email" class="form-control" placeholder="ایمیل" autocomplete="email" aria-required="true" />
 
                         <span asp-validation-for="Email"  class="text-danger">
                         </span>
@@ -51,7 +51,7 @@
                         <label asp-for="Password" class="form-label">
                         </label>
 
-                        <input asp-for="Password" class="form-control" placeholder="رمز عبور" />
+                        <input asp-for="Password" class="form-control" placeholder="رمز عبور" autocomplete="current-password" aria-required="true" />
 
                         <span asp-validation-for="Password" class="text-danger">
                         </span>
@@ -64,7 +64,7 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 auth-btn">
+                    <button type="submit" class="btn btn-primary w-100 auth-btn" aria-label="ورود به حساب کاربری">
                         ورود
                     </button>
 
@@ -84,7 +84,8 @@
                                value="Google" />
 
                         <button type="submit"
-                                class="google-btn">
+                                class="google-btn"
+                                aria-label="ورود با حساب Google">
 
                             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                                  alt="Google" />

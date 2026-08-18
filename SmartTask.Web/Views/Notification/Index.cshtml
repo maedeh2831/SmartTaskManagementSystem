@@ -1,68 +1,191 @@
-﻿@model SmartTask.Web.Models.ViewModels.Notification.NotificationIndexViewModel
+@model SmartTask.Web.Models.ViewModels.Notification.NotificationIndexViewModel
+@using SmartTask.Web.Models.Enums
 
 @{
     ViewData["Title"] = "اعلان‌ها";
+
+    var allCount = Model.Notifications.Count;
+    var unreadCount = Model.Notifications.Count(n => !n.IsRead);
+    var readCount = Model.Notifications.Count(n => n.IsRead);
+
+    var typeLabels = new Dictionary<NotificationType, (string Label, string Icon, string CssClass)>
+    {
+        { NotificationType.Assignment,   ("تکلیف",       "fa-solid fa-user-check",      "type-assignment") },
+        { NotificationType.Comment,      ("نظر",         "fa-solid fa-comment",          "type-comment") },
+        { NotificationType.Mention,      ("اشاره",       "fa-solid fa-at",               "type-mention") },
+        { NotificationType.Invitation,   ("دعوت",        "fa-solid fa-user-plus",        "type-invitation") },
+        { NotificationType.StatusChange, ("تغییر وضعیت", "fa-solid fa-arrows-rotate",    "type-statuschange") },
+        { NotificationType.Deadline,     ("مهلت",        "fa-solid fa-hourglass-end",    "type-deadline") },
+        { NotificationType.Reminder,     ("یادآوری",     "fa-solid fa-bell",             "type-reminder") },
+    };
 }
 
 @section Styles
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
 }
 
-<div class="workspace-details-page">
+<div class="workspace-container">
 
-    <div class="page-header">
-        <div>
+    <!-- =====================================================
+         Hero Header
+         ===================================================== -->
+    <div class="notification-hero">
+
+        <div class="notification-hero-content">
             <h1>اعلان‌ها</h1>
-            <p>@(Model.UnreadCount > 0 ? $"{Model.UnreadCount} اعلان خوانده‌نشده" : "همه اعلان‌ها خوانده شده‌اند")</p>
+            <p>
+                @if (unreadCount > 0)
+                {
+                    <span><strong class="fa-digits">@unreadCount</strong> اعلان خوانده‌نشده</span>
+                }
+                else
+                {
+                    <span>همه اعلان‌ها خوانده شده‌اند</span>
+                }
+                @if (allCount > 0)
+                {
+                    <span> — مجموع <strong class="fa-digits">@allCount</strong> اعلان</span>
+                }
+            </p>
         </div>
 
-        @if (Model.UnreadCount > 0)
-        {
-            <button type="button" id="markAllReadPageBtn" class="btn btn-light">
-                <i class="fa-solid fa-check-double"></i>
-                علامت‌گذاری همه به‌عنوان خوانده‌شده
-            </button>
-        }
+        <div class="notification-hero-actions">
+            @if (unreadCount > 0)
+            {
+                <button type="button"
+                        id="markAllReadPageBtn"
+                        class="notification-mark-all-page-btn"
+                        aria-label="علامت‌گذاری همه به‌عنوان خوانده‌شده">
+                    <i class="fa-solid fa-check-double"></i>
+                    علامت‌گذاری همه به‌عنوان خوانده‌شده
+                </button>
+            }
+        </div>
+
     </div>
 
+
+    <!-- =====================================================
+         Filter Tabs (only when notifications exist)
+         ===================================================== -->
+    @if (Model.Notifications.Any())
+    {
+        <div class="notification-filter-bar" id="notificationFilterBar">
+
+            <div class="notification-filter-tabs" role="tablist" aria-label="فیلتر بر اساس وضعیت">
+                <button class="notification-filter-tab active"
+                        role="tab"
+                        aria-selected="true"
+                        data-filter="all">
+                    همه
+                    <span class="notification-filter-count fa-digits">@allCount</span>
+                </button>
+                <button class="notification-filter-tab"
+                        role="tab"
+                        aria-selected="false"
+                        data-filter="unread">
+                    <i class="fa-solid fa-circle" style="font-size:6px; color:var(--primary);"></i>
+                    خوانده‌نشده
+                    <span class="notification-filter-count fa-digits">@unreadCount</span>
+                </button>
+                <button class="notification-filter-tab"
+                        role="tab"
+                        aria-selected="false"
+                        data-filter="read">
+                    <i class="fa-solid fa-check" style="font-size:10px;"></i>
+                    خوانده‌شده
+                    <span class="notification-filter-count fa-digits">@readCount</span>
+                </button>
+            </div>
+
+            <span class="notification-filter-summary" id="notificationFilterSummary">
+                نمایش <strong class="fa-digits">@allCount</strong> از <strong class="fa-digits">@allCount</strong> اعلان
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         Notification List
+         ===================================================== -->
     <div class="details-card notification-center-card">
+
         @if (!Model.Notifications.Any())
         {
-            <div class="team-empty-text">
-                <i class="fa-regular fa-bell-slash"></i>
-                هنوز اعلانی برای شما ثبت نشده است.
+            <!-- Empty State -->
+            <div class="notification-empty-state">
+                <div class="notification-empty-icon">
+                    <i class="fa-regular fa-bell-slash"></i>
+                </div>
+                <h3>هنوز اعلانی ندارید</h3>
+                <p>
+                    اعلان‌های شما از فعالیت‌های پروژه، نظرات و تغییرات وضعیت اینجا نمایش داده خواهند شد.
+                </p>
             </div>
         }
         else
         {
-            <div class="notification-center-list" id="notificationCenterList">
+            <div class="notification-center-list" id="notificationCenterList" role="list" aria-label="لیست اعلان‌ها">
                 @foreach (var item in Model.Notifications)
                 {
-                    <div class="notification-center-item @(item.IsRead ? "" : "unread")" data-id="@item.Id">
+                    var typeFound = typeLabels.TryGetValue(item.Type, out var t);
+                    var notifLabel = typeFound ? t.Item1 : "سایر";
+                    var notifIcon = typeFound ? t.Item2 : "fa-solid fa-circle-info";
+                    var notifClass = typeFound ? t.Item3 : "type-default";
+
+                    <div class="notification-center-item @(item.IsRead ? "" : "unread")"
+                         data-id="@item.Id"
+                         data-read="@(item.IsRead.ToString().ToLower())"
+                         data-type="@item.Type.ToString().ToLower()"
+                         role="listitem">
+
                         <div class="notification-item-icon">
                             <i class="@item.IconClass"></i>
                         </div>
+
                         <div class="notification-item-body">
-                            <span class="notification-item-title">@item.Title</span>
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <span class="notification-item-title">@item.Title</span>
+                                <span class="notification-type-badge @notifClass">
+                                    <i class="@notifIcon" style="font-size:8px;"></i>
+                                    @notifLabel
+                                </span>
+                            </div>
                             <span class="notification-item-message">@item.Message</span>
-                            <span class="notification-item-time">@item.TimeAgoDisplay</span>
+                            <span class="notification-item-time">
+                                <i class="fa-regular fa-clock" style="font-size:9px; opacity:.7;"></i>
+                                @item.TimeAgoDisplay
+                            </span>
                         </div>
+
                         <div class="notification-item-actions">
                             @if (!item.IsRead)
                             {
-                                <button type="button" class="notification-read-btn" data-id="@item.Id" title="علامت‌گذاری به‌عنوان خوانده‌شده">
+                                <button type="button"
+                                        class="notification-read-btn"
+                                        data-id="@item.Id"
+                                        title="علامت‌گذاری به‌عنوان خوانده‌شده"
+                                        aria-label="علامت‌گذاری به‌عنوان خوانده‌شده">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
                             }
-                            <button type="button" class="notification-delete-btn" data-id="@item.Id" title="حذف">
+                            <button type="button"
+                                    class="notification-delete-btn"
+                                    data-id="@item.Id"
+                                    title="حذف"
+                                    aria-label="حذف اعلان">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
+
                     </div>
                 }
             </div>
         }
+
     </div>
 
 </div>

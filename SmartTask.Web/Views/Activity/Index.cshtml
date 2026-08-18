@@ -14,14 +14,14 @@
 
     <div class="dashboard-header">
         <div class="dashboard-title">
-            <h1>فعالیت‌های من</h1>
+            <h1><i class="fa-solid fa-clock-rotate-left" style="font-size:18px; color:var(--primary); margin-left:8px;"></i>فعالیت‌های من</h1>
             <p>تاریخچه کامل اقدامات شما روی Task های مختلف</p>
         </div>
     </div>
 
     <div class="widget-card widget-card-wide">
         <div class="widget-header">
-            <h3>تاریخچه فعالیت</h3>
+            <h3><i class="fa-solid fa-timeline" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>تاریخچه فعالیت</h3>
         </div>
 
         @if (!Model.Activities.Any())
@@ -33,10 +33,10 @@
         }
         else
         {
-            <div class="activity-timeline">
+            <div class="activity-timeline" role="list" aria-label="تاریخچه فعالیت">
                 @foreach (var item in Model.Activities)
                 {
-                    <div class="activity-row">
+                    <div class="activity-row" role="listitem">
                         <div class="activity-icon"><i class="@item.IconClass"></i></div>
                         <div class="activity-info">
                             <p>
@@ -50,7 +50,7 @@
                             {
                                 <span class="activity-desc">@item.Description</span>
                             }
-                            <span>@Html.DisplayDate(item.ActivityDate, includeTime: true)</span>
+                            <span><i class="fa-regular fa-clock" style="font-size:9px; opacity:.7;"></i> @Html.DisplayDate(item.ActivityDate, includeTime: true)</span>
                         </div>
                     </div>
                 }

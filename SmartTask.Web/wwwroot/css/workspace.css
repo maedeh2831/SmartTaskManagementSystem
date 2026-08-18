@@ -771,30 +771,53 @@ textarea.form-control {
 
 
 .details-card {
-    background: rgba(255,255,255,.75);
-    backdrop-filter: blur(18px);
-    border-radius: 28px;
-    padding: 30px;
-    box-shadow: var(--shadow);
-    margin-bottom: 25px;
-}
-
-
-
-.card-title {
-    font-size: 18px;
-    font-weight: 800;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
     margin-bottom: 20px;
 }
 
 
 
+.card-title {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 17px;
+    color: var(--gray800);
+}
+
+    .card-title > div {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+        .card-title > i,
+        .card-title > div > i {
+            color: var(--primary);
+        }
+
+
+
 .details-card p {
-    color: var(--gray500);
+    color: var(--gray700);
     line-height: 2;
+    margin: 0;
+}
+
+/* Empty state text used across detail pages */
+.team-empty-text {
+    color: var(--gray400);
+    text-align: center;
+    padding: 24px 0;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Entities;
@@ -15,12 +15,15 @@ public class TaskDependencyService : ITaskDependencyService
 
     public TaskDependencyService(ApplicationDbContext context, ITaskService taskService)
     {
-        _context = context;
-        _taskService = taskService;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService));
     }
 
     public async Task<TaskDependencyWidgetViewModel> GetWidgetAsync(int taskId, int currentUserId)
     {
+        if (taskId <= 0 || currentUserId <= 0)
+            throw new ArgumentException("Invalid task or user ID");
+
         var task = await _context.TaskItems
             .Include(t => t.UserStory)
             .FirstOrDefaultAsync(t => t.Id == taskId);
@@ -30,17 +33,17 @@ public class TaskDependencyService : ITaskDependencyService
 
         var projectId = task.UserStory.ProjectId;
 
-        var dependsOnRaw = await _context.TaskDependencies
-            .Where(d => d.TaskItemId == taskId)
+        // OPTIMIZED: Load all dependencies in 2 queries instead of separate queries
+        var dependencies = await _context.TaskDependencies
+            .Where(d => (d.TaskItemId == taskId || d.DependsOnTaskItemId == taskId) && d.ViewState)
+            .Include(d => d.TaskItem)
             .Include(d => d.DependsOnTaskItem)
             .ToListAsync();
 
-        var dependentsRaw = await _context.TaskDependencies
-            .Where(d => d.DependsOnTaskItemId == taskId)
-            .Include(d => d.TaskItem)
-            .ToListAsync();
+        var dependsOnRaw = dependencies.Where(d => d.TaskItemId == taskId).ToList();
+        var dependentsRaw = dependencies.Where(d => d.DependsOnTaskItemId == taskId).ToList();
 
-        var linkedIds = dependsOnRaw.Select(d => d.DependsOnTaskItemId).ToHashSet();
+        var linkedIds = new HashSet<int>(dependsOnRaw.Select(d => d.DependsOnTaskItemId));
         linkedIds.Add(taskId);
 
         var availableTasks = await _context.TaskItems
@@ -82,11 +85,14 @@ public class TaskDependencyService : ITaskDependencyService
 
     public async Task<(bool success, string? error)> AddDependencyAsync(int taskId, int dependsOnTaskId, bool isRequired)
     {
+        if (taskId <= 0 || dependsOnTaskId <= 0)
+            return (false, "معرفات غیر معتبر.");
+
         if (taskId == dependsOnTaskId)
             return (false, "یک Task نمی‌تواند به خودش وابسته باشد.");
 
         var exists = await _context.TaskDependencies
-            .AnyAsync(d => d.TaskItemId == taskId && d.DependsOnTaskItemId == dependsOnTaskId);
+            .AnyAsync(d => d.TaskItemId == taskId && d.DependsOnTaskItemId == dependsOnTaskId && d.ViewState);
 
         if (exists)
             return (false, "این وابستگی قبلاً ثبت شده است.");
@@ -109,30 +115,57 @@ public class TaskDependencyService : ITaskDependencyService
 
     public async Task<bool> RemoveDependencyAsync(int id)
     {
-        var dep = await _context.TaskDependencies.FirstOrDefaultAsync(x => x.Id == id);
-        if (dep == null) return false;
+        if (id <= 0)
+            return false;
 
-        _context.TaskDependencies.Remove(dep);
-        await _context.SaveChangesAsync();
-        return true;
+        var updated = await _context.TaskDependencies
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(u => u.SetProperty(x => x.ViewState, false));
+
+        return updated > 0;
     }
 
     public async Task<List<DependencyRiskItemViewModel>> GetProjectRiskOverviewAsync(int projectId)
     {
+        if (projectId <= 0)
+            return new List<DependencyRiskItemViewModel>();
+
+        // OPTIMIZED: Load all tasks and dependencies upfront (2 queries total)
         var tasks = await _context.TaskItems
             .Where(t => t.UserStory.ProjectId == projectId && t.ViewState
                 && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled)
+            .Select(t => new { t.Id, t.Title, t.DueDate, t.Status })
+            .ToListAsync();
+
+        if (tasks.Count == 0)
+            return new List<DependencyRiskItemViewModel>();
+
+        var taskIds = tasks.Select(t => t.Id).ToHashSet();
+
+        // Load ALL dependencies for the entire graph in ONE query
+        var allDependencies = await _context.TaskDependencies
+            .Where(d => taskIds.Contains(d.DependsOnTaskItemId) || taskIds.Contains(d.TaskItemId))
+            .Where(d => d.ViewState)
             .ToListAsync();
 
         var result = new List<DependencyRiskItemViewModel>();
 
         foreach (var task in tasks)
         {
-            var delayDays = CalculateDelayDays(task);
+            var delayDays = CalculateDelayDays(new TaskItem
+            {
+                Id = task.Id,
+                Title = task.Title,
+                DueDate = task.DueDate,
+                Status = task.Status,
+                ViewState = true
+            });
+
             if (delayDays <= 0)
                 continue;
 
-            var impacted = await GetImpactedTasksAsync(task.Id, delayDays);
+            // OPTIMIZED: Traverse dependency graph in-memory instead of DB queries
+            var impacted = GetImpactedTasksInMemory(task.Id, delayDays, allDependencies, taskIds);
             var requiredImpacted = impacted.Where(x => x.IsRequiredChain).ToList();
 
             if (!requiredImpacted.Any())
@@ -156,27 +189,36 @@ public class TaskDependencyService : ITaskDependencyService
 
     public async Task<DependencyGraphViewModel> GetDependencyGraphAsync(int projectId)
     {
+        if (projectId <= 0)
+            return new DependencyGraphViewModel { Nodes = new(), Edges = new() };
+
+        // OPTIMIZED: Single query with proper projections
         var tasks = await _context.TaskItems
             .Where(t => t.UserStory.ProjectId == projectId && t.ViewState)
             .Select(t => new { t.Id, t.Title, t.Status, t.DueDate })
             .ToListAsync();
 
+        if (tasks.Count == 0)
+            return new DependencyGraphViewModel { Nodes = new(), Edges = new() };
+
         var taskIds = tasks.Select(t => t.Id).ToHashSet();
 
         var dependencies = await _context.TaskDependencies
-            .Where(d => taskIds.Contains(d.TaskItemId) && taskIds.Contains(d.DependsOnTaskItemId))
+            .Where(d => taskIds.Contains(d.TaskItemId) && taskIds.Contains(d.DependsOnTaskItemId) && d.ViewState)
             .ToListAsync();
 
         var riskyTaskIds = (await GetProjectRiskOverviewAsync(projectId))
             .Select(r => r.TaskId)
             .ToHashSet();
 
+        var now = DateTime.Now.Date;
+
         var nodes = tasks.Select(t => new DependencyGraphNodeViewModel
         {
             Id = t.Id,
             Title = t.Title,
             IsDone = t.Status == TaskStatusType.Done || t.Status == TaskStatusType.Cancelled,
-            IsOverdue = t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.Now.Date
+            IsOverdue = t.DueDate.HasValue && t.DueDate.Value.Date < now
                 && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled,
             IsAtRisk = riskyTaskIds.Contains(t.Id)
         }).ToList();
@@ -191,7 +233,7 @@ public class TaskDependencyService : ITaskDependencyService
         return new DependencyGraphViewModel { Nodes = nodes, Edges = edges };
     }
 
-    // Private Helpers 
+    // Private Helpers
 
     private static int CalculateDelayDays(TaskItem task)
     {
@@ -206,6 +248,15 @@ public class TaskDependencyService : ITaskDependencyService
 
     private async Task<bool> WouldCreateCycleAsync(int taskId, int dependsOnTaskId)
     {
+        if (taskId <= 0 || dependsOnTaskId <= 0)
+            return false;
+
+        // OPTIMIZED: Load all dependencies once, then traverse in-memory
+        var allDependencies = await _context.TaskDependencies
+            .Where(d => d.ViewState)
+            .Select(d => new { d.TaskItemId, d.DependsOnTaskItemId })
+            .ToListAsync();
+
         var visited = new HashSet<int>();
         var queue = new Queue<int>();
         queue.Enqueue(dependsOnTaskId);
@@ -220,10 +271,11 @@ public class TaskDependencyService : ITaskDependencyService
             if (!visited.Add(current))
                 continue;
 
-            var next = await _context.TaskDependencies
+            // Traverse in-memory dependencies
+            var next = allDependencies
                 .Where(d => d.TaskItemId == current)
                 .Select(d => d.DependsOnTaskItemId)
-                .ToListAsync();
+                .ToList();
 
             foreach (var n in next)
                 queue.Enqueue(n);
@@ -232,8 +284,26 @@ public class TaskDependencyService : ITaskDependencyService
         return false;
     }
 
-     public async Task<List<ImpactedTaskViewModel>> GetImpactedTasksAsync(int taskId, int delayDays)
+    public async Task<List<ImpactedTaskViewModel>> GetImpactedTasksAsync(int taskId, int delayDays)
     {
+        if (taskId <= 0)
+            return new List<ImpactedTaskViewModel>();
+
+        // OPTIMIZED: Load all dependencies for the entire graph in ONE query
+        var allDependencies = await _context.TaskDependencies
+            .Where(d => d.ViewState)
+            .Select(d => new
+            {
+                d.Id,
+                d.TaskItemId,
+                d.DependsOnTaskItemId,
+                d.IsRequired,
+                TaskTitle = d.TaskItem.Title,
+                TaskDueDate = d.TaskItem.DueDate
+            })
+            .ToListAsync();
+
+        // Traverse in-memory instead of making DB queries per node
         var result = new List<ImpactedTaskViewModel>();
         var visited = new HashSet<int> { taskId };
         var queue = new Queue<(int TaskId, int Depth, bool RequiredChain)>();
@@ -243,10 +313,10 @@ public class TaskDependencyService : ITaskDependencyService
         {
             var (currentId, depth, requiredChain) = queue.Dequeue();
 
-            var directDependents = await _context.TaskDependencies
+            // Get direct dependents from in-memory collection
+            var directDependents = allDependencies
                 .Where(d => d.DependsOnTaskItemId == currentId)
-                .Include(d => d.TaskItem)
-                .ToListAsync();
+                .ToList();
 
             foreach (var dep in directDependents)
             {
@@ -258,13 +328,58 @@ public class TaskDependencyService : ITaskDependencyService
                 result.Add(new ImpactedTaskViewModel
                 {
                     TaskId = dep.TaskItemId,
-                    Title = dep.TaskItem.Title,
+                    Title = dep.TaskTitle,
                     Depth = depth + 1,
                     IsRequiredChain = chainRequired,
-                    OriginalDueDate = dep.TaskItem.DueDate,
-                    ProjectedDueDate = chainRequired && delayDays > 0 && dep.TaskItem.DueDate.HasValue
+                    OriginalDueDate = dep.TaskDueDate,
+                    ProjectedDueDate = chainRequired && delayDays > 0 && dep.TaskDueDate.HasValue
+                        ? dep.TaskDueDate.Value.AddDays(delayDays)
+                        : dep.TaskDueDate
+                });
+
+                queue.Enqueue((dep.TaskItemId, depth + 1, chainRequired));
+            }
+        }
+
+        return result.OrderBy(x => x.Depth).ToList();
+    }
+
+    /// <summary>
+    /// OPTIMIZED: In-memory traversal of dependency graph to avoid N+1 queries
+    /// </summary>
+    private List<ImpactedTaskViewModel> GetImpactedTasksInMemory(int taskId, int delayDays,
+        List<TaskDependency> allDependencies, HashSet<int> validTaskIds)
+    {
+        var result = new List<ImpactedTaskViewModel>();
+        var visited = new HashSet<int> { taskId };
+        var queue = new Queue<(int TaskId, int Depth, bool RequiredChain)>();
+        queue.Enqueue((taskId, 0, true));
+
+        while (queue.Count > 0)
+        {
+            var (currentId, depth, requiredChain) = queue.Dequeue();
+
+            var directDependents = allDependencies
+                .Where(d => d.DependsOnTaskItemId == currentId && d.ViewState)
+                .ToList();
+
+            foreach (var dep in directDependents)
+            {
+                if (!visited.Add(dep.TaskItemId) || !validTaskIds.Contains(dep.TaskItemId))
+                    continue;
+
+                var chainRequired = requiredChain && dep.IsRequired;
+
+                result.Add(new ImpactedTaskViewModel
+                {
+                    TaskId = dep.TaskItemId,
+                    Title = dep.TaskItem?.Title ?? "Unknown",
+                    Depth = depth + 1,
+                    IsRequiredChain = chainRequired,
+                    OriginalDueDate = dep.TaskItem?.DueDate,
+                    ProjectedDueDate = chainRequired && delayDays > 0 && dep.TaskItem?.DueDate.HasValue == true
                         ? dep.TaskItem.DueDate.Value.AddDays(delayDays)
-                        : dep.TaskItem.DueDate
+                        : dep.TaskItem?.DueDate
                 });
 
                 queue.Enqueue((dep.TaskItemId, depth + 1, chainRequired));
@@ -276,8 +391,11 @@ public class TaskDependencyService : ITaskDependencyService
 
     public async Task<List<CascadeInfoViewModel>> GetCascadeInfoAsync(int taskId)
     {
+        if (taskId <= 0)
+            return new List<CascadeInfoViewModel>();
+
         return await _context.OverdueCascadeLogs
-            .Where(x => x.ImpactedTaskId == taskId)
+            .Where(x => x.ImpactedTaskId == taskId && x.ViewState)
             .Include(x => x.SourceTask)
             .OrderByDescending(x => x.AppliedDate)
             .Select(x => new CascadeInfoViewModel

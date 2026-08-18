@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
@@ -9,6 +9,7 @@ namespace SmartTask.Web.Services.Implementations;
 public class BacklogService : BaseService<Backlog>, IBacklogService
 {
     private readonly ApplicationDbContext _context;
+    private const string DefaultBacklogName = "Product Backlog";
 
     public BacklogService(
         IGenericRepository<Backlog> repository,
@@ -30,7 +31,7 @@ public class BacklogService : BaseService<Backlog>, IBacklogService
         backlog = new Backlog
         {
             ProjectId = projectId,
-            Name = "Product Backlog",
+            Name = DefaultBacklogName,
             CreatedDate = DateTime.Now,
             ViewState = true
         };

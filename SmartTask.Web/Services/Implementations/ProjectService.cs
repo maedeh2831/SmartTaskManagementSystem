@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
@@ -32,12 +32,8 @@ public class ProjectService : BaseService<Project>, IProjectService
 
     public async Task<bool> ExistsByKeyAsync(int workspaceId, string key, int? excludeId = null)
     {
-        var query = _repository
-            .Query()
-            .Where(x =>
-            x.WorkspaceId == workspaceId &&
-            x.Key == key &&
-            x.ViewState);
+        var query = _repository.Query()
+            .Where(x => x.WorkspaceId == workspaceId && x.Key == key && x.ViewState);
 
         if (excludeId.HasValue)
             query = query.Where(x => x.Id != excludeId.Value);
@@ -47,32 +43,31 @@ public class ProjectService : BaseService<Project>, IProjectService
 
     public async Task<bool> CanManageProjectsAsync(int workspaceId, int userId)
     {
-        var isOwner = await _context.Workspaces
-            .AnyAsync(x => x.Id == workspaceId && x.OwnerId == userId);
-
-        if (isOwner)
-            return true;
-
-        return await _context.WorkspaceMembers
-            .AnyAsync(x =>
-                x.WorkspaceId == workspaceId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState &&
-                (x.Role == WorkspaceRoleType.Owner || x.Role == WorkspaceRoleType.Admin));
+        return await _context.Workspaces
+            .Where(w => w.Id == workspaceId)
+            .AnyAsync(w =>
+                w.OwnerId == userId ||
+                w.Members.Any(m =>
+                    m.ApplicationUserId == userId &&
+                    m.ViewState &&
+                    (m.Role == WorkspaceRoleType.Owner || m.Role == WorkspaceRoleType.Admin)));
     }
 
     public async Task<bool> CanManageProjectAsync(int projectId, int userId)
     {
-        var project = await _repository
-            .Query()
-            .FirstOrDefaultAsync(x => x.Id == projectId);
+        var workspaceId = await _repository.Query()
+            .Where(x => x.Id == projectId)
+            .Select(x => x.WorkspaceId)
+            .FirstOrDefaultAsync();
 
-        if (project == null)
+        if (workspaceId == 0)
             return false;
 
-        if (await CanManageProjectsAsync(project.WorkspaceId, userId))
+        // Check if user can manage workspace
+        if (await CanManageProjectsAsync(workspaceId, userId))
             return true;
 
+        // Check if user is project manager
         return await _context.ProjectMembers
             .AnyAsync(x =>
                 x.ProjectId == projectId &&
@@ -83,62 +78,45 @@ public class ProjectService : BaseService<Project>, IProjectService
 
     public new async Task DeleteAsync(int id)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (project == null)
-            return;
-
-        project.ViewState = false;
-        await _context.SaveChangesAsync();
+        await _context.Projects
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(p => p.SetProperty(x => x.ViewState, false));
     }
 
     public async Task ArchiveAsync(int id)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        var updated = await _context.Projects
+            .Where(x => x.Id == id && x.ViewState && !x.IsArchived)
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(x => x.IsArchived, true)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
 
-        if (project == null)
-            throw new Exception("پروژه یافت نشد.");
-
-        if (project.IsArchived)
-            return;
-
-        project.IsArchived = true;
-        project.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        if (updated == 0)
+            throw new InvalidOperationException("پروژه یافت نشد یا قبلاً بایگانی‌شده است.");
     }
 
     public async Task RestoreAsync(int id)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        var updated = await _context.Projects
+            .Where(x => x.Id == id && x.ViewState && x.IsArchived)
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(x => x.IsArchived, false)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
 
-        if (project == null)
-            throw new Exception("پروژه یافت نشد.");
-
-        if (!project.IsArchived)
-            return;
-
-        project.IsArchived = false;
-        project.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        if (updated == 0)
+            throw new InvalidOperationException("پروژه یافت نشد یا قبلاً بازیابی‌شده است.");
     }
 
     public async Task UpdatePreferencesAsync(int id, string color, string icon)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        var updated = await _context.Projects
+            .Where(x => x.Id == id && x.ViewState)
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(x => x.Color, color)
+                .SetProperty(x => x.Icon, icon)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
 
-        if (project == null)
-            throw new Exception("پروژه یافت نشد.");
-
-        project.Color = color;
-        project.Icon = icon;
-        project.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        if (updated == 0)
+            throw new InvalidOperationException("پروژه یافت نشد.");
     }
 }

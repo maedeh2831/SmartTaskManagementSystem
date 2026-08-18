@@ -36,8 +36,8 @@ namespace SmartTask.Web.Services.Implementations
             model.TotalProjects = await _context.Projects
                 .CountAsync(x => x.ViewState && myWorkspaceIds.Contains(x.WorkspaceId));
 
-            // ===== Assigned Tasks =====
-            var assignedTasks = await _context.TaskAssignments
+            // OPTIMIZED: Single query with server-side projections for all task stats
+            var taskStats = await _context.TaskAssignments
                 .Where(a => a.ViewState && a.ApplicationUserId == userId && a.TaskItem.ViewState)
                 .Select(a => new
                 {
@@ -50,17 +50,17 @@ namespace SmartTask.Web.Services.Implementations
                 })
                 .ToListAsync();
 
-            model.TotalAssignedTasks = assignedTasks.Count;
-            model.CompletedAssignedTasks = assignedTasks.Count(t => t.CompletedDate.HasValue);
-            model.OverdueAssignedTasks = assignedTasks.Count(t =>
+            model.TotalAssignedTasks = taskStats.Count;
+            model.CompletedAssignedTasks = taskStats.Count(t => t.CompletedDate.HasValue);
+            model.OverdueAssignedTasks = taskStats.Count(t =>
                 t.DueDate.HasValue && t.DueDate.Value < now && !t.CompletedDate.HasValue);
 
-            model.TaskStatusChart = assignedTasks
+            model.TaskStatusChart = taskStats
                 .GroupBy(t => t.Status)
                 .Select(g => new ChartPointViewModel { Label = g.Key.ToString(), Value = g.Count() })
                 .ToList();
 
-            model.UpcomingTasks = assignedTasks
+            model.UpcomingTasks = taskStats
                 .Where(t => t.DueDate.HasValue && !t.CompletedDate.HasValue
                     && t.DueDate.Value >= now && t.DueDate.Value <= now.AddDays(7))
                 .OrderBy(t => t.DueDate)

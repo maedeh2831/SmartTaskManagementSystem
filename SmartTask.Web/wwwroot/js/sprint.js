@@ -202,18 +202,76 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===== Live Index search =====
+    // ===== Live Index search + status filter =====
     const searchInput = document.getElementById("sprintSearchInput");
-    if (searchInput) {
-        const sprintCards = document.querySelectorAll("#sprintGrid .sprint-card");
-        searchInput.addEventListener("input", function () {
-            const q = this.value.trim().toLowerCase();
-            sprintCards.forEach(function (card) {
-                const name = (card.dataset.name || "").toLowerCase();
-                card.style.display = (!q || name.includes(q)) ? "" : "none";
-            });
+    const sprintCards = document.querySelectorAll("#sprintGrid .sprint-card");
+    const filterTabs = document.querySelectorAll(".sprint-filter-tab[data-filter]");
+    const filterSummary = document.getElementById("sprintFilterSummary");
+    let activeFilter = "all";
+
+    function applySprintFilters() {
+        const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+        let visibleCount = 0;
+        const totalCount = sprintCards.length;
+
+        sprintCards.forEach(function (card) {
+            const name = (card.dataset.name || "").toLowerCase();
+            const status = card.dataset.status || "";
+            const matchesSearch = !q || name.includes(q);
+            const matchesFilter = activeFilter === "all" || status === activeFilter;
+            const visible = matchesSearch && matchesFilter;
+            card.style.display = visible ? "" : "none";
+            if (visible) visibleCount++;
         });
+
+        // Update summary text
+        if (filterSummary) {
+            filterSummary.innerHTML = "نمایش <strong class=\"fa-digits\">" + toFaDigits(visibleCount) + "</strong> از <strong class=\"fa-digits\">" + toFaDigits(totalCount) + "</strong> اسپرینت";
+        }
+
+        // Show/hide empty state when filters hide all cards
+        const emptyState = document.querySelector(".workspace-empty");
+        const grid = document.getElementById("sprintGrid");
+        if (grid) {
+            if (visibleCount === 0 && totalCount > 0) {
+                grid.style.display = "none";
+                if (!emptyState) {
+                    // Create a transient empty state
+                    let noResult = document.getElementById("sprintNoResult");
+                    if (!noResult) {
+                        noResult = document.createElement("div");
+                        noResult.id = "sprintNoResult";
+                        noResult.className = "workspace-empty";
+                        noResult.innerHTML = '<div class="workspace-empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div><h3>اسپرینتی یافت نشد</h3><p>فیلتر یا جستجوی شما نتیجه‌ای نداشت.</p>';
+                        grid.parentNode.insertBefore(noResult, grid.nextSibling);
+                    }
+                    noResult.style.display = "";
+                }
+            } else {
+                grid.style.display = "";
+                const noResult = document.getElementById("sprintNoResult");
+                if (noResult) noResult.style.display = "none";
+            }
+        }
     }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", applySprintFilters);
+    }
+
+    // Filter tab click
+    filterTabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            filterTabs.forEach(function (t) {
+                t.classList.remove("active");
+                t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("active");
+            tab.setAttribute("aria-selected", "true");
+            activeFilter = tab.dataset.filter;
+            applySprintFilters();
+        });
+    });
 
     // ===== Sprint Report Loading (if tab-overview exists and sprint is completed) =====
     const reportList = document.getElementById("sprintReportList");
@@ -227,6 +285,18 @@ document.addEventListener("DOMContentLoaded", function () {
             generateSprintReport(generateBtn.dataset.sprintId);
         });
     }
+
+    // ===== Form submit loading state =====
+    document.querySelectorAll('.sprint-create-form').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var btn = form.querySelector('.workspace-primary-btn');
+            if (btn && !btn.classList.contains('loading')) {
+                btn.classList.add('loading');
+                btn.dataset.originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ذخیره...';
+            }
+        });
+    });
 
     // ===== Live Create preview =====
     initSprintPreview(document);

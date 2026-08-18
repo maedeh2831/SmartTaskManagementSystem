@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Workspace;
@@ -9,6 +9,10 @@ namespace SmartTask.Web.Services.Implementations;
 public class WorkspaceDashboardService : IWorkspaceDashboardService
 {
     private readonly ApplicationDbContext _context;
+    private const int RecentItemsCount = 5;
+    private const int TopMembersCount = 6;
+    private const int ActivityItemsCount = 8;
+    private const int DaysLookback = 6;
 
     public WorkspaceDashboardService(ApplicationDbContext context)
     {
@@ -18,10 +22,8 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
     public async Task<WorkspaceDashboardViewModel> GetDashboardAsync(int workspaceId, int currentUserId)
     {
         var workspace = await _context.Workspaces
-            .FirstOrDefaultAsync(x => x.Id == workspaceId && x.ViewState);
-
-        if (workspace == null)
-            throw new Exception("فضای کاری یافت نشد.");
+            .FirstOrDefaultAsync(x => x.Id == workspaceId && x.ViewState)
+            ?? throw new InvalidOperationException("فضای کاری یافت نشد.");
 
         var model = new WorkspaceDashboardViewModel
         {
@@ -30,28 +32,49 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
             WorkspaceColor = workspace.Color ?? "#4F46E5"
         };
 
-        // ===== Statistics Cards =====
-        model.TotalMembers = await _context.WorkspaceMembers
+        // Execute queries sequentially — DbContext is not thread-safe
+        var stats = await GetStatisticsAsync(workspaceId);
+        model.TotalMembers = stats.TotalMembers;
+        model.TotalProjects = stats.TotalProjects;
+        model.ActiveProjects = stats.ActiveProjects;
+        model.PendingInvitations = stats.PendingInvitations;
+
+        model.RecentProjects = await GetRecentProjectsAsync(workspaceId);
+        model.TopMembers = await GetTopMembersAsync(workspaceId, currentUserId);
+        model.RecentActivities = await GetRecentActivitiesAsync(workspaceId);
+
+        var charts = await GetChartsDataAsync(workspaceId);
+        model.ProjectStatusChart = charts.StatusChart;
+        model.ActivityChart = charts.ActivityChart;
+
+        return model;
+    }
+
+    private async Task<(int TotalMembers, int TotalProjects, int ActiveProjects, int PendingInvitations)> GetStatisticsAsync(int workspaceId)
+    {
+        var totalMembers = await _context.WorkspaceMembers
             .CountAsync(x => x.WorkspaceId == workspaceId && x.ViewState);
 
-        model.TotalProjects = await _context.Projects
+        var totalProjects = await _context.Projects
             .CountAsync(x => x.WorkspaceId == workspaceId && x.ViewState);
 
-        // فرض: Project.Status از نوع ProjectStatusType هست و مقدار Active داره
-        model.ActiveProjects = await _context.Projects
-            .CountAsync(x => x.WorkspaceId == workspaceId && x.ViewState
-                && x.Status == ProjectStatusType.Active);
+        var activeProjects = await _context.Projects
+            .CountAsync(x => x.WorkspaceId == workspaceId && x.ViewState && x.Status == ProjectStatusType.Active);
 
-        model.PendingInvitations = await _context.WorkspaceInvitations
+        var pendingInvitations = await _context.WorkspaceInvitations
             .CountAsync(x => x.WorkspaceId == workspaceId
                 && x.Status == WorkspaceInvitationStatusType.Pending
                 && x.ExpiryDate >= DateTime.Now);
 
-        // ===== Recent Projects =====
-        model.RecentProjects = await _context.Projects
+        return (totalMembers, totalProjects, activeProjects, pendingInvitations);
+    }
+
+    private async Task<List<DashboardProjectItemViewModel>> GetRecentProjectsAsync(int workspaceId)
+    {
+        return await _context.Projects
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
             .OrderByDescending(x => x.CreatedDate)
-            .Take(5)
+            .Take(RecentItemsCount)
             .Select(x => new DashboardProjectItemViewModel
             {
                 Id = x.Id,
@@ -61,13 +84,15 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
                 CreateDate = x.CreatedDate
             })
             .ToListAsync();
+    }
 
-        // ===== Top Members =====
-        model.TopMembers = await _context.WorkspaceMembers
+    private async Task<List<WorkspaceMemberViewModel>> GetTopMembersAsync(int workspaceId, int currentUserId)
+    {
+        return await _context.WorkspaceMembers
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
             .Include(x => x.ApplicationUser)
             .OrderBy(x => x.Role)
-            .Take(6)
+            .Take(TopMembersCount)
             .Select(x => new WorkspaceMemberViewModel
             {
                 Id = x.Id,
@@ -81,13 +106,14 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
                 IsCurrentUser = x.ApplicationUserId == currentUserId
             })
             .ToListAsync();
+    }
 
-        // ===== Recent Activities (Proxy تا زمان پیاده‌سازی Sprint 6) =====
-        var recentMemberActivities = await _context.WorkspaceMembers
+    private async Task<List<DashboardActivityItemViewModel>> GetRecentActivitiesAsync(int workspaceId)
+    {
+        var memberActivities = await _context.WorkspaceMembers
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
-            .Include(x => x.ApplicationUser)
             .OrderByDescending(x => x.CreatedDate)
-            .Take(5)
+            .Take(RecentItemsCount)
             .Select(x => new DashboardActivityItemViewModel
             {
                 Title = x.ApplicationUser.FullName + " به فضای کاری پیوست",
@@ -96,10 +122,10 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
             })
             .ToListAsync();
 
-        var recentProjectActivities = await _context.Projects
+        var projectActivities = await _context.Projects
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
             .OrderByDescending(x => x.CreatedDate)
-            .Take(5)
+            .Take(RecentItemsCount)
             .Select(x => new DashboardActivityItemViewModel
             {
                 Title = "پروژه «" + x.Name + "» ایجاد شد",
@@ -108,54 +134,49 @@ public class WorkspaceDashboardService : IWorkspaceDashboardService
             })
             .ToListAsync();
 
-        model.RecentActivities = recentMemberActivities
-            .Concat(recentProjectActivities)
+        return memberActivities
+            .Concat(projectActivities)
             .OrderByDescending(x => x.CreateDate)
-            .Take(8)
+            .Take(ActivityItemsCount)
             .ToList();
+    }
 
-        // ===== Charts =====
-
-        var statusGroups = await _context.Projects
+    private async Task<(List<ChartPointViewModel> StatusChart, List<ChartPointViewModel> ActivityChart)> GetChartsDataAsync(int workspaceId)
+    {
+        var statusChart = await _context.Projects
             .Where(x => x.WorkspaceId == workspaceId && x.ViewState)
             .GroupBy(x => x.Status)
-            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .Select(g => new ChartPointViewModel
+            {
+                Label = g.Key.ToString(),
+                Value = g.Count()
+            })
             .ToListAsync();
 
-        model.ProjectStatusChart = statusGroups
-            .Select(x => new ChartPointViewModel
+        var fromDate = DateTime.Now.Date.AddDays(-DaysLookback);
+
+        var memberDates = _context.WorkspaceMembers
+            .Where(x => x.WorkspaceId == workspaceId && x.ViewState && x.CreatedDate >= fromDate)
+            .Select(x => x.CreatedDate.Date);
+
+        var projectDates = _context.Projects
+            .Where(x => x.WorkspaceId == workspaceId && x.ViewState && x.CreatedDate >= fromDate)
+            .Select(x => x.CreatedDate.Date);
+
+        // Materialize the raw dates from both sources first (this Concat is fine — no GroupBy attached to it)
+        var allDates = await memberDates.Concat(projectDates).ToListAsync();
+
+        // Group and shape client-side
+        var activityData = allDates
+            .GroupBy(d => d)
+            .Select(g => new ChartPointViewModel
             {
-                Label = x.Status.ToString(),
-                Value = x.Count
+                Label = g.Key.ToString("yyyy-MM-dd"),
+                Value = g.Count()
             })
+            .OrderBy(x => x.Label)
             .ToList();
 
-        var fromDate = DateTime.Now.Date.AddDays(-6);
-
-        var memberDates = await _context.WorkspaceMembers
-            .Where(x => x.WorkspaceId == workspaceId && x.ViewState && x.CreatedDate >= fromDate)
-            .Select(x => x.CreatedDate.Date)
-            .ToListAsync();
-
-        var projectDates = await _context.Projects
-            .Where(x => x.WorkspaceId == workspaceId && x.ViewState && x.CreatedDate >= fromDate)
-            .Select(x => x.CreatedDate.Date)
-            .ToListAsync();
-
-        var allDates = memberDates.Concat(projectDates).ToList();
-
-        var chartPoints = new List<ChartPointViewModel>();
-        for (var day = fromDate; day <= DateTime.Now.Date; day = day.AddDays(1))
-        {
-            chartPoints.Add(new ChartPointViewModel
-            {
-                Label = day.ToString("MM/dd"),
-                Value = allDates.Count(d => d == day)
-            });
-        }
-
-        model.ActivityChart = chartPoints;
-
-        return model;
+        return (statusChart, activityData);
     }
 }

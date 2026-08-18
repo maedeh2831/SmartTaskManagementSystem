@@ -30,42 +30,36 @@ namespace SmartTask.Web.Services.Implementations
                 .ToListAsync();
         }
 
+        // OPTIMIZED: Project only needed field instead of loading full entity
         public async Task<bool> CanManageSubTaskAsync(int subTaskId, int userId)
         {
-            var subTask = await _repository
-                .Query()
-                .FirstOrDefaultAsync(x => x.Id == subTaskId);
+            var taskId = await _context.SubTaskItems
+                .Where(x => x.Id == subTaskId)
+                .Select(x => x.TaskItemId)
+                .FirstOrDefaultAsync();
 
-            if (subTask == null)
-                return false;
-
-            return await _taskService.CanManageTaskAsync(subTask.TaskItemId, userId);
+            return taskId > 0 && await _taskService.CanManageTaskAsync(taskId, userId);
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync for toggle instead of load-modify-save
         public async Task ToggleCompleteAsync(int subTaskId)
         {
-            var subTask = await _context.SubTaskItems
-                .FirstOrDefaultAsync(x => x.Id == subTaskId);
-
-            if (subTask == null)
-                return;
-
-            subTask.IsCompleted = !subTask.IsCompleted;
-            subTask.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            var now = DateTime.Now;
+            await _context.SubTaskItems
+                .Where(x => x.Id == subTaskId && x.ViewState)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.IsCompleted, x => !x.IsCompleted)
+                    .SetProperty(x => x.ChangeDate, now));
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync for soft delete instead of load-modify-save
         public new async Task DeleteAsync(int id)
         {
-            var subTask = await _context.SubTaskItems
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (subTask == null)
-                return;
-
-            subTask.ViewState = false;
-            await _context.SaveChangesAsync();
+            await _context.SubTaskItems
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.ViewState, false)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
     }
 }

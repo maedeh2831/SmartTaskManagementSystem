@@ -39,11 +39,10 @@
 
         <div class="workspace-hero-actions">
 
-            <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت
-                </button>
+            <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId"
+               class="workspace-filter" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت
             </a>
 
             @if (Model.CanManage)
@@ -53,151 +52,267 @@
                     ویرایش پروژه
                 </a>
 
-                    <a asp-controller="Project" asp-action="Settings" asp-route-id="@Model.Id" class="workspace-filter" style="text-decoration:none;">
-                        <button type="button">
-                            <i class="fa-solid fa-gear"></i>
-                            تنظیمات
-                        </button>
-                    </a>
+                <a asp-controller="Project" asp-action="Settings" asp-route-id="@Model.Id"
+                   class="workspace-filter" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-gear"></i>
+                    تنظیمات
+                </a>
             }
 
         </div>
 
     </div>
 
-    <!-- Project sections nav -->
-    <nav class="project-nav">
-        <a asp-controller="ProjectDashboard" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+    <!-- =====================================================
+         Tab Bar
+         ===================================================== -->
+    <div class="project-tabs" id="projectTabs" role="tablist" role="tablist" aria-label="بخش‌های پروژه">
+        <button class="project-tab-btn active" data-tab="overview" role="tab" aria-selected="true">
+            <i class="fa-solid fa-bullseye"></i>
+            <span class="project-tab-btn-label">نمای کلی</span>
+        </button>
+        <button class="project-tab-btn" data-tab="dashboard"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=dashboard" role="tab" aria-selected="false">
             <i class="fa-solid fa-gauge"></i>
-            داشبورد
-        </a>
-        <a asp-controller="Backlog" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">داشبورد</span>
+        </button>
+        <button class="project-tab-btn" data-tab="backlog"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=backlog" role="tab" aria-selected="false">
             <i class="fa-solid fa-layer-group"></i>
-            بک‌لاگ محصول
-        </a>
-        <a asp-controller="TaskBoard" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">بک‌لاگ</span>
+        </button>
+        <button class="project-tab-btn" data-tab="taskboard"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=taskboard" role="tab" aria-selected="false">
             <i class="fa-solid fa-table-columns"></i>
-            Task Board
-        </a>
-        <a asp-controller="Sprint" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">Task Board</span>
+        </button>
+        <button class="project-tab-btn" data-tab="sprints"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=sprints" role="tab" aria-selected="false">
             <i class="fa-solid fa-flag-checkered"></i>
-            اسپرینت‌ها
-        </a>
-        <a asp-controller="Workload" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">اسپرینت‌ها</span>
+        </button>
+        <button class="project-tab-btn" data-tab="workload"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=workload" role="tab" aria-selected="false">
             <i class="fa-solid fa-gauge-high"></i>
-            بارکاری
-        </a>
-        <a asp-controller="ProjectMember" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">بارکاری</span>
+        </button>
+        <button class="project-tab-btn" data-tab="members"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=members" role="tab" aria-selected="false">
             <i class="fa-solid fa-users"></i>
-            اعضا
-        </a>
-        <a asp-controller="Dependency" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">اعضا</span>
+        </button>
+        <button class="project-tab-btn" data-tab="dependency"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=dependency" role="tab" aria-selected="false">
             <i class="fa-solid fa-diagram-project"></i>
-            ریسک وابستگی
-        </a>
-        <a asp-controller="DelayRisk" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">وابستگی</span>
+        </button>
+        <button class="project-tab-btn" data-tab="delayrisk"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=delayrisk" role="tab" aria-selected="false">
             <i class="fa-solid fa-chart-line"></i>
-            پیش‌بینی ریسک
-        </a>
-        <a asp-controller="Offroad" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">پیش‌بینی ریسک</span>
+        </button>
+        <button class="project-tab-btn" data-tab="offroad"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=offroad" role="tab" aria-selected="false">
             <i class="fa-solid fa-route"></i>
-            آفرود
-        </a>
-        <a asp-controller="TaskTrade" asp-action="Index" asp-route-projectId="@Model.Id" class="project-nav-link">
+            <span class="project-tab-btn-label">آفرود</span>
+        </button>
+        <button class="project-tab-btn" data-tab="tasktrade"
+                data-lazy-url="/Project/Tab/@Model.Id?tab=tasktrade" role="tab" aria-selected="false">
             <i class="fa-solid fa-right-left"></i>
-            ترید تسک
-        </a>
-    </nav>
+            <span class="project-tab-btn-label">ترید تسک</span>
+        </button>
+    </div>
 
-    <div class="team-stat-grid">
 
-        <div class="team-stat-card">
-            <i class="fa-solid fa-circle-info"></i>
-            <div>
-                <h4>@Model.Status.GetDisplayName()</h4>
-                <span>وضعیت</span>
+    <!-- =====================================================
+         Tab: نمای کلی (inline)
+         ===================================================== -->
+    <div class="project-tab-pane active" id="tab-overview" role="tabpanel">
+
+        <div class="team-stat-grid">
+            <div class="team-stat-card">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <h4>@Model.Status.GetDisplayName()</h4>
+                    <span>وضعیت</span>
+                </div>
+            </div>
+            <div class="team-stat-card">
+                <i class="fa-solid fa-flag"></i>
+                <div>
+                    <h4>@Model.Priority.GetDisplayName()</h4>
+                    <span>اولویت</span>
+                </div>
+            </div>
+            <div class="team-stat-card">
+                <i class="fa-solid fa-users"></i>
+                <div>
+                    <h4>@Model.MembersCount</h4>
+                    <span>عضو</span>
+                </div>
+            </div>
+            <div class="team-stat-card">
+                <i class="fa-solid fa-people-group"></i>
+                <div>
+                    <h4>@Model.TeamNames.Count</h4>
+                    <span>تیم مرتبط</span>
+                </div>
             </div>
         </div>
 
-        <div class="team-stat-card">
-            <i class="fa-solid fa-flag"></i>
-            <div>
-                <h4>@Model.Priority.GetDisplayName()</h4>
-                <span>اولویت</span>
+        <div class="team-detail-grid">
+            <div class="team-detail-card">
+                <h3><i class="fa-regular fa-calendar"></i> زمان‌بندی</h3>
+                <div class="project-timeline-row">
+                    <div>
+                        <span>تاریخ شروع</span>
+                        <strong>@Html.DisplayDate(Model.StartDate, "تعیین نشده")</strong>
+                    </div>
+                    <div>
+                        <span>موعد تحویل</span>
+                        <strong>@Html.DisplayDate(Model.DueDate, "تعیین نشده")</strong>
+                    </div>
+                    <div>
+                        <span>تاریخ پایان</span>
+                        <strong>@Html.DisplayDate(Model.EndDate, "-")</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="team-detail-card">
+                <h3><i class="fa-solid fa-people-group"></i> تیم‌های مرتبط</h3>
+                @if (!Model.TeamNames.Any())
+                {
+                    <p class="team-empty-text">هیچ تیمی به این پروژه متصل نیست.</p>
+                }
+                else
+                {
+                    <div class="team-project-chips">
+                        @foreach (var teamName in Model.TeamNames)
+                        {
+                            <span class="team-project-chip">@teamName</span>
+                        }
+                    </div>
+                }
             </div>
         </div>
 
-        <div class="team-stat-card">
-            <i class="fa-solid fa-users"></i>
-            <div>
-                <h4>@Model.MembersCount</h4>
-                <span>عضو</span>
+        @if (Model.CanManage)
+        {
+            <div class="team-detail-card" style="margin-top:20px;">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> منطقه خطر</h3>
+                <p class="team-empty-text" style="text-align:right;padding:0 0 16px;">حذف پروژه غیرقابل بازگشت است و تمام اطلاعات مرتبط را حذف می‌کند.</p>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-project-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                        حذف پروژه
+                    </button>
+                </form>
             </div>
-        </div>
-
-        <div class="team-stat-card">
-            <i class="fa-solid fa-people-group"></i>
-            <div>
-                <h4>@Model.TeamNames.Count</h4>
-                <span>تیم مرتبط</span>
-            </div>
-        </div>
+        }
 
     </div>
 
-    <div class="team-detail-grid">
 
-        <div class="team-detail-card">
-            <h3><i class="fa-regular fa-calendar"></i> زمان‌بندی</h3>
-            <div class="project-timeline-row">
-                <div>
-                    <span>تاریخ شروع</span>
-                    <strong>@Html.DisplayDate(Model.StartDate, "تعیین نشده")</strong>
-                </div>
-                <div>
-                    <span>موعد تحویل</span>
-                    <strong>@Html.DisplayDate(Model.DueDate, "تعیین نشده")</strong>
-                </div>
-                <div>
-                    <span>تاریخ پایان</span>
-                    <strong>@Html.DisplayDate(Model.EndDate, "-")</strong>
-                </div>
-            </div>
+    <!-- =====================================================
+         Tab: داشبورد (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-dashboard" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری داشبورد...</span>
         </div>
-
-        <div class="team-detail-card">
-            <h3><i class="fa-solid fa-people-group"></i> تیم‌های مرتبط</h3>
-            @if (!Model.TeamNames.Any())
-            {
-                <p class="team-empty-text">هیچ تیمی به این پروژه متصل نیست.</p>
-            }
-            else
-            {
-                <div class="team-project-chips">
-                    @foreach (var teamName in Model.TeamNames)
-                    {
-                        <span class="team-project-chip">@teamName</span>
-                    }
-                </div>
-            }
-        </div>
-
     </div>
 
-    @if (Model.CanManage)
-    {
-        <div class="team-detail-card" style="margin-top:24px;">
-            <h3><i class="fa-solid fa-triangle-exclamation"></i> منطقه خطر</h3>
-            <p class="team-empty-text" style="text-align:right;padding:0 0 16px;">حذف پروژه غیرقابل بازگشت است و تمام اطلاعات مرتبط را حذف می‌کند.</p>
-            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-project-form">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger">
-                    <i class="fa-solid fa-trash"></i>
-                    حذف پروژه
-                </button>
-            </form>
+    <!-- =====================================================
+         Tab: بک‌لاگ (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-backlog" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری بک‌لاگ...</span>
         </div>
-    }
+    </div>
+
+    <!-- =====================================================
+         Tab: Task Board (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-taskboard" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری Task Board...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: اسپرینت‌ها (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-sprints" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری اسپرینت‌ها...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: بارکاری (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-workload" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری بارکاری...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: اعضا (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-members" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری اعضا...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: وابستگی (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-dependency" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری وابستگی...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: پیش‌بینی ریسک (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-delayrisk" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری پیش‌بینی ریسک...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: آفرود (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-offroad" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری آفرود...</span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         Tab: ترید تسک (lazy-load)
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-tasktrade" role="tabpanel">
+        <div class="project-tab-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری ترید تسک...</span>
+        </div>
+    </div>
 
 </div>
 

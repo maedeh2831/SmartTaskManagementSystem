@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
@@ -43,9 +43,8 @@ public class SprintService : BaseService<Sprint>, ISprintService
         string name,
         int? excludeId = null)
     {
-        var query = _repository
-            .Query()
-            .Where(x => x.ProjectId == projectId && x.Name == name);
+        var query = _repository.Query()
+            .Where(x => x.ProjectId == projectId && x.Name == name && x.ViewState);
 
         if (excludeId.HasValue)
             query = query.Where(x => x.Id != excludeId.Value);
@@ -59,10 +58,10 @@ public class SprintService : BaseService<Sprint>, ISprintService
         DateTime endDate,
         int? excludeId = null)
     {
-        var query = _repository
-            .Query()
+        var query = _repository.Query()
             .Where(x =>
                 x.ProjectId == projectId &&
+                x.ViewState &&
                 x.Status != SprintStatusType.Completed &&
                 x.Status != SprintStatusType.Cancelled &&
                 x.StartDate < endDate &&
@@ -76,36 +75,27 @@ public class SprintService : BaseService<Sprint>, ISprintService
 
     public async Task<bool> CanManageSprintsAsync(int projectId, int userId)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(x => x.Id == projectId);
-
-        if (project == null)
-            return false;
-
-        var isWorkspaceOwner = await _context.Workspaces
-            .AnyAsync(x => x.Id == project.WorkspaceId && x.OwnerId == userId);
-
-        if (isWorkspaceOwner)
-            return true;
-
-        return await _context.WorkspaceMembers
-            .AnyAsync(x =>
-                x.WorkspaceId == project.WorkspaceId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState &&
-                (x.Role == WorkspaceRoleType.Owner || x.Role == WorkspaceRoleType.Admin));
+        return await _context.Projects
+            .Where(p => p.Id == projectId)
+            .AnyAsync(p =>
+                p.Workspace.OwnerId == userId ||
+                p.Workspace.Members.Any(m =>
+                    m.ApplicationUserId == userId &&
+                    m.ViewState &&
+                    (m.Role == WorkspaceRoleType.Owner || m.Role == WorkspaceRoleType.Admin)));
     }
 
     public async Task<bool> CanManageSprintAsync(int sprintId, int userId)
     {
-        var sprint = await _repository
-            .Query()
-            .FirstOrDefaultAsync(x => x.Id == sprintId);
+        var projectId = await _repository.Query()
+            .Where(x => x.Id == sprintId)
+            .Select(x => x.ProjectId)
+            .FirstOrDefaultAsync();
 
-        if (sprint == null)
+        if (projectId == 0)
             return false;
 
-        return await CanManageSprintsAsync(sprint.ProjectId, userId);
+        return await CanManageSprintsAsync(projectId, userId);
     }
 
     public async Task ActivateAsync(int sprintId)
@@ -116,16 +106,15 @@ public class SprintService : BaseService<Sprint>, ISprintService
         if (sprint == null)
             return;
 
-        // فقط یک اسپرینت فعال در هر پروژه مجاز است
-        var otherActive = await _context.Sprints
+        // Deactivate other sprints in one query
+        await _context.Sprints
             .Where(x =>
                 x.ProjectId == sprint.ProjectId &&
                 x.Id != sprintId &&
                 x.Status == SprintStatusType.Active)
-            .ToListAsync();
-
-        foreach (var s in otherActive)
-            s.Status = SprintStatusType.Planning;
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.Status, SprintStatusType.Planning)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
 
         sprint.Status = SprintStatusType.Active;
         sprint.ChangeDate = DateTime.Now;
@@ -135,55 +124,50 @@ public class SprintService : BaseService<Sprint>, ISprintService
 
     public async Task CompleteAsync(int sprintId)
     {
-        var sprint = await _context.Sprints
-            .FirstOrDefaultAsync(x => x.Id == sprintId);
-
-        if (sprint == null)
-            return;
-
-        sprint.Status = SprintStatusType.Completed;
-        sprint.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        await _context.Sprints
+            .Where(x => x.Id == sprintId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.Status, SprintStatusType.Completed)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     public new async Task DeleteAsync(int id)
     {
-        var sprint = await _context.Sprints
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (sprint == null)
-            return;
-
-        sprint.ViewState = false;
-        await _context.SaveChangesAsync();
+        await _context.Sprints
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.ViewState, false));
     }
 
     public async Task<List<BurndownPointDto>> GetBurndownDataAsync(int sprintId)
     {
         var sprint = await _context.Sprints
-            .Include(x => x.UserStories.Where(s => s.ViewState))
+            .Select(s => new
+            {
+                s.Id,
+                s.StartDate,
+                s.EndDate,
+                TotalPoints = s.UserStories.Where(us => us.ViewState).Sum(us => us.StoryPoint)
+            })
             .FirstOrDefaultAsync(x => x.Id == sprintId);
 
         if (sprint == null)
             return new List<BurndownPointDto>();
 
-        var totalPoints = sprint.UserStories.Sum(x => x.StoryPoint);
-        var totalDays = Math.Max(1, (sprint.EndDate.Date - sprint.StartDate.Date).Days);
-        var today = DateTime.Today;
-
-        var doneStories = sprint.UserStories
-            .Where(x => x.Status == StoryStatusType.Done)
+        var doneStories = await _context.UserStories
+            .Where(x => x.SprintId == sprintId && x.ViewState && x.Status == StoryStatusType.Done)
             .Select(x => new { x.StoryPoint, CompletedOn = (x.ChangeDate ?? x.CreatedDate).Date })
-            .ToList();
+            .ToListAsync();
 
         var points = new List<BurndownPointDto>();
+        var totalDays = Math.Max(1, (sprint.EndDate.Date - sprint.StartDate.Date).Days);
+        var today = DateTime.Today;
 
         for (var day = sprint.StartDate.Date; day <= sprint.EndDate.Date; day = day.AddDays(1))
         {
             var elapsedDays = (day - sprint.StartDate.Date).Days;
             var idealRemaining = (int)Math.Round(
-                totalPoints - ((double)totalPoints / totalDays * elapsedDays));
+                sprint.TotalPoints - ((double)sprint.TotalPoints / totalDays * elapsedDays));
 
             int? actualRemaining = null;
 
@@ -193,7 +177,7 @@ public class SprintService : BaseService<Sprint>, ISprintService
                     .Where(x => x.CompletedOn <= day)
                     .Sum(x => x.StoryPoint);
 
-                actualRemaining = totalPoints - completedByThisDay;
+                actualRemaining = sprint.TotalPoints - completedByThisDay;
             }
 
             points.Add(new BurndownPointDto
@@ -211,20 +195,19 @@ public class SprintService : BaseService<Sprint>, ISprintService
     {
         var completedSprints = await _context.Sprints
             .Where(x => x.ProjectId == projectId && x.ViewState && x.Status == SprintStatusType.Completed)
-            .Include(x => x.UserStories.Where(s => s.ViewState))
             .OrderByDescending(x => x.EndDate)
             .Take(lastCount)
+            .Select(sprint => new VelocityPointDto
+            {
+                SprintName = sprint.Name,
+                PlannedPoints = sprint.UserStories.Where(s => s.ViewState).Sum(s => s.StoryPoint),
+                CompletedPoints = sprint.UserStories
+                    .Where(s => s.ViewState && s.Status == StoryStatusType.Done)
+                    .Sum(s => s.StoryPoint)
+            })
+            .OrderBy(x => x.SprintName)
             .ToListAsync();
 
-        completedSprints.Reverse(); // ترتیب زمانی صحیح برای نمودار
-
-        return completedSprints.Select(sprint => new VelocityPointDto
-        {
-            SprintName = sprint.Name,
-            PlannedPoints = sprint.UserStories.Sum(x => x.StoryPoint),
-            CompletedPoints = sprint.UserStories
-                .Where(x => x.Status == StoryStatusType.Done)
-                .Sum(x => x.StoryPoint)
-        }).ToList();
+        return completedSprints;
     }
 }

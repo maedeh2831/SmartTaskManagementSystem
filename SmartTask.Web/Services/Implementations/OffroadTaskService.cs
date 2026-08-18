@@ -33,56 +33,54 @@ public class OffroadTaskService : BaseService<OffroadTask>, IOffroadTaskService
             .ToListAsync();
     }
 
+    // OPTIMIZED: Project only needed fields instead of loading full entity
     public async Task<bool> CanManageOffroadTaskAsync(int offroadTaskId, int userId)
     {
-        var task = await _repository.Query()
-            .FirstOrDefaultAsync(x => x.Id == offroadTaskId);
+        var taskInfo = await _context.OffroadTasks
+            .Where(x => x.Id == offroadTaskId && x.ViewState)
+            .Select(x => new { x.CreatedByUserId, x.ProjectId })
+            .FirstOrDefaultAsync();
 
-        if (task == null)
-            return false;
-
-        if (task.CreatedByUserId == userId)
-            return true;
-
-        return await _projectService.CanManageProjectAsync(task.ProjectId, userId);
+        if (taskInfo == null) return false;
+        if (taskInfo.CreatedByUserId == userId) return true;
+        return await _projectService.CanManageProjectAsync(taskInfo.ProjectId, userId);
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync for all update operations
     public async Task ChangeStatusAsync(int id, OffroadStatusType status)
     {
-        var task = await _context.OffroadTasks.FirstOrDefaultAsync(x => x.Id == id);
-        if (task == null) return;
-
-        task.Status = status;
-        task.ChangeDate = DateTime.Now;
-        await _context.SaveChangesAsync();
+        await _context.OffroadTasks
+            .Where(x => x.Id == id && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Status, status)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     public async Task ChangePriorityAsync(int id, OffroadPriorityType priority)
     {
-        var task = await _context.OffroadTasks.FirstOrDefaultAsync(x => x.Id == id);
-        if (task == null) return;
-
-        task.Priority = priority;
-        task.ChangeDate = DateTime.Now;
-        await _context.SaveChangesAsync();
+        await _context.OffroadTasks
+            .Where(x => x.Id == id && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Priority, priority)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     public async Task AssignAsync(int id, int? userId)
     {
-        var task = await _context.OffroadTasks.FirstOrDefaultAsync(x => x.Id == id);
-        if (task == null) return;
-
-        task.AssignedToUserId = userId;
-        task.ChangeDate = DateTime.Now;
-        await _context.SaveChangesAsync();
+        await _context.OffroadTasks
+            .Where(x => x.Id == id && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.AssignedToUserId, userId)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync for soft delete
     public new async Task DeleteAsync(int id)
     {
-        var task = await _context.OffroadTasks.FirstOrDefaultAsync(x => x.Id == id);
-        if (task == null) return;
-
-        task.ViewState = false;
-        await _context.SaveChangesAsync();
+        await _context.OffroadTasks
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.ViewState, false)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 }

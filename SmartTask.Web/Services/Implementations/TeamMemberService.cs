@@ -57,30 +57,24 @@ public class TeamMemberService : BaseService<TeamMember>, ITeamMemberService
 
         await NotifyMemberAddedAsync(teamId, userId, role);
     }
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task RemoveMemberAsync(int teamId, int userId)
     {
-        var member = await _context.TeamMembers
-            .FirstOrDefaultAsync(x =>
-                x.TeamId == teamId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState);
-        if (member == null)
-            return;
-        member.ViewState = false;
-        await _context.SaveChangesAsync();
+        await _context.TeamMembers
+            .Where(x => x.TeamId == teamId && x.ApplicationUserId == userId && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.ViewState, false)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
+
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task ChangeRoleAsync(int teamId, int userId, TeamRoleType role)
     {
-        var member = await _context.TeamMembers
-            .FirstOrDefaultAsync(x =>
-                x.TeamId == teamId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState);
-        if (member == null)
-            return;
-        member.Role = role;
-        member.ChangeDate = DateTime.Now;
-        await _context.SaveChangesAsync();
+        await _context.TeamMembers
+            .Where(x => x.TeamId == teamId && x.ApplicationUserId == userId && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Role, role)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     private async Task NotifyMemberAddedAsync(int teamId, int userId, TeamRoleType role)

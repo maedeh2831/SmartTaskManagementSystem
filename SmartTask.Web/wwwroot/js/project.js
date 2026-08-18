@@ -81,4 +81,59 @@
         });
     }
 
+    // ===== Project Tab System =====
+    var tabBtns = document.querySelectorAll(".project-tab-btn[data-tab]");
+    var tabPanes = document.querySelectorAll(".project-tab-pane");
+
+    tabBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            tabBtns.forEach(function (b) {
+                b.classList.remove("active");
+                b.setAttribute("aria-selected", "false");
+            });
+            btn.classList.add("active");
+            btn.setAttribute("aria-selected", "true");
+
+            tabPanes.forEach(function (p) { p.classList.remove("active"); });
+            var targetPane = document.getElementById("tab-" + btn.dataset.tab);
+            if (targetPane) {
+                targetPane.classList.add("active");
+                if (btn.dataset.lazyUrl && !targetPane.dataset.loaded) {
+                    loadProjectTab(targetPane, btn.dataset.lazyUrl);
+                }
+            }
+        });
+    });
+
+    function loadProjectTab(pane, url) {
+        pane.dataset.loaded = "true";
+        fetch(url)
+            .then(function (r) {
+                if (!r.ok) throw new Error("Tab load failed");
+                return r.text();
+            })
+            .then(function (html) {
+                pane.innerHTML = html;
+                pane.querySelectorAll("script").forEach(function (oldScript) {
+                    var s = document.createElement("script");
+                    if (oldScript.src) s.src = oldScript.src;
+                    else s.textContent = oldScript.textContent;
+                    oldScript.parentNode.replaceChild(s, oldScript);
+                });
+                if (window.SmartTask && window.SmartTask.initPlanning) {
+                    window.SmartTask.initPlanning(pane);
+                }
+            })
+            .catch(function () {
+                pane.innerHTML = '<div class="workspace-empty"><div class="workspace-empty-icon"><i class="fa-solid fa-exclamation-triangle"></i></div><h3>خطا در بارگذاری</h3><p>محتوای این بخش بارگذاری نشد.</p></div>';
+            });
+    }
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var tabParam = urlParams.get("tab");
+    if (tabParam) {
+        var t = document.querySelector('.project-tab-btn[data-tab="' + tabParam + '"]');
+        if (t) t.click();
+    }
+
 });

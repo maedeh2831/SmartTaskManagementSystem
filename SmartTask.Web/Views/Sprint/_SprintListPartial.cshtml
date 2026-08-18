@@ -1,0 +1,104 @@
+@model SmartTask.Web.Models.ViewModels.Sprint.SprintIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+<link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
+
+<div class="workspace-grid" id="sprintGrid">
+    @foreach (var sprint in Model.Sprints)
+    {
+        var statusClass = sprint.Status.ToString().ToLower();
+        var statusLabel = sprint.Status switch
+        {
+            SprintStatusType.Planning => "برنامه‌ریزی",
+            SprintStatusType.Active => "فعال",
+            SprintStatusType.Completed => "پایان یافته",
+            SprintStatusType.Cancelled => "لغو شده",
+            _ => "-"
+        };
+        var statusIcon = sprint.Status switch
+        {
+            SprintStatusType.Planning => "fa-flag",
+            SprintStatusType.Active => "fa-bolt",
+            SprintStatusType.Completed => "fa-flag-checkered",
+            SprintStatusType.Cancelled => "fa-ban",
+            _ => "fa-circle"
+        };
+        var ringPercent = sprint.Status switch
+        {
+            SprintStatusType.Completed => 100,
+            SprintStatusType.Cancelled => 0,
+            _ => sprint.ProgressPercent
+        };
+
+        <div class="workspace-card sprint-card" data-name="@sprint.Name">
+            <div class="sprint-card-top">
+                <div class="sprint-ring-wrap">
+                    <svg class="sprint-ring" viewBox="0 0 64 64" aria-hidden="true">
+                        <circle class="sprint-ring-track" cx="32" cy="32" r="26"></circle>
+                        <circle class="sprint-ring-fill status-@statusClass" cx="32" cy="32" r="26"
+                                stroke-dasharray="163.4" data-percent="@ringPercent"
+                                transform="rotate(-90 32 32)"></circle>
+                    </svg>
+                    <div class="sprint-ring-center status-@statusClass">
+                        <strong class="sprint-ring-num fa-digits">
+                            @(sprint.Status == SprintStatusType.Completed ? "✓" : (sprint.TotalDays - sprint.ElapsedDays).ToString())
+                        </strong>
+                        <span class="sprint-ring-label">
+                            @(sprint.Status == SprintStatusType.Completed ? "تمام" : "روز")
+                        </span>
+                    </div>
+                </div>
+                <div class="sprint-card-head">
+                    <span class="sprint-status-badge status-@statusClass">
+                        <i class="fa-solid @statusIcon"></i> @statusLabel
+                    </span>
+                    <h3 class="sprint-card-name">
+                        <a href="/Sprint/Details/@sprint.Id">@sprint.Name</a>
+                    </h3>
+                </div>
+            </div>
+            <div class="sprint-card-meta">
+                <span class="sprint-chip">
+                    <i class="fa-solid fa-list-check"></i>
+                    <strong class="fa-digits">@sprint.UserStoriesCount</strong> داستان
+                </span>
+                <span class="sprint-chip">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    ظرفیت <strong class="fa-digits">@sprint.Capacity</strong>
+                </span>
+            </div>
+            <div class="workspace-card-footer sprint-card-footer">
+                <div class="sprint-card-dates">
+                    <i class="fa-regular fa-calendar"></i>
+                    <small>@Html.DisplayDate(sprint.StartDate) تا @Html.DisplayDate(sprint.EndDate)</small>
+                </div>
+                <div class="workspace-actions">
+                    <a href="/Sprint/Details/@sprint.Id" class="workspace-open-btn">
+                        ورود <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Sprints.Any())
+{
+    <div class="workspace-empty">
+        <div class="workspace-empty-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+        <h3>هنوز اسپرینتی ایجاد نشده</h3>
+        <p>اولین چرخهٔ کاری این پروژه را بسازید.</p>
+    </div>
+}
+
+<script>
+    document.querySelectorAll('.sprint-ring-fill[data-percent]').forEach(function(circle) {
+        var c = parseFloat(circle.getAttribute('stroke-dasharray')) || 0;
+        var pct = Math.min(100, Math.max(0, parseFloat(circle.dataset.percent) || 0));
+        circle.style.strokeDashoffset = String(c * (1 - pct / 100));
+    });
+    document.querySelectorAll('.fa-digits').forEach(function(el) {
+        var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+        el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+    });
+</script>

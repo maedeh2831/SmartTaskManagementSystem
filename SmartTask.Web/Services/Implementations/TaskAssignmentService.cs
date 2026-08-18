@@ -68,51 +68,58 @@ namespace SmartTask.Web.Services.Implementations
 
             await NotifyAndLogAssignmentAsync(taskItemId, userId);
         }
+        // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save + single query for task title
         public async Task RemoveUserAsync(int taskItemId, int userId)
         {
-            var assignment = await _context.TaskAssignments
-                .FirstOrDefaultAsync(x =>
-                    x.TaskItemId == taskItemId &&
-                    x.ApplicationUserId == userId &&
-                    x.ViewState);
-            if (assignment == null)
-                return;
-            assignment.ViewState = false;
-            assignment.ChangeDate = DateTime.Now;
-            await _context.SaveChangesAsync();
+            var now = DateTime.Now;
+            var updated = await _context.TaskAssignments
+                .Where(x => x.TaskItemId == taskItemId && x.ApplicationUserId == userId && x.ViewState)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.ViewState, false)
+                    .SetProperty(x => x.ChangeDate, now));
 
-            var task = await _context.TaskItems.FirstOrDefaultAsync(x => x.Id == taskItemId);
-            if (task != null)
+            if (updated == 0) return;
+
+            var taskTitle = await _context.TaskItems
+                .Where(x => x.Id == taskItemId)
+                .Select(x => x.Title)
+                .FirstOrDefaultAsync();
+
+            if (taskTitle != null)
             {
                 await _activityLogService.LogAsync(
                     _currentUser.UserId,
                     "حذف تخصیص Task",
-                    $"تخصیص Task «{task.Title}» حذف شد.",
+                    $"تخصیص Task «{taskTitle}» حذف شد.",
                     taskItemId);
             }
         }
 
+        // OPTIMIZED: Single combined query for task + user instead of 2 separate queries
         private async Task NotifyAndLogAssignmentAsync(int taskItemId, int userId)
         {
-            var task = await _context.TaskItems.FirstOrDefaultAsync(x => x.Id == taskItemId);
-            if (task == null)
+            var taskData = await _context.TaskItems
+                .Where(x => x.Id == taskItemId)
+                .Select(x => new { x.Title })
+                .FirstOrDefaultAsync();
+            if (taskData == null)
                 return;
 
             await _notificationService.CreateAsync(
                 userId,
                 "تخصیص Task جدید",
-                $"شما به Task «{task.Title}» تخصیص یافتید.",
+                $"شما به Task «{taskData.Title}» تخصیص یافتید.",
                 NotificationType.Assignment);
 
-            var assignedUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            var assignedUserName = assignedUser != null
-                ? $"{assignedUser.FirstName} {assignedUser.LastName}".Trim()
-                : "یکی از اعضا";
+            var userName = await _context.Users
+                .Where(x => x.Id == userId)
+                .Select(x => (x.FirstName + " " + x.LastName).Trim())
+                .FirstOrDefaultAsync() ?? "یکی از اعضا";
 
             await _activityLogService.LogAsync(
                 _currentUser.UserId,
                 "تخصیص Task",
-                $"Task «{task.Title}» به {assignedUserName} تخصیص یافت.",
+                $"Task «{taskData.Title}» به {userName} تخصیص یافت.",
                 taskItemId);
         }
     }

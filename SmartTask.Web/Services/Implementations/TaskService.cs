@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
@@ -62,8 +62,7 @@ namespace SmartTask.Web.Services.Implementations
 
         public async Task<bool> ExistsByTitleAsync(int userStoryId, string title, int? excludeId = null)
         {
-            var query = _repository
-                .Query()
+            var query = _repository.Query()
                 .Where(x => x.UserStoryId == userStoryId && x.Title == title && x.ViewState);
 
             if (excludeId.HasValue)
@@ -74,19 +73,22 @@ namespace SmartTask.Web.Services.Implementations
 
         public async Task<bool> CanManageTaskAsync(int taskId, int userId)
         {
-            var task = await _repository
-                .Query()
-                .FirstOrDefaultAsync(x => x.Id == taskId);
+            var userStoryId = await _repository.Query()
+                .Where(x => x.Id == taskId)
+                .Select(x => x.UserStoryId)
+                .FirstOrDefaultAsync();
 
-            if (task == null)
+            if (userStoryId == 0)
                 return false;
 
-            return await _userStoryService.CanManageStoryAsync(task.UserStoryId, userId);
+            return await _userStoryService.CanManageStoryAsync(userStoryId, userId);
         }
 
         public async Task ChangeStatusAsync(int taskId, TaskStatusType status)
         {
             var task = await _context.TaskItems
+                .Include(x => x.Assignments.Where(a => a.ViewState))
+                    .ThenInclude(a => a.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == taskId);
 
             if (task == null)
@@ -125,19 +127,22 @@ namespace SmartTask.Web.Services.Implementations
 
         private async Task NotifyStatusChangeAsync(TaskItem task, string statusDisplay)
         {
-            var assigneeIds = await _context.TaskAssignments
-                .Where(x => x.TaskItemId == task.Id && x.ViewState)
-                .Select(x => x.ApplicationUserId)
-                .ToListAsync();
+            var assigneeIds = task.Assignments
+                .Where(a => a.ViewState)
+                .Select(a => a.ApplicationUserId)
+                .ToList();
 
-            foreach (var assigneeId in assigneeIds)
-            {
-                await _notificationService.CreateAsync(
+            if (assigneeIds.Count == 0)
+                return;
+
+            var tasks = assigneeIds.Select(assigneeId =>
+                _notificationService.CreateAsync(
                     assigneeId,
                     "تغییر وضعیت Task",
                     $"وضعیت Task «{task.Title}» به «{statusDisplay}» تغییر کرد.",
-                    NotificationType.StatusChange);
-            }
+                    NotificationType.StatusChange));
+
+            await Task.WhenAll(tasks);
         }
 
         public new async Task DeleteAsync(int id)
@@ -150,29 +155,20 @@ namespace SmartTask.Web.Services.Implementations
 
             task.ViewState = false;
             await _context.SaveChangesAsync();
-
             await _activityLogService.LogAsync(_currentUser.UserId, "حذف Task", $"Task «{task.Title}» حذف شد.", task.Id);
         }
 
         public async Task<List<TaskItem>> GetProjectBoardAsync(
-        int projectId,
-        int? assigneeId = null,
-        TaskPriorityType? priority = null,
-        TaskType? type = null,
-        int? labelId = null)
+            int projectId,
+            int? assigneeId = null,
+            TaskPriorityType? priority = null,
+            TaskType? type = null,
+            int? labelId = null)
         {
             var query = _context.TaskItems
-                .Where(x =>
-                    x.ViewState &&
-                    x.UserStory.ViewState &&
-                    x.UserStory.ProjectId == projectId)
-                .Include(x => x.UserStory)
-                .Include(x => x.Assignments.Where(a => a.ViewState))
-                    .ThenInclude(a => a.ApplicationUser)
-                .Include(x => x.TaskLabels.Where(tl => tl.ViewState))
-                    .ThenInclude(tl => tl.Label)
-                .AsQueryable();
+                .Where(x => x.ViewState && x.UserStory.ViewState && x.UserStory.ProjectId == projectId);
 
+            // Apply filters before includes to reduce cartesian products
             if (assigneeId.HasValue)
                 query = query.Where(x => x.Assignments.Any(a => a.ViewState && a.ApplicationUserId == assigneeId.Value));
 
@@ -186,6 +182,11 @@ namespace SmartTask.Web.Services.Implementations
                 query = query.Where(x => x.TaskLabels.Any(tl => tl.ViewState && tl.LabelId == labelId.Value));
 
             return await query
+                .Include(x => x.UserStory)
+                .Include(x => x.Assignments.Where(a => a.ViewState))
+                    .ThenInclude(a => a.ApplicationUser)
+                .Include(x => x.TaskLabels.Where(tl => tl.ViewState))
+                    .ThenInclude(tl => tl.Label)
                 .OrderByDescending(x => x.CreatedDate)
                 .ToListAsync();
         }

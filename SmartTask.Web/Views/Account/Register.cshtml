@@ -50,7 +50,9 @@
 
                         <input asp-for="FirstName"
                                class="form-control"
-                               placeholder="نام" />
+                               placeholder="نام"
+                               autocomplete="given-name"
+                               aria-required="true" />
                     </div>
 
                     <span asp-validation-for="FirstName"
@@ -67,7 +69,9 @@
 
                         <input asp-for="LastName"
                                class="form-control"
-                               placeholder="نام خانوادگی" />
+                               placeholder="نام خانوادگی"
+                               autocomplete="family-name"
+                               aria-required="true" />
                     </div>
 
                     <span asp-validation-for="LastName"
@@ -84,7 +88,9 @@
 
                         <input asp-for="Email"
                                class="form-control"
-                               placeholder="ایمیل" />
+                               placeholder="ایمیل"
+                               autocomplete="email"
+                               aria-required="true" />
                     </div>
 
                     <span asp-validation-for="Email"
@@ -101,7 +107,9 @@
 
                         <input asp-for="Password"
                                class="form-control"
-                               placeholder="رمز عبور" />
+                               placeholder="رمز عبور"
+                               autocomplete="new-password"
+                               aria-required="true" />
                     </div>
 
                     <span asp-validation-for="Password"
@@ -118,7 +126,9 @@
 
                         <input asp-for="ConfirmPassword"
                                class="form-control"
-                               placeholder="تکرار رمز عبور" />
+                               placeholder="تکرار رمز عبور"
+                               autocomplete="new-password"
+                               aria-required="true" />
                     </div>
 
                     <span asp-validation-for="ConfirmPassword"
@@ -128,7 +138,8 @@
                 </div>
 
                 <button type="submit"
-                        class="auth-submit">
+                        class="auth-submit"
+                        aria-label="ایجاد حساب کاربری">
                     ثبت نام
                 </button>
 

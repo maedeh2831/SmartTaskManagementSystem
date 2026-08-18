@@ -36,13 +36,12 @@ public class ProjectHealthService : IProjectHealthService
         var dependencyHealth = risk == null
             ? 100 : Math.Max(0, 100 - Math.Min(risk.RiskyDependencyChainsCount * 10, 100));
 
-        //  سلامت پیشرفت واقعی (همه‌ی تسک‌های ViewState، فارغ از باز/بسته) 
-        var allTasks = await _context.TaskItems
-            .Where(t => t.UserStory.ProjectId == projectId && t.ViewState)
-            .ToListAsync();
+        // OPTIMIZED: Server-side counting instead of loading all tasks into memory
+        var totalTasksCount = await _context.TaskItems
+            .CountAsync(t => t.UserStory.ProjectId == projectId && t.ViewState);
 
-        var totalTasksCount = allTasks.Count;
-        var completedTasksCount = allTasks.Count(t => t.Status == TaskStatusType.Done);
+        var completedTasksCount = await _context.TaskItems
+            .CountAsync(t => t.UserStory.ProjectId == projectId && t.ViewState && t.Status == TaskStatusType.Done);
 
         var deliveryHealth = totalTasksCount == 0
             ? 100 : (int)Math.Round((double)completedTasksCount / totalTasksCount * 100);

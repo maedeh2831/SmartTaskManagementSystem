@@ -82,6 +82,72 @@
 
 
     <!-- =====================================================
+         Status Filter Tabs
+         ===================================================== -->
+    @if (Model.Sprints.Any())
+    {
+        var allCount = Model.Sprints.Count;
+        var planningCount = Model.Sprints.Count(s => s.Status == SprintStatusType.Planning);
+        var activeCount = Model.Sprints.Count(s => s.Status == SprintStatusType.Active);
+        var completedCount = Model.Sprints.Count(s => s.Status == SprintStatusType.Completed);
+        var cancelledCount = Model.Sprints.Count(s => s.Status == SprintStatusType.Cancelled);
+
+        <div class="sprint-filter-bar" id="sprintFilterBar">
+
+            <div class="sprint-filter-tabs" role="tablist" aria-label="فیلتر بر اساس وضعیت">
+                <button class="sprint-filter-tab active"
+                        role="tab"
+                        aria-selected="true"
+                        data-filter="all">
+                    همه
+                    <span class="sprint-filter-count fa-digits">@allCount</span>
+                </button>
+                <button class="sprint-filter-tab"
+                        role="tab"
+                        aria-selected="false"
+                        data-filter="planning">
+                    <i class="fa-solid fa-flag"></i>
+                    برنامه‌ریزی
+                    <span class="sprint-filter-count fa-digits">@planningCount</span>
+                </button>
+                <button class="sprint-filter-tab"
+                        role="tab"
+                        aria-selected="false"
+                        data-filter="active">
+                    <i class="fa-solid fa-bolt"></i>
+                    فعال
+                    <span class="sprint-filter-count fa-digits">@activeCount</span>
+                </button>
+                <button class="sprint-filter-tab"
+                        role="tab"
+                        aria-selected="false"
+                        data-filter="completed">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    پایان یافته
+                    <span class="sprint-filter-count fa-digits">@completedCount</span>
+                </button>
+                @if (cancelledCount > 0)
+                {
+                    <button class="sprint-filter-tab"
+                            role="tab"
+                            aria-selected="false"
+                            data-filter="cancelled">
+                        <i class="fa-solid fa-ban"></i>
+                        لغو شده
+                        <span class="sprint-filter-count fa-digits">@cancelledCount</span>
+                    </button>
+                }
+            </div>
+
+            <span class="sprint-filter-summary" id="sprintFilterSummary">
+                نمایش <strong class="fa-digits">@allCount</strong> از <strong class="fa-digits">@allCount</strong> اسپرینت
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
          Empty State
          ===================================================== -->
     @if (!Model.Sprints.Any())
@@ -199,7 +265,8 @@
                      Sprint Card
                      ========================================= -->
                 <div class="workspace-card sprint-card"
-                     data-name="@sprint.Name">
+                     data-name="@sprint.Name"
+                     data-status="@statusClass">
 
 
                     <!-- Card Header -->

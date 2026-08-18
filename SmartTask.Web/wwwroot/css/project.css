@@ -166,52 +166,100 @@
     gap: 18px;
 }
 
-/* ================= Project sections nav ================= */
+/* ================= Project Tab System ================= */
 
-.project-nav {
+.project-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid var(--gray200);
+    margin-bottom: 24px;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+.project-tab-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    padding: 14px 20px;
-    margin-bottom: 24px;
-    background: var(--card);
-    border: 1px solid var(--gray200);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
-}
-
-.project-nav-link {
-    display: inline-flex;
-    align-items: center;
     gap: 7px;
-    padding: 9px 14px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    background: none;
     color: var(--gray600);
+    font-family: inherit;
     font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .2s ease, color .2s ease;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    transition: color .2s ease;
 }
 
-    .project-nav-link i {
+    .project-tab-btn i {
         color: var(--gray400);
         font-size: 13px;
         transition: color .2s ease;
     }
 
-    .project-nav-link:hover {
-        background: var(--primary-light);
-        color: var(--primary);
+    .project-tab-btn:hover {
+        color: var(--gray900);
     }
 
-        .project-nav-link:hover i {
+        .project-tab-btn:hover i {
+            color: var(--gray600);
+        }
+
+    .project-tab-btn.active {
+        color: var(--primary);
+        font-weight: 600;
+        border-bottom-color: var(--primary);
+    }
+
+        .project-tab-btn.active i {
             color: var(--primary);
         }
 
-    .project-nav-link:focus-visible {
+    .project-tab-btn:focus-visible {
         outline: 2px solid var(--primary);
-        outline-offset: 2px;
+        outline-offset: -2px;
+        border-radius: 8px 8px 0 0;
+    }
+
+.project-tab-btn-label {
+    pointer-events: none;
+}
+
+.project-tab-pane {
+    display: none;
+    animation: project-fadeIn .3s ease;
+}
+
+    .project-tab-pane.active {
+        display: block;
+    }
+
+@keyframes project-fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Tab loading state */
+
+.project-tab-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--gray500);
+    gap: 12px;
+    font-size: 13px;
+}
+
+    .project-tab-loading i {
+        font-size: 28px;
+        color: var(--gray400);
     }
 
 /* ================= Details Grid ================= */
@@ -311,6 +359,15 @@
 
     .team-detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    .project-tabs {
+        gap: 4px;
+    }
+
+    .project-tab-btn {
+        padding: 10px 14px;
+        font-size: 12px;
     }
 }
 /* ================= Project Role Badges ================= */

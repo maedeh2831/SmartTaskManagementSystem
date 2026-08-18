@@ -1,15 +1,104 @@
-﻿/*  DelayRisk Gauge css  */
+/* ==========================================================
+                 SmartTask Delay Risk UI
+   ========================================================== */
+
+/* ==========================================================
+   Risk Hero
+   ========================================================== */
+
+.delayrisk-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+
+.delayrisk-hero-content {
+    flex: 1;
+    min-width: 260px;
+}
+
+    .delayrisk-hero-content h1 {
+        margin: 0 0 6px;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray900);
+        line-height: 1.6;
+    }
+
+        .delayrisk-hero-content h1 i {
+            color: var(--warning);
+            margin-left: 8px;
+            font-size: 20px;
+        }
+
+    .delayrisk-hero-content p {
+        margin: 0;
+        color: var(--gray500);
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+.delayrisk-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delayrisk-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--gray700);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+    .delayrisk-back-link:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+    }
+
+    .delayrisk-back-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+
+/* ==========================================================
+   Risk Gauge Card
+   ========================================================== */
+
 .risk-gauge-card {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 32px;
     background: var(--card);
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
     margin-bottom: 20px;
     flex-wrap: wrap;
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
+
+    .risk-gauge-card:hover {
+        border-color: var(--gray300);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+    }
+
+/* Donut */
 
 .risk-donut-wrap {
     flex-shrink: 0;
@@ -31,19 +120,29 @@
     stroke: #EF4444;
 }
 
+/* Gauge Info */
+
 .risk-gauge-info {
     flex: 1;
     min-width: 260px;
 }
 
+/* Risk Level Pill */
+
 .risk-level-pill {
-    display: inline-block;
-    padding: 8px 20px;
-    border-radius: 16px;
-    font-size: 14px;
-    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
     margin-bottom: 18px;
 }
+
+    .risk-level-pill i {
+        font-size: 12px;
+    }
 
     .risk-level-pill.status-low {
         background: #D1FAE5;
@@ -65,53 +164,374 @@
         color: #B91C1C;
     }
 
+/* Risk Factor Rows */
+
 .risk-factor-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 4px;
 }
 
 .risk-factor-row {
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
     font-size: 13px;
-    color: var(--gray500);
-    font-weight: 600;
+    color: var(--gray600);
+    font-weight: 500;
+    transition: background .15s ease;
 }
 
-    .risk-factor-row strong {
-        color: var(--gray900);
+    .risk-factor-row:hover {
+        background: var(--gray50);
     }
-/*  AI Narrative  */
-.ai-narrative-card {
+
+.risk-factor-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .risk-factor-label i {
+        font-size: 12px;
+        width: 16px;
+        text-align: center;
+        opacity: .7;
+    }
+
+.risk-factor-value {
+    font-weight: 700;
+    color: var(--gray800);
+    white-space: nowrap;
+}
+
+.risk-factor-value.value-danger {
+    color: #DC2626;
+}
+
+.risk-factor-value.value-warning {
+    color: #B45309;
+}
+
+.risk-factor-divider {
+    height: 1px;
+    background: var(--gray100);
+    margin: 4px 0;
+}
+
+
+/* ==========================================================
+   Risk Summary Stats
+   ========================================================== */
+
+.delayrisk-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.delayrisk-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+    .delayrisk-summary-item:hover {
+        border-color: var(--gray300);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+        transform: translateY(-1px);
+    }
+
+.delayrisk-summary-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+    .delayrisk-summary-icon.icon-danger {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .delayrisk-summary-icon.icon-warning {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+    .delayrisk-summary-icon.icon-info {
+        background: #DBEAFE;
+        color: #2563EB;
+    }
+
+    .delayrisk-summary-icon.icon-success {
+        background: #D1FAE5;
+        color: #047857;
+    }
+
+.delayrisk-summary-text {
     display: flex;
     flex-direction: column;
+    gap: 1px;
+    min-width: 0;
 }
+
+.delayrisk-summary-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray900);
+    line-height: 1.2;
+}
+
+.delayrisk-summary-label {
+    font-size: 11px;
+    color: var(--gray500);
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   AI Narrative Card
+   ========================================================== */
+
+.ai-narrative-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+}
+
+.ai-narrative-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+    .ai-narrative-header i {
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .ai-narrative-header h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
 
 .ai-narrative-box {
     background: var(--gray50);
-    border-radius: 16px;
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
     padding: 20px;
     margin-bottom: 16px;
-    min-height: 70px;
-    display: flex;
-    align-items: center;
+    min-height: 80px;
+    line-height: 1.9;
+    color: var(--gray700);
+    font-size: 14px;
 }
 
     .ai-narrative-box p {
         margin: 0;
-        line-height: 1.9;
-        color: var(--gray700);
-        font-size: 14px;
     }
 
-.ai-narrative-card .ai-suggest-btn {
-    align-self: flex-start;
+.ai-narrative-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 0;
+    color: var(--gray400);
+    font-size: 13px;
 }
-/*  Responsive  */
+
+    .ai-narrative-placeholder i {
+        font-size: 24px;
+    }
+
+/* AI Generate Button */
+
+.ai-generate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
+    transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+    .ai-generate-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(91, 95, 239, .25);
+    }
+
+    .ai-generate-btn:active {
+        transform: translateY(0);
+    }
+
+    .ai-generate-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .ai-generate-btn:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Loading state */
+
+.ai-generate-btn.loading {
+    pointer-events: none;
+}
+
+    .ai-generate-btn.loading::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 6px;
+        border: 2px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: delayrisk-spin .6s linear infinite;
+    }
+
+@keyframes delayrisk-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* AI Loading State inside narrative box */
+
+.ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+    color: var(--gray500);
+    font-size: 13px;
+}
+
+.ai-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--gray200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: delayrisk-spin .8s linear infinite;
+}
+
+/* AI Error State */
+
+.ai-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 10px;
+    color: #991B1B;
+    font-size: 13px;
+}
+
+    .ai-error i {
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .ai-error p {
+        margin: 0;
+    }
+
+
+/* ==========================================================
+   Responsive
+   ========================================================== */
+
+@media (max-width: 1024px) {
+    .delayrisk-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .delayrisk-hero {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .delayrisk-hero-actions {
+        width: 100%;
+    }
+
+    .delayrisk-back-link {
+        width: 100%;
+        justify-content: center;
+    }
+
     .risk-gauge-card {
         flex-direction: column;
+        align-items: center;
         text-align: center;
+    }
+
+    .risk-factor-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .delayrisk-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-narrative-card {
+        padding: 18px;
+    }
+}
+
+
+/* ==========================================================
+   Reduced Motion
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .risk-gauge-card,
+    .delayrisk-summary-item,
+    .ai-generate-btn,
+    .risk-factor-row,
+    .ai-spinner {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
     }
 }

@@ -521,6 +521,37 @@ textarea.form-control {
     flex-wrap: wrap;
 }
 
+/* Input focus animation */
+.sprint-input-wrap .form-control {
+    transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+    .sprint-input-wrap .form-control:focus {
+        transform: translateY(-1px);
+    }
+
+/* Submit button loading state */
+.form-actions .workspace-primary-btn.loading {
+    pointer-events: none;
+    opacity: .75;
+}
+
+    .form-actions .workspace-primary-btn.loading::after {
+        content: '';
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        border: 2px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: sprint-btn-spin .6s linear infinite;
+    }
+
+@keyframes sprint-btn-spin {
+    to { transform: rotate(360deg); }
+}
+
 /* ---------- Create preview / Edit info ---------- */
 
 .preview-card {
@@ -832,15 +863,15 @@ textarea.form-control {
 }
 
     .sprint-ring-fill.status-active {
-        stroke: #22C55E;
+        stroke: var(--status-active-fill);
     }
 
     .sprint-ring-fill.status-completed {
-        stroke: #8B5CF6;
+        stroke: var(--status-completed-fill);
     }
 
     .sprint-ring-fill.status-cancelled {
-        stroke: var(--gray300);
+        stroke: var(--status-cancelled-fill);
     }
 
 .sprint-ring-center {
@@ -1097,7 +1128,14 @@ textarea.form-control {
     padding: 16px;
     border-radius: 10px;
     background: var(--gray50);
+    border: 1px solid var(--gray100);
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
+
+    .sprint-stat:hover {
+        border-color: var(--gray200);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+    }
 
     .sprint-stat > i {
         width: 40px;
@@ -1149,23 +1187,23 @@ textarea.form-control {
     }
 
     .sprint-status-badge.status-planning {
-        background: var(--gray100);
-        color: var(--gray700);
+        background: var(--status-planning-bg);
+        color: var(--status-planning-fg);
     }
 
     .sprint-status-badge.status-active {
-        background: #DCFCE7;
-        color: #15803D;
+        background: var(--status-active-bg);
+        color: var(--status-active-fg);
     }
 
     .sprint-status-badge.status-completed {
-        background: #EDE9FE;
-        color: #6D28D9;
+        background: var(--status-completed-bg);
+        color: var(--status-completed-fg);
     }
 
     .sprint-status-badge.status-cancelled {
-        background: #FEE2E2;
-        color: #B91C1C;
+        background: var(--status-cancelled-bg);
+        color: var(--status-cancelled-fg);
     }
 
 
@@ -1181,11 +1219,11 @@ textarea.form-control {
 }
 
     .sprint-progress-fill.status-active {
-        background: #22C55E;
+        background: var(--status-active-fill);
     }
 
     .sprint-progress-fill.status-completed {
-        background: #8B5CF6;
+        background: var(--status-completed-fill);
     }
 
 
@@ -1395,6 +1433,93 @@ textarea.form-control {
 
 
 /* ==========================================================
+   Sprint Index — Status Filter Tabs
+   ========================================================== */
+
+.sprint-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.sprint-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--gray50);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+}
+
+.sprint-filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--gray500);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+    white-space: nowrap;
+}
+
+    .sprint-filter-tab:hover {
+        background: var(--gray100);
+        color: var(--gray700);
+    }
+
+    .sprint-filter-tab.active {
+        background: var(--card);
+        color: var(--primary);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, .06);
+    }
+
+    .sprint-filter-tab:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+.sprint-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--gray200);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+    .sprint-filter-tab.active .sprint-filter-count {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+.sprint-filter-summary {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--gray500);
+}
+
+    .sprint-filter-summary strong {
+        font-weight: 700;
+        color: var(--gray700);
+    }
+
+
+/* ==========================================================
    Responsive
    ========================================================== */
 
@@ -1409,6 +1534,21 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
+    .sprint-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sprint-filter-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sprint-filter-summary {
+        margin-left: 0;
+        text-align: center;
+    }
+
     .sprint-tabs {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -1463,7 +1603,16 @@ textarea.form-control {
 
 @media (prefers-reduced-motion: reduce) {
 
-    .sprint-ring-fill {
+    .sprint-ring-fill,
+    .sprint-progress-fill,
+    .sprint-filter-tab,
+    .sprint-tab,
+    .workspace-card,
+    .sprint-input-wrap .form-control {
+        transition: none !important;
+    }
+
+    .sprint-tab.active::after {
         transition: none !important;
     }
 }

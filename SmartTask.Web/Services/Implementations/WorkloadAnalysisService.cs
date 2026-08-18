@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Workload;
@@ -13,40 +13,53 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
 
     public WorkloadAnalysisService(ApplicationDbContext context, IProjectService projectService)
     {
-        _context = context;
-        _projectService = projectService;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
     }
 
     public async Task<WorkloadIndexViewModel?> GetWorkloadAsync(int projectId, int currentUserId)
     {
-        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == projectId && x.ViewState);
+        if (projectId <= 0 || currentUserId <= 0)
+            return null;
+
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(x => x.Id == projectId && x.ViewState);
+
         if (project == null)
             return null;
 
+        // Load members once
         var members = await _context.ProjectMembers
             .Where(x => x.ProjectId == projectId && x.ViewState)
             .Include(x => x.ApplicationUser)
             .ToListAsync();
 
         var activeSprint = await _context.Sprints
-            .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.Status == SprintStatusType.Active && x.ViewState);
+            .FirstOrDefaultAsync(x => x.ProjectId == projectId
+                && x.Status == SprintStatusType.Active && x.ViewState);
 
-        // ===== تسک‌های باز کل پروژه (به همراه Assignee ها) =====
+        // OPTIMIZED: Single query for all open tasks with assignments
         var openTasksQuery = _context.TaskItems
             .Where(t => t.UserStory.ProjectId == projectId
                 && t.ViewState
                 && t.Status != TaskStatusType.Done
                 && t.Status != TaskStatusType.Cancelled)
             .Include(t => t.Assignments)
+            .Include(t => t.UserStory)
             .AsQueryable();
 
         var projectTasks = await openTasksQuery.ToListAsync();
 
+        // OPTIMIZED: Filter in-memory instead of second DB query
         var sprintTasks = activeSprint == null
             ? new List<Models.Entities.TaskItem>()
-            : await openTasksQuery
+            : projectTasks
                 .Where(t => t.UserStory.SprintId == activeSprint.Id)
-                .ToListAsync();
+                .ToList();
+
+        // Pre-compute assignment mappings to avoid O(n²) lookups
+        var projectAssignmentMap = ComputeAssignmentMap(projectTasks);
+        var sprintAssignmentMap = ComputeAssignmentMap(sprintTasks);
 
         var vm = new WorkloadIndexViewModel
         {
@@ -56,32 +69,66 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
             HasActiveSprint = activeSprint != null,
             ActiveSprintName = activeSprint?.Name,
             ActiveSprintEndDate = activeSprint?.EndDate,
-            ProjectWorkload = BuildWorkloadList(members, projectTasks),
-            SprintWorkload = BuildWorkloadList(members, sprintTasks),
-            ProjectUnassignedHours = projectTasks.Where(t => !t.Assignments.Any()).Sum(t => (double)t.Estimate),
-            SprintUnassignedHours = sprintTasks.Where(t => !t.Assignments.Any()).Sum(t => (double)t.Estimate)
+            ProjectWorkload = BuildWorkloadList(members, projectTasks, projectAssignmentMap),
+            SprintWorkload = BuildWorkloadList(members, sprintTasks, sprintAssignmentMap),
+            ProjectUnassignedHours = projectTasks
+                .Where(t => !t.Assignments.Any())
+                .Sum(t => (double)t.Estimate),
+            SprintUnassignedHours = sprintTasks
+                .Where(t => !t.Assignments.Any())
+                .Sum(t => (double)t.Estimate)
         };
 
         return vm;
     }
 
+    /// <summary>
+    /// OPTIMIZED: Pre-compute assignment map to avoid O(n²) nested filtering
+    /// Maps userId -> list of task estimates
+    /// </summary>
+    private static Dictionary<int, List<double>> ComputeAssignmentMap(List<Models.Entities.TaskItem> tasks)
+    {
+        var map = new Dictionary<int, List<double>>();
+
+        foreach (var task in tasks)
+        {
+            if (task.Assignments == null || task.Assignments.Count == 0)
+                continue;
+
+            var estimatePerAssignee = (double)task.Estimate / task.Assignments.Count;
+
+            foreach (var assignment in task.Assignments)
+            {
+                if (!map.ContainsKey(assignment.ApplicationUserId))
+                    map[assignment.ApplicationUserId] = new List<double>();
+
+                map[assignment.ApplicationUserId].Add(estimatePerAssignee);
+            }
+        }
+
+        return map;
+    }
+
+    /// <summary>
+    /// OPTIMIZED: Use pre-computed assignment map to eliminate nested loops
+    /// </summary>
     private static List<WorkloadMemberViewModel> BuildWorkloadList(
         List<Models.Entities.ProjectMember> members,
-        List<Models.Entities.TaskItem> tasks)
+        List<Models.Entities.TaskItem> tasks,
+        Dictionary<int, List<double>> assignmentMap)
     {
         var result = new List<WorkloadMemberViewModel>();
 
         foreach (var member in members)
         {
-            var myTasks = tasks
-                .Where(t => t.Assignments.Any(a => a.ApplicationUserId == member.ApplicationUserId))
-                .ToList();
-
+            // Get assigned hours from pre-computed map (O(1) lookup)
             double assignedHours = 0;
-            foreach (var task in myTasks)
+            int taskCount = 0;
+
+            if (assignmentMap.TryGetValue(member.ApplicationUserId, out var estimates))
             {
-                var assigneeCount = task.Assignments.Count;
-                assignedHours += assigneeCount > 0 ? (double)task.Estimate / assigneeCount : 0;
+                assignedHours = estimates.Sum();
+                taskCount = estimates.Count;
             }
 
             var capacity = member.WeeklyCapacityHours <= 0 ? 1 : member.WeeklyCapacityHours;
@@ -102,7 +149,7 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
                 Role = member.Role,
                 CapacityHours = member.WeeklyCapacityHours,
                 AssignedHours = Math.Round(assignedHours, 1),
-                TaskCount = myTasks.Count,
+                TaskCount = taskCount,
                 UtilizationPercent = utilization,
                 StatusLevel = statusLevel
             });
@@ -111,41 +158,57 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
         return result.OrderByDescending(x => x.UtilizationPercent).ToList();
     }
 
+    /// <summary>
+    /// OPTIMIZED: Single ExecuteUpdateAsync instead of load-modify-save pattern
+    /// </summary>
     public async Task UpdateCapacityAsync(int projectMemberId, int weeklyCapacityHours)
     {
-        var member = await _context.ProjectMembers.FirstOrDefaultAsync(x => x.Id == projectMemberId);
-        if (member == null) return;
+        if (projectMemberId <= 0)
+            return;
 
-        member.WeeklyCapacityHours = Math.Max(1, weeklyCapacityHours);
-        member.ChangeDate = DateTime.Now;
-        await _context.SaveChangesAsync();
+        var capacityValue = Math.Max(1, weeklyCapacityHours);
+        var now = DateTime.Now;
+
+        await _context.ProjectMembers
+            .Where(x => x.Id == projectMemberId && x.ViewState)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.WeeklyCapacityHours, capacityValue)
+                .SetProperty(x => x.ChangeDate, now));
     }
 
+    /// <summary>
+    /// OPTIMIZED: Single query with server-side aggregation instead of loading all tasks
+    /// </summary>
     public async Task<int> GetUserUtilizationAsync(int projectId, int userId)
     {
-        var member = await _context.ProjectMembers
-            .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.ApplicationUserId == userId && x.ViewState);
-
-        if (member == null)
+        if (projectId <= 0 || userId <= 0)
             return 0;
 
-        var openTasks = await _context.TaskItems
+        var member = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ApplicationUserId == userId && x.ViewState)
+            .Select(x => x.WeeklyCapacityHours)
+            .FirstOrDefaultAsync();
+
+        if (member <= 0)
+            return 0;
+
+        // OPTIMIZED: Server-side aggregation - single query instead of load-then-calculate
+        var assignedHours = await _context.TaskItems
             .Where(t => t.UserStory.ProjectId == projectId
                 && t.ViewState
                 && t.Status != TaskStatusType.Done
                 && t.Status != TaskStatusType.Cancelled
                 && t.Assignments.Any(a => a.ApplicationUserId == userId))
-            .Include(t => t.Assignments)
+            .Select(t => new { t.Estimate, AssigneeCount = t.Assignments.Count })
             .ToListAsync();
 
-        double assignedHours = 0;
-        foreach (var task in openTasks)
-        {
-            var assigneeCount = task.Assignments.Count;
-            assignedHours += assigneeCount > 0 ? (double)task.Estimate / assigneeCount : 0;
-        }
+        if (assignedHours.Count == 0)
+            return 0;
 
-        var capacity = member.WeeklyCapacityHours <= 0 ? 1 : member.WeeklyCapacityHours;
-        return (int)Math.Round(assignedHours / capacity * 100);
+        // Calculate total assigned hours
+        var totalHours = assignedHours.Sum(t => (double)t.Estimate / Math.Max(1, t.AssigneeCount));
+        var capacity = member <= 0 ? 1 : member;
+
+        return (int)Math.Round(totalHours / capacity * 100);
     }
 }

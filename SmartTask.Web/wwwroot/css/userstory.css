@@ -216,14 +216,286 @@
     gap: 16px;
 }
 
+/* ================= Details Hero ================= */
+
+.userstory-detail-hero {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+}
+
+.userstory-hero-icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 22px;
+}
+
+.userstory-hero-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.userstory-hero-content h1 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray900);
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.userstory-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: var(--gray500);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.userstory-hero-meta i {
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.userstory-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+/* ================= Summary Strip ================= */
+
+.userstory-summary-strip {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 22px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.userstory-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray700);
+}
+
+.userstory-summary-item i {
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.userstory-summary-item strong {
+    font-weight: 700;
+    color: var(--gray800);
+}
+
+.userstory-summary-sep {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gray300);
+    flex-shrink: 0;
+}
+
+/* ================= Detail Cards (improved) ================= */
+
+.userstory-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.userstory-cards .details-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.userstory-section-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.userstory-section-icon.icon-primary {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.userstory-section-icon.icon-success {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.userstory-section-icon.icon-warning {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.userstory-section-icon.icon-info {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+/* ================= Improved Info Grid ================= */
+
+.userstory-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 4px;
+}
+
+.userstory-info-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.userstory-info-grid > div:hover {
+    border-color: var(--gray200);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .04);
+}
+
+.userstory-info-grid span:last-child {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray800);
+}
+
+.userstory-info-label {
+    font-size: 11px;
+    color: var(--gray500);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.userstory-info-label i {
+    font-size: 10px;
+    color: var(--gray400);
+}
+
+/* ================= Description blocks ================= */
+
+.userstory-description,
+.userstory-acceptance {
+    color: var(--gray600);
+    line-height: 2;
+    font-size: 14px;
+    white-space: pre-line;
+}
+
+.userstory-empty-text {
+    color: var(--gray400);
+    font-style: italic;
+    font-size: 13px;
+    padding: 20px;
+    text-align: center;
+    background: var(--gray50);
+    border: 1px dashed var(--gray200);
+    border-radius: 10px;
+}
+
+/* ================= Create / Edit Form ================= */
+
+.userstory-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
 /* ================= Responsive ================= */
 
+@media (max-width: 1024px) {
+    .userstory-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
+    .userstory-detail-hero {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .userstory-hero-actions {
+        width: 100%;
+    }
+
+    .userstory-hero-actions a,
+    .userstory-hero-actions button {
+        flex: 1;
+    }
+
+    .userstory-summary-strip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 18px;
+    }
+
+    .userstory-summary-sep {
+        display: none;
+    }
+
+    .userstory-info-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .userstory-form-row {
         grid-template-columns: 1fr;
     }
 }
 
+@media (max-width: 480px) {
+    .userstory-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ================= Reduced motion ================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .userstory-info-grid > div,
+    .userstory-edit-btn {
+        transition: none;
+    }
+}
 
 

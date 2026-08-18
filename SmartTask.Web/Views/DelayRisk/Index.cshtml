@@ -1,92 +1,215 @@
-﻿@using SmartTask.Web.Models.ViewModels.Search
+@using SmartTask.Web.Models.ViewModels.Search
 @model SmartTask.Web.Models.ViewModels.Risk.DelayRiskViewModel
 
 @{
     ViewData["Title"] = "پیش‌بینی ریسک تأخیر";
+
+    var riskLevelIcon = Model.RiskLevel switch
+    {
+        "low"      => "fa-solid fa-shield-check",
+        "medium"   => "fa-solid fa-triangle-exclamation",
+        "high"     => "fa-solid fa-circle-exclamation",
+        "critical" => "fa-solid fa-skull-crossbones",
+        _          => "fa-solid fa-circle-info"
+    };
 }
 
 @section Styles
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/delayrisk.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
 }
 
 <div class="workspace-container">
 
     @Html.AntiForgeryToken()
 
-    <div class="workspace-hero">
-        <div class="workspace-hero-content">
-            <h1><i class="fa-solid fa-triangle-exclamation"></i> پیش‌بینی ریسک تأخیر — @Model.ProjectName</h1>
-            <p>تحلیل ترکیبی از بارکاری، وابستگی‌ها و روند تأخیرهای اخیر پروژه.</p>
+    <!-- =====================================================
+         Hero Header
+         ===================================================== -->
+    <div class="delayrisk-hero">
+
+        <div class="delayrisk-hero-content">
+            <h1>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                پیش‌بینی ریسک تأخیر
+            </h1>
+            <p>
+                تحلیل ترکیبی از بارکاری، وابستگی‌ها و روند تأخیرهای اخیر پروژه
+                <strong>@Model.ProjectName</strong>.
+            </p>
         </div>
 
-        <div class="workspace-toolbar">
-            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به پروژه
-                </button>
+        <div class="delayrisk-hero-actions">
+            <a asp-controller="Project"
+               asp-action="Details"
+               asp-route-id="@Model.ProjectId"
+               class="delayrisk-back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
             </a>
         </div>
+
     </div>
 
-    <div class="risk-gauge-card">
+
+    <!-- =====================================================
+         Risk Summary Stats
+         ===================================================== -->
+    <div class="delayrisk-summary" role="list" aria-label="خلاصه ریسک">
+
+        <div class="delayrisk-summary-item" role="listitem">
+            <span class="delayrisk-summary-icon icon-danger">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </span>
+            <div class="delayrisk-summary-text">
+                <span class="delayrisk-summary-value fa-digits">@Model.OverdueTasksCount</span>
+                <span class="delayrisk-summary-label">Task عقب‌افتاده</span>
+            </div>
+        </div>
+
+        <div class="delayrisk-summary-item" role="listitem">
+            <span class="delayrisk-summary-icon icon-warning">
+                <i class="fa-solid fa-users"></i>
+            </span>
+            <div class="delayrisk-summary-text">
+                <span class="delayrisk-summary-value fa-digits">@Model.OverloadedMembersCount</span>
+                <span class="delayrisk-summary-label">عضو اضافه‌بار</span>
+            </div>
+        </div>
+
+        <div class="delayrisk-summary-item" role="listitem">
+            <span class="delayrisk-summary-icon icon-info">
+                <i class="fa-solid fa-link"></i>
+            </span>
+            <div class="delayrisk-summary-text">
+                <span class="delayrisk-summary-value fa-digits">@Model.RiskyDependencyChainsCount</span>
+                <span class="delayrisk-summary-label">زنجیره پرریسک</span>
+            </div>
+        </div>
+
+        <div class="delayrisk-summary-item" role="listitem">
+            <span class="delayrisk-summary-icon icon-success">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </span>
+            <div class="delayrisk-summary-text">
+                <span class="delayrisk-summary-value fa-digits">@Model.RecentCascadeCount</span>
+                <span class="delayrisk-summary-label">تمدید خودکار</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         Risk Gauge Card
+         ===================================================== -->
+    <div class="risk-gauge-card" role="region" aria-label="گیج ریسک">
 
         <div class="dashboard-donut-wrap risk-donut-wrap">
-            <svg viewBox="0 0 120 120" class="dashboard-donut" data-progress="@Model.RiskScore">
+            <svg viewBox="0 0 120 120"
+                 class="dashboard-donut"
+                 data-progress="@Model.RiskScore"
+                 aria-label="@Model.RiskScore از ۱۰۰">
                 <circle cx="60" cy="60" r="52" class="donut-track"></circle>
-                <circle cx="60" cy="60" r="52" class="donut-value risk-donut-value status-@Model.RiskLevel"></circle>
+                <circle cx="60" cy="60" r="52"
+                        class="donut-value risk-donut-value status-@Model.RiskLevel"></circle>
             </svg>
             <div class="dashboard-donut-label">
-                <strong>@Model.RiskScore</strong>
+                <strong class="fa-digits">@Model.RiskScore</strong>
                 <span>از ۱۰۰</span>
             </div>
         </div>
 
         <div class="risk-gauge-info">
-            <span class="risk-level-pill status-@Model.RiskLevel">سطح ریسک: @Model.RiskLevelDisplay</span>
 
-            <div class="risk-factor-list">
-                <div class="risk-factor-row">
-                    <span>Task های عقب‌افتاده</span>
-                    <strong>@Model.OverdueTasksCount از @Model.TotalOpenTasksCount</strong>
+            <span class="risk-level-pill status-@Model.RiskLevel">
+                <i class="@riskLevelIcon"></i>
+                سطح ریسک: @Model.RiskLevelDisplay
+            </span>
+
+            <div class="risk-factor-list" role="list">
+
+                <div class="risk-factor-row" role="listitem">
+                    <span class="risk-factor-label">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                        Task های عقب‌افتاده
+                    </span>
+                    <span class="risk-factor-value @(Model.OverdueTasksCount > 0 ? "value-danger" : "")">
+                        <span class="fa-digits">@Model.OverdueTasksCount</span> از
+                        <span class="fa-digits">@Model.TotalOpenTasksCount</span>
+                    </span>
                 </div>
-                <div class="risk-factor-row">
-                    <span>اعضای اضافه‌بار</span>
-                    <strong>@Model.OverloadedMembersCount از @Model.TotalMembersCount</strong>
+
+                <div class="risk-factor-divider"></div>
+
+                <div class="risk-factor-row" role="listitem">
+                    <span class="risk-factor-label">
+                        <i class="fa-solid fa-users"></i>
+                        اعضای اضافه‌بار
+                    </span>
+                    <span class="risk-factor-value @(Model.OverloadedMembersCount > 0 ? "value-warning" : "")">
+                        <span class="fa-digits">@Model.OverloadedMembersCount</span> از
+                        <span class="fa-digits">@Model.TotalMembersCount</span>
+                    </span>
                 </div>
-                <div class="risk-factor-row">
-                    <span>زنجیره‌های پرریسک وابستگی</span>
-                    <strong>@Model.RiskyDependencyChainsCount</strong>
+
+                <div class="risk-factor-divider"></div>
+
+                <div class="risk-factor-row" role="listitem">
+                    <span class="risk-factor-label">
+                        <i class="fa-solid fa-link"></i>
+                        زنجیره‌های پرریسک وابستگی
+                    </span>
+                    <span class="risk-factor-value @(Model.RiskyDependencyChainsCount > 0 ? "value-danger" : "")">
+                        <span class="fa-digits">@Model.RiskyDependencyChainsCount</span>
+                    </span>
                 </div>
-                <div class="risk-factor-row">
-                    <span>تمدید خودکار (۷ روز اخیر)</span>
-                    <strong>@Model.RecentCascadeCount</strong>
+
+                <div class="risk-factor-divider"></div>
+
+                <div class="risk-factor-row" role="listitem">
+                    <span class="risk-factor-label">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        تمدید خودکار (۷ روز اخیر)
+                    </span>
+                    <span class="risk-factor-value @(Model.RecentCascadeCount > 0 ? "value-warning" : "")">
+                        <span class="fa-digits">@Model.RecentCascadeCount</span>
+                    </span>
                 </div>
+
             </div>
         </div>
 
     </div>
 
-    <div class="details-card ai-narrative-card">
-        <div class="card-title">
+
+    <!-- =====================================================
+         AI Narrative Card
+         ===================================================== -->
+    <div class="ai-narrative-card">
+
+        <div class="ai-narrative-header">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            تحلیل هوشمند وضعیت پروژه
+            <h3>تحلیل هوشمند وضعیت پروژه</h3>
         </div>
 
         <div id="narrativeBox" class="ai-narrative-box">
-            <p class="team-empty-text">برای دریافت تحلیل هوشمند این پروژه، دکمه زیر را بزنید.</p>
+            <div class="ai-narrative-placeholder">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>برای دریافت تحلیل هوشمند، دکمه زیر را بزنید.</span>
+            </div>
         </div>
 
-        <button type="button" id="generateNarrativeBtn" class="ai-suggest-btn" data-project-id="@Model.ProjectId">
+        <button type="button"
+                id="generateNarrativeBtn"
+                class="ai-generate-btn"
+                data-project-id="@Model.ProjectId"
+                aria-label="تولید تحلیل هوشمند">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             تولید تحلیل هوشمند
         </button>
+
     </div>
 
 </div>

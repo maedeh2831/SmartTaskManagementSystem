@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using System.Linq.Expressions;
@@ -16,46 +16,28 @@ namespace SmartTask.Web.Infrastructure.Repositories
             _context = context;
             _dbSet = context.Set<T>();
         }
-        public IQueryable<T> Query()
-        {
-            return _context.Set<T>();
-        }
+
+        public IQueryable<T> Query() => _dbSet.AsQueryable();
 
         public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await _dbSet.ToListAsync();
-        }
+            => await _dbSet.ToListAsync();
 
         public async Task<T?> GetByIdAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
+            => await _dbSet.FindAsync(id);
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet
-                .Where(predicate)
-                .ToListAsync();
-        }
+            => await _dbSet.Where(predicate).ToListAsync();
 
         public async Task AddAsync(T entity)
-        {
-            await _dbSet.AddAsync(entity);
-        }
+            => await _dbSet.AddAsync(entity);
 
         public void Update(T entity)
-        {
-            _dbSet.Update(entity);
-        }
+            => _dbSet.Update(entity);
 
         public void Delete(T entity)
-        {
-            _dbSet.Remove(entity);
-        }
+            => _dbSet.Remove(entity);
 
         public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+            => await _context.SaveChangesAsync();
     }
 }

@@ -59,18 +59,14 @@ public class WorkspaceService
                 x.OwnerId == userId);
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public new async Task DeleteAsync(int id)
     {
-        var workspace = await _context.Workspaces
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (workspace == null)
-            return;
-
-
-        workspace.ViewState = false;
-
-        await _context.SaveChangesAsync();
+        await _context.Workspaces
+            .Where(x => x.Id == id)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.ViewState, false)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     public async Task UpdateSettingsAsync(

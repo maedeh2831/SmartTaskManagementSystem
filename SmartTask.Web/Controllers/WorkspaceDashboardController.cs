@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Services.Interfaces;
 
@@ -10,35 +12,39 @@ public class WorkspaceDashboardController : BaseController
 {
     private readonly IWorkspaceDashboardService _dashboardService;
     private readonly IWorkspaceMemberService _workspaceMemberService;
+    private readonly ApplicationDbContext _context;
 
     public WorkspaceDashboardController(
         IWorkspaceDashboardService dashboardService,
         IWorkspaceMemberService workspaceMemberService,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        ApplicationDbContext context)
         : base(currentUser)
     {
         _dashboardService = dashboardService;
         _workspaceMemberService = workspaceMemberService;
+        _context = context;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(int workspaceId)
     {
-        if (!await _workspaceMemberService.IsMemberAsync(workspaceId, CurrentUser.UserId))
+        // Validate workspace exists before anything else
+        var workspace = await _context.Workspaces
+            .FirstOrDefaultAsync(x => x.Id == workspaceId && x.ViewState);
+
+        if (workspace == null)
         {
-            TempData["Error"] = "شما عضو این Workspace نیستید.";
+            // Silent redirect — no error popup on login
             return RedirectToAction("Index", "Workspace");
         }
 
-        try
+        if (!await _workspaceMemberService.IsMemberAsync(workspaceId, CurrentUser.UserId))
         {
-            var model = await _dashboardService.GetDashboardAsync(workspaceId, CurrentUser.UserId);
-            return View(model);
-        }
-        catch (Exception)
-        {
-            TempData["Error"] = "فضای کاری یافت نشد.";
             return RedirectToAction("Index", "Workspace");
         }
+
+        var model = await _dashboardService.GetDashboardAsync(workspaceId, CurrentUser.UserId);
+        return View(model);
     }
 }

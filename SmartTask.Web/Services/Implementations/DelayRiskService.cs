@@ -33,14 +33,16 @@ public class DelayRiskService : IDelayRiskService
         if (project == null)
             return null;
 
-        //  ۱) نسبت Task های عقب‌افتاده 
-        var openTasks = await _context.TaskItems
-            .Where(t => t.UserStory.ProjectId == projectId && t.ViewState
-                && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled)
-            .ToListAsync();
+        // OPTIMIZED: Server-side counting instead of loading all tasks into memory
+        var now = DateTime.Now;
+        var totalOpen = await _context.TaskItems
+            .CountAsync(t => t.UserStory.ProjectId == projectId && t.ViewState
+                && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled);
 
-        var overdueCount = openTasks.Count(t => t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.Now.Date);
-        var totalOpen = openTasks.Count;
+        var overdueCount = await _context.TaskItems
+            .CountAsync(t => t.UserStory.ProjectId == projectId && t.ViewState
+                && t.Status != TaskStatusType.Done && t.Status != TaskStatusType.Cancelled
+                && t.DueDate.HasValue && t.DueDate.Value.Date < now.Date);
 
         var overdueRatio = totalOpen == 0 ? 0 : (double)overdueCount / totalOpen;
         var overdueScore = (int)Math.Round(overdueRatio * 40);

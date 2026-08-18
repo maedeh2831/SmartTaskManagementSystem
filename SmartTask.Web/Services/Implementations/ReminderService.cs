@@ -63,30 +63,26 @@ namespace SmartTask.Web.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
         public async Task UpdateAsync(int id, string title, DateTime reminderDate)
         {
-            var reminder = await _context.Reminders.FirstOrDefaultAsync(x => x.Id == id);
-            if (reminder == null)
-                return;
-
-            reminder.Title = title.Trim();
-            reminder.ReminderDate = reminderDate;
-            reminder.IsSent = false; // اگه زمان تغییر کرد، باید دوباره ارسال بشه
-            reminder.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.Reminders
+                .Where(x => x.Id == id && x.ViewState)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.Title, title.Trim())
+                    .SetProperty(x => x.ReminderDate, reminderDate)
+                    .SetProperty(x => x.IsSent, false)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync for soft delete
         public async Task DeleteAsync(int id)
         {
-            var reminder = await _context.Reminders.FirstOrDefaultAsync(x => x.Id == id);
-            if (reminder == null)
-                return;
-
-            reminder.ViewState = false;
-            reminder.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.Reminders
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.ViewState, false)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task<List<Reminder>> GetPendingManualRemindersAsync()
@@ -99,16 +95,14 @@ namespace SmartTask.Web.Services.Implementations
                 .ToListAsync();
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
         public async Task MarkAsSentAsync(int id)
         {
-            var reminder = await _context.Reminders.FirstOrDefaultAsync(x => x.Id == id);
-            if (reminder == null)
-                return;
-
-            reminder.IsSent = true;
-            reminder.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.Reminders
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.IsSent, true)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task<bool> AutoReminderExistsAsync(int taskItemId, int userId, string marker)

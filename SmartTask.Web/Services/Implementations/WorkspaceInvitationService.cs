@@ -34,26 +34,21 @@ public class WorkspaceInvitationService
         _notificationService = notificationService;
     }
 
+    // OPTIMIZED: Batch expire invitations with ExecuteUpdateAsync instead of load-modify-save
     public async Task<List<WorkspaceInvitationViewModel>> GetPendingInvitationsAsync(int workspaceId)
     {
-        var expiredOnes = await _context.WorkspaceInvitations
-            .Where(x =>
-                x.WorkspaceId == workspaceId &&
-                x.Status == WorkspaceInvitationStatusType.Pending &&
-                x.ExpiryDate < DateTime.Now)
-            .ToListAsync();
+        var now = DateTime.Now;
 
-        foreach (var item in expiredOnes)
-            item.Status = WorkspaceInvitationStatusType.Expired;
-
-        if (expiredOnes.Any())
-            await _context.SaveChangesAsync();
+        await _context.WorkspaceInvitations
+            .Where(x => x.WorkspaceId == workspaceId
+                && x.Status == WorkspaceInvitationStatusType.Pending
+                && x.ExpiryDate < now)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Status, WorkspaceInvitationStatusType.Expired));
 
         return await _context.WorkspaceInvitations
-            .Where(x =>
-                x.WorkspaceId == workspaceId &&
-                x.Status == WorkspaceInvitationStatusType.Pending)
-            .Include(x => x.InvitedUser)
+            .Where(x => x.WorkspaceId == workspaceId
+                && x.Status == WorkspaceInvitationStatusType.Pending)
             .OrderByDescending(x => x.CreatedDate)
             .Select(x => new WorkspaceInvitationViewModel
             {
@@ -302,17 +297,13 @@ public class WorkspaceInvitationService
         await _context.SaveChangesAsync();
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task CancelInvitationAsync(int invitationId)
     {
-        var invitation = await _context.WorkspaceInvitations
-            .FirstOrDefaultAsync(x => x.Id == invitationId);
-
-        if (invitation == null)
-            return;
-
-        invitation.Status = WorkspaceInvitationStatusType.Cancelled;
-        invitation.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        await _context.WorkspaceInvitations
+            .Where(x => x.Id == invitationId)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Status, WorkspaceInvitationStatusType.Cancelled)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 }

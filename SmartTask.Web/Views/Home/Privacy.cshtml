@@ -1,6 +1,74 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+@{
+    ViewData["Title"] = "حریم خصوصی";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+                <div style="width:48px; height:48px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:12px; background:var(--primary-light); color:var(--primary); font-size:18px;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 style="margin:0; font-size:22px; font-weight:700; color:var(--gray900); line-height:1.6;">حریم خصوصی</h1>
+                </div>
+            </div>
+            <p style="color:var(--gray500); font-size:13px; line-height:1.9; margin:0;">سیاست‌ها و رویه‌های مربوط به حریم خصوصی کاربران SmartTask</p>
+        </div>
+    </div>
+
+
+    <div style="background:var(--card); border:1px solid var(--gray200); border-radius:12px; padding:32px; box-shadow:0 1px 3px rgba(15,23,42,.04); margin-top:24px;">
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--gray100);">
+            <i class="fa-solid fa-circle-info" style="color:var(--primary); font-size:16px;"></i>
+            <span style="font-size:14px; font-weight:700; color:var(--gray800);">اطلاعات کلی</span>
+        </div>
+
+        <div style="color:var(--gray600); font-size:14px; line-height:2.2;">
+            <p style="margin:0 0 16px;">
+                SmartTask متعهد به حفاظت از حریم خصوصی کاربران خود است. این سند توضیح می‌دهد که چه اطلاعاتی جمع‌آوری می‌شود، چگونه استفاده می‌شود و چه حقوقی دارید.
+            </p>
+
+            <h3 style="font-size:16px; font-weight:700; color:var(--gray800); margin:24px 0 12px;">
+                <i class="fa-solid fa-database" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                جمع‌آوری اطلاعات
+            </h3>
+            <p style="margin:0 0 16px;">
+                ما اطلاعاتی مانند نام، آدرس ایمیل و فعالیت‌های شما در پلتفرم را جمع‌آوری می‌کنیم. این اطلاعات صرفاً برای بهبود تجربه کاربری و ارائه خدمات بهتر استفاده می‌شوند.
+            </p>
+
+            <h3 style="font-size:16px; font-weight:700; color:var(--gray800); margin:24px 0 12px;">
+                <i class="fa-solid fa-lock" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                استفاده از اطلاعات
+            </h3>
+            <p style="margin:0 0 16px;">
+                اطلاعات شما بدون اجازه صریح شما به اشخاص ثالث فروخته یا اجاره داده نمی‌شود. ما از اطلاعات برای ارائه خدمات، بهبود پلتفرم و ارسال اعلان‌های مرتبط استفاده می‌کنیم.
+            </p>
+
+            <h3 style="font-size:16px; font-weight:700; color:var(--gray800); margin:24px 0 12px;">
+                <i class="fa-solid fa-key" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                امنیت اطلاعات
+            </h3>
+            <p style="margin:0 0 16px;">
+                ما از روش‌های امنیتی مناسب برای محافظت از اطلاعات شخصی شما در برابر دسترسی غیرمجاز استفاده می‌کنیم.
+            </p>
+
+            <h3 style="font-size:16px; font-weight:700; color:var(--gray800); margin:24px 0 12px;">
+                <i class="fa-solid fa-envelope" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                تماس با ما
+            </h3>
+            <p style="margin:0;">
+                اگر سؤالی درباره این سیاست حریم خصوصی دارید، لطفاً با ما تماس بگیرید.
+            </p>
+        </div>
+
+    </div>
+
+</div>

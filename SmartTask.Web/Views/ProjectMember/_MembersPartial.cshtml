@@ -1,0 +1,55 @@
+@model SmartTask.Web.Models.ViewModels.ProjectMember.ProjectMemberIndexViewModel
+
+<style>
+    .pm-list { display: flex; flex-direction: column; gap: 8px; }
+    .pm-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--gray200); background: var(--card); transition: border-color .2s ease, box-shadow .2s ease; }
+    .pm-row:hover { border-color: var(--gray300); box-shadow: 0 2px 8px rgba(15,23,42,.04); }
+    .pm-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; font-weight: 700; overflow: hidden; }
+    .pm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .pm-info { flex: 1; min-width: 0; }
+    .pm-name { font-size: 14px; font-weight: 600; color: var(--gray800); }
+    .pm-role { font-size: 11px; color: var(--gray500); }
+    .pm-role-badge { display: inline-flex; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .pm-role-badge.role-owner { background: #FEF3C7; color: #B45309; }
+    .pm-role-badge.role-manager { background: #DBEAFE; color: #1D4ED8; }
+    .pm-role-badge.role-developer { background: var(--primary-light); color: var(--primary); }
+    .pm-role-badge.role-tester { background: #D1FAE5; color: #047857; }
+    .pm-role-badge.role-guest { background: var(--gray100); color: var(--gray500); }
+    .pm-empty { text-align: center; padding: 40px; color: var(--gray500); }
+</style>
+
+@if (!Model.Members.Any())
+{
+    <div class="pm-empty">
+        <i class="fa-solid fa-users" style="font-size:28px; color:var(--gray400); margin-bottom:12px; display:block;"></i>
+        <p>هنوز عضوی به این پروژه اضافه نشده.</p>
+    </div>
+}
+else
+{
+    <div class="pm-list">
+        @foreach (var m in Model.Members)
+        {
+            var initials = (m.FullName.Length >= 2) ? m.FullName.Substring(0, 2) : m.FullName;
+            var roleClass = m.Role.ToString().ToLower();
+            var roleLabel = m.Role switch
+            {
+                SmartTask.Web.Models.Enums.ProjectRoleType.Owner => "مالک",
+                SmartTask.Web.Models.Enums.ProjectRoleType.Manager => "مدیر",
+                SmartTask.Web.Models.Enums.ProjectRoleType.Developer => "توسعه‌دهنده",
+                SmartTask.Web.Models.Enums.ProjectRoleType.Tester => "تستر",
+                SmartTask.Web.Models.Enums.ProjectRoleType.Guest => "مهمان",
+                _ => m.Role.ToString()
+            };
+
+            <div class="pm-row">
+                <div class="pm-avatar">@initials</div>
+                <div class="pm-info">
+                    <div class="pm-name">@m.FullName</div>
+                    <div class="pm-role">عضو از @Html.DisplayDate(m.JoinedDate)</div>
+                </div>
+                <span class="pm-role-badge role-@roleClass">@roleLabel</span>
+            </div>
+        }
+    </div>
+}

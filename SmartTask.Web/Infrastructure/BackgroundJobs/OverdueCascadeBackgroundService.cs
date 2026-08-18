@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
@@ -16,8 +16,8 @@ namespace SmartTask.Web.Infrastructure.BackgroundJobs
             IServiceScopeFactory scopeFactory,
             ILogger<OverdueCascadeBackgroundService> logger)
         {
-            _scopeFactory = scopeFactory;
-            _logger = logger;
+            _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -48,6 +48,7 @@ namespace SmartTask.Web.Infrastructure.BackgroundJobs
 
             var now = DateTime.Now;
 
+            // OPTIMIZED: Load all overdue tasks with minimal data
             var overdueTasks = await context.TaskItems
                 .Where(x =>
                     x.ViewState &&
@@ -55,7 +56,26 @@ namespace SmartTask.Web.Infrastructure.BackgroundJobs
                     x.DueDate.Value.Date < now.Date &&
                     x.Status != TaskStatusType.Done &&
                     x.Status != TaskStatusType.Cancelled)
+                .Select(x => new { x.Id, x.Title, x.DueDate })
                 .ToListAsync(stoppingToken);
+
+            if (overdueTasks.Count == 0)
+                return;
+
+            // OPTIMIZED: Load all cascade logs upfront instead of querying per task
+            var sourceTaskIds = overdueTasks.Select(t => t.Id).ToList();
+            var cascadeLogs = await context.OverdueCascadeLogs
+                .Where(x => x.ViewState && sourceTaskIds.Contains(x.SourceTaskId))
+                .ToListAsync(stoppingToken);
+
+            // OPTIMIZED: Pre-compute cascade log dictionary for O(1) lookups
+            var cascadeLogDict = cascadeLogs
+                .GroupBy(x => new { x.SourceTaskId, x.ImpactedTaskId })
+                .ToDictionary(
+                    g => (g.Key.SourceTaskId, g.Key.ImpactedTaskId),
+                    g => g.First());
+
+            var cascadesToApply = new List<(TaskItem sourceTask, int impactedTaskId, int delayDays)>();
 
             foreach (var sourceTask in overdueTasks)
             {
@@ -68,82 +88,103 @@ namespace SmartTask.Web.Infrastructure.BackgroundJobs
 
                 foreach (var impacted in requiredChain)
                 {
-                    await ApplyCascadeAsync(
-                        context, notificationService, activityLogService,
-                        sourceTask, impacted.TaskId, delayDays);
+                    cascadesToApply.Add((
+                        new TaskItem { Id = sourceTask.Id, Title = sourceTask.Title, DueDate = sourceTask.DueDate },
+                        impacted.TaskId,
+                        delayDays));
                 }
             }
-        }
 
-        private async Task ApplyCascadeAsync(
-            ApplicationDbContext context,
-            INotificationService notificationService,
-            IActivityLogService activityLogService,
-            TaskItem sourceTask,
-            int impactedTaskId,
-            int currentDelayDays)
-        {
-            var impactedTask = await context.TaskItems
+            if (cascadesToApply.Count == 0)
+                return;
+
+            // OPTIMIZED: Load all impacted tasks at once instead of individually
+            var impactedTaskIds = cascadesToApply.Select(x => x.impactedTaskId).Distinct().ToList();
+            var impactedTasks = await context.TaskItems
+                .Where(x => x.ViewState && impactedTaskIds.Contains(x.Id))
                 .Include(x => x.Assignments.Where(a => a.ViewState))
-                .FirstOrDefaultAsync(x => x.Id == impactedTaskId && x.ViewState);
+                .ToListAsync(stoppingToken);
 
-            if (impactedTask == null)
-                return;
+            var impactedTaskDict = impactedTasks.ToDictionary(x => x.Id);
 
-            if (impactedTask.Status == TaskStatusType.Done || impactedTask.Status == TaskStatusType.Cancelled)
-                return;
+            var notificationTasks = new List<Task>();
+            var activityLogTasks = new List<Task>();
 
-            var log = await context.OverdueCascadeLogs
-                .FirstOrDefaultAsync(x => x.SourceTaskId == sourceTask.Id && x.ImpactedTaskId == impactedTaskId);
-
-            int additionalDelay;
-
-            if (log == null)
+            foreach (var (sourceTask, impactedTaskId, currentDelayDays) in cascadesToApply)
             {
-                additionalDelay = currentDelayDays;
+                if (!impactedTaskDict.TryGetValue(impactedTaskId, out var impactedTask))
+                    continue;
 
-                context.OverdueCascadeLogs.Add(new OverdueCascadeLog
+                if (impactedTask.Status == TaskStatusType.Done || impactedTask.Status == TaskStatusType.Cancelled)
+                    continue;
+
+                // OPTIMIZED: Use O(1) lookup instead of querying
+                var logKey = (sourceTask.Id, impactedTaskId);
+                var logExists = cascadeLogDict.TryGetValue(logKey, out var log);
+
+                int additionalDelay;
+
+                if (!logExists)
                 {
-                    SourceTaskId = sourceTask.Id,
-                    ImpactedTaskId = impactedTaskId,
-                    DelayDaysApplied = currentDelayDays,
-                    AppliedDate = DateTime.Now,
-                    CreatedDate = DateTime.Now,
-                    ViewState = true
-                });
+                    additionalDelay = currentDelayDays;
+
+                    context.OverdueCascadeLogs.Add(new OverdueCascadeLog
+                    {
+                        SourceTaskId = sourceTask.Id,
+                        ImpactedTaskId = impactedTaskId,
+                        DelayDaysApplied = currentDelayDays,
+                        AppliedDate = DateTime.Now,
+                        CreatedDate = DateTime.Now,
+                        ViewState = true
+                    });
+                }
+                else if (currentDelayDays > log.DelayDaysApplied)
+                {
+                    additionalDelay = currentDelayDays - log.DelayDaysApplied;
+                    log.DelayDaysApplied = currentDelayDays;
+                    log.AppliedDate = DateTime.Now;
+                }
+                else
+                {
+                    continue; // تأخیر جدیدی برای اعمال وجود ندارد
+                }
+
+                if (impactedTask.DueDate.HasValue)
+                    impactedTask.DueDate = impactedTask.DueDate.Value.AddDays(additionalDelay);
+
+                impactedTask.ChangeDate = DateTime.Now;
+
+                // OPTIMIZED: Batch notifications using Task.WhenAll
+                foreach (var assignment in impactedTask.Assignments)
+                {
+                    notificationTasks.Add(notificationService.CreateAsync(
+                        assignment.ApplicationUserId,
+                        "تأخیر زنجیره‌ای",
+                        $"به‌دلیل تأخیر در Task «{sourceTask.Title}»، موعد Task «{impactedTask.Title}» به‌طور خودکار {additionalDelay} روز به تعویق افتاد.",
+                        NotificationType.Deadline));
+                }
+
+                var assignee = impactedTask.Assignments.FirstOrDefault();
+                if (assignee != null)
+                {
+                    activityLogTasks.Add(activityLogService.LogAsync(
+                        assignee.ApplicationUserId,
+                        "Overdue Auto-Cascade",
+                        $"موعد Task «{impactedTask.Title}» به‌دلیل تأخیر {additionalDelay} روزه در «{sourceTask.Title}» به‌صورت خودکار به‌روزرسانی شد.",
+                        impactedTask.Id));
+                }
             }
-            else if (currentDelayDays > log.DelayDaysApplied)
-            {
-                additionalDelay = currentDelayDays - log.DelayDaysApplied;
-                log.DelayDaysApplied = currentDelayDays;
-                log.AppliedDate = DateTime.Now;
-            }
-            else
-            {
-                return; // تأخیر جدیدی برای اعمال وجود ندارد
-            }
 
-            if (impactedTask.DueDate.HasValue)
-                impactedTask.DueDate = impactedTask.DueDate.Value.AddDays(additionalDelay);
+            // Save all cascades at once
+            await context.SaveChangesAsync(stoppingToken);
 
-            impactedTask.ChangeDate = DateTime.Now;
+            // OPTIMIZED: Execute all notifications in parallel
+            if (notificationTasks.Any())
+                await Task.WhenAll(notificationTasks);
 
-            await context.SaveChangesAsync();
-
-            foreach (var assignment in impactedTask.Assignments)
-            {
-                await notificationService.CreateAsync(
-                    assignment.ApplicationUserId,
-                    "تأخیر زنجیره‌ای",
-                    $"به‌دلیل تأخیر در Task «{sourceTask.Title}»، موعد Task «{impactedTask.Title}» به‌طور خودکار {additionalDelay} روز به تعویق افتاد.",
-                    NotificationType.Deadline);
-            }
-
-            await activityLogService.LogAsync(
-                            impactedTask.Assignments.FirstOrDefault()?.ApplicationUserId ?? 5,
-                            "Overdue Auto-Cascade",
-                            $"موعد Task «{impactedTask.Title}» به‌دلیل تأخیر {additionalDelay} روزه در «{sourceTask.Title}» به‌صورت خودکار به‌روزرسانی شد.",
-                            impactedTask.Id);
+            // OPTIMIZED: Execute all activity logs in parallel
+            if (activityLogTasks.Any())
+                await Task.WhenAll(activityLogTasks);
         }
     }
 }

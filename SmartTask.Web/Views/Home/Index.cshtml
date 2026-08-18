@@ -17,33 +17,69 @@
         </div>
     </div>
 
-    <div class="report-stats-grid">
-        <div class="report-stat-card">
-            <span class="report-stat-value">@Model.TotalWorkspaces</span>
-            <span class="report-stat-label">فضای کاری</span>
+    <div class="report-stats-grid" role="list" aria-label="آمار کلی">
+
+        <div class="report-stat-card" role="listitem">
+            <span class="report-stat-icon icon-primary">
+                <i class="fa-solid fa-layer-group"></i>
+            </span>
+            <div class="report-stat-text">
+                <span class="report-stat-value fa-digits">@Model.TotalWorkspaces</span>
+                <span class="report-stat-label">فضای کاری</span>
+            </div>
         </div>
-        <div class="report-stat-card">
-            <span class="report-stat-value">@Model.TotalProjects</span>
-            <span class="report-stat-label">پروژه</span>
+
+        <div class="report-stat-card" role="listitem">
+            <span class="report-stat-icon icon-info">
+                <i class="fa-solid fa-folder"></i>
+            </span>
+            <div class="report-stat-text">
+                <span class="report-stat-value fa-digits">@Model.TotalProjects</span>
+                <span class="report-stat-label">پروژه</span>
+            </div>
         </div>
-        <div class="report-stat-card">
-            <span class="report-stat-value">@Model.TotalAssignedTasks</span>
-            <span class="report-stat-label">Task تخصیص‌یافته</span>
+
+        <div class="report-stat-card" role="listitem">
+            <span class="report-stat-icon icon-success">
+                <i class="fa-solid fa-list-check"></i>
+            </span>
+            <div class="report-stat-text">
+                <span class="report-stat-value fa-digits">@Model.TotalAssignedTasks</span>
+                <span class="report-stat-label">Task تخصیص‌یافته</span>
+            </div>
         </div>
-        <div class="report-stat-card report-stat-danger">
-            <span class="report-stat-value">@Model.OverdueAssignedTasks</span>
-            <span class="report-stat-label">عقب‌افتاده</span>
+
+        <div class="report-stat-card report-stat-danger" role="listitem">
+            <span class="report-stat-icon icon-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </span>
+            <div class="report-stat-text">
+                <span class="report-stat-value fa-digits">@Model.OverdueAssignedTasks</span>
+                <span class="report-stat-label">عقب‌افتاده</span>
+            </div>
         </div>
+
     </div>
 
     <div class="home-dashboard-grid">
+
         <div class="widget-card">
-            <div class="widget-header"><h3>وضعیت Task های من</h3></div>
+            <div class="widget-header">
+                <h3>
+                    <i class="fa-solid fa-chart-pie" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                    وضعیت Task های من
+                </h3>
+            </div>
             <canvas id="myTaskStatusChart"></canvas>
         </div>
 
         <div class="widget-card">
-            <div class="widget-header"><h3>Task های نزدیک به موعد</h3></div>
+            <div class="widget-header">
+                <h3>
+                    <i class="fa-solid fa-clock" style="font-size:14px; color:var(--warning); margin-left:6px;"></i>
+                    Task های نزدیک به موعد
+                </h3>
+            </div>
             @if (!Model.UpcomingTasks.Any())
             {
                 <div class="widget-empty">
@@ -53,26 +89,40 @@
             }
             else
             {
-                <div class="home-upcoming-list">
+                <div class="home-upcoming-list" role="list" aria-label="Task های نزدیک به موعد">
                     @foreach (var t in Model.UpcomingTasks)
                     {
-                        <a asp-controller="Task" asp-action="Details" asp-route-id="@t.Id" class="home-upcoming-item">
+                        <a asp-controller="Task"
+                           asp-action="Details"
+                           asp-route-id="@t.Id"
+                           class="home-upcoming-item"
+                           role="listitem">
                             <div>
                                 <p>@t.Title</p>
                                 <span>@t.ProjectName</span>
                             </div>
-                            <span class="home-upcoming-days">@t.DaysLeft روز مانده</span>
+                            <span class="home-upcoming-days @(t.DaysLeft <= 2 ? "urgent" : "")">
+                                <i class="fa-solid fa-hourglass-end" style="font-size:9px;"></i>
+                                @t.DaysLeft روز مانده
+                            </span>
                         </a>
                     }
                 </div>
             }
         </div>
+
     </div>
 
     <div class="widget-card widget-card-wide">
         <div class="widget-header">
-            <h3>فضاهای کاری من</h3>
-            <a asp-controller="Workspace" asp-action="Index" class="widget-header-link">مشاهده همه</a>
+            <h3>
+                <i class="fa-solid fa-layer-group" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                فضاهای کاری من
+            </h3>
+            <a asp-controller="Workspace" asp-action="Index" class="widget-header-link">
+                مشاهده همه
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
         </div>
         @if (!Model.MyWorkspaces.Any())
         {
@@ -83,13 +133,18 @@
         }
         else
         {
-            <div class="home-workspace-list">
+            <div class="home-workspace-list" role="list" aria-label="فضاهای کاری">
                 @foreach (var w in Model.MyWorkspaces)
                 {
-                    <a asp-controller="Workspace" asp-action="Details" asp-route-id="@w.Id" class="home-workspace-item">
+                    <a asp-controller="Workspace"
+                       asp-action="Details"
+                       asp-route-id="@w.Id"
+                       class="home-workspace-item"
+                       role="listitem">
                         <span class="home-workspace-dot" style="background:@w.Color"></span>
                         <span class="home-workspace-name">@w.Name</span>
                         <span class="home-workspace-meta">@w.ProjectsCount پروژه · @w.MembersCount عضو</span>
+                        <i class="fa-solid fa-arrow-left home-workspace-arrow"></i>
                     </a>
                 }
             </div>
@@ -97,7 +152,12 @@
     </div>
 
     <div class="widget-card widget-card-wide">
-        <div class="widget-header"><h3>آخرین فعالیت‌های من</h3></div>
+        <div class="widget-header">
+            <h3>
+                <i class="fa-solid fa-clock-rotate-left" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
+                آخرین فعالیت‌های من
+            </h3>
+        </div>
         @if (!Model.RecentActivities.Any())
         {
             <div class="widget-empty">
@@ -107,11 +167,13 @@
         }
         else
         {
-            <div class="activity-timeline">
+            <div class="activity-timeline" role="list" aria-label="آخرین فعالیت‌ها">
                 @foreach (var item in Model.RecentActivities)
                 {
-                    <div class="activity-row">
-                        <div class="activity-icon"><i class="@item.IconClass"></i></div>
+                    <div class="activity-row" role="listitem">
+                        <div class="activity-icon">
+                            <i class="@item.IconClass"></i>
+                        </div>
                         <div class="activity-info">
                             <p>
                                 @item.Action
@@ -120,7 +182,10 @@
                                     <a asp-controller="Task" asp-action="Details" asp-route-id="@item.TaskItemId">(@item.TaskTitle)</a>
                                 }
                             </p>
-                            <span>@Html.DisplayDate(item.ActivityDate, includeTime: true)</span>
+                            <span>
+                                <i class="fa-regular fa-clock" style="font-size:9px; opacity:.7;"></i>
+                                @Html.DisplayDate(item.ActivityDate, includeTime: true)
+                            </span>
                         </div>
                     </div>
                 }

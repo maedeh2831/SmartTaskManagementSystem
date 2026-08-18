@@ -1,0 +1,91 @@
+@model SmartTask.Web.Models.ViewModels.Backlog.BacklogIndexViewModel
+@using SmartTask.Web.Models.Enums
+
+<style>
+    .bp-table-wrap { overflow-x: auto; }
+    .bp-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    .bp-table th { padding: 10px 14px; text-align: right; font-weight: 700; color: var(--gray600); border-bottom: 2px solid var(--gray200); font-size: 12px; white-space: nowrap; }
+    .bp-table td { padding: 10px 14px; border-bottom: 1px solid var(--gray100); color: var(--gray700); }
+    .bp-table tr:hover td { background: var(--gray50); }
+    .bp-id { color: var(--gray400); font-size: 12px; }
+    .bp-title { font-weight: 600; color: var(--gray800); }
+    .bp-title a { color: inherit; text-decoration: none; }
+    .bp-title a:hover { color: var(--primary); }
+    .bp-badge { display: inline-flex; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .bp-status-new { background: var(--gray100); color: var(--gray600); }
+    .bp-status-ready { background: #DBEAFE; color: #1D4ED8; }
+    .bp-status-inprogress { background: #FEF3C7; color: #B45309; }
+    .bp-status-done { background: #D1FAE5; color: #047857; }
+    .bp-status-closed { background: var(--gray100); color: var(--gray500); }
+    .bp-priority-lowest { color: var(--gray400); }
+    .bp-priority-low { color: var(--gray600); }
+    .bp-priority-medium { color: var(--primary); }
+    .bp-priority-high { color: #C2410C; }
+    .bp-priority-highest { color: #B91C1C; }
+    .bp-sp { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: var(--gray100); font-weight: 700; font-size: 12px; }
+    .bp-empty { text-align: center; padding: 40px; color: var(--gray500); }
+    .bp-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 8px 16px; border-radius: 8px; background: var(--primary-light); color: var(--primary); font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s ease; }
+    .bp-link:hover { background: var(--primary); color: #fff; }
+</style>
+
+@if (!Model.Stories.Any())
+{
+    <div class="bp-empty">
+        <i class="fa-solid fa-layer-group" style="font-size:28px; color:var(--gray400); margin-bottom:12px; display:block;"></i>
+        <p>Backlog خالی است.</p>
+    </div>
+}
+else
+{
+    <div class="bp-table-wrap">
+        <table class="bp-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>عنوان</th>
+                    <th>وضعیت</th>
+                    <th>اولویت</th>
+                    <th>SP</th>
+                    <th>مسئول</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Stories)
+                {
+                    var statusClass = s.Status.ToString().ToLower();
+                    var statusLabel = s.Status switch
+                    {
+                        StoryStatusType.New => "جدید",
+                        StoryStatusType.Ready => "آماده",
+                        StoryStatusType.InProgress => "درحال انجام",
+                        StoryStatusType.Done => "انجام‌شده",
+                        StoryStatusType.Closed => "بسته‌شده",
+                        _ => s.Status.ToString()
+                    };
+                    <tr>
+                        <td><span class="bp-id">#@s.Id</span></td>
+                        <td class="bp-title">
+                            <a href="/UserStory/Details/@s.Id">@s.Title</a>
+                        </td>
+                        <td><span class="bp-badge bp-status-@statusClass">@statusLabel</span></td>
+                        <td><span class="bp-priority-@s.Priority.ToString().ToLower()">@s.Priority</span></td>
+                        <td><span class="bp-sp fa-digits">@s.StoryPoint</span></td>
+                        <td>@(s.OwnerName ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/Backlog/Index?projectId=@Model.ProjectId" class="bp-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        مشاهده کامل بک‌لاگ
+    </a>
+}
+
+<script>
+    document.querySelectorAll('.fa-digits').forEach(function(el) {
+        var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+        el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+    });
+</script>

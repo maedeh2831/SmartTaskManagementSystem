@@ -1,276 +1,142 @@
-/*  dependency css  */
+/* ==========================================================
+                 SmartTask Dependency UI
+   ========================================================== */
 
-.dependency-alert {
+/* ==========================================================
+   Dependency Hero
+   ========================================================== */
+
+.dependency-hero {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #FEE2E2;
-    color: #B91C1C;
-    padding: 14px 20px;
-    border-radius: 16px;
-    font-size: 13px;
-    margin-bottom: 18px;
-}
-
-.dependency-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
 }
 
-.dependency-column h5 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--gray700);
-    margin: 0 0 12px;
+.dependency-hero-content {
+    flex: 1;
+    min-width: 260px;
 }
 
-.dependency-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--gray50);
-    border-radius: 14px;
-    padding: 10px 14px;
-    margin-bottom: 10px;
-    font-size: 13px;
-}
-
-    .dependency-chip a {
-        color: var(--gray900);
+    .dependency-hero-content h1 {
+        margin: 0 0 6px;
+        font-size: 22px;
         font-weight: 700;
-        text-decoration: none;
-        flex: 1;
+        color: var(--gray900);
+        line-height: 1.6;
     }
 
-        .dependency-chip a:hover {
+        .dependency-hero-content h1 i {
             color: var(--primary);
+            margin-left: 8px;
+            font-size: 20px;
         }
 
-.dependency-optional-badge {
-    background: var(--gray100);
-    color: var(--gray500);
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 10px;
-}
-
-.delete-dependency-btn {
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--gray400);
-}
-
-    .delete-dependency-btn:hover {
-        background: #FEE2E2;
-        color: #B91C1C;
-    }
-
-.dependency-add-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-top: 10px;
-}
-
-    .dependency-add-form select {
-        flex: 1;
-        min-width: 160px;
-    }
-
-.dependency-required-check {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--gray500);
-    white-space: nowrap;
-}
-
-/*  Impact Map  */
-
-.dependency-impact-box {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--gray100);
-}
-
-    .dependency-impact-box h5 {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .dependency-hero-content p {
+        margin: 0;
+        color: var(--gray500);
         font-size: 13px;
-        font-weight: 800;
-        color: var(--gray700);
-        margin: 0 0 14px;
+        line-height: 1.9;
     }
 
-.dependency-impact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.dependency-impact-item {
+.dependency-hero-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: var(--gray50);
-    font-size: 13px;
-    border-right: 3px solid var(--gray300);
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-    .dependency-impact-item.required {
-        border-right-color: var(--danger);
+.dependency-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--gray700);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+    .dependency-back-link:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
     }
 
-    .dependency-impact-item.optional {
-        border-right-color: var(--gray300);
+    .dependency-back-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+
+/* ==========================================================
+   Risk Stats Summary Bar
+   ========================================================== */
+
+.dependency-stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    flex-wrap: wrap;
+}
+
+.dependency-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gray600);
+    font-weight: 600;
+}
+
+    .dependency-stat-item i {
+        font-size: 12px;
         opacity: .7;
     }
 
-    .dependency-impact-item a {
-        color: var(--gray900);
+    .dependency-stat-item strong {
         font-weight: 700;
-        text-decoration: none;
-        flex: 1;
+        color: var(--gray800);
     }
 
-.dependency-depth-badge {
-    background: var(--gray100);
-    color: var(--gray500);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 8px;
-    white-space: nowrap;
+.dependency-stat-item.stat-danger strong {
+    color: #DC2626;
 }
 
-.dependency-projected-date {
-    font-size: 11px;
-    color: #B91C1C;
-    font-weight: 700;
-    white-space: nowrap;
+.dependency-stat-item.stat-warning strong {
+    color: #B45309;
 }
 
-/* Project Risk Page */
-
-.dependency-risk-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.dependency-stat-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--gray200);
+    flex-shrink: 0;
 }
 
-.dependency-risk-card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 20px 24px;
-    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
-    border-right: 4px solid var(--danger);
-}
 
-.dependency-risk-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-    .dependency-risk-header h4 {
-        margin: 0 0 4px;
-        font-size: 15px;
-    }
-
-        .dependency-risk-header h4 a {
-            color: var(--gray900);
-            text-decoration: none;
-        }
-
-            .dependency-risk-header h4 a:hover {
-                color: var(--primary);
-            }
-
-.dependency-risk-delay {
-    font-size: 12px;
-    color: #B91C1C;
-    font-weight: 700;
-}
-
-.dependency-risk-count {
-    background: #FEE2E2;
-    color: #B91C1C;
-    padding: 6px 14px;
-    border-radius: 14px;
-    font-size: 12px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.dependency-risk-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* Responsive */
-
-@media (max-width: 768px) {
-    .dependency-columns {
-        grid-template-columns: 1fr;
-    }
-}
-/*  Cascade Info Box  */
-
-.cascade-info-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: #FFF7ED;
-    color: #C2410C;
-    padding: 14px 20px;
-    border-radius: 16px;
-    font-size: 13px;
-    margin-bottom: 18px;
-}
-
-    .cascade-info-box i {
-        font-size: 18px;
-        margin-top: 2px;
-    }
-
-    .cascade-info-box strong {
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    .cascade-info-box ul {
-        margin: 0;
-        padding-right: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .cascade-info-box a {
-        color: #C2410C;
-        font-weight: 700;
-        text-decoration: underline;
-    }
-/* Graph Tabs */
+/* ==========================================================
+   Tabs
+   ========================================================== */
 
 .dependency-tabs {
     display: flex;
-    gap: 8px;
-    margin: 20px 0 16px;
-    border-bottom: 1px solid var(--gray100);
+    gap: 4px;
+    border-bottom: 2px solid var(--gray200);
+    margin-bottom: 24px;
+    position: relative;
 }
 
 .dependency-tab-btn {
@@ -279,20 +145,203 @@
     gap: 8px;
     background: transparent;
     border: none;
-    padding: 10px 18px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--gray500);
-    border-bottom: 2px solid transparent;
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray600);
     cursor: pointer;
+    position: relative;
+    transition: color .2s ease;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
 }
+
+    .dependency-tab-btn:hover {
+        color: var(--gray900);
+    }
 
     .dependency-tab-btn.active {
         color: var(--primary);
+        font-weight: 600;
         border-bottom-color: var(--primary);
     }
 
-/* Graph View */
+    .dependency-tab-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: -2px;
+        border-radius: 8px;
+    }
+
+    .dependency-tab-btn i {
+        font-size: 13px;
+    }
+
+
+/* ==========================================================
+   Risk List
+   ========================================================== */
+
+.dependency-risk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dependency-risk-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-right: 4px solid var(--danger);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    animation: dependency-fadeUp .35s ease;
+}
+
+    .dependency-risk-card:hover {
+        border-color: var(--gray300);
+        border-right-color: var(--danger);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+        transform: translateY(-1px);
+    }
+
+@keyframes dependency-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.dependency-risk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+    .dependency-risk-header h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+        .dependency-risk-header h4 a {
+            color: var(--gray900);
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+            .dependency-risk-header h4 a:hover {
+                color: var(--primary);
+            }
+
+.dependency-risk-delay {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #B91C1C;
+    font-weight: 700;
+}
+
+.dependency-risk-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEE2E2;
+    color: #B91C1C;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.dependency-risk-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dependency-risk-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .2s ease;
+}
+
+    .dependency-risk-chip:hover {
+        background: var(--gray200);
+    }
+
+.dependency-risk-more {
+    color: var(--gray400);
+    font-style: italic;
+}
+
+
+/* ==========================================================
+   Search Filter
+   ========================================================== */
+
+.dependency-search {
+    position: relative;
+    max-width: 400px;
+    margin-bottom: 16px;
+}
+
+    .dependency-search input {
+        width: 100%;
+        height: 42px;
+        border: 1px solid var(--gray200);
+        border-radius: 10px;
+        background: var(--card);
+        padding-right: 40px;
+        padding-left: 14px;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--gray800);
+        box-shadow: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .dependency-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .dependency-search input::placeholder {
+            color: var(--gray400);
+        }
+
+    .dependency-search i {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray400);
+        font-size: 13px;
+        pointer-events: none;
+    }
+
+
+/* ==========================================================
+   Graph View
+   ========================================================== */
 
 .dependency-graph-toolbar {
     display: flex;
@@ -308,7 +357,7 @@
     flex-wrap: wrap;
     gap: 16px;
     font-size: 12px;
-    color: var(--gray500);
+    color: var(--gray600);
 }
 
     .dependency-graph-legend span {
@@ -333,7 +382,7 @@
     }
 
     .dependency-legend-dot.risk {
-        background: #EF4444;
+        background: var(--danger);
     }
 
     .dependency-legend-dot.done {
@@ -342,34 +391,388 @@
 
 .dependency-graph-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
     .dependency-graph-actions button {
         width: 34px;
         height: 34px;
-        border-radius: 10px;
-        border: 1px solid var(--gray100);
+        border-radius: 8px;
+        border: 1px solid var(--gray200);
         background: var(--card);
         color: var(--gray500);
+        font-family: inherit;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
     }
 
         .dependency-graph-actions button:hover {
-            background: var(--gray50);
+            background: var(--primary-light);
             color: var(--primary);
+            border-color: var(--primary-border);
+        }
+
+        .dependency-graph-actions button:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
 .dependency-graph-canvas {
     width: 100%;
     height: 520px;
-    border-radius: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--gray200);
     background: var(--card);
-    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
 }
 
 .dependency-graph-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     text-align: center;
-    padding: 40px;
-    color: var(--gray400);
+    padding: 60px 20px;
+    color: var(--gray500);
     font-size: 13px;
+}
+
+    .dependency-graph-state i {
+        font-size: 28px;
+        color: var(--gray400);
+    }
+
+
+/* ==========================================================
+   Tab Panel
+   ========================================================== */
+
+.dependency-tab-panel {
+    animation: dependency-fadeUp .3s ease;
+}
+
+
+/* ==========================================================
+   Alert / Info Boxes
+   ========================================================== */
+
+.dependency-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FEF2F2;
+    color: #991B1B;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    border: 1px solid #FECACA;
+}
+
+    .dependency-alert i {
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+.cascade-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #FFF7ED;
+    color: #9A3412;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    border: 1px solid #FED7AA;
+}
+
+    .cascade-info-box i {
+        font-size: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .cascade-info-box strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+    }
+
+    .cascade-info-box ul {
+        margin: 0;
+        padding-right: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+    }
+
+    .cascade-info-box a {
+        color: #9A3412;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+
+/* ==========================================================
+   Columns (for dependency management pages)
+   ========================================================== */
+
+.dependency-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.dependency-column h5 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray700);
+    margin: 0 0 12px;
+}
+
+.dependency-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .dependency-chip:hover {
+        border-color: var(--gray200);
+        background: var(--card);
+    }
+
+    .dependency-chip a {
+        color: var(--gray900);
+        font-weight: 700;
+        text-decoration: none;
+        flex: 1;
+    }
+
+        .dependency-chip a:hover {
+            color: var(--primary);
+        }
+
+.dependency-optional-badge {
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.delete-dependency-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--gray400);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .delete-dependency-btn:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+    .delete-dependency-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+.dependency-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+    .dependency-add-form select {
+        flex: 1;
+        min-width: 160px;
+        height: 40px;
+        border: 1px solid var(--gray200);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 0 12px;
+        background: var(--card);
+        color: var(--gray800);
+    }
+
+.dependency-required-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray500);
+    white-space: nowrap;
+}
+
+/* Impact Map */
+
+.dependency-impact-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gray100);
+}
+
+    .dependency-impact-box h5 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray700);
+        margin: 0 0 14px;
+    }
+
+.dependency-impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dependency-impact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--gray50);
+    font-size: 13px;
+    border-right: 3px solid var(--gray300);
+    transition: background .2s ease;
+}
+
+    .dependency-impact-item:hover {
+        background: var(--gray100);
+    }
+
+    .dependency-impact-item.required {
+        border-right-color: var(--danger);
+    }
+
+    .dependency-impact-item.optional {
+        border-right-color: var(--gray300);
+        opacity: .7;
+    }
+
+    .dependency-impact-item a {
+        color: var(--gray900);
+        font-weight: 700;
+        text-decoration: none;
+        flex: 1;
+    }
+
+.dependency-depth-badge {
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.dependency-projected-date {
+    font-size: 11px;
+    color: #B91C1C;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   Responsive
+   ========================================================== */
+
+@media (max-width: 768px) {
+    .dependency-hero {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .dependency-hero-actions {
+        width: 100%;
+    }
+
+    .dependency-back-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dependency-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dependency-tab-btn {
+        white-space: nowrap;
+        padding: 10px 16px;
+    }
+
+    .dependency-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .dependency-risk-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .dependency-stats-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .dependency-stat-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .dependency-graph-canvas {
+        height: 380px;
+    }
+}
+
+
+/* ==========================================================
+   Reduced Motion
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .dependency-risk-card,
+    .dependency-tab-panel,
+    .dependency-risk-chip,
+    .dependency-graph-actions button {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
 }

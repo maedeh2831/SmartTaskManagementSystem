@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
@@ -50,8 +50,7 @@ namespace SmartTask.Web.Services.Implementations
             string title,
             int? excludeId = null)
         {
-            var query = _repository
-                .Query()
+            var query = _repository.Query()
                 .Where(x => x.BacklogId == backlogId && x.Title == title && x.ViewState);
 
             if (excludeId.HasValue)
@@ -62,55 +61,42 @@ namespace SmartTask.Web.Services.Implementations
 
         public async Task<bool> CanManageBacklogAsync(int projectId, int userId)
         {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(x => x.Id == projectId);
-
-            if (project == null)
-                return false;
-
-            var isWorkspaceOwner = await _context.Workspaces
-                .AnyAsync(x => x.Id == project.WorkspaceId && x.OwnerId == userId);
-
-            if (isWorkspaceOwner)
-                return true;
-
-            return await _context.WorkspaceMembers
-                .AnyAsync(x =>
-                    x.WorkspaceId == project.WorkspaceId &&
-                    x.ApplicationUserId == userId &&
-                    x.ViewState &&
-                    (x.Role == WorkspaceRoleType.Owner || x.Role == WorkspaceRoleType.Admin));
+            return await _context.Projects
+                .Where(p => p.Id == projectId)
+                .AnyAsync(p =>
+                    p.Workspace.OwnerId == userId ||
+                    p.Workspace.Members.Any(m =>
+                        m.ApplicationUserId == userId &&
+                        m.ViewState &&
+                        (m.Role == WorkspaceRoleType.Owner || m.Role == WorkspaceRoleType.Admin)));
         }
 
         public async Task<bool> CanManageStoryAsync(int storyId, int userId)
         {
-            var story = await _repository
-                .Query()
-                .FirstOrDefaultAsync(x => x.Id == storyId);
+            var projectId = await _repository.Query()
+                .Where(x => x.Id == storyId)
+                .Select(x => x.ProjectId)
+                .FirstOrDefaultAsync();
 
-            if (story == null)
+            if (projectId == 0)
                 return false;
 
-            return await CanManageBacklogAsync(story.ProjectId, userId);
+            return await CanManageBacklogAsync(projectId, userId);
         }
 
         public async Task MoveToSprintAsync(int storyId, int sprintId)
         {
-            var story = await _context.UserStories
-                .FirstOrDefaultAsync(x => x.Id == storyId);
-
-            if (story == null)
-                return;
-
-            story.SprintId = sprintId;
-            story.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == storyId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.SprintId, sprintId)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task RemoveFromSprintAsync(int storyId)
         {
             var story = await _context.UserStories
+                .Select(x => new { x.Id, x.ProjectId, x.SprintId })
                 .FirstOrDefaultAsync(x => x.Id == storyId);
 
             if (story == null)
@@ -118,92 +104,72 @@ namespace SmartTask.Web.Services.Implementations
 
             var maxOrder = await _context.UserStories
                 .Where(x => x.ProjectId == story.ProjectId && x.SprintId == null && x.ViewState)
-                .Select(x => (int?)x.Order)
-                .MaxAsync() ?? -1;
+                .MaxAsync(x => (int?)x.Order) ?? -1;
 
-            story.SprintId = null;
-            story.Order = maxOrder + 1;
-            story.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == storyId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.SprintId, (int?)null)
+                    .SetProperty(x => x.Order, maxOrder + 1)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task ChangePriorityAsync(int storyId, StoryPriorityType priority)
         {
-            var story = await _context.UserStories
-                .FirstOrDefaultAsync(x => x.Id == storyId);
-
-            if (story == null)
-                return;
-
-            story.Priority = priority;
-            story.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == storyId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.Priority, priority)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task ChangeStatusAsync(int storyId, StoryStatusType status)
         {
-            var story = await _context.UserStories
-                .FirstOrDefaultAsync(x => x.Id == storyId);
-
-            if (story == null)
-                return;
-
-            story.Status = status;
-            story.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == storyId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.Status, status)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task ReorderAsync(List<int> orderedIds)
         {
+            var now = DateTime.Now;
             var stories = await _context.UserStories
                 .Where(x => orderedIds.Contains(x.Id) && x.ViewState)
                 .ToListAsync();
 
+            // Batch update using direct updates
             for (int i = 0; i < orderedIds.Count; i++)
             {
-                var story = stories.FirstOrDefault(x => x.Id == orderedIds[i]);
-                if (story != null)
-                {
-                    story.Order = i;
-                    story.ChangeDate = DateTime.Now;
-                }
+                var id = orderedIds[i];
+                await _context.UserStories
+                    .Where(x => x.Id == id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.Order, i)
+                        .SetProperty(x => x.ChangeDate, now));
             }
-
-            await _context.SaveChangesAsync();
         }
 
         public new async Task DeleteAsync(int id)
         {
-            var story = await _context.UserStories
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (story == null)
-                return;
-
-            story.ViewState = false;
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.ViewState, false));
         }
 
         public async Task ChangeOwnerAsync(int storyId, int? ownerId)
         {
-            var story = await _context.UserStories
-                .FirstOrDefaultAsync(x => x.Id == storyId);
-
-            if (story == null)
-                return;
-
-            story.OwnerId = ownerId;
-            story.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.UserStories
+                .Where(x => x.Id == storyId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.OwnerId, ownerId)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
 
         public async Task<Dictionary<int, List<string>>> GetContributorsMapAsync(int projectId)
         {
-            var data = await _context.TaskAssignments
+            return await _context.TaskAssignments
                 .Where(x =>
                     x.ViewState &&
                     x.TaskItem.ViewState &&
@@ -213,12 +179,13 @@ namespace SmartTask.Web.Services.Implementations
                     x.TaskItem.UserStoryId,
                     x.ApplicationUser.FullName
                 })
-                .Distinct()
-                .ToListAsync();
-
-            return data
                 .GroupBy(x => x.UserStoryId)
-                .ToDictionary(g => g.Key, g => g.Select(x => x.FullName).ToList());
+                .Select(g => new
+                {
+                    StoryId = g.Key,
+                    Contributors = g.Select(x => x.FullName).Distinct().ToList()
+                })
+                .ToDictionaryAsync(x => x.StoryId, x => x.Contributors);
         }
     }
 }

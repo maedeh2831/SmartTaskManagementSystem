@@ -1,101 +1,229 @@
-﻿@model SmartTask.Web.Models.ViewModels.Dependency.DependencyRiskIndexViewModel
+@model SmartTask.Web.Models.ViewModels.Dependency.DependencyRiskIndexViewModel
 @{
     ViewData["Title"] = "ریسک وابستگی‌ها";
+
+    var totalRisky = Model.RiskyTasks.Count;
+    var totalImpacted = Model.RiskyTasks.Sum(r => r.ImpactedTaskCount);
+    var maxDelay = Model.RiskyTasks.Any() ? Model.RiskyTasks.Max(r => r.DelayDays) : 0;
 }
+
 @section Styles
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dependency.css" asp-append-version="true" />
 }
+
 <div class="workspace-container">
-    <div class="workspace-hero">
-        <div class="workspace-hero-content">
-            <h1><i class="fa-solid fa-diagram-project"></i> تحلیل ریسک وابستگی — @Model.ProjectName</h1>
-            <p>Task هایی که تأخیرشان روی سایر بخش‌های پروژه اثر مستقیم می‌گذارد.</p>
+
+    <!-- =====================================================
+         Hero Header
+         ===================================================== -->
+    <div class="dependency-hero">
+
+        <div class="dependency-hero-content">
+            <h1>
+                <i class="fa-solid fa-diagram-project"></i>
+                تحلیل ریسک وابستگی
+            </h1>
+            <p>
+                Task هایی که تأخیرشان روی سایر بخش‌های پروژه <strong>@Model.ProjectName</strong> اثر مستقیم می‌گذارد.
+            </p>
         </div>
-        <div class="workspace-toolbar">
-            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به پروژه
-                </button>
+
+        <div class="dependency-hero-actions">
+            <a asp-controller="Project"
+               asp-action="Details"
+               asp-route-id="@Model.ProjectId"
+               class="dependency-back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
             </a>
         </div>
+
     </div>
 
-    <div class="dependency-tabs">
-        <button type="button" class="dependency-tab-btn active" data-tab="riskList">
-            <i class="fa-solid fa-triangle-exclamation"></i> لیست ریسک‌ها
+
+    <!-- =====================================================
+         Risk Stats Summary
+         ===================================================== -->
+    @if (Model.RiskyTasks.Any())
+    {
+        <div class="dependency-stats-bar" role="region" aria-label="خلاصه ریسک‌ها">
+            <div class="dependency-stat-item stat-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <strong class="fa-digits">@totalRisky</strong>
+                Task ریسک‌دار
+            </div>
+            <span class="dependency-stat-divider"></span>
+            <div class="dependency-stat-item stat-warning">                <i class="fa-solid fa-link"></i>
+                <strong class="fa-digits">@totalImpacted</strong>
+                Task متأثر
+            </div>
+            <span class="dependency-stat-divider"></span>
+            <div class="dependency-stat-item stat-danger">
+                <i class="fa-solid fa-hourglass-end"></i>
+                حداکثر تأخیر
+                <strong class="fa-digits">@maxDelay</strong>
+                روز
+            </div>
+        </div>
+    }
+
+
+    <!-- =====================================================
+         Tabs
+         ===================================================== -->
+    <div class="dependency-tabs" id="dependencyTabs" role="tablist" aria-label="نمای وابستگی‌ها">
+        <button type="button"
+                class="dependency-tab-btn active"
+                data-tab="riskList"
+                role="tab"
+                aria-selected="true"
+                aria-controls="riskList">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            لیست ریسک‌ها
         </button>
-        <button type="button" class="dependency-tab-btn" data-tab="graphView">
-            <i class="fa-solid fa-share-nodes"></i> نمای گراف
+        <button type="button"
+                class="dependency-tab-btn"
+                data-tab="graphView"
+                role="tab"
+                aria-selected="false"
+                aria-controls="graphView">
+            <i class="fa-solid fa-share-nodes"></i>
+            نمای گراف
         </button>
     </div>
 
-    <div class="dependency-tab-panel" id="riskList">
+
+    <!-- =====================================================
+         Tab: Risk List
+         ===================================================== -->
+    <div class="dependency-tab-panel"
+         id="riskList"
+         role="tabpanel"
+         aria-label="لیست ریسک‌ها">
+
         @if (!Model.RiskyTasks.Any())
         {
             <div class="workspace-empty">
-                <i class="fa-solid fa-circle-check"></i>
-                <h3>در حال حاضر هیچ ریسک زنجیره‌ای شناسایی نشد.</h3>
+                <div class="workspace-empty-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3>هیچ ریسک زنجیره‌ای شناسایی نشد</h3>
                 <p>هیچ Task عقب‌افتاده‌ای وجود ندارد که روی Task دیگری تأثیر بگذارد.</p>
             </div>
         }
         else
         {
-            <div class="dependency-risk-list">
+            <!-- Search -->
+            <div class="dependency-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text"
+                       id="dependencySearchInput"
+                       placeholder="جستجوی Task..."
+                       autocomplete="off"
+                       aria-label="جستجوی ریسک" />
+            </div>
+
+            <div class="dependency-risk-list" id="dependencyRiskList" role="list">
                 @foreach (var risk in Model.RiskyTasks)
                 {
-                    <div class="dependency-risk-card">
+                    <div class="dependency-risk-card"
+                         data-title="@risk.Title.ToLower()"
+                         role="listitem">
+
                         <div class="dependency-risk-header">
                             <div>
-                                <h4><a asp-controller="Task" asp-action="Details" asp-route-id="@risk.TaskId">@risk.Title</a></h4>
-                                <span class="dependency-risk-delay">@risk.DelayDays روز تأخیر</span>
+                                <h4>
+                                    <a asp-controller="Task"
+                                       asp-action="Details"
+                                       asp-route-id="@risk.TaskId">
+                                        @risk.Title
+                                    </a>
+                                </h4>
+                                <span class="dependency-risk-delay">
+                                    <i class="fa-solid fa-hourglass-end" style="font-size:10px;"></i>
+                                    @risk.DelayDays روز تأخیر
+                                </span>
                             </div>
                             <span class="dependency-risk-count">
-                                @risk.ImpactedTaskCount Task متأثر
+                                <i class="fa-solid fa-link" style="font-size:10px;"></i>
+                                <span class="fa-digits">@risk.ImpactedTaskCount</span>
+                                Task متأثر
                             </span>
                         </div>
+
                         <div class="dependency-risk-chips">
                             @foreach (var title in risk.ImpactedTaskTitles)
                             {
-                                <span class="team-project-chip">@title</span>
+                                <span class="dependency-risk-chip">
+                                    <i class="fa-solid fa-arrow-left" style="font-size:9px; opacity:.5;"></i>
+                                    @title
+                                </span>
                             }
                             @if (risk.ImpactedTaskCount > risk.ImpactedTaskTitles.Count)
                             {
-                                <span class="team-project-chip">+@(risk.ImpactedTaskCount - risk.ImpactedTaskTitles.Count) مورد دیگر</span>
+                                <span class="dependency-risk-chip dependency-risk-more">
+                                    +@(risk.ImpactedTaskCount - risk.ImpactedTaskTitles.Count) مورد دیگر
+                                </span>
                             }
                         </div>
+
                     </div>
                 }
             </div>
         }
+
     </div>
 
-    <div class="dependency-tab-panel d-none" id="graphView">
+
+    <!-- =====================================================
+         Tab: Graph View
+         ===================================================== -->
+    <div class="dependency-tab-panel d-none"
+         id="graphView"
+         role="tabpanel"
+         aria-label="نمای گراف">
+
         <div class="dependency-graph-toolbar">
-            <div class="dependency-graph-legend">
+
+            <div class="dependency-graph-legend" role="img" aria-label="راهنمای رنگ‌ها">
                 <span><i class="dependency-legend-dot normal"></i> عادی</span>
                 <span><i class="dependency-legend-dot overdue"></i> عقب‌افتاده</span>
                 <span><i class="dependency-legend-dot risk"></i> ریسک زنجیره‌ای</span>
                 <span><i class="dependency-legend-dot done"></i> انجام‌شده</span>
             </div>
+
             <div class="dependency-graph-actions">
-                <button type="button" id="graphFitBtn" title="نمایش کامل"><i class="fa-solid fa-expand"></i></button>
-                <button type="button" id="graphZoomInBtn" title="بزرگنمایی"><i class="fa-solid fa-plus"></i></button>
-                <button type="button" id="graphZoomOutBtn" title="کوچک‌نمایی"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" id="graphFitBtn" title="نمایش کامل" aria-label="نمایش کامل">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+                <button type="button" id="graphZoomInBtn" title="بزرگنمایی" aria-label="بزرگنمایی">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" id="graphZoomOutBtn" title="کوچک‌نمایی" aria-label="کوچک‌نمایی">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
             </div>
+
         </div>
-        <div id="dependencyGraph" class="dependency-graph-canvas" data-project-id="@Model.ProjectId"></div>
+
+        <div id="dependencyGraph"
+             class="dependency-graph-canvas"
+             data-project-id="@Model.ProjectId"></div>
+
         <div id="dependencyGraphLoading" class="dependency-graph-state">
-            <i class="fa-solid fa-spinner fa-spin"></i> در حال بارگذاری گراف...
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>در حال بارگذاری گراف...</span>
         </div>
+
         <div id="dependencyGraphEmpty" class="dependency-graph-state d-none">
-            <i class="fa-solid fa-diagram-project"></i> هیچ وابستگی‌ای بین Taskهای این پروژه ثبت نشده است.
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>هیچ وابستگی‌ای بین Taskهای این پروژه ثبت نشده است.</span>
         </div>
+
     </div>
+
 </div>
 
 @section Scripts
@@ -104,17 +232,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape-dagre/2.5.0/cytoscape-dagre.min.js"></script>
     <script src="~/js/dependency-graph.js" asp-append-version="true"></script>
-    <script>
-        document.querySelectorAll('.dependency-tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.dependency-tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.dependency-tab-panel').forEach(p => p.classList.add('d-none'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.tab).classList.remove('d-none');
-                if (btn.dataset.tab === 'graphView') {
-                    window.initDependencyGraph();
-                }
-            });
-        });
-    </script>
+    <script src="~/js/dependency.js" asp-append-version="true"></script>
 }

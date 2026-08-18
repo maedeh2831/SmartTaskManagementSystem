@@ -56,14 +56,15 @@
 
             <i class="fa-solid fa-chevron-left"></i>
 
-            <a asp-action="Index"
-               asp-route-userStoryId="@Model.UserStoryId">
-                @Model.UserStoryTitle
+            <a asp-controller="TaskBoard"
+               asp-action="Index"
+               asp-route-projectId="@Model.ProjectId">
+                TaskBoard
             </a>
 
             <i class="fa-solid fa-chevron-left"></i>
 
-            <span>Task</span>
+            <span>@Model.Title</span>
         </div>
 
         <div class="task-header-main">
@@ -101,12 +102,13 @@
 
             <div class="task-header-actions">
 
-                <a asp-action="Index"
-                   asp-route-userStoryId="@Model.UserStoryId"
+                <a asp-controller="TaskBoard"
+                   asp-action="Index"
+                   asp-route-projectId="@Model.ProjectId"
                    class="task-action-btn secondary">
 
                     <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت
+                    بازگشت به TaskBoard
                 </a>
 
                 @if (Model.CanManage)

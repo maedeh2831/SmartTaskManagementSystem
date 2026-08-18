@@ -59,37 +59,34 @@ public class TeamService : BaseService<Team>, ITeamService
                 x.ApplicationUserId == userId &&
                 x.ViewState &&
                 (x.Role == WorkspaceRoleType.Owner || x.Role == WorkspaceRoleType.Admin));
-    }
+    }        // OPTIMIZED: Project only WorkspaceId instead of loading full entity
+        public async Task<bool> CanManageTeamAsync(int teamId, int userId)
+        {
+            var workspaceId = await _context.Teams
+                .Where(x => x.Id == teamId)
+                .Select(x => x.WorkspaceId)
+                .FirstOrDefaultAsync();
 
-    public async Task<bool> CanManageTeamAsync(int teamId, int userId)
-    {
-        var team = await _repository
-            .Query()
-            .FirstOrDefaultAsync(x => x.Id == teamId);
+            if (workspaceId <= 0) return false;
 
-        if (team == null)
-            return false;
+            if (await CanManageTeamsAsync(workspaceId, userId))
+                return true;
 
-        if (await CanManageTeamsAsync(team.WorkspaceId, userId))
-            return true;
+            return await _context.TeamMembers
+                .AnyAsync(x =>
+                    x.TeamId == teamId &&
+                    x.ApplicationUserId == userId &&
+                    x.ViewState &&
+                    x.Role == TeamRoleType.Leader);
+        }
 
-        return await _context.TeamMembers
-            .AnyAsync(x =>
-                x.TeamId == teamId &&
-                x.ApplicationUserId == userId &&
-                x.ViewState &&
-                x.Role == TeamRoleType.Leader);
-    }
-
-    public new async Task DeleteAsync(int id)
-    {
-        var team = await _context.Teams
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (team == null)
-            return;
-
-        team.ViewState = false;
-        await _context.SaveChangesAsync();
-    }
+        // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
+        public new async Task DeleteAsync(int id)
+        {
+            await _context.Teams
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.ViewState, false)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
+        }
 }

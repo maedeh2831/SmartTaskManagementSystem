@@ -3,113 +3,269 @@
 
 @{
     ViewData["Title"] = "جزئیات User Story";
+
+    var statusLabel = Model.Status switch
+    {
+        StoryStatusType.New => "جدید",
+        StoryStatusType.Ready => "آماده",
+        StoryStatusType.InProgress => "درحال انجام",
+        StoryStatusType.Done => "انجام‌شده",
+        StoryStatusType.Closed => "بسته‌شده",
+        _ => "-"
+    };
+    var statusIcon = Model.Status switch
+    {
+        StoryStatusType.New => "fa-sparkles",
+        StoryStatusType.Ready => "fa-circle-check",
+        StoryStatusType.InProgress => "fa-spinner",
+        StoryStatusType.Done => "fa-flag-checkered",
+        StoryStatusType.Closed => "fa-lock",
+        _ => "fa-circle"
+    };
+    var priorityLabel = Model.Priority switch
+    {
+        StoryPriorityType.Lowest => "خیلی کم",
+        StoryPriorityType.Low => "کم",
+        StoryPriorityType.Medium => "متوسط",
+        StoryPriorityType.High => "زیاد",
+        StoryPriorityType.Highest => "خیلی زیاد",
+        _ => "-"
+    };
+    var priorityIcon = Model.Priority switch
+    {
+        StoryPriorityType.Lowest or StoryPriorityType.Low => "fa-arrow-down",
+        StoryPriorityType.Medium => "fa-minus",
+        StoryPriorityType.High or StoryPriorityType.Highest => "fa-arrow-up",
+        _ => "fa-circle"
+    };
 }
 
 @section Styles
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
 }
 
-<div class="workspace-details-page">
+<div class="workspace-container">
 
-    <div class="page-header">
-        <div>
+    <!-- ===== Hero ===== -->
+    <div class="userstory-detail-hero">
+
+        <div class="userstory-hero-icon" title="User Story">
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+
+        <div class="userstory-hero-content">
             <h1>
                 @Model.Title
                 <span class="backlog-status-badge status-@Model.Status.ToString().ToLower()">
-                    @(Model.Status switch
-                    {
-                        StoryStatusType.New => "جدید",
-                        StoryStatusType.Ready => "آماده",
-                        StoryStatusType.InProgress => "درحال انجام",
-                        StoryStatusType.Done => "انجام‌شده",
-                        StoryStatusType.Closed => "بسته‌شده",
-                        _ => "-"
-                    })
+                    <i class="fa-solid @statusIcon" style="font-size:8px;"></i>
+                    @statusLabel
                 </span>
             </h1>
-            <p>پروژه: @Model.ProjectName</p>
+            <div class="userstory-hero-meta">
+                <span>
+                    <i class="fa-solid fa-folder"></i>
+                    پروژهٔ <strong>@Model.ProjectName</strong>
+                </span>
+                @if (!string.IsNullOrEmpty(Model.SprintName))
+                {
+                    <span>
+                        <i class="fa-solid fa-flag"></i>
+                        اسپرینت <strong>@Model.SprintName</strong>
+                    </span>
+                }
+                @if (!string.IsNullOrEmpty(Model.OwnerName))
+                {
+                    <span>
+                        <i class="fa-regular fa-circle-user"></i>
+                        مسئول <strong>@Model.OwnerName</strong>
+                    </span>
+                }
+            </div>
         </div>
 
-        <div style="display:flex;gap:10px;">
-
-            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="back-link">
+        <div class="userstory-hero-actions">
+            <a asp-action="Index" asp-route-projectId="@Model.ProjectId"
+               class="workspace-filter">
                 <i class="fa-solid fa-arrow-right"></i>
                 بازگشت
             </a>
-
             @if (Model.CanManage)
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
+                <a asp-action="Edit" asp-route-id="@Model.Id"
+                   class="workspace-filter">
                     <i class="fa-solid fa-pen-to-square"></i>
                     ویرایش
                 </a>
             }
-            <a asp-controller="Task" asp-action="Index" asp-route-userStoryId="@Model.Id" class="btn btn-primary">
+            <a asp-controller="Task" asp-action="Index" asp-route-userStoryId="@Model.Id"
+               class="workspace-primary-btn">
                 <i class="fa-solid fa-list-check"></i>
                 Task ها
             </a>
-
         </div>
+
     </div>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-align-right"></i>
-            توضیحات
+    <!-- ===== Summary Strip ===== -->
+    <div class="userstory-summary-strip" role="list" aria-label="خلاصه User Story">
+
+        <div class="userstory-summary-item" role="listitem">
+            <i class="fa-solid fa-flag"></i>
+            <span>اولویت:</span>
+            <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">
+                <i class="fa-solid @priorityIcon" style="font-size:8px;"></i>
+                @priorityLabel
+            </span>
         </div>
-        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "توضیحاتی ثبت نشده است." : Model.Description)</p>
+
+        <span class="userstory-summary-sep"></span>
+
+        <div class="userstory-summary-item" role="listitem">
+            <i class="fa-solid fa-fire"></i>
+            <span>Story Point:</span>
+            <strong class="fa-digits">@Model.StoryPoint</strong>
+        </div>
+
+        <span class="userstory-summary-sep"></span>
+
+        <div class="userstory-summary-item" role="listitem">
+            <i class="fa-solid fa-gem"></i>
+            <span>ارزش تجاری:</span>
+            <strong class="fa-digits">@Model.BusinessValue</strong>
+        </div>
+
+        <span class="userstory-summary-sep"></span>
+
+        <div class="userstory-summary-item" role="listitem">
+            <i class="fa-regular fa-calendar"></i>
+            <span>تاریخ ایجاد:</span>
+            <strong>@Html.DisplayDate(Model.CreateDate)</strong>
+        </div>
+
     </div>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-circle-check"></i>
-            معیارهای پذیرش
-        </div>
-        <p>@(string.IsNullOrWhiteSpace(Model.AcceptanceCriteria) ? "معیار پذیرشی ثبت نشده است." : Model.AcceptanceCriteria)</p>
-    </div>
+    <!-- ===== Cards ===== -->
+    <div class="userstory-cards">
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-gauge-high"></i>
-            اطلاعات برنامه‌ریزی
-        </div>
-
-        <div class="userstory-info-grid">
-            <div>
-                <span class="userstory-info-label">اولویت</span>
-                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">
-                    @(Model.Priority switch
-                    {
-                        StoryPriorityType.Lowest => "خیلی کم",
-                        StoryPriorityType.Low => "کم",
-                        StoryPriorityType.Medium => "متوسط",
-                        StoryPriorityType.High => "زیاد",
-                        StoryPriorityType.Highest => "خیلی زیاد",
-                        _ => "-"
-                    })
+        <!-- Description -->
+        <div class="details-card full-width">
+            <div class="card-title">
+                <span class="userstory-section-icon icon-primary">
+                    <i class="fa-solid fa-align-right"></i>
                 </span>
+                توضیحات
             </div>
-            <div>
-                <span class="userstory-info-label">Story Point</span>
-                <span class="backlog-sp-badge">@Model.StoryPoint</span>
+            @if (string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <p class="userstory-empty-text">
+                    <i class="fa-regular fa-comment-dots" style="font-size:18px; display:block; margin-bottom:8px;"></i>
+                    توضیحاتی ثبت نشده است.
+                </p>
+            }
+            else
+            {
+                <div class="userstory-description">@Model.Description</div>
+            }
+        </div>
+
+        <!-- Acceptance Criteria -->
+        <div class="details-card full-width">
+            <div class="card-title">
+                <span class="userstory-section-icon icon-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                </span>
+                معیارهای پذیرش
             </div>
-            <div>
-                <span class="userstory-info-label">ارزش تجاری</span>
-                <span class="backlog-bv-badge">@Model.BusinessValue</span>
+            @if (string.IsNullOrWhiteSpace(Model.AcceptanceCriteria))
+            {
+                <p class="userstory-empty-text">
+                    <i class="fa-regular fa-clipboard" style="font-size:18px; display:block; margin-bottom:8px;"></i>
+                    معیار پذیرشی ثبت نشده است.
+                </p>
+            }
+            else
+            {
+                <div class="userstory-acceptance">@Model.AcceptanceCriteria</div>
+            }
+        </div>
+
+        <!-- Planning Info -->
+        <div class="details-card full-width">
+            <div class="card-title">
+                <span class="userstory-section-icon icon-warning">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </span>
+                اطلاعات برنامه‌ریزی
             </div>
-            <div>
-                <span class="userstory-info-label">اسپرینت</span>
-                <span>@(Model.SprintName ?? "در بک‌لاگ")</span>
-            </div>
-            <div>
-                <span class="userstory-info-label">مسئول</span>
-                <span>@(Model.OwnerName ?? "—")</span>
+
+            <div class="userstory-info-grid" role="list" aria-label="اطلاعات برنامه‌ریزی">
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-solid fa-flag"></i>
+                        اولویت
+                    </span>
+                    <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">
+                        @priorityLabel
+                    </span>
+                </div>
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-solid fa-fire"></i>
+                        Story Point
+                    </span>
+                    <span class="backlog-sp-badge fa-digits">@Model.StoryPoint</span>
+                </div>
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-solid fa-gem"></i>
+                        ارزش تجاری
+                    </span>
+                    <span class="backlog-bv-badge fa-digits">@Model.BusinessValue</span>
+                </div>
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-solid fa-flag"></i>
+                        اسپرینت
+                    </span>
+                    <span>@(Model.SprintName ?? "در بک‌لاگ")</span>
+                </div>
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-regular fa-circle-user"></i>
+                        مسئول
+                    </span>
+                    <span>@(Model.OwnerName ?? "—")</span>
+                </div>
+
+                <div role="listitem">
+                    <span class="userstory-info-label">
+                        <i class="fa-solid fa-layer-group"></i>
+                        پروژه
+                    </span>
+                    <span>@Model.ProjectName</span>
+                </div>
+
             </div>
         </div>
+
     </div>
 
 </div>
+
+@section Scripts
+{
+    <script>
+        document.querySelectorAll('.fa-digits').forEach(function(el) {
+            var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+            el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+        });
+    </script>
+}

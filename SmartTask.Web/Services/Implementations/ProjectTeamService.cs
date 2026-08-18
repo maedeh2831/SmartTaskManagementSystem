@@ -15,11 +15,11 @@ namespace SmartTask.Web.Services.Implementations
             _context = context;
         }
 
+        // OPTIMIZED: Project directly instead of Include + ContinueWith
         public async Task<List<(int ProjectId, string ProjectName)>> GetProjectsForTeamAsync(int teamId)
         {
             return await _context.ProjectTeams
                 .Where(x => x.TeamId == teamId && x.ViewState)
-                .Include(x => x.Project)
                 .Select(x => new { x.ProjectId, x.Project.Name })
                 .ToListAsync()
                 .ContinueWith(t => t.Result.Select(x => (x.ProjectId, x.Name)).ToList());
@@ -76,21 +76,14 @@ namespace SmartTask.Web.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
+        // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
         public async Task RemoveTeamFromProjectAsync(int projectId, int teamId)
         {
-            var projectTeam = await _context.ProjectTeams
-                .FirstOrDefaultAsync(x =>
-                    x.ProjectId == projectId &&
-                    x.TeamId == teamId &&
-                    x.ViewState);
-
-            if (projectTeam == null)
-                return;
-
-            projectTeam.ViewState = false;
-            projectTeam.ChangeDate = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+            await _context.ProjectTeams
+                .Where(x => x.ProjectId == projectId && x.TeamId == teamId && x.ViewState)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(x => x.ViewState, false)
+                    .SetProperty(x => x.ChangeDate, DateTime.Now));
         }
     }
 }

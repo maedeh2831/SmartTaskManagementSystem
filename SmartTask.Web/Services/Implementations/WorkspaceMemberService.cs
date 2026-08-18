@@ -80,40 +80,42 @@ public class WorkspaceMemberService
         await _context.SaveChangesAsync();
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task RemoveMemberAsync(int memberId)
     {
-        var member = await _context.WorkspaceMembers
-            .FirstOrDefaultAsync(x => x.Id == memberId);
+        var role = await _context.WorkspaceMembers
+            .Where(x => x.Id == memberId)
+            .Select(x => x.Role)
+            .FirstOrDefaultAsync();
 
-        if (member == null)
-            return;
-
-        if (member.Role == WorkspaceRoleType.Owner)
+        if (role == WorkspaceRoleType.Owner)
             throw new Exception("مالک Workspace قابل حذف نیست.");
 
-        member.ViewState = false;
-        member.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        await _context.WorkspaceMembers
+            .Where(x => x.Id == memberId)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.ViewState, false)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
+    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task ChangeRoleAsync(
         int memberId,
         WorkspaceRoleType role)
     {
-        var member = await _context.WorkspaceMembers
-            .FirstOrDefaultAsync(x => x.Id == memberId);
+        var currentRole = await _context.WorkspaceMembers
+            .Where(x => x.Id == memberId)
+            .Select(x => x.Role)
+            .FirstOrDefaultAsync();
 
-        if (member == null)
-            return;
-
-        if (member.Role == WorkspaceRoleType.Owner)
+        if (currentRole == WorkspaceRoleType.Owner)
             throw new Exception("نقش مالک قابل تغییر نیست.");
 
-        member.Role = role;
-        member.ChangeDate = DateTime.Now;
-
-        await _context.SaveChangesAsync();
+        await _context.WorkspaceMembers
+            .Where(x => x.Id == memberId)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(x => x.Role, role)
+                .SetProperty(x => x.ChangeDate, DateTime.Now));
     }
 
     public async Task<bool> IsMemberAsync(
