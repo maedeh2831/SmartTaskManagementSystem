@@ -258,9 +258,28 @@
         if (e.target === overlay) closeModal();
     });
 
-    form.addEventListener("submit", function () {
+    form.addEventListener("submit", function (e) {
+
         hiddenInputsContainer.innerHTML = "";
-        document.querySelectorAll(".ai-suggestion-checkbox:checked").forEach(cb => {
+
+        const selected = document.querySelectorAll(
+            ".ai-suggestion-checkbox:checked"
+        );
+
+        if (!selected.length) {
+            e.preventDefault();
+
+            Swal.fire({
+                icon: "warning",
+                title: "انتخابی انجام نشده",
+                text: "حداقل یک زیروظیفه را انتخاب کنید.",
+                confirmButtonText: "باشه"
+            });
+
+            return;
+        }
+
+        selected.forEach(cb => {
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = "titles";
@@ -268,4 +287,163 @@
             hiddenInputsContainer.appendChild(input);
         });
     });
+})();
+
+// ===== Task Details — Tab Switching =====
+(function () {
+
+    const tabs = document.querySelectorAll(".task-tab-btn");
+    const panes = document.querySelectorAll(".task-tab-pane");
+
+    if (!tabs.length || !panes.length)
+        return;
+
+    function activateTab(tabKey, updateUrl = true) {
+
+        tabs.forEach(tab => {
+            const isActive = tab.dataset.tab === tabKey;
+
+            tab.classList.toggle("active", isActive);
+            tab.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+
+        panes.forEach(pane => {
+            const isActive = pane.dataset.tabPane === tabKey;
+
+            pane.classList.toggle("active", isActive);
+            pane.hidden = !isActive;
+        });
+
+        if (updateUrl) {
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("tab", tabKey);
+
+            window.history.replaceState(
+                { tab: tabKey },
+                "",
+                url
+            );
+        }
+    }
+
+    // ------------------------------------------
+    // Tab click
+    // ------------------------------------------
+
+    tabs.forEach(tab => {
+
+        tab.addEventListener("click", function () {
+
+            const tabKey = this.dataset.tab;
+
+            if (!tabKey)
+                return;
+
+            activateTab(tabKey);
+
+        });
+
+    });
+
+    // ------------------------------------------
+    // Browser Back / Forward
+    // ------------------------------------------
+
+    window.addEventListener("popstate", function () {
+
+        const url = new URL(window.location.href);
+        const tabKey = url.searchParams.get("tab");
+
+        if (tabKey && document.querySelector(
+            `.task-tab-btn[data-tab="${tabKey}"]`
+        )) {
+            activateTab(tabKey, false);
+        } else {
+            activateTab("overview", false);
+        }
+
+    });
+
+    // ------------------------------------------
+    // Initial tab
+    // ------------------------------------------
+
+    const url = new URL(window.location.href);
+    const initialTab = url.searchParams.get("tab");
+
+    const validInitialTab =
+        initialTab &&
+            document.querySelector(
+                `.task-tab-btn[data-tab="${initialTab}"]`
+            )
+            ? initialTab
+            : "overview";
+
+    activateTab(validInitialTab, false);
+
+})();
+/* ==========================================================
+   Create Task Modal
+   ========================================================== */
+
+(function () {
+
+    const modal = document.querySelector("[data-task-modal]");
+    const openButton = document.querySelector("[data-task-modal-open]");
+
+    if (!modal || !openButton)
+        return;
+
+    const closeButtons =
+        modal.querySelectorAll("[data-task-modal-close]");
+
+    function openModal() {
+
+        modal.classList.add("is-open");
+
+        document.body.classList.add("task-modal-open");
+
+        const titleInput =
+            modal.querySelector("#taskTitle");
+
+        setTimeout(() => {
+            titleInput?.focus();
+        }, 150);
+    }
+
+    function closeModal() {
+
+        modal.classList.remove("is-open");
+
+        document.body.classList.remove("task-modal-open");
+    }
+
+    openButton.addEventListener("click", openModal);
+
+    closeButtons.forEach(button => {
+
+        button.addEventListener("click", closeModal);
+
+    });
+
+    modal.addEventListener("click", function (event) {
+
+        if (event.target === modal) {
+            closeModal();
+        }
+
+    });
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape" &&
+            modal.classList.contains("is-open")) {
+
+            closeModal();
+
+        }
+
+    });
+
 })();

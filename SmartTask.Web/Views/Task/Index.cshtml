@@ -16,30 +16,57 @@
 
 <div class="workspace-container">
 
-    <div class="workspace-hero">
+    <div class="workspace-hero task-page-hero">
+
         <div class="workspace-hero-content">
-            <h1>تسک‌های «@Model.UserStoryTitle»</h1>
-            <p>مدیریت وظایف اجرایی این User Story به‌صورت Kanban.</p>
-        </div>
 
-        <div class="workspace-toolbar">
+            <div class="task-page-title-row">
 
-            <a asp-controller="UserStory" asp-action="Details" asp-route-id="@Model.UserStoryId"
-               class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
+                <div class="task-page-title">
+
+                    <div class="task-page-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+
+                    <div>
+                        <h1>تسک‌های «@Model.UserStoryTitle»</h1>
+                        <p>مدیریت وظایف اجرایی این User Story به‌صورت Kanban.</p>
+                    </div>
+
+                </div>
+
+                <a asp-controller="UserStory"
+                   asp-action="Details"
+                   asp-route-id="@Model.UserStoryId"
+                   class="task-story-back">
+
                     <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به Story
-                </button>
-            </a>
 
-            @if (Model.CanManage)
-            {
-                <a asp-action="Create" asp-route-userStoryId="@Model.UserStoryId" class="workspace-create-btn">
-                    <i class="fa-solid fa-plus"></i>
-                    Task جدید
+                    <span>بازگشت به Story</span>
+
                 </a>
-            }
+
+            </div>
+
         </div>
+
+        @if (Model.CanManage)
+        {
+            <div class="task-page-actions">
+
+                <button type="button"
+                        class="task-create-trigger"
+                        data-task-modal-open>
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    <span>Task جدید</span>
+
+                </button>
+
+            </div>
+        }
+
     </div>
 
     @if (!Model.Tasks.Any())
@@ -145,6 +172,16 @@
     }
 
 </div>
+
+@if (Model.CanManage)
+{
+    @await Html.PartialAsync(
+    "_CreateTaskModal",
+        new SmartTask.Web.Models.ViewModels.Task.CreateTaskViewModel
+        {
+            UserStoryId = Model.UserStoryId
+        })
+}
 
 <form id="antiForgeryForm">
     @Html.AntiForgeryToken()
