@@ -1,0 +1,750 @@
+/* ==========================================================
+   SmartTask — Task pages
+   ==========================================================
+   Scoped to Task views (Index, Details, Create, Edit). Loaded
+   AFTER workspace.css / task.css so these rules win at equal
+   specificity. Supplies the flat component language for things
+   task.css never styled (subtasks, dependencies, info grid,
+   date row, dashboard bars, btn-danger) and overrides the
+   remaining gradient/glass era rules.
+   ========================================================== */
+
+/* ================= Kanban (Index) ================= */
+
+.task-column {
+    background: var(--bg);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 200px;
+}
+
+.task-column-header {
+    font-size: 13px;
+    padding: 6px 6px 12px;
+    border-bottom: 1px solid var(--gray200);
+    margin-bottom: 10px;
+}
+
+    .task-column-header i {
+        color: var(--gray400);
+    }
+
+/* Column count badge (planning.css isn't loaded here) */
+.planning-count {
+    min-width: 26px;
+    height: 22px;
+    padding: 0 8px;
+    margin-right: auto;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray100);
+    color: var(--gray600);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.task-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 12px;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+    .task-card:hover {
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+        transform: translateY(-2px);
+        border-color: var(--primary-border);
+    }
+
+.task-drag-handle {
+    color: var(--gray400);
+    transition: color .2s ease;
+}
+
+    .task-card:hover .task-drag-handle {
+        color: var(--primary);
+    }
+
+.task-card-title {
+    color: var(--gray800);
+    line-height: 1.7;
+}
+
+.task-card-meta {
+    align-items: center;
+}
+
+.task-card-footer i {
+    color: var(--gray400);
+}
+
+/* Priority badge base (backlog.css isn't loaded here) */
+.backlog-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* Status badge base (backlog.css isn't loaded here) */
+.backlog-status-badge,
+.task-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.task-status-badge.status-todo {
+    background: var(--gray100);
+    color: var(--gray700);
+}
+
+.task-status-badge.status-inprogress {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.task-status-badge.status-inreview {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.task-status-badge.status-done {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.task-status-badge.status-cancelled {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* ================= Details info grid ================= */
+
+.userstory-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin-top: 6px;
+}
+
+    .userstory-info-grid > div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .userstory-info-grid span:last-child {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+.userstory-info-label {
+    font-size: 11px;
+    color: var(--gray500);
+    font-weight: 600;
+}
+
+/* ================= Danger button ================= */
+
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: #EF4444;
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    border: 1px solid #EF4444;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+    .btn-danger:hover {
+        background: #DC2626;
+        border-color: #DC2626;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(239, 68, 68, .28);
+    }
+
+    .btn-danger:active {
+        background: #B91C1C;
+        border-color: #B91C1C;
+        transform: translateY(0);
+    }
+
+    .btn-danger:focus-visible {
+        outline: 2px solid #EF4444;
+        outline-offset: 2px;
+    }
+
+/* ================= AI suggest button (flat) ================= */
+
+.ai-suggest-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: none;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    .ai-suggest-btn:hover {
+        background: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(91, 95, 239, .28);
+    }
+
+    .ai-suggest-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+/* ================= Timer & time logs ================= */
+
+.timer-active-box {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.timer-live-display {
+    font-size: 20px;
+    font-weight: 800;
+    color: #B45309;
+}
+
+.timelog-item {
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+/* ================= Labels ================= */
+
+.assignee-chip {
+    background: var(--gray100);
+    border: 1px solid var(--gray200);
+    border-radius: 20px;
+}
+
+.task-label-badge {
+    border-radius: 20px;
+}
+
+.checklist-block {
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+}
+
+/* ================= Subtasks & checklist items ================= */
+
+.subtask-progress-text {
+    font-size: 11px;
+    color: var(--gray500);
+    font-weight: 400;
+    margin-right: 6px;
+}
+
+.subtask-progress-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--gray100);
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.subtask-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--primary);
+    transition: width .35s ease;
+}
+
+.subtask-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 9px 12px;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .subtask-item:hover {
+        border-color: var(--primary-border);
+    }
+
+    .subtask-item.completed {
+        background: var(--gray50);
+        opacity: .75;
+    }
+
+.subtask-checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+    .subtask-checkbox-wrap input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+
+.subtask-title {
+    font-size: 13px;
+    color: var(--gray800);
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.subtask-item.completed .subtask-title {
+    text-decoration: line-through;
+    color: var(--gray400);
+}
+
+.subtask-delete-btn {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--gray400);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .subtask-delete-btn:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+.subtask-quick-add {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray200);
+}
+
+    .subtask-quick-add i {
+        color: var(--primary);
+        font-size: 12px;
+    }
+
+    .subtask-quick-add input[type="text"] {
+        flex: 1;
+        border: 1px solid var(--gray200);
+        border-radius: 8px;
+        padding: 8px 12px;
+        outline: none;
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--gray800);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .subtask-quick-add input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+    .subtask-quick-add button {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .subtask-quick-add button:hover {
+            background: var(--primary-dark);
+        }
+
+/* ================= Dependencies & cascade ================= */
+
+.dependency-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #B91C1C;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.cascade-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #B45309;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.dependency-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.dependency-column {
+    min-width: 0;
+}
+
+    .dependency-column h5 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray700);
+        margin: 0 0 12px;
+    }
+
+.dependency-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+    .dependency-chip:hover {
+        border-color: var(--primary-border);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+    }
+
+    .dependency-chip a {
+        color: var(--gray800);
+        font-weight: 700;
+        text-decoration: none;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .dependency-chip a:hover {
+            color: var(--primary);
+        }
+
+.dependency-optional-badge {
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.delete-dependency-btn {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--gray400);
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .delete-dependency-btn:hover {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+.dependency-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+    .dependency-add-form select {
+        flex: 1;
+        min-width: 160px;
+    }
+
+.dependency-required-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray600);
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+    .dependency-required-check input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+    }
+
+.dependency-impact-box {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--gray200);
+}
+
+    .dependency-impact-box h5 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray700);
+        margin: 0 0 14px;
+    }
+
+.dependency-impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dependency-impact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-right: 3px solid var(--gray300);
+    font-size: 13px;
+}
+
+    .dependency-impact-item.required {
+        border-right-color: var(--danger);
+        border-color: #FECACA;
+    }
+
+    .dependency-impact-item.optional {
+        border-right-color: var(--gray300);
+        opacity: .75;
+    }
+
+    .dependency-impact-item a {
+        color: var(--gray800);
+        font-weight: 700;
+        text-decoration: none;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.dependency-depth-badge {
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.dependency-projected-date {
+    font-size: 11px;
+    color: #B91C1C;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ================= Smart priority ================= */
+
+.smart-priority-card .smart-priority-compare {
+    border-bottom-color: var(--gray200);
+}
+
+.smart-priority-reasons li {
+    background: var(--gray50);
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+}
+
+/* Dashboard bars (project-dashboard.css isn't loaded here) */
+.dashboard-bar-track {
+    flex: 1;
+    height: 10px;
+    background: var(--gray100);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.dashboard-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    width: 0;
+    transition: width .6s ease;
+    background: var(--primary);
+}
+
+/* ================= Create / Edit date row ================= */
+
+.sprint-date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ================= AI modal ================= */
+
+.ai-modal {
+    border-radius: 16px;
+}
+
+.ai-modal-header,
+.ai-modal-footer {
+    border-color: var(--gray200);
+}
+
+.ai-suggestion-item {
+    border: 1px solid var(--gray100);
+    border-radius: 10px;
+}
+
+/* ================= Attachments (Details) ================= */
+
+/* Upload row: hide the native file input behind the .upload-btn label */
+.attachment-upload-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray200);
+}
+
+.attachment-upload-form input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.attachment-upload-form .upload-btn {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--primary-border, rgba(91, 95, 239, .25));
+}
+
+    .attachment-upload-form .upload-btn:hover {
+        background: var(--primary);
+        color: #fff;
+    }
+
+.attachment-file-name {
+    font-size: 12px;
+    color: var(--gray500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+    .dependency-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .sprint-date-row {
+        grid-template-columns: 1fr;
+    }
+
+    .task-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================= Reduced motion ================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .subtask-progress-fill,
+    .dashboard-bar-fill {
+        transition: none !important;
+    }
+}

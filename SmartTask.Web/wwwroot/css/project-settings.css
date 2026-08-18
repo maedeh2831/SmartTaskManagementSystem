@@ -29,9 +29,10 @@
 
 .settings-card {
     background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    padding: 28px;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    padding: 26px 28px;
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -143,11 +144,11 @@
 }
 
 /* Danger Zone */
-.danger-zone {
-    border: 1px solid #FEE2E2;
+.settings-card.danger-zone {
+    border-color: #FECACA;
 }
 
-    .danger-zone h3 {
+    .settings-card.danger-zone h3 {
         color: #DC2626;
     }
 
@@ -196,20 +197,39 @@
     }
 
 .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 18px;
     border-radius: 10px;
-    background: #FEF2F2;
-    color: #DC2626;
+    background: #EF4444;
+    color: #fff;
+    font-family: inherit;
     font-weight: 700;
     font-size: 13px;
-    border: 1px solid #FECACA;
+    border: 1px solid #EF4444;
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--transition);
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
     .btn-danger:hover {
-        background: #FEE2E2;
+        background: #DC2626;
+        border-color: #DC2626;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(239, 68, 68, .28);
+    }
+
+    .btn-danger:active {
+        background: #B91C1C;
+        border-color: #B91C1C;
+        transform: translateY(0);
+    }
+
+    .btn-danger:focus-visible {
+        outline: 2px solid #EF4444;
+        outline-offset: 2px;
     }
 
 .field-error {

@@ -1,4 +1,13 @@
-/*  SmartTask Project Dashboard UI */
+/* ==========================================================
+   SmartTask — Project Dashboard
+   ==========================================================
+   Flat, RTL-first, workspace-consistent. Loaded AFTER
+   workspace.css / team.css / project.css, so these rules win
+   at equal specificity and bring the dashboard onto the
+   design language (bordered white cards, 8-12px radii).
+   ========================================================== */
+
+/* ================= Stat cards ================= */
 
 .dashboard-stat-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -7,12 +16,74 @@
     margin-bottom: 24px;
 }
 
+.team-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+    .team-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+    }
+
+    .team-stat-card i {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .team-stat-card h4 {
+        font-size: 18px;
+        font-weight: 800;
+        margin: 0 0 2px;
+        color: var(--gray900);
+    }
+
+    .team-stat-card span {
+        font-size: 12px;
+        color: var(--gray500);
+        font-weight: 600;
+    }
+
+/* ================= Chart cards ================= */
+
 .dashboard-charts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     margin-bottom: 20px;
 }
+
+.team-detail-card {
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+}
+
+    .team-detail-card h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gray900);
+        margin: 0 0 16px;
+    }
 
 .dashboard-chart-card {
     display: flex;
@@ -25,7 +96,7 @@
         align-self: flex-start;
     }
 
-/*  Donut Chart  */
+/* ================= Donut chart ================= */
 
 .dashboard-donut-wrap {
     position: relative;
@@ -42,7 +113,7 @@
 
 .donut-track {
     fill: none;
-    stroke: var(--gray100);
+    stroke: var(--gray200);
     stroke-width: 12;
 }
 
@@ -80,19 +151,21 @@
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    border-radius: 14px;
+    border-radius: 10px;
     background: var(--gray50);
+    border: 1px solid var(--gray200);
     color: var(--gray700);
     font-size: 13px;
     font-weight: 600;
 }
 
     .dashboard-timeline-info.overdue {
-        background: #FEE2E2;
+        background: #FEF2F2;
+        border-color: #FECACA;
         color: #B91C1C;
     }
 
-/*  Bar Chart  */
+/* ================= Bar chart ================= */
 
 .dashboard-bar-list {
     display: flex;
@@ -119,13 +192,13 @@
     flex: 1;
     height: 12px;
     background: var(--gray100);
-    border-radius: 20px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
 .dashboard-bar-fill {
     height: 100%;
-    border-radius: 20px;
+    border-radius: 8px;
     width: 0;
     transition: width 1s ease;
     background: var(--primary);
@@ -160,12 +233,12 @@
     flex-shrink: 0;
 }
 
-/*  Activity List  */
+/* ================= Activity list ================= */
 
 .dashboard-activity-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
 }
 
 .dashboard-activity-item {
@@ -173,12 +246,15 @@
     align-items: center;
     gap: 14px;
     padding: 12px 14px;
-    border-radius: 14px;
-    background: var(--gray50);
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--gray200);
+    transition: border-color .2s ease, background .2s ease;
 }
 
     .dashboard-activity-item:hover {
         background: var(--primary-light);
+        border-color: var(--primary-border, rgba(91, 95, 239, .25));
     }
 
 .dashboard-activity-text {
@@ -204,20 +280,28 @@
     white-space: nowrap;
 }
 
-/*  Responsive  */
+/* ================= Team chips ================= */
 
-@media (max-width: 992px) {
-    .dashboard-stat-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.team-project-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-@media (max-width: 768px) {
-    .dashboard-charts-grid {
-        grid-template-columns: 1fr;
-    }
+.team-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--gray50);
+    border: 1px solid var(--gray200);
+    color: var(--gray700);
+    font-size: 12px;
+    font-weight: 600;
 }
-/*  Project Health Score  */
+
+/* ================= Health score ================= */
 
 .health-score-card {
     display: flex;
@@ -225,11 +309,12 @@
     justify-content: space-between;
     gap: 30px;
     background: var(--card);
-    border-radius: 24px;
-    padding: 28px 32px;
-    box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.05));
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
     margin-bottom: 24px;
-    border-right: 6px solid var(--gray300);
+    border-right: 4px solid var(--gray300);
     flex-wrap: wrap;
 }
 
@@ -327,7 +412,7 @@
 
 .health-mini-track {
     fill: none;
-    stroke: var(--gray100);
+    stroke: var(--gray200);
     stroke-width: 6;
 }
 
@@ -352,9 +437,19 @@
     color: var(--gray900);
 }
 
-/*  Responsive  */
+/* ================= Responsive ================= */
+
+@media (max-width: 992px) {
+    .dashboard-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
 @media (max-width: 768px) {
+    .dashboard-charts-grid {
+        grid-template-columns: 1fr;
+    }
+
     .health-score-card {
         flex-direction: column;
         align-items: flex-start;
@@ -363,5 +458,16 @@
     .health-score-breakdown {
         width: 100%;
         justify-content: space-between;
+    }
+}
+
+/* ================= Reduced motion ================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .donut-value,
+    .dashboard-bar-fill,
+    .health-mini-value {
+        transition: none !important;
     }
 }

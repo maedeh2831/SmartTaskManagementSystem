@@ -1463,14 +1463,7 @@ textarea.form-control {
 
 @media (prefers-reduced-motion: reduce) {
 
-    .workspace-card,
-    .workspace-primary-btn,
-    .workspace-create-btn,
-    .workspace-filter,
-    .workspace-secondary-btn,
-    .ai-suggest-btn,
-    .sprint-ring-fill,
-    .sprint-more-menu {
+    .sprint-ring-fill {
         transition: none !important;
     }
 }

@@ -19,6 +19,21 @@
     grid-template-columns: repeat(2, 1fr);
 }
 
+/* ================= Card (Index) ================= */
+
+.team-card .workspace-card-header {
+    border-radius: 12px 12px 0 0;
+}
+
+.team-card .workspace-status {
+    background: rgba(255, 255, 255, .92);
+}
+
+.team-archived-badge {
+    font-size: 10px;
+    padding: 3px 9px;
+}
+
 /* ================= Add Member ================= */
 
 .add-member-fields {
@@ -41,6 +56,7 @@
     color: var(--gray500);
     text-align: center;
     padding: 20px 0;
+    font-size: 13px;
 }
 
 /* ================= Member List ================= */
@@ -55,34 +71,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--gray50);
-    border-radius: 18px;
-    padding: 16px 20px;
-    transition: var(--transition);
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    transition: border-color .2s ease, background .2s ease;
 }
 
     .team-member-row:hover {
         background: var(--primary-light);
+        border-color: var(--primary-border);
     }
 
 .team-member-info {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
+    min-width: 0;
 }
 
     .team-member-info h4 {
-        font-size: 15px;
-        font-weight: 800;
+        font-size: 14px;
+        font-weight: 700;
         margin: 0 0 6px;
-        color: var(--gray900);
+        color: var(--gray800);
     }
 
 .team-role-badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     background: var(--primary-light);
     color: var(--primary);
@@ -97,19 +118,28 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
     .team-member-actions .role-select {
-        height: 44px;
+        height: 40px;
         min-height: auto;
-        padding: 8px 14px;
+        padding: 6px 12px;
         font-size: 13px;
         width: auto;
+        border-radius: 8px;
+        border: 1px solid var(--gray200);
+        background: var(--card);
+        color: var(--gray700);
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
     }
 
     .team-member-actions .workspace-delete-btn {
         width: 40px;
         height: 40px;
+        border-radius: 8px;
     }
 
 /* ================= Projects ================= */
@@ -122,9 +152,10 @@
 
 .team-project-chip {
     background: var(--gray50);
+    border: 1px solid var(--gray200);
     color: var(--gray700);
-    padding: 8px 16px;
-    border-radius: 14px;
+    padding: 7px 14px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
 }
@@ -203,8 +234,12 @@
     gap: 10px;
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
+    border-top: 1px solid var(--gray200);
 }
+
+/* ================= Reduced motion ================= */
+
+
 
     .assign-project-form select {
         flex: 1;

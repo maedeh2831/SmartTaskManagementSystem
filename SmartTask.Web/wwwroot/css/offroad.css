@@ -28,14 +28,19 @@
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-    background: var(--gray50);
-    border-radius: 18px;
-    padding: 18px 22px;
-    transition: var(--transition);
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
 }
 
     .offroad-row:hover {
         background: var(--primary-light);
+        border-color: var(--primary-border, rgba(91, 95, 239, .25));
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
     }
 
     .offroad-row.done {
@@ -86,6 +91,7 @@
         padding: 6px 12px;
         font-size: 12px;
         width: auto;
+        border-radius: 8px;
     }
 
 .offroad-priority-select.priority-urgent {

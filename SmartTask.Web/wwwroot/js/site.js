@@ -1,4 +1,13 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿// Sidebar submenu expand/collapse — used by Sidebar.cshtml's parent links.
+window.SmartTask = window.SmartTask || {};
+
+SmartTask.toggleSidebarGroup = function (link) {
+    const li = link.closest("li.has-children");
+    if (li) li.classList.toggle("open");
+    return false;
+};
+
+document.addEventListener("DOMContentLoaded", function () {
 
     const sidebarToggle = document.getElementById("sidebarToggle");
     const sidebar = document.getElementById("sidebar");

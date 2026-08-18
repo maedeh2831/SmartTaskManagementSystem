@@ -9,6 +9,7 @@
 {
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
 }
 
 <div class="workspace-details-page">
@@ -132,7 +133,15 @@
                         <select name="role" class="form-control" required>
                             @foreach (TeamRoleType role in Enum.GetValues<TeamRoleType>())
                             {
-                                <option value="@role">@role</option>
+                                <option value="@role">
+                                    @(role switch
+                                    {
+                                        TeamRoleType.Leader => "رهبر تیم",
+                                        TeamRoleType.Member => "عضو تیم",
+                                        TeamRoleType.Guest => "مهمان",
+                                        _ => role.ToString()
+                                    })
+                                </option>
                             }
                         </select>
 
@@ -170,7 +179,15 @@
                             </div>
                             <div>
                                 <h4>@member.FullName</h4>
-                                <span class="team-role-badge role-@member.Role.ToString().ToLower()">@member.Role</span>
+                                <span class="team-role-badge role-@member.Role.ToString().ToLower()">
+                                    @(member.Role switch
+                                    {
+                                        TeamRoleType.Leader => "رهبر تیم",
+                                        TeamRoleType.Member => "عضو تیم",
+                                        TeamRoleType.Guest => "مهمان",
+                                        _ => member.Role.ToString()
+                                    })
+                                </span>
                             </div>
                         </div>
 
@@ -185,7 +202,15 @@
                                     <select name="role" class="form-control role-select">
                                         @foreach (TeamRoleType role in Enum.GetValues<TeamRoleType>())
                                         {
-                                            <option value="@role" selected="@(role == member.Role)">@role</option>
+                                            <option value="@role" selected="@(role == member.Role)">
+                                                @(role switch
+                                                {
+                                                    TeamRoleType.Leader => "رهبر تیم",
+                                                    TeamRoleType.Member => "عضو تیم",
+                                                    TeamRoleType.Guest => "مهمان",
+                                                    _ => role.ToString()
+                                                })
+                                            </option>
                                         }
                                     </select>
                                 </form>

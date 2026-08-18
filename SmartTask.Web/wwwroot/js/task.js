@@ -19,6 +19,18 @@
         });
     });
 
+    // ===== Attachment Upload =====
+    const attachmentFile = document.getElementById("taskAttachmentFile");
+    const attachmentFileName = document.getElementById("attachmentFileName");
+
+    if (attachmentFile && attachmentFileName) {
+        attachmentFile.addEventListener("change", function () {
+            attachmentFileName.textContent = this.files.length
+                ? this.files[0].name
+                : "هیچ فایلی انتخاب نشده است";
+        });
+    }
+
     // ===== Kanban Drag & Drop =====
     const kanban = document.getElementById("taskKanban");
 

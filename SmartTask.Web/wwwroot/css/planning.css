@@ -607,10 +607,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-    .planning-card,
-    .planning-capacity-fill,
-    .planning-list,
-    .planning-card-handle {
+    .planning-capacity-fill {
         transition: none !important;
     }
 }

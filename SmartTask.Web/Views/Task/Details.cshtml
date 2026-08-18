@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/task-pages.css" asp-append-version="true" />
 }
 
 <div class="workspace-details-page">
@@ -66,11 +68,31 @@
         <div class="userstory-info-grid">
             <div>
                 <span class="userstory-info-label">نوع</span>
-                <span class="task-type-badge type-@Model.Type.ToString().ToLower()">@Model.Type</span>
+                <span class="task-type-badge type-@Model.Type.ToString().ToLower()">
+                    @(Model.Type switch
+                    {
+                        TaskType.Task => "Task",
+                        TaskType.Bug => "Bug",
+                        TaskType.Feature => "Feature",
+                        TaskType.Improvement => "بهبود",
+                        TaskType.TechnicalDebt => "بدهی فنی",
+                        _ => "-"
+                    })
+                </span>
             </div>
             <div>
                 <span class="userstory-info-label">اولویت</span>
-                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">@Model.Priority</span>
+                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">
+                    @(Model.Priority switch
+                    {
+                        TaskPriorityType.Lowest => "خیلی کم",
+                        TaskPriorityType.Low => "کم",
+                        TaskPriorityType.Medium => "متوسط",
+                        TaskPriorityType.High => "زیاد",
+                        TaskPriorityType.Highest => "خیلی زیاد",
+                        _ => "-"
+                    })
+                </span>
             </div>
             <div>
                 <span class="userstory-info-label">برآورد</span>
@@ -289,7 +311,7 @@
         }
         @if (Model.IsCurrentUserAssignee && Model.TradeModal != null && Model.TradeModal.ProjectMembers.Any())
         {
-            <button type="button" id="openTradeModalBtn" class="ai-suggest-btn" style="margin-top:14px;background:linear-gradient(135deg, #8B5CF6, #A78BFA);">
+            <button type="button" id="openTradeModalBtn" class="ai-suggest-btn" style="margin-top:14px;">
                 <i class="fa-solid fa-right-left"></i>
                 درخواست ترید این تسک
             </button>
@@ -412,7 +434,15 @@
             <div class="smart-priority-box">
                 <span>اولویت فعلی</span>
                 <strong class="backlog-priority-badge priority-@Model.SmartPriority.CurrentPriority.ToString().ToLower()">
-                    @Model.SmartPriority.CurrentPriority
+                    @(Model.SmartPriority.CurrentPriority switch
+                    {
+                        TaskPriorityType.Lowest => "خیلی کم",
+                        TaskPriorityType.Low => "کم",
+                        TaskPriorityType.Medium => "متوسط",
+                        TaskPriorityType.High => "زیاد",
+                        TaskPriorityType.Highest => "خیلی زیاد",
+                        _ => "-"
+                    })
                 </strong>
             </div>
 
@@ -421,7 +451,15 @@
             <div class="smart-priority-box">
                 <span>اولویت پیشنهادی</span>
                 <strong class="backlog-priority-badge priority-@Model.SmartPriority.SuggestedPriority.ToString().ToLower()">
-                    @Model.SmartPriority.SuggestedPriority
+                    @(Model.SmartPriority.SuggestedPriority switch
+                    {
+                        TaskPriorityType.Lowest => "خیلی کم",
+                        TaskPriorityType.Low => "کم",
+                        TaskPriorityType.Medium => "متوسط",
+                        TaskPriorityType.High => "زیاد",
+                        TaskPriorityType.Highest => "خیلی زیاد",
+                        _ => "-"
+                    })
                 </strong>
             </div>
 
@@ -532,7 +570,17 @@
                     {
                         <div class="dependency-chip">
                             <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
-                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
+                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">
+                                @(dep.TaskStatus switch
+                                {
+                                    TaskStatusType.ToDo => "برای انجام",
+                                    TaskStatusType.InProgress => "درحال انجام",
+                                    TaskStatusType.InReview => "درحال بررسی",
+                                    TaskStatusType.Done => "انجام‌شده",
+                                    TaskStatusType.Cancelled => "لغو‌شده",
+                                    _ => dep.TaskStatus.ToString()
+                                })
+                            </span>
                             @if (!dep.IsRequired)
                             {
                                 <span class="dependency-optional-badge">اختیاری</span>
@@ -591,7 +639,17 @@
                     {
                         <div class="dependency-chip">
                             <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
-                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
+                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">
+                                @(dep.TaskStatus switch
+                                {
+                                    TaskStatusType.ToDo => "برای انجام",
+                                    TaskStatusType.InProgress => "درحال انجام",
+                                    TaskStatusType.InReview => "درحال بررسی",
+                                    TaskStatusType.Done => "انجام‌شده",
+                                    TaskStatusType.Cancelled => "لغو‌شده",
+                                    _ => dep.TaskStatus.ToString()
+                                })
+                            </span>
                             @if (!dep.IsRequired)
                             {
                                 <span class="dependency-optional-badge">اختیاری</span>
@@ -740,7 +798,12 @@
             <form asp-controller="Attachment" asp-action="Upload" method="post" enctype="multipart/form-data" class="attachment-upload-form">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <input type="file" name="file" required />
+                <input type="file" name="file" id="taskAttachmentFile" required />
+                <label for="taskAttachmentFile" class="upload-btn">
+                    <i class="fa-solid fa-paperclip"></i>
+                    انتخاب فایل
+                </label>
+                <span class="attachment-file-name" id="attachmentFileName">هیچ فایلی انتخاب نشده است</span>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-upload"></i>
                     آپلود

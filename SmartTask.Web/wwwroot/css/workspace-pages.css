@@ -432,15 +432,77 @@
     margin: 0;
 }
 
+.team-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
 .details-card,
-.owner-card {
+.owner-card,
+.team-detail-card,
+.team-stat-card {
     background: var(--card);
     backdrop-filter: none;
     border: 1px solid var(--gray200);
     border-radius: 12px;
-    padding: 22px;
+    padding: 26px;
     box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
     margin-bottom: 20px;
+}
+
+    .team-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 20px 24px;
+        margin-bottom: 0;
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+        .team-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+        }
+
+        .team-stat-card i {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .team-stat-card h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 2px;
+            color: var(--gray900);
+        }
+
+        .team-stat-card span {
+            font-size: 12px;
+            color: var(--gray500);
+            font-weight: 600;
+        }
+
+/* Project key chip on flat heroes (the old translucent-white
+   pill was designed for the gradient hero and disappears on white) */
+.workspace-hero .project-key-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    vertical-align: middle;
+    margin-right: 8px;
 }
 
 .card-title {
@@ -1136,21 +1198,4 @@ textarea.form-control {
    Reduced motion
    ========================================================== */
 
-@media (prefers-reduced-motion: reduce) {
 
-    .workspace-card,
-    .member-row,
-    .stat-card,
-    .workspace-primary-btn,
-    .workspace-create-btn,
-    .btn-primary,
-    .workspace-btn-primary,
-    .workspace-filter,
-    .btn-light,
-    .workspace-btn-light,
-    .btn-secondary,
-    .details-btn,
-    .back-link {
-        transition: none !important;
-    }
-}
