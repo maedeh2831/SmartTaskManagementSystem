@@ -56,14 +56,12 @@
         })(window, document);
         webpushr('setup', { 'key': '7b8acf774ea9e965e393120da0b7d643' });
 
-        // خواندن توکن ضد-جعل از فرم مخصوص Webpushr (تابع سراسری)
         function webpushrToken() {
             var el = document.querySelector(
                 '#webpushrAntiForgeryForm input[name="__RequestVerificationToken"]');
             return el ? el.value : "";
         }
 
-        // ذخیره SID در سرور (فرم‌دیتا تا با پارامتر long sid در کنترلر bind شود)
         function saveWebpushrSubscriber(sid) {
             if (!sid) return;
             var form = new FormData();
@@ -95,7 +93,6 @@
     <!-- end webpushr code -->
 
     <script>
-        // دیاگنوستیک: وضعیت پوش در این مرورگر را در کنسول چاپ می‌کند
         window.webpushrDiagnostic = function () {
             var info = {
                 permission: (typeof Notification !== "undefined") ? Notification.permission : "n/a",
@@ -133,19 +130,15 @@
     </script>
 
     <script>
-        // فقط یک مسیر پرامپت وجود داشته باشد (پرامپت خود وب‌پشر)،
-        // تا کاربر دو بار اجازه نگیرد و سهواً دکمه Block را نزند.
         window.addEventListener("load", function () {
             setTimeout(function () {
                 if (typeof webpushr === "undefined") return;
 
                 if (Notification.permission === "granted") {
-                    // قبلاً اجازه داده شده؛ مطمئن شو SID ثبت شده است
                     webpushr('fetch_id', function (sid) {
                         if (sid) saveWebpushrSubscriber(sid);
                     });
                 } else if (Notification.permission === "default") {
-                    // اشتراک را فعال کن؛ وب‌پشر پرامپت خودش را نشان می‌دهد
                     window.ensureWebpushrSubscription && window.ensureWebpushrSubscription();
                 }
             }, 1500);
@@ -173,10 +166,7 @@
         </div>
 
         <div class="logo">
-            <span>SmartTask</span>
-            <div class="logo-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>          
+            <img width="180px" src="~/images/logo.png"></img>
         </div>
 
     </header>
@@ -200,8 +190,6 @@
         </main>
 
     </div>
-
-    @await Component.InvokeAsync("Footer")
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @if (isJalaliDate)

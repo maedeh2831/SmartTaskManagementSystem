@@ -15,14 +15,20 @@
 <div class="dashboard-page">
 
     <div class="dashboard-header">
+
         <div class="dashboard-title">
-            <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.WorkspaceId" class="back-link">
-                <i class="fa-solid fa-arrow-right"></i>
-                بازگشت به فضای کاری
-            </a>
             <h1>داشبورد @Model.WorkspaceName</h1>
             <p>نمای کلی از وضعیت فعلی فضای کاری شما</p>
         </div>
+
+        <a asp-controller="Workspace"
+           asp-action="Details"
+           asp-route-id="@Model.WorkspaceId"
+           class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به فضای کاری
+        </a>
+
     </div>
 
     <div class="stats-grid">

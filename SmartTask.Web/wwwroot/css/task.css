@@ -2,17 +2,6 @@
                     SmartTask Task UI
    ========================================================== */
 
-.task-form-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-@media (max-width: 768px) {
-    .task-form-row {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* ==========================================================
    SMARTTASK — TASK KANBAN
@@ -74,8 +63,6 @@
     color: var(--gray700);
 }
 
-    /* Top status indicator */
-
     .task-column-header::before {
         content: "";
         position: absolute;
@@ -85,8 +72,6 @@
         height: 3px;
         background: var(--gray300);
     }
-
-    /* Status icon */
 
     .task-column-header > i {
         width: 18px;
@@ -98,9 +83,7 @@
         opacity: .9;
     }
 
-    /* ==========================================================
-   Status Colors
-   ========================================================== */
+    /* Status Colors */
 
     .task-column-header.status-todo {
         color: var(--gray700);
@@ -142,10 +125,7 @@
             background: #EF4444;
         }
 
-
-    /* ==========================================================
-   Column Counter
-   ========================================================== */
+    /* Column Counter */
 
     .task-column-header .planning-count {
         display: inline-flex;
@@ -163,9 +143,6 @@
         font-weight: 800;
         line-height: 1;
     }
-
-
-    /* Status counter colors */
 
     .task-column-header.status-inprogress .planning-count {
         background: #FFFBEB;
@@ -262,7 +239,7 @@
 
 
 /* ==========================================================
-   Task Body
+   Task Body / Title / Meta
    ========================================================== */
 
 .task-card-body {
@@ -272,11 +249,6 @@
     flex: 1;
     min-width: 0;
 }
-
-
-/* ==========================================================
-   Task Title
-   ========================================================== */
 
 .task-card-title {
     display: block;
@@ -293,11 +265,6 @@
     .task-card-title:hover {
         color: var(--primary);
     }
-
-
-/* ==========================================================
-   Meta / Badges
-   ========================================================== */
 
 .task-card-meta {
     display: flex;
@@ -325,9 +292,6 @@
     font-weight: 800;
     line-height: 1;
 }
-
-
-    /* Task type */
 
     .task-type-badge.type-task {
         background: var(--gray50);
@@ -362,6 +326,7 @@
 
 /* ==========================================================
    Priority Badge
+   (تعریف واحد — قبلاً سه بار با رنگ‌های متفاوت تعریف شده بود)
    ========================================================== */
 
 .backlog-priority-badge {
@@ -378,26 +343,22 @@
 
     .backlog-priority-badge.priority-lowest,
     .backlog-priority-badge.priority-low {
-        background: var(--gray50);
-        border: 1px solid var(--gray100);
+        background: var(--gray100);
         color: var(--gray500);
     }
 
     .backlog-priority-badge.priority-medium {
-        background: #EEF2FF;
-        border: 1px solid #C7D2FE;
+        background: #E0E7FF;
         color: var(--primary-darker);
     }
 
     .backlog-priority-badge.priority-high {
-        background: #FFF7ED;
-        border: 1px solid #FED7AA;
+        background: #FFEDD5;
         color: #C2410C;
     }
 
     .backlog-priority-badge.priority-highest {
-        background: #FEF2F2;
-        border: 1px solid #FECACA;
+        background: #FEE2E2;
         color: #B91C1C;
     }
 
@@ -482,29 +443,22 @@
     box-shadow: 0 16px 35px rgba(15, 23, 42, .16);
 }
 
-
-/* ==========================================================
-   Column Drop State
-   ========================================================== */
-
 .task-list.sortable-drag-over {
     background: var(--primary-light);
 }
 
 
 /* ==========================================================
-   Responsive
+   Kanban Responsive
    ========================================================== */
 
 @media (max-width: 1400px) {
-
     .task-kanban {
         grid-template-columns: repeat(3, minmax(240px, 1fr));
     }
 }
 
 @media (max-width: 1000px) {
-
     .task-kanban {
         grid-template-columns: repeat(2, minmax(240px, 1fr));
     }
@@ -551,7 +505,7 @@
 
 
 /* ==========================================================
-   Accessibility
+   Accessibility / Reduced Motion
    ========================================================== */
 
 .task-card-title:focus-visible,
@@ -565,11 +519,6 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-light);
 }
-
-
-/* ==========================================================
-   Reduced Motion
-   ========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -587,341 +536,11 @@
         transform: none;
     }
 }
-/* ===== Assignees ===== */
-.assignee-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 16px;
-}
 
-.assignee-chip {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--gray100);
-    border-radius: 20px;
-    padding: 6px 8px 6px 14px;
-    font-size: 13px;
-    color: var(--gray700);
-}
 
-    .assignee-chip i:first-child {
-        color: var(--primary);
-    }
-
-.assignee-remove-form {
-    display: inline-block;
-}
-
-    .assignee-remove-form button {
-        background: none;
-        border: none;
-        color: var(--gray500);
-        cursor: pointer;
-        font-size: 11px;
-        padding: 4px 6px;
-        border-radius: 50%;
-        transition: background .2s ease, color .2s ease;
-    }
-
-        .assignee-remove-form button:hover {
-            background: #FEE2E2;
-            color: #B91C1C;
-        }
-
-.assignee-add-form {
-    display: flex;
-    gap: 10px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
-}
-
-    .assignee-add-form select {
-        flex: 1;
-    }
-/* ===== Labels ===== */
-.label-badge-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
-}
-
-.task-label-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.label-remove-form {
-    display: inline-block;
-}
-
-    .label-remove-form button {
-        background: none;
-        border: none;
-        color: #fff;
-        opacity: .8;
-        cursor: pointer;
-        font-size: 10px;
-        padding: 0;
-    }
-
-        .label-remove-form button:hover {
-            opacity: 1;
-        }
-
-.label-assign-form {
-    display: flex;
-    gap: 10px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
-    margin-bottom: 10px;
-}
-
-    .label-assign-form select {
-        flex: 1;
-    }
-
-.label-manage-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--gray500);
-    text-decoration: none;
-}
-
-    .label-manage-link:hover {
-        color: var(--primary);
-    }
-
-/* ===== Checklist ===== */
-.checklist-block {
-    border: 1px solid var(--gray100);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 14px;
-}
-
-.checklist-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.checklist-title {
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--gray700);
-}
-
-.checklist-header form {
-    margin-right: auto;
-}
-
-.checklist-create-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
-}
-
-    .checklist-create-form i {
-        color: var(--primary);
-    }
-
-    .checklist-create-form input[type="text"] {
-        flex: 1;
-        border: 1px solid var(--gray100);
-        border-radius: 8px;
-        padding: 8px 12px;
-        outline: none;
-        font-size: 13px;
-    }
-
-    .checklist-create-form button {
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-/* ===== Comments ===== */
-.comment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 16px;
-}
-
-.comment-item {
-    display: flex;
-    gap: 10px;
-}
-
-.comment-avatar {
-    color: var(--primary);
-    font-size: 22px;
-    flex-shrink: 0;
-}
-
-.comment-body {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--gray100);
-    border-radius: 12px;
-    padding: 10px 14px;
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
-
-.comment-author {
-    font-weight: 700;
-    font-size: 12px;
-    color: var(--gray700);
-}
-
-.comment-date {
-    font-size: 11px;
-    color: var(--gray500);
-}
-
-.comment-content {
-    font-size: 13px;
-    color: var(--gray700);
-    white-space: pre-wrap;
-    margin: 0 0 6px;
-}
-
-.comment-delete-btn {
-    background: none;
-    border: none;
-    color: var(--gray500);
-    font-size: 11px;
-    cursor: pointer;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-    .comment-delete-btn:hover {
-        color: #B91C1C;
-    }
-
-.comment-add-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
-}
-
-    .comment-add-form textarea {
-        resize: vertical;
-    }
-
-    .comment-add-form button {
-        align-self: flex-end;
-    }
-
-/* ===== Attachments ===== */
-.attachment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.attachment-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg);
-    border: 1px solid var(--gray100);
-    border-radius: 10px;
-    padding: 10px 14px;
-}
-
-    .attachment-item i {
-        color: var(--primary);
-        font-size: 18px;
-    }
-
-.attachment-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.attachment-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray700);
-    text-decoration: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-    .attachment-name:hover {
-        color: var(--primary);
-    }
-
-.attachment-meta {
-    font-size: 11px;
-    color: var(--gray500);
-}
-
-.attachment-upload-form {
-    display: flex;
-    gap: 10px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--gray100);
-    align-items: center;
-}
-/* ===== Time Tracking ===== */
-.timer-active-box {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: #FEF3C7;
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 14px;
-}
-
-.timer-live-display {
-    font-size: 22px;
-    font-weight: 800;
-    color: #B45309;
-    font-family: monospace;
-    direction: ltr;
-}
-
-.timer-start-form {
-    margin-bottom: 14px;
-}
+/* ==========================================================
+   ثبت دستی زمان — فقط اینجا تعریف شده (تکراری نیست)
+   ========================================================== */
 
 .manual-timelog-form {
     padding: 14px 0;
@@ -930,70 +549,8 @@
     margin-bottom: 14px;
 }
 
-.manual-timelog-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 10px;
-    align-items: center;
-}
 
-@media (max-width: 768px) {
-    .manual-timelog-fields {
-        grid-template-columns: 1fr;
-    }
-}
-
-.timelog-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.timelog-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg);
-    border: 1px solid var(--gray100);
-    border-radius: 10px;
-    padding: 10px 14px;
-}
-
-    .timelog-item i {
-        color: var(--primary);
-    }
-
-.timelog-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.timelog-user {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gray700);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.timelog-running-badge {
-    background: #FEF3C7;
-    color: #B45309;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 700;
-}
-
-.timelog-meta {
-    font-size: 11px;
-    color: var(--gray500);
-}
-/* ================= AI Task Breakdown ================= */
+/* ================= AI Task Breakdown (+ Trade Modal reuse) ================= */
 
 .ai-suggest-btn {
     display: inline-flex;
@@ -1147,269 +704,11 @@
     padding: 18px 26px;
     border-top: 1px solid var(--gray100);
 }
-/* ================= Smart Priority ================= */
 
-.smart-priority-compare {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding-bottom: 18px;
-    margin-bottom: 18px;
-    border-bottom: 1px solid var(--gray100);
-}
 
-.smart-priority-box {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-    .smart-priority-box span {
-        font-size: 12px;
-        color: var(--gray500);
-    }
-
-.smart-priority-arrow {
-    color: var(--gray300);
-    font-size: 18px;
-}
-
-.smart-priority-score {
-    margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-}
-
-    .smart-priority-score span {
-        font-size: 12px;
-        color: var(--gray500);
-    }
-
-    .smart-priority-score strong {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--gray900);
-    }
-
-.smart-priority-breakdown {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.smart-priority-bar-row {
-    display: grid;
-    grid-template-columns: 110px 1fr 50px;
-    align-items: center;
-    gap: 12px;
-    font-size: 12px;
-    color: var(--gray500);
-    font-weight: 600;
-}
-
-.smart-priority-reasons {
-    list-style: none;
-    margin: 0 0 16px;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-    .smart-priority-reasons li {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--gray700);
-        background: var(--gray50);
-        padding: 10px 14px;
-        border-radius: 12px;
-    }
-
-        .smart-priority-reasons li i {
-            color: var(--primary);
-            margin-top: 2px;
-        }
-
-.smart-priority-match {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #047857;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-/*  Priority Badge */
-
-.backlog-priority-badge.priority-lowest {
-    background: var(--gray100);
-    color: var(--gray500);
-}
-
-.backlog-priority-badge.priority-low {
-    background: var(--gray100);
-    color: var(--gray500);
-}
-
-.backlog-priority-badge.priority-medium {
-    background: #E0E7FF;
-    color: var(--primary-darker);
-}
-
-.backlog-priority-badge.priority-high {
-    background: #FFEDD5;
-    color: #C2410C;
-}
-
-.backlog-priority-badge.priority-highest {
-    background: #FEE2E2;
-    color: #B91C1C;
-}
-
-/* ================= Task Details Header ================= */
-
-.task-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.icon-btn-danger {
-    color: #B91C1C;
-    background: #FEF2F2;
-}
-
-    .icon-btn-danger:hover {
-        background: #FEE2E2;
-        color: #991B1B;
-    }
-
-/* ================= Task Tabs ================= */
-
-.task-tabs {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    border-bottom: 1px solid var(--gray100);
-    margin-bottom: 20px;
-    padding-bottom: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-}
-
-    .task-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-.task-tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    padding: 12px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--gray500);
-    cursor: pointer;
-    transition: color .2s ease, border-color .2s ease;
-}
-
-    .task-tab-btn i {
-        font-size: 13px;
-    }
-
-    .task-tab-btn:hover {
-        color: var(--gray700);
-    }
-
-    .task-tab-btn.active {
-        color: var(--primary);
-        border-bottom-color: var(--primary);
-    }
-
-.task-tab-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 20px;
-    background: var(--gray100);
-    color: var(--gray700);
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.task-tab-btn.active .task-tab-badge {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.task-tab-badge-live {
-    width: 8px;
-    height: 8px;
-    min-width: 8px;
-    padding: 0;
-    border-radius: 50%;
-    background: #B45309;
-    animation: taskLiveDotPulse 1.4s ease-in-out infinite;
-}
-
-@keyframes taskLiveDotPulse {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: .35;
-    }
-}
-
-.task-tab-content {
-    display: block;
-}
-
-.task-tab-pane {
-    display: none;
-}
-
-    .task-tab-pane.active {
-        display: block;
-        animation: taskTabFadeIn .2s ease;
-    }
-
-@keyframes taskTabFadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .task-tabs {
-        margin-bottom: 16px;
-    }
-
-    .task-tab-btn {
-        padding: 10px 12px;
-        font-size: 12px;
-    }
-}
 /* ==========================================================
-   CREATE TASK MODAL
+   CREATE / EDIT TASK MODAL
+   (کلاس‌های مشترک بین مودال ایجاد و ویرایش Task)
    ========================================================== */
 
 .task-modal-backdrop {
@@ -1452,9 +751,7 @@
 }
 
 
-/* ==========================================================
-   Modal Header
-   ========================================================== */
+/* Modal Header */
 
 .task-modal-header {
     display: flex;
@@ -1520,9 +817,7 @@
     }
 
 
-/* ==========================================================
-   Modal Form
-   ========================================================== */
+/* Modal Form */
 
 .task-create-form {
     display: flex;
@@ -1561,9 +856,7 @@
 }
 
 
-/* ==========================================================
-   Inputs
-   ========================================================== */
+/* Inputs */
 
 .task-create-form .form-control {
     width: 100%;
@@ -1595,9 +888,7 @@
 }
 
 
-/* ==========================================================
-   Input With Icon
-   ========================================================== */
+/* Input With Icon */
 
 .task-input-wrapper,
 .task-date-wrapper {
@@ -1621,9 +912,7 @@
     }
 
 
-/* ==========================================================
-   Estimate
-   ========================================================== */
+/* Estimate */
 
 .task-input-with-suffix {
     position: relative;
@@ -1645,9 +934,7 @@
     }
 
 
-/* ==========================================================
-   Validation
-   ========================================================== */
+/* Validation */
 
 .task-create-form .text-danger {
     color: #DC2626;
@@ -1656,9 +943,7 @@
 }
 
 
-/* ==========================================================
-   Modal Footer
-   ========================================================== */
+/* Modal Footer */
 
 .task-modal-footer {
     display: flex;
@@ -1709,9 +994,58 @@
         box-shadow: 0 7px 18px rgba(99, 102, 241, .25);
     }
 
+    .task-modal-submit:disabled,
+    .task-modal-cancel:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+
+/* Modal Responsive */
+
+@media (max-width: 700px) {
+
+    .task-modal-backdrop {
+        padding: 12px;
+    }
+
+    .task-create-modal {
+        max-height: calc(100vh - 24px);
+        border-radius: 16px;
+    }
+
+    .task-modal-header,
+    .task-create-form {
+        padding: 17px;
+    }
+
+    .task-form-grid,
+    .task-form-grid-dates {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .task-modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .task-modal-cancel,
+    .task-modal-submit {
+        width: 100%;
+    }
+}
+
+body.task-modal-open {
+    overflow: hidden;
+}
+
 
 /* ==========================================================
-   Page Header
+   Kanban Page Header (Index.cshtml)
    ========================================================== */
 
 .task-page-title-row {
@@ -1778,11 +1112,6 @@
         transform: translateX(2px);
     }
 
-
-/* ==========================================================
-   Create Button
-   ========================================================== */
-
 .task-page-actions {
     display: flex;
     justify-content: flex-start;
@@ -1813,31 +1142,7 @@
         box-shadow: 0 7px 18px rgba(99, 102, 241, .25);
     }
 
-
-/* ==========================================================
-   Responsive
-   ========================================================== */
-
 @media (max-width: 700px) {
-
-    .task-modal-backdrop {
-        padding: 12px;
-    }
-
-    .task-create-modal {
-        max-height: calc(100vh - 24px);
-        border-radius: 16px;
-    }
-
-    .task-modal-header,
-    .task-create-form {
-        padding: 17px;
-    }
-
-    .task-form-grid,
-    .task-form-grid-dates {
-        grid-template-columns: 1fr;
-    }
 
     .task-page-title-row {
         align-items: flex-start;
@@ -1864,22 +1169,9 @@
         height: 40px;
         flex-basis: 40px;
     }
-
-    .task-modal-footer {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .task-modal-cancel,
-    .task-modal-submit {
-        width: 100%;
-    }
-}
-body.task-modal-open {
-    overflow: hidden;
 }
 /* =========================================================
-   TASK DETAILS — REDESIGN
+   TASK DETAILS PAGE
    ========================================================= */
 
 .task-details-page {
@@ -1890,9 +1182,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .task-page-header {
     background: var(--surface, #fff);
@@ -1911,20 +1201,20 @@ body.task-modal-open {
     margin-bottom: 18px;
 }
 
-    .task-breadcrumb a {
-        color: var(--text-secondary, #4b5563);
-        text-decoration: none;
-        transition: color .2s ease;
-    }
+.task-breadcrumb a {
+    color: var(--text-secondary, #4b5563);
+    text-decoration: none;
+    transition: color .2s ease;
+}
 
-        .task-breadcrumb a:hover {
-            color: var(--primary, #6366f1);
-        }
+.task-breadcrumb a:hover {
+    color: var(--primary, #6366f1);
+}
 
-    .task-breadcrumb i {
-        font-size: 9px;
-        opacity: .5;
-    }
+.task-breadcrumb i {
+    font-size: 9px;
+    opacity: .5;
+}
 
 .task-header-main {
     display: flex;
@@ -2061,9 +1351,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   STATUS
-========================= */
+/* STATUS */
 
 .task-status-badge {
     display: inline-flex;
@@ -2109,9 +1397,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   TABS
-========================= */
+/* TABS */
 
 .task-tabs {
     position: sticky;
@@ -2203,9 +1489,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   TAB CONTENT
-========================= */
+/* TAB CONTENT */
 
 .task-tab-content {
     min-width: 0;
@@ -2218,6 +1502,10 @@ body.task-modal-open {
 
     .task-tab-pane.active {
         display: block;
+    }
+
+    .task-tab-pane[hidden] {
+        display: none !important;
     }
 
 @keyframes taskTabFade {
@@ -2233,9 +1521,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   CARDS
-========================= */
+/* CARDS */
 
 .details-card {
     background: var(--surface, #fff);
@@ -2272,9 +1558,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   OVERVIEW
-========================= */
+/* OVERVIEW */
 
 .task-overview-grid {
     display: grid;
@@ -2343,15 +1627,8 @@ body.task-modal-open {
     color: var(--text-primary, #111827);
 }
 
-.task-overview-grid > .details-card:nth-child(3),
-.task-overview-grid > .details-card:nth-child(4) {
-    min-width: 0;
-}
 
-
-/* =========================
-   LABELS
-========================= */
+/* LABELS */
 
 .label-badge-list {
     display: flex;
@@ -2396,9 +1673,7 @@ body.task-modal-open {
     }
 
 
-/* =========================
-   ASSIGNEES
-========================= */
+/* ASSIGNEES */
 
 .assignee-list {
     display: flex;
@@ -2439,9 +1714,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   SUBTASK
-========================= */
+/* SUBTASK / CHECKLIST */
 
 .subtask-progress-text {
     margin-right: 7px;
@@ -2597,9 +1870,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   TIME
-========================= */
+/* TIME */
 
 .timer-active-box {
     display: flex;
@@ -2684,9 +1955,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   COLLABORATION
-========================= */
+/* COLLABORATION (Files + Comments) */
 
 .task-collaboration-grid {
     display: grid;
@@ -2826,9 +2095,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   INSIGHTS
-========================= */
+/* INSIGHTS */
 
 .smart-feature-badge {
     padding: 4px 8px;
@@ -2946,9 +2213,7 @@ body.task-modal-open {
 }
 
 
-/* =========================
-   DEPENDENCY
-========================= */
+/* DEPENDENCY */
 
 .dependency-columns {
     display: grid;
@@ -3111,7 +2376,7 @@ body.task-modal-open {
 
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE — Details Page
 ========================= */
 
 @media (max-width: 1100px) {
@@ -3215,128 +2480,3 @@ body.task-modal-open {
         align-items: stretch;
     }
 }
-.task-tab-pane[hidden] {
-    display: none !important;
-}
-
-/* =========================================================
-   TASK DETAILS — DESIGN-SYSTEM ALIGNMENT
-   The redesign used ad-hoc tokens (--surface, --border-color,
-   --text-*) that don't exist in the app; their fallbacks are
-   light-theme-only and break dark mode. Map them onto the app
-   tokens and flatten the remaining glass / gradient / radius
-   violations so the page follows the SmartTask design language.
-   ========================================================= */
-
-:root {
-    --surface: var(--card);
-    --surface-secondary: var(--gray50);
-    --border-color: var(--border);
-    --text-primary: var(--text);
-    --text-secondary: var(--gray700);
-    --text-muted: var(--muted);
-}
-
-/* Header card: 18px -> 12px */
-
-.task-page-header {
-    border-radius: 12px;
-}
-
-/* Tabs: drop the glass (blur + color-mix), use the design
-   system's underline indicator on a flat bar */
-
-.task-tabs {
-    position: sticky;
-    top: 10px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: 0;
-    border-bottom: 1px solid var(--gray200);
-    border-radius: 0;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
-
-.task-tab-btn {
-    min-height: 44px;
-    padding: 0 14px;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    background: transparent;
-    color: var(--gray500);
-}
-
-    .task-tab-btn:hover {
-        background: transparent;
-        color: var(--gray700);
-    }
-
-    .task-tab-btn.active {
-        background: transparent;
-        color: var(--primary);
-        border-bottom-color: var(--primary);
-        box-shadow: none;
-    }
-
-    .task-tab-btn.active .task-tab-badge {
-        background: var(--primary-light);
-        color: var(--primary);
-    }
-
-/* Trade button: gradient -> solid purple fill */
-
-.task-trade-btn {
-    background: #8B5CF6;
-    background-image: none;
-    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
-}
-
-    .task-trade-btn:hover {
-        background: #7C3AED;
-        background-image: none;
-        transform: translateY(-1px);
-    }
-
-/* Danger action button: readable fill on hover */
-
-.task-action-btn.danger:hover {
-    background: #EF4444;
-    border-color: #EF4444;
-    color: #fff;
-}
-
-/* Modals: radii 20-24px -> 12px, drop overlay blur */
-
-.ai-modal,
-.task-create-modal {
-    border-radius: 12px;
-}
-
-.ai-modal-overlay,
-.task-modal-backdrop {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-}
-
-.ai-suggestion-item {
-    border-radius: 12px;
-}
-
-/* Summary strip uses --border-color as the 1px gutters; keep
-   it consistent with the gray200 border language */
-
-.task-summary {
-    border-color: var(--gray200);
-}
-
-    .task-summary .task-summary-item {
-        background: var(--card);
-    }

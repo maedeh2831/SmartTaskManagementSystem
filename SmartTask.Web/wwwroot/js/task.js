@@ -19,18 +19,6 @@
         });
     });
 
-    // ===== Attachment Upload =====
-    const attachmentFile = document.getElementById("taskAttachmentFile");
-    const attachmentFileName = document.getElementById("attachmentFileName");
-
-    if (attachmentFile && attachmentFileName) {
-        attachmentFile.addEventListener("change", function () {
-            attachmentFileName.textContent = this.files.length
-                ? this.files[0].name
-                : "هیچ فایلی انتخاب نشده است";
-        });
-    }
-
     // ===== Kanban Drag & Drop =====
     const kanban = document.getElementById("taskKanban");
 
@@ -183,6 +171,11 @@
     }
 
 });
+
+
+// ==========================================================
+// AI Sub-Task Suggestions
+// ==========================================================
 (function () {
     const aiBtn = document.getElementById("aiSuggestBtn");
     if (!aiBtn) return;
@@ -289,7 +282,10 @@
     });
 })();
 
-// ===== Task Details — Tab Switching =====
+
+// ==========================================================
+// Task Details — Tab Switching
+// ==========================================================
 (function () {
 
     const tabs = document.querySelectorAll(".task-tab-btn");
@@ -383,66 +379,196 @@
     activateTab(validInitialTab, false);
 
 })();
-/* ==========================================================
-   Create Task Modal
-   ========================================================== */
 
+
+// ==========================================================
+// Task Create / Edit Modal
+// پشتیبانی از چند مودال هم‌زمان روی یک صفحه
+// (createTaskModal در Index.cshtml + editTaskModal در Details.cshtml)
+// ==========================================================
 (function () {
 
-    const modal = document.querySelector("[data-task-modal]");
-    const openButton = document.querySelector("[data-task-modal-open]");
+    const modals = document.querySelectorAll("[data-task-modal]");
 
-    if (!modal || !openButton)
+    if (!modals.length)
         return;
 
-    const closeButtons =
-        modal.querySelectorAll("[data-task-modal-close]");
+    function getModalByKey(key) {
+        return document.querySelector(`[data-task-modal="${key}"]`);
+    }
 
-    function openModal() {
+    function openModal(modal) {
 
         modal.classList.add("is-open");
 
         document.body.classList.add("task-modal-open");
 
-        const titleInput =
-            modal.querySelector("#taskTitle");
+        const firstField = modal.querySelector(
+            "input:not([type='hidden']), textarea"
+        );
 
         setTimeout(() => {
-            titleInput?.focus();
+            firstField?.focus();
         }, 150);
     }
 
-    function closeModal() {
+    function closeModal(modal) {
 
         modal.classList.remove("is-open");
 
-        document.body.classList.remove("task-modal-open");
+        // اگر مودال دیگری باز نبود، اسکرول صفحه آزاد بشه
+        const anyOpen = document.querySelector(".task-modal-backdrop.is-open");
+
+        if (!anyOpen) {
+            document.body.classList.remove("task-modal-open");
+        }
     }
 
-    openButton.addEventListener("click", openModal);
+    // باز کردن مودال از طریق دکمه‌های data-task-modal-open="key"
+    document.querySelectorAll("[data-task-modal-open]").forEach(btn => {
 
-    closeButtons.forEach(button => {
+        btn.addEventListener("click", function () {
 
-        button.addEventListener("click", closeModal);
+            const key = this.dataset.taskModalOpen;
+            const modal = getModalByKey(key);
+
+            if (modal) {
+                openModal(modal);
+            }
+
+        });
 
     });
 
-    modal.addEventListener("click", function (event) {
+    // بستن هر مودال با دکمه‌های داخل خودش + کلیک روی بک‌دراپ
+    modals.forEach(modal => {
 
-        if (event.target === modal) {
-            closeModal();
-        }
+        modal.querySelectorAll("[data-task-modal-close]").forEach(button => {
+            button.addEventListener("click", () => closeModal(modal));
+        });
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closeModal(modal);
+            }
+        });
 
     });
 
+    // بستن با کلید Escape (هر مودالی که باز است)
     document.addEventListener("keydown", function (event) {
 
-        if (event.key === "Escape" &&
-            modal.classList.contains("is-open")) {
+        if (event.key !== "Escape")
+            return;
 
-            closeModal();
+        const openModal_ = document.querySelector(".task-modal-backdrop.is-open");
 
+        if (openModal_) {
+            closeModal(openModal_);
         }
+
+    });
+
+})();
+
+
+// ==========================================================
+// AJAX Submit — فرم‌های مودال Create/Edit Task
+// (کنترلر Json برمی‌گرداند، پس دیگر نباید فرم به‌صورت
+//  معمولی Submit شود، وگرنه مرورگر صفحه‌ی خام JSON نشان می‌دهد)
+// ==========================================================
+(function () {
+
+    const forms = document.querySelectorAll("[data-ajax-task-form]");
+
+    if (!forms.length)
+        return;
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", async function (e) {
+
+            e.preventDefault();
+
+            // ولیدیشن کلاینت (در صورت وجود jQuery Unobtrusive Validation)
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.valid) {
+                const isValid = window.jQuery(form).valid();
+                if (isValid === false) {
+                    return;
+                }
+            }
+
+            const submitBtn = form.querySelector(".task-modal-submit");
+            const cancelBtn = form.querySelector(".task-modal-cancel");
+            const originalHtml = submitBtn ? submitBtn.innerHTML : null;
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>در حال ذخیره...</span>';
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = true;
+            }
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch(form.action, {
+                    method: form.method || "POST",
+                    body: formData
+                });
+
+                let data;
+
+                try {
+                    data = await response.json();
+                } catch {
+                    throw new Error("پاسخ نامعتبر از سرور دریافت شد.");
+                }
+
+                if (!data.success) {
+                    await Swal.fire({
+                        icon: "error",
+                        title: "خطا",
+                        text: data.message || "عملیات ناموفق بود.",
+                        confirmButtonText: "باشه",
+                        confirmButtonColor: "#5B5FEF"
+                    });
+                    return;
+                }
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "انجام شد",
+                    text: data.message || "با موفقیت ذخیره شد.",
+                    confirmButtonText: "باشه",
+                    confirmButtonColor: "#5B5FEF",
+                    timer: 1300,
+                    timerProgressBar: true
+                });
+
+                window.location.reload();
+
+            } catch (err) {
+                console.error("Ajax task form error:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "خطا",
+                    text: "ارتباط با سرور برقرار نشد.",
+                    confirmButtonText: "باشه",
+                    confirmButtonColor: "#5B5FEF"
+                });
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                }
+                if (cancelBtn) {
+                    cancelBtn.disabled = false;
+                }
+            }
+
+        });
 
     });
 
