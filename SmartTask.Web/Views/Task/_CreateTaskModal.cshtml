@@ -1,0 +1,265 @@
+﻿@model SmartTask.Web.Models.ViewModels.Task.CreateTaskViewModel
+@using SmartTask.Web.Models.Enums
+
+<div class="task-modal-backdrop"
+     data-task-modal>
+
+    <div class="task-create-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="createTaskModalTitle">
+
+        <div class="task-modal-header">
+
+            <div class="task-modal-heading">
+
+                <div class="task-modal-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+
+                <div>
+                    <h2 id="createTaskModalTitle">
+                        ایجاد Task جدید
+                    </h2>
+
+                    <p>
+                        یک وظیفه اجرایی برای این User Story تعریف کنید.
+                    </p>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="task-modal-close"
+                    data-task-modal-close
+                    aria-label="بستن">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <form asp-action="Create"
+              asp-controller="Task"
+              method="post"
+              class="task-create-form"
+              data-create-task-form>
+
+
+            @Html.AntiForgeryToken()
+
+            <input asp-for="UserStoryId" type="hidden" />
+
+
+            <!-- Title -->
+            <div class="task-form-field task-form-field-full">
+
+                <label asp-for="Title">
+                    عنوان Task
+                </label>
+
+                <div class="task-input-wrapper">
+
+                    <i class="fa-regular fa-pen-to-square"></i>
+
+                    <input asp-for="Title"
+                           class="form-control"
+                           placeholder="مثلاً: طراحی View ثبت‌نام"
+                           autocomplete="off" />
+
+                </div>
+
+                <span asp-validation-for="Title"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- Description -->
+            <div class="task-form-field task-form-field-full">
+
+                <label asp-for="Description">
+                    توضیحات
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control task-description-input"
+                          rows="4"
+                          placeholder="شرح مختصر Task را وارد کنید..."></textarea>
+
+                <span asp-validation-for="Description"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- Options -->
+            <div class="task-form-grid">
+
+                <div class="task-form-field">
+
+                    <label asp-for="Type">
+                        نوع Task
+                    </label>
+
+                    <select asp-for="Type"
+                            class="form-control">
+
+                        @foreach (TaskType t in Enum.GetValues(typeof(TaskType)))
+                        {
+                            <option value="@t">
+                                @(t switch
+                                {
+                                    TaskType.Task => "Task",
+                                    TaskType.Bug => "Bug",
+                                    TaskType.Feature => "Feature",
+                                    TaskType.Improvement => "بهبود",
+                                    TaskType.TechnicalDebt => "بدهی فنی",
+                                    _ => "-"
+                                })
+                        </option>
+                                                }
+
+                    </select>
+
+                </div>
+
+
+                <div class="task-form-field">
+
+                    <label asp-for="Priority">
+                        اولویت
+                    </label>
+
+                    <select asp-for="Priority"
+                            class="form-control">
+
+                        @foreach (TaskPriorityType p in Enum.GetValues(typeof(TaskPriorityType)))
+                        {
+                            <option value="@p">
+                                @(p switch
+                                {
+                                    TaskPriorityType.Lowest => "خیلی کم",
+                                    TaskPriorityType.Low => "کم",
+                                    TaskPriorityType.Medium => "متوسط",
+                                    TaskPriorityType.High => "زیاد",
+                                    TaskPriorityType.Highest => "خیلی زیاد",
+                                    _ => "-"
+                                })
+                        </option>
+                                                }
+
+                    </select>
+
+                </div>
+
+
+                <div class="task-form-field">
+
+                    <label asp-for="Estimate">
+                        برآورد
+                    </label>
+
+                    <div class="task-input-with-suffix">
+
+                        <input asp-for="Estimate"
+                               type="number"
+                               min="0"
+                               max="999"
+                               class="form-control"
+                               placeholder="0" />
+
+                        <span>ساعت</span>
+
+                    </div>
+
+                    <span asp-validation-for="Estimate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Dates -->
+            <div class="task-form-grid task-form-grid-dates">
+
+                <div class="task-form-field">
+
+                    <label asp-for="StartDate">
+                        تاریخ شروع
+                    </label>
+
+                    <div class="task-date-wrapper">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        <input asp-date-for="StartDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <span asp-validation-for="StartDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <div class="task-form-field">
+
+                    <label asp-for="DueDate">
+                        تاریخ سررسید
+                    </label>
+
+                    <div class="task-date-wrapper">
+
+                        <i class="fa-regular fa-calendar-check"></i>
+
+                        <input asp-date-for="DueDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <span asp-validation-for="DueDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="task-modal-footer">
+
+                <button type="button"
+                        class="task-modal-cancel"
+                        data-task-modal-close>
+
+                    انصراف
+
+                </button>
+
+                <button type="submit"
+                        class="task-modal-submit"
+                        data-create-task-submit>
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    <span>ایجاد Task</span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

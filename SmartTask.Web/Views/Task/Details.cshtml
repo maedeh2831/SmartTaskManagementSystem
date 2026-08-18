@@ -3,6 +3,31 @@
 
 @{
     ViewData["Title"] = "جزئیات Task";
+
+    var statusText = Model.Status switch
+    {
+        TaskStatusType.ToDo => "برای انجام",
+        TaskStatusType.InProgress => "درحال انجام",
+        TaskStatusType.InReview => "درحال بررسی",
+        TaskStatusType.Done => "انجام‌شده",
+        TaskStatusType.Cancelled => "لغو‌شده",
+        _ => "-"
+    };
+
+    var priorityText = Model.Priority switch
+    {
+        TaskPriorityType.Lowest => "خیلی کم",
+        TaskPriorityType.Low => "کم",
+        TaskPriorityType.Medium => "متوسط",
+        TaskPriorityType.High => "زیاد",
+        TaskPriorityType.Highest => "بحرانی",
+        _ => Model.Priority.ToString()
+    };
+
+    var filesAndCommentsCount = Model.Attachments.Count + Model.Comments.Count;
+    var subtaskAndChecklistCount =
+        Model.SubTasksTotal +
+        Model.Checklists.Sum(c => c.TotalItems);
 }
 
 @section Styles
@@ -12,897 +37,2078 @@
     <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" />
 }
 
-<div class="workspace-details-page">
+<div class="task-details-page">
 
-    <div class="page-header">
-        <div>
-            <h1>
-                @Model.Title
-                <span class="backlog-status-badge task-status-badge status-@Model.Status.ToString().ToLower()">
-                    @(Model.Status switch
-                    {
-                        TaskStatusType.ToDo => "برای انجام",
-                        TaskStatusType.InProgress => "درحال انجام",
-                        TaskStatusType.InReview => "درحال بررسی",
-                        TaskStatusType.Done => "انجام‌شده",
-                        TaskStatusType.Cancelled => "لغو‌شده",
-                        _ => "-"
-                    })
-                </span>
-            </h1>
-            <p>User Story: @Model.UserStoryTitle — پروژه: @Model.ProjectName</p>
-        </div>
+    <!-- =========================
+         HEADER
+    ========================== -->
 
-        <div style="display:flex;gap:10px;">
-            <a asp-action="Index" asp-route-userStoryId="@Model.UserStoryId" class="back-link">
-                <i class="fa-solid fa-arrow-right"></i>
-                بازگشت
+    <header class="task-page-header">
+
+        <div class="task-breadcrumb">
+            <a asp-controller="Workspace"
+               asp-action="Details"
+               asp-route-id="@Model.ProjectId">
+                @Model.ProjectName
             </a>
 
-            @if (Model.CanManage)
-            {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    ویرایش
-                </a>
-            }
-        </div>
-    </div>
+            <i class="fa-solid fa-chevron-left"></i>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-align-right"></i>
-            توضیحات
-        </div>
-        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "توضیحاتی ثبت نشده است." : Model.Description)</p>
-    </div>
+            <a asp-action="Index"
+               asp-route-userStoryId="@Model.UserStoryId">
+                @Model.UserStoryTitle
+            </a>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-gauge-high"></i>
-            اطلاعات Task
+            <i class="fa-solid fa-chevron-left"></i>
+
+            <span>Task</span>
         </div>
 
-        <div class="userstory-info-grid">
-            <div>
-                <span class="userstory-info-label">نوع</span>
-                <span class="task-type-badge type-@Model.Type.ToString().ToLower()">@Model.Type</span>
-            </div>
-            <div>
-                <span class="userstory-info-label">اولویت</span>
-                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">@Model.Priority</span>
-            </div>
-            <div>
-                <span class="userstory-info-label">برآورد</span>
-                <span>@Model.Estimate ساعت</span>
-            </div>
-            <div>
-                <span class="userstory-info-label">تاریخ شروع</span>
-                <span>@Html.DisplayDate(Model.StartDate, "—")</span>
-            </div>
-            <div>
-                <span class="userstory-info-label">موعد انجام</span>
-                <span>@Html.DisplayDate(Model.DueDate, "—")</span>
-            </div>
-            @if (Model.CompletedDate.HasValue)
-            {
-                <div>
-                    <span class="userstory-info-label">تاریخ تکمیل</span>
-                    <span>@Html.DisplayDate(Model.CompletedDate)</span>
-                </div>
-            }
-        </div>
-    </div>
+        <div class="task-header-main">
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-stopwatch"></i>
-            ثبت زمان
-            <span class="subtask-progress-text">(مجموع: @Model.TotalLoggedDisplay)</span>
-        </div>
+            <div class="task-title-section">
 
-        @if (Model.MyActiveTimer != null)
-        {
-            <div class="timer-active-box">
-                <div class="timer-live-display" id="liveTimer" data-start="@Model.MyActiveTimer.StartTime.ToString("o")">
-                    ۰۰:۰۰:۰۰
-                </div>
+                <div class="task-title-row">
 
-                <form asp-controller="TimeLog" asp-action="Stop" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@Model.MyActiveTimer.Id" />
-                    <input type="hidden" name="taskItemId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fa-solid fa-stop"></i>
-                        توقف تایمر
-                    </button>
-                </form>
-            </div>
-        }
-        else
-        {
-            <form asp-controller="TimeLog" asp-action="Start" method="post" class="timer-start-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-play"></i>
-                    شروع تایمر
-                </button>
-            </form>
-        }
+                    <h1>@Model.Title</h1>
 
-        @if (Model.CanManage)
-        {
-            <form asp-controller="TimeLog" asp-action="AddManual" method="post" class="manual-timelog-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-
-                <div class="manual-timelog-fields">
-                    <input asp-date-name="startTime" asp-include-time="true" class="form-control" required />
-                    <input type="number" name="durationMinutes" min="1" max="1440" placeholder="مدت (دقیقه)" class="form-control" required />
-                    <input type="text" name="description" placeholder="توضیح (اختیاری)" class="form-control" />
-                    <button type="submit" class="btn btn-light">
-                        <i class="fa-solid fa-plus"></i>
-                        ثبت دستی
-                    </button>
-                </div>
-            </form>
-        }
-
-        @if (!Model.TimeLogs.Any())
-        {
-            <div class="team-empty-text">هنوز زمانی برای این Task ثبت نشده است.</div>
-        }
-        else
-        {
-            <div class="timelog-list">
-                @foreach (var log in Model.TimeLogs)
-                {
-                    <div class="timelog-item">
-                        <i class="fa-regular fa-clock"></i>
-                        <div class="timelog-info">
-                            <span class="timelog-user">
-                                @log.UserName
-                                @if (log.IsRunning)
-                                {
-                                    <span class="timelog-running-badge">درحال اجرا</span>
-                                }
-                            </span>
-                            <span class="timelog-meta">
-                                @Html.DisplayDate(log.StartTime, includeTime: true)
-                                @if (!log.IsRunning)
-                                {
-                                    <text> — @(log.DurationMinutes) دقیقه</text>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(log.Description))
-                                {
-                                    <text> — @log.Description</text>
-                                }
-                            </span>
-                        </div>
-
-                        @if (log.CanDelete && !log.IsRunning)
-                        {
-                            <form asp-controller="TimeLog" asp-action="Delete" method="post" class="delete-timelog-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@log.Id" />
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        }
-                    </div>
-                }
-            </div>
-        }
-    </div>
-
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-tags"></i>
-            Label ها
-        </div>
-
-        <div class="label-badge-list">
-            @if (!Model.Labels.Any())
-            {
-                <span class="team-empty-text">هیچ Label ای به این Task اضافه نشده است.</span>
-            }
-            else
-            {
-                @foreach (var label in Model.Labels)
-                {
-                    <span class="task-label-badge" style="background:@label.Color">
-                        @label.Name
-
-                        @if (Model.CanManage)
-                        {
-                            <form asp-controller="TaskLabel" asp-action="Remove" method="post" class="label-remove-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <input type="hidden" name="labelId" value="@label.Id" />
-                                <button type="submit"><i class="fa-solid fa-xmark"></i></button>
-                            </form>
-                        }
+                    <span class="task-status-badge status-@Model.Status.ToString().ToLower()">
+                        <span class="status-dot"></span>
+                        @statusText
                     </span>
-                }
-            }
-        </div>
 
-        @if (Model.CanManage && Model.AvailableLabels.Any())
-        {
-            <form asp-controller="TaskLabel" asp-action="Assign" method="post" class="label-assign-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <select name="labelId" class="form-control" required>
-                    <option value="">— انتخاب Label برای افزودن —</option>
-                    @foreach (var label in Model.AvailableLabels)
-                    {
-                        <option value="@label.Id">@label.Name</option>
-                    }
-                </select>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i>
-                    افزودن
-                </button>
-            </form>
-        }
+                </div>
 
-        <a asp-controller="Label" asp-action="Index" asp-route-projectId="@Model.ProjectId" class="label-manage-link">
-            <i class="fa-solid fa-gear"></i>
-            مدیریت Label های پروژه
-        </a>
-    </div>
+                <div class="task-header-meta">
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-users"></i>
-            افراد تخصیص‌یافته
-        </div>
+                    <span>
+                        <i class="fa-solid fa-layer-group"></i>
+                        @Model.UserStoryTitle
+                    </span>
 
-        @if (!Model.Assignees.Any())
-        {
-            <div class="team-empty-text">هنوز کسی به این Task تخصیص نیافته است.</div>
-        }
-        else
-        {
-            <div class="assignee-list">
-                @foreach (var assignee in Model.Assignees)
-                {
-                    <div class="assignee-chip">
-                        <i class="fa-regular fa-circle-user"></i>
-                        <span>@assignee.FullName</span>
+                    <span class="meta-separator">•</span>
 
-                        @if (Model.CanManage)
-                        {
-                            <form asp-controller="TaskAssignment" asp-action="RemoveMember" method="post" class="assignee-remove-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <input type="hidden" name="userId" value="@assignee.UserId" />
-                                <button type="submit" title="حذف تخصیص">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </form>
-                        }
-                    </div>
-                }
+                    <span>
+                        <i class="fa-solid fa-folder"></i>
+                        @Model.ProjectName
+                    </span>
+
+                </div>
+
             </div>
-        }
-        @if (Model.IsCurrentUserAssignee && Model.TradeModal != null && Model.TradeModal.ProjectMembers.Any())
-        {
-            <button type="button" id="openTradeModalBtn" class="ai-suggest-btn" style="margin-top:14px;background:linear-gradient(135deg, #8B5CF6, #A78BFA);">
-                <i class="fa-solid fa-right-left"></i>
-                درخواست ترید این تسک
-            </button>
-        }
 
-        @if (Model.CanManage && Model.AvailableMembers.Any())
-        {
-            <form asp-controller="TaskAssignment" asp-action="AssignMember" method="post" class="assignee-add-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <select name="userId" class="form-control" required>
-                    <option value="">— انتخاب عضو برای تخصیص —</option>
-                    @foreach (var member in Model.AvailableMembers)
-                    {
-                        <option value="@member.UserId">@member.FullName</option>
-                    }
-                </select>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-user-plus"></i>
-                    تخصیص
-                </button>
-            </form>
-        }
-    </div>
+            <div class="task-header-actions">
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-list-check"></i>
-            Checklist ها
+                <a asp-action="Index"
+                   asp-route-userStoryId="@Model.UserStoryId"
+                   class="task-action-btn secondary">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+                    بازگشت
+                </a>
+
+                @if (Model.CanManage)
+                {
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="task-action-btn primary">
+
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        ویرایش
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="delete-task-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="task-action-btn danger"
+                                title="حذف Task">
+
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+
+                    </form>
+                }
+
+            </div>
+
         </div>
 
-        @if (!Model.Checklists.Any())
-        {
-            <div class="team-empty-text">هنوز Checklist ای برای این Task ثبت نشده است.</div>
-        }
-        else
-        {
-            @foreach (var checklist in Model.Checklists)
-            {
-                <div class="checklist-block">
-                    <div class="checklist-header">
-                        <span class="checklist-title">@checklist.Title</span>
-                        <span class="subtask-progress-text">(@checklist.CompletedItems از @checklist.TotalItems)</span>
+        <!-- Summary -->
 
-                        @if (Model.CanManage)
-                        {
-                            <form asp-controller="Checklist" asp-action="Delete" method="post" class="delete-checklist-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@checklist.Id" />
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        }
+        <div class="task-summary">
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-solid fa-flag"></i>
+                    اولویت
+                </span>
+
+                <span class="backlog-priority-badge priority-@Model.Priority.ToString().ToLower()">
+                    @priorityText
+                </span>
+
+            </div>
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-solid fa-code"></i>
+                    نوع
+                </span>
+
+                <span class="task-type-badge type-@Model.Type.ToString().ToLower()">
+                    @Model.Type
+                </span>
+
+            </div>
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-regular fa-clock"></i>
+                    برآورد
+                </span>
+
+                <strong>@Model.Estimate ساعت</strong>
+
+            </div>
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    موعد
+                </span>
+
+                <strong>
+                    @Html.DisplayDate(Model.DueDate, "—")
+                </strong>
+
+            </div>
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-solid fa-users"></i>
+                    تخصیص
+                </span>
+
+                <strong>
+                    @Model.Assignees.Count نفر
+                </strong>
+
+            </div>
+
+            <div class="task-summary-item">
+
+                <span class="task-summary-label">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    زمان ثبت‌شده
+                </span>
+
+                <strong>
+                    @Model.TotalLoggedDisplay
+                </strong>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         TABS
+    ========================== -->
+
+    <nav class="task-tabs" id="taskTabs">
+
+        <button type="button"
+                class="task-tab-btn active"
+                data-tab="overview">
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            <span>نمای کلی</span>
+
+        </button>
+
+
+        <button type="button"
+                class="task-tab-btn"
+                data-tab="subtasks">
+
+            <i class="fa-solid fa-list-check"></i>
+
+            <span>زیروظایف</span>
+
+            @if (subtaskAndChecklistCount > 0)
+            {
+                <span class="task-tab-badge">
+                    @subtaskAndChecklistCount
+                </span>
+            }
+
+        </button>
+
+
+        <button type="button"
+                class="task-tab-btn"
+                data-tab="time">
+
+            <i class="fa-solid fa-stopwatch"></i>
+
+            <span>زمان</span>
+
+            @if (Model.MyActiveTimer != null)
+            {
+                <span class="task-tab-badge task-tab-badge-live"></span>
+            }
+
+        </button>
+
+
+        <button type="button"
+                class="task-tab-btn"
+                data-tab="files">
+
+            <i class="fa-solid fa-comments"></i>
+
+            <span>مستندات و گفتگو</span>
+
+            @if (filesAndCommentsCount > 0)
+            {
+                <span class="task-tab-badge">
+                    @filesAndCommentsCount
+                </span>
+            }
+
+        </button>
+
+
+        <button type="button"
+                class="task-tab-btn"
+                data-tab="insights">
+
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+            <span>تحلیل و وابستگی‌ها</span>
+
+        </button>
+
+    </nav>
+
+
+    <!-- =========================
+         CONTENT
+    ========================== -->
+
+    <main class="task-tab-content">
+
+
+        <!-- =================================
+             OVERVIEW
+        ================================== -->
+
+        <section class="task-tab-pane active"
+                 data-tab-pane="overview">
+
+            <div class="task-overview-grid">
+
+                <!-- Description -->
+
+                <div class="details-card task-description-card">
+
+                    <div class="card-title">
+                        <i class="fa-solid fa-align-right"></i>
+                        توضیحات Task
                     </div>
 
-                    @if (checklist.TotalItems > 0)
+                    @if (string.IsNullOrWhiteSpace(Model.Description))
                     {
-                        <div class="subtask-progress-track">
-                            <div class="subtask-progress-fill" style="width:@checklist.ProgressPercent%"></div>
+                        <p class="task-empty-description">
+                            توضیحی برای این Task ثبت نشده است.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="task-description">
+                            @Model.Description
                         </div>
                     }
 
-                    <div class="subtask-list">
-                        @foreach (var item in checklist.Items)
-                        {
-                            <div class="subtask-item @(item.IsCompleted ? "completed" : "")" data-id="@item.Id">
-                                <label class="subtask-checkbox-wrap">
-                                    <input type="checkbox" class="checklist-item-toggle" data-id="@item.Id"
-                                           checked="@item.IsCompleted" disabled="@(!Model.CanManage)" />
-                                    <span class="subtask-title">@item.Title</span>
-                                </label>
+                </div>
 
-                                @if (Model.CanManage)
-                                {
-                                    <form asp-controller="Checklist" asp-action="DeleteItem" method="post" class="delete-checklist-item-form">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                        <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-xmark"></i></button>
-                                    </form>
-                                }
+
+                <!-- Dates -->
+
+                <div class="details-card">
+
+                    <div class="card-title">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        زمان‌بندی
+                    </div>
+
+                    <div class="task-date-list">
+
+                        <div class="task-date-item">
+
+                            <div class="task-date-icon">
+                                <i class="fa-solid fa-play"></i>
                             </div>
+
+                            <div>
+                                <span>تاریخ شروع</span>
+                                <strong>
+                                    @Html.DisplayDate(Model.StartDate, "—")
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="task-date-item">
+
+                            <div class="task-date-icon">
+                                <i class="fa-solid fa-flag-checkered"></i>
+                            </div>
+
+                            <div>
+                                <span>موعد انجام</span>
+                                <strong>
+                                    @Html.DisplayDate(Model.DueDate, "—")
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        @if (Model.CompletedDate.HasValue)
+                        {
+                            <div class="task-date-item">
+
+                                <div class="task-date-icon success">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+
+                                <div>
+                                    <span>تاریخ تکمیل</span>
+                                    <strong>
+                                        @Html.DisplayDate(Model.CompletedDate)
+                                    </strong>
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <!-- Labels -->
+
+                <div class="details-card">
+
+                    <div class="card-title">
+                        <i class="fa-solid fa-tags"></i>
+                        Label ها
+                    </div>
+
+                    @if (!Model.Labels.Any())
+                    {
+                        <div class="team-empty-text">
+                            Label ای اضافه نشده است.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="label-badge-list">
+
+                            @foreach (var label in Model.Labels)
+                            {
+                                <span class="task-label-badge"
+                                      style="background:@label.Color">
+
+                                    @label.Name
+
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-controller="TaskLabel"
+                                              asp-action="Remove"
+                                              method="post"
+                                              class="label-remove-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="taskItemId"
+                                                   value="@Model.Id" />
+
+                                            <input type="hidden"
+                                                   name="labelId"
+                                                   value="@label.Id" />
+
+                                            <button type="submit">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </span>
+                            }
+
+                        </div>
+                    }
+
+                    @if (Model.CanManage && Model.AvailableLabels.Any())
+                    {
+                        <form asp-controller="TaskLabel"
+                              asp-action="Assign"
+                              method="post"
+                              class="label-assign-form">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="taskItemId"
+                                   value="@Model.Id" />
+
+                            <select name="labelId"
+                                    class="form-control"
+                                    required>
+
+                                <option value="">
+                                    — انتخاب Label —
+                                </option>
+
+                                @foreach (var label in Model.AvailableLabels)
+                                {
+                                    <option value="@label.Id">
+                                        @label.Name
+                                    </option>
+                                }
+
+                            </select>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="fa-solid fa-plus"></i>
+                                افزودن
+
+                            </button>
+
+                        </form>
+                    }
+
+                </div>
+
+
+                <!-- Assignees -->
+
+                <div class="details-card">
+
+                    <div class="card-title">
+                        <i class="fa-solid fa-users"></i>
+                        افراد تخصیص‌یافته
+                    </div>
+
+                    @if (!Model.Assignees.Any())
+                    {
+                        <div class="team-empty-text">
+                            هنوز کسی به این Task تخصیص نیافته است.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="assignee-list">
+
+                            @foreach (var assignee in Model.Assignees)
+                            {
+                                <div class="assignee-chip">
+
+                                    <i class="fa-regular fa-circle-user"></i>
+
+                                    <span>
+                                        @assignee.FullName
+                                    </span>
+
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-controller="TaskAssignment"
+                                              asp-action="RemoveMember"
+                                              method="post"
+                                              class="assignee-remove-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="taskItemId"
+                                                   value="@Model.Id" />
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@assignee.UserId" />
+
+                                            <button type="submit">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                    @if (Model.CanManage && Model.AvailableMembers.Any())
+                    {
+                        <form asp-controller="TaskAssignment"
+                              asp-action="AssignMember"
+                              method="post"
+                              class="assignee-add-form">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="taskItemId"
+                                   value="@Model.Id" />
+
+                            <select name="userId"
+                                    class="form-control"
+                                    required>
+
+                                <option value="">
+                                    — انتخاب عضو —
+                                </option>
+
+                                @foreach (var member in Model.AvailableMembers)
+                                {
+                                    <option value="@member.UserId">
+                                        @member.FullName
+                                    </option>
+                                }
+
+                            </select>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="fa-solid fa-user-plus"></i>
+                                تخصیص
+
+                            </button>
+
+                        </form>
+                    }
+
+                    @if (Model.IsCurrentUserAssignee &&
+                         Model.TradeModal != null &&
+                         Model.TradeModal.ProjectMembers.Any())
+                    {
+                        <button type="button"
+                                id="openTradeModalBtn"
+                                class="task-trade-btn">
+
+                            <i class="fa-solid fa-right-left"></i>
+
+                            درخواست ترید این Task
+
+                        </button>
+                    }
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             SUBTASKS
+        ================================== -->
+
+        <section class="task-tab-pane"
+                 data-tab-pane="subtasks">
+
+            <div class="details-card">
+
+                <div class="card-title card-title-with-action">
+
+                    <div>
+                        <i class="fa-solid fa-list-check"></i>
+                        زیروظایف
+
+                        @if (Model.SubTasksTotal > 0)
+                        {
+                            <span class="subtask-progress-text">
+                                @Model.SubTasksCompleted از @Model.SubTasksTotal
+                            </span>
                         }
                     </div>
 
                     @if (Model.CanManage)
                     {
-                        <form asp-controller="Checklist" asp-action="AddItem" method="post" class="subtask-quick-add">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="checklistId" value="@checklist.Id" />
-                            <input type="hidden" name="taskItemId" value="@Model.Id" />
-                            <i class="fa-solid fa-plus"></i>
-                            <input type="text" name="title" placeholder="افزودن آیتم جدید..." required maxlength="250" />
-                            <button type="submit">افزودن</button>
-                        </form>
+                        <button type="button"
+                                id="aiSuggestBtn"
+                                class="ai-suggest-btn"
+                                data-task-id="@Model.Id">
+
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            پیشنهاد با AI
+
+                        </button>
                     }
+
                 </div>
-            }
-        }
 
-        @if (Model.CanManage)
-        {
-            <form asp-controller="Checklist" asp-action="Create" method="post" class="checklist-create-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <i class="fa-solid fa-plus"></i>
-                <input type="text" name="title" placeholder="افزودن Checklist جدید... (مثلاً: مراحل تست)" required maxlength="200" />
-                <button type="submit">ایجاد Checklist</button>
-            </form>
-        }
-    </div>
-
-    <div class="details-card smart-priority-card">
-        <div class="card-title">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            اولویت پیشنهادی هوشمند
-        </div>
-
-        <div class="smart-priority-compare">
-            <div class="smart-priority-box">
-                <span>اولویت فعلی</span>
-                <strong class="backlog-priority-badge priority-@Model.SmartPriority.CurrentPriority.ToString().ToLower()">
-                    @Model.SmartPriority.CurrentPriority
-                </strong>
-            </div>
-
-            <i class="fa-solid fa-arrow-left-long smart-priority-arrow"></i>
-
-            <div class="smart-priority-box">
-                <span>اولویت پیشنهادی</span>
-                <strong class="backlog-priority-badge priority-@Model.SmartPriority.SuggestedPriority.ToString().ToLower()">
-                    @Model.SmartPriority.SuggestedPriority
-                </strong>
-            </div>
-
-            <div class="smart-priority-score">
-                <span>امتیاز کل</span>
-                <strong>@Model.SmartPriority.TotalScore / 100</strong>
-            </div>
-        </div>
-
-        <div class="smart-priority-breakdown">
-            <div class="smart-priority-bar-row">
-                <span>فوریت زمانی</span>
-                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.UrgencyScore * 100 / 40)%;background:#F59E0B"></div></div>
-                <span>@Model.SmartPriority.UrgencyScore/40</span>
-            </div>
-            <div class="smart-priority-bar-row">
-                <span>تأثیر وابستگی</span>
-                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.DependencyScore * 100 / 35)%;background:#EF4444"></div></div>
-                <span>@Model.SmartPriority.DependencyScore/35</span>
-            </div>
-            <div class="smart-priority-bar-row">
-                <span>ریسک کارکارگیر</span>
-                <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:@(Model.SmartPriority.WorkloadScore * 100 / 25)%;background:#8B5CF6"></div></div>
-                <span>@Model.SmartPriority.WorkloadScore/25</span>
-            </div>
-        </div>
-
-        @if (Model.SmartPriority.Reasons.Any())
-        {
-            <ul class="smart-priority-reasons">
-                @foreach (var reason in Model.SmartPriority.Reasons)
+                @if (Model.SubTasksTotal > 0)
                 {
-                    <li><i class="fa-solid fa-circle-info"></i> @reason</li>
+                    <div class="subtask-progress-track">
+                        <div class="subtask-progress-fill"
+                             style="width:@Model.SubTasksProgressPercent%">
+                        </div>
+                    </div>
                 }
-            </ul>
-        }
 
-        @if (Model.SmartPriority.IsDifferent && Model.SmartPriority.CanApply)
-        {
-            <form asp-action="ApplySmartPriority" method="post" class="smart-priority-apply-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskId" value="@Model.Id" />
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-check"></i>
-                    اعمال اولویت پیشنهادی
-                </button>
-            </form>
-        }
-        else if (!Model.SmartPriority.IsDifferent)
-        {
-            <div class="smart-priority-match">
-                <i class="fa-solid fa-circle-check"></i>
-                اولویت فعلی با پیشنهاد سیستم هم‌راستاست.
-            </div>
-        }
-    </div>
-
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-diagram-project"></i>
-            وابستگی‌ها
-        </div>
-
-        @if (Model.CascadeInfo.Any())
-        {
-            <div class="cascade-info-box">
-                <i class="fa-solid fa-arrows-rotate"></i>
-                <div>
-                    <strong>موعد این Task به‌صورت خودکار تمدید شده است.</strong>
-                    <ul>
-                        @foreach (var info in Model.CascadeInfo)
-                        {
-                            <li>
-                                به‌دلیل تأخیر <strong>@info.DelayDaysApplied روزه</strong> در
-                                <a asp-action="Details" asp-route-id="@info.SourceTaskId">«@info.SourceTaskTitle»</a>
-                                — آخرین به‌روزرسانی: @Html.DisplayDate(info.AppliedDate, includeTime: true)
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        }
-
-        @if (Model.Dependency.DelayDays > 0)
-        {
-            <div class="dependency-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                این Task <strong>@Model.Dependency.DelayDays روز</strong> از موعدش گذشته.
-                @if (Model.Dependency.ImpactedTasks.Any(x => x.IsRequiredChain))
+                @if (!Model.SubTasks.Any())
                 {
-                    <text> این تأخیر روی <strong>@Model.Dependency.ImpactedTasks.Count(x => x.IsRequiredChain) Task دیگر</strong> تأثیر مستقیم دارد.</text>
-                }
-            </div>
-        }
-
-        <div class="dependency-columns">
-
-            <div class="dependency-column">
-                <h5><i class="fa-solid fa-arrow-left-long"></i> این Task به این‌ها وابسته است</h5>
-
-                @if (!Model.Dependency.DependsOn.Any())
-                {
-                    <p class="team-empty-text">وابستگی‌ای ثبت نشده است.</p>
+                    <div class="team-empty-text">
+                        هنوز SubTask ای ثبت نشده است.
+                    </div>
                 }
                 else
                 {
-                    @foreach (var dep in Model.Dependency.DependsOn)
-                    {
-                        <div class="dependency-chip">
-                            <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
-                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
-                            @if (!dep.IsRequired)
-                            {
-                                <span class="dependency-optional-badge">اختیاری</span>
-                            }
+                    <div class="subtask-list">
 
-                            @if (Model.Dependency.CanManage)
-                            {
-                                <form asp-controller="TaskDependency" asp-action="Remove" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@dep.Id" />
-                                    <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                    <button type="submit" class="delete-dependency-btn"><i class="fa-solid fa-xmark"></i></button>
-                                </form>
-                            }
-                        </div>
-                    }
+                        @foreach (var sub in Model.SubTasks)
+                        {
+                            <div class="subtask-item @(sub.IsCompleted ? "completed" : "")"
+                                 data-id="@sub.Id">
+
+                                <label class="subtask-checkbox-wrap">
+
+                                    <input type="checkbox"
+                                           class="subtask-toggle"
+                                           data-id="@sub.Id"
+                                           data-task-id="@Model.Id"
+                                           checked="@sub.IsCompleted"
+                                           disabled="@(!Model.CanManage)" />
+
+                                    <span class="subtask-title">
+                                        @sub.Title
+                                    </span>
+
+                                </label>
+
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-controller="SubTask"
+                                          asp-action="Delete"
+                                          method="post"
+                                          class="delete-subtask-form">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@sub.Id" />
+
+                                        <input type="hidden"
+                                               name="taskItemId"
+                                               value="@Model.Id" />
+
+                                        <button type="submit"
+                                                class="subtask-delete-btn">
+
+                                            <i class="fa-solid fa-xmark"></i>
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
                 }
 
-                @if (Model.Dependency.CanManage && Model.Dependency.AvailableTasks.Any())
+                @if (Model.CanManage)
                 {
-                    <form asp-controller="TaskDependency" asp-action="Add" method="post" class="dependency-add-form">
+                    <form asp-controller="SubTask"
+                          asp-action="QuickAdd"
+                          method="post"
+                          class="subtask-quick-add">
+
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="taskItemId" value="@Model.Id" />
 
-                        <select name="dependsOnTaskId" class="form-control" required>
-                            <option value="">— انتخاب Task —</option>
-                            @foreach (var t in Model.Dependency.AvailableTasks)
-                            {
-                                <option value="@t.Value">@t.Text</option>
-                            }
-                        </select>
+                        <input type="hidden"
+                               name="taskItemId"
+                               value="@Model.Id" />
 
-                        <label class="dependency-required-check">
-                            <input type="checkbox" name="isRequired" value="true" checked />
-                            وابستگی اجباری
-                        </label>
+                        <i class="fa-solid fa-plus"></i>
 
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-plus"></i>
+                        <input type="text"
+                               name="title"
+                               placeholder="افزودن زیروظیفه جدید..."
+                               required
+                               maxlength="250" />
+
+                        <button type="submit">
                             افزودن
                         </button>
+
                     </form>
                 }
+
             </div>
 
-            <div class="dependency-column">
-                <h5><i class="fa-solid fa-arrow-right-long"></i> این‌ها به این Task وابسته‌اند</h5>
 
-                @if (!Model.Dependency.Dependents.Any())
+            <!-- CHECKLIST -->
+
+            <div class="details-card">
+
+                <div class="card-title">
+                    <i class="fa-solid fa-list-check"></i>
+                    Checklist ها
+                </div>
+
+                @if (!Model.Checklists.Any())
                 {
-                    <p class="team-empty-text">هیچ Task ای به این وابسته نیست.</p>
+                    <div class="team-empty-text">
+                        هنوز Checklist ای ثبت نشده است.
+                    </div>
                 }
                 else
                 {
-                    @foreach (var dep in Model.Dependency.Dependents)
+                    @foreach (var checklist in Model.Checklists)
                     {
-                        <div class="dependency-chip">
-                            <a asp-action="Details" asp-route-id="@dep.TaskId">@dep.TaskTitle</a>
-                            <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">@dep.TaskStatus</span>
-                            @if (!dep.IsRequired)
-                            {
-                                <span class="dependency-optional-badge">اختیاری</span>
-                            }
-                        </div>
-                    }
-                }
-            </div>
+                        <div class="checklist-block">
 
-        </div>
+                            <div class="checklist-header">
 
-        @if (Model.Dependency.ImpactedTasks.Any())
-        {
-            <div class="dependency-impact-box">
-                <h5><i class="fa-solid fa-bolt"></i> نقشه تأثیر کامل (زنجیره‌ای)</h5>
-                <div class="dependency-impact-list">
-                    @foreach (var impacted in Model.Dependency.ImpactedTasks)
-                    {
-                        <div class="dependency-impact-item @(impacted.IsRequiredChain ? "required" : "optional")">
-                            <span class="dependency-depth-badge">سطح @impacted.Depth</span>
-                            <a asp-action="Details" asp-route-id="@impacted.TaskId">@impacted.Title</a>
-                            @if (impacted.IsRequiredChain && impacted.ProjectedDueDate.HasValue && impacted.ProjectedDueDate != impacted.OriginalDueDate)
-                            {
-                                <span class="dependency-projected-date">
-                                    موعد جدید تخمینی: @Html.DisplayDate(impacted.ProjectedDueDate)
-                                </span>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-    </div>
+                                <div>
+                                    <span class="checklist-title">
+                                        @checklist.Title
+                                    </span>
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-list-check"></i>
-            SubTask ها
-            @if (Model.SubTasksTotal > 0)
-            {
-                <span class="subtask-progress-text">(@Model.SubTasksCompleted از @Model.SubTasksTotal)</span>
-            }
-        </div>
+                                    <span class="subtask-progress-text">
+                                        @checklist.CompletedItems از @checklist.TotalItems
+                                    </span>
+                                </div>
 
-        @if (Model.CanManage)
-        {
-            <button type="button" id="aiSuggestBtn" class="ai-suggest-btn" data-task-id="@Model.Id">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                پیشنهاد زیروظایف با AI
-            </button>
-        }
+                                @if (Model.CanManage)
+                                {
+                                    <form asp-controller="Checklist"
+                                          asp-action="Delete"
+                                          method="post">
 
-        @if (Model.SubTasksTotal > 0)
-        {
-            <div class="subtask-progress-track">
-                <div class="subtask-progress-fill" style="width:@Model.SubTasksProgressPercent%"></div>
-            </div>
-        }
+                                        @Html.AntiForgeryToken()
 
-        @if (!Model.SubTasks.Any())
-        {
-            <div class="team-empty-text">هنوز SubTask ای برای این Task ثبت نشده است.</div>
-        }
-        else
-        {
-            <div class="subtask-list">
-                @foreach (var sub in Model.SubTasks)
-                {
-                    <div class="subtask-item @(sub.IsCompleted ? "completed" : "")" data-id="@sub.Id">
-                        <label class="subtask-checkbox-wrap">
-                            <input type="checkbox"
-                                   class="subtask-toggle"
-                                   data-id="@sub.Id"
-                                   data-task-id="@Model.Id"
-                                   checked="@sub.IsCompleted"
-                                   disabled="@(!Model.CanManage)" />
-                            <span class="subtask-title">@sub.Title</span>
-                        </label>
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@checklist.Id" />
 
-                        @if (Model.CanManage)
-                        {
-                            <form asp-controller="SubTask" asp-action="Delete" method="post" class="delete-subtask-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@sub.Id" />
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <button type="submit" class="subtask-delete-btn">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </form>
-                        }
-                    </div>
-                }
-            </div>
-        }
+                                        <input type="hidden"
+                                               name="taskItemId"
+                                               value="@Model.Id" />
 
-        @if (Model.CanManage)
-        {
-            <form asp-controller="SubTask" asp-action="QuickAdd" method="post" class="subtask-quick-add">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <i class="fa-solid fa-plus"></i>
-                <input type="text" name="title" placeholder="افزودن SubTask جدید... (Enter بزنید)" required maxlength="250" />
-                <button type="submit">افزودن</button>
-            </form>
-        }
-    </div>
+                                        <button type="submit"
+                                                class="subtask-delete-btn">
 
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-paperclip"></i>
-            فایل‌های پیوست
-        </div>
+                                            <i class="fa-solid fa-trash"></i>
 
-        @if (!Model.Attachments.Any())
-        {
-            <div class="team-empty-text">هنوز فایلی پیوست نشده است.</div>
-        }
-        else
-        {
-            <div class="attachment-list">
-                @foreach (var file in Model.Attachments)
-                {
-                    <div class="attachment-item">
-                        <i class="fa-solid fa-file"></i>
-                        <div class="attachment-info">
-                            <a href="@file.FilePath" target="_blank" class="attachment-name">@file.FileName</a>
-                            <span class="attachment-meta">@file.FileSizeDisplay — @file.UploaderName — @Html.DisplayDate(file.CreateDate)</span>
-                        </div>
+                                        </button>
 
-                        @if (file.CanDelete)
-                        {
-                            <form asp-controller="Attachment" asp-action="Delete" method="post" class="delete-attachment-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@file.Id" />
-                                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                <button type="submit" class="subtask-delete-btn"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                        }
-                    </div>
-                }
-            </div>
-        }
+                                    </form>
+                                }
 
-        @if (Model.CanManage)
-        {
-            <form asp-controller="Attachment" asp-action="Upload" method="post" enctype="multipart/form-data" class="attachment-upload-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="taskItemId" value="@Model.Id" />
-                <input type="file" name="file" required />
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-upload"></i>
-                    آپلود
-                </button>
-            </form>
-        }
-    </div>
-
-    <div class="details-card">
-        <div class="card-title">
-            <i class="fa-solid fa-comments"></i>
-            نظرات
-            <span class="subtask-progress-text">(@Model.Comments.Count)</span>
-        </div>
-
-        @if (!Model.Comments.Any())
-        {
-            <div class="team-empty-text">هنوز نظری ثبت نشده است.</div>
-        }
-        else
-        {
-            <div class="comment-list">
-                @foreach (var comment in Model.Comments)
-                {
-                    <div class="comment-item">
-                        <div class="comment-avatar"><i class="fa-regular fa-circle-user"></i></div>
-                        <div class="comment-body">
-                            <div class="comment-header">
-                                <span class="comment-author">@comment.AuthorName</span>
-                                <span class="comment-date">
-                                    @Html.DisplayDate(comment.CreateDate, includeTime: true)
-                                    @if (comment.IsEdited)
-                                    {
-                                        <span>(ویرایش‌شده)</span>
-                                    }
-                                </span>
                             </div>
-                            <p class="comment-content">@comment.Content</p>
 
-                            @if (comment.CanDelete)
+                            @if (checklist.TotalItems > 0)
                             {
-                                <form asp-controller="Comment" asp-action="Delete" method="post" class="delete-comment-form">
+                                <div class="subtask-progress-track">
+
+                                    <div class="subtask-progress-fill"
+                                         style="width:@checklist.ProgressPercent%">
+                                    </div>
+
+                                </div>
+                            }
+
+                            <div class="subtask-list">
+
+                                @foreach (var item in checklist.Items)
+                                {
+                                    <div class="subtask-item @(item.IsCompleted ? "completed" : "")"
+                                         data-id="@item.Id">
+
+                                        <label class="subtask-checkbox-wrap">
+
+                                            <input type="checkbox"
+                                                   class="checklist-item-toggle"
+                                                   data-id="@item.Id"
+                                                   checked="@item.IsCompleted"
+                                                   disabled="@(!Model.CanManage)" />
+
+                                            <span class="subtask-title">
+                                                @item.Title
+                                            </span>
+
+                                        </label>
+
+                                        @if (Model.CanManage)
+                                        {
+                                            <form asp-controller="Checklist"
+                                                  asp-action="DeleteItem"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.Id" />
+
+                                                <input type="hidden"
+                                                       name="taskItemId"
+                                                       value="@Model.Id" />
+
+                                                <button type="submit"
+                                                        class="subtask-delete-btn">
+
+                                                    <i class="fa-solid fa-xmark"></i>
+
+                                                </button>
+
+                                            </form>
+                                        }
+
+                                    </div>
+                                }
+
+                            </div>
+
+                            @if (Model.CanManage)
+                            {
+                                <form asp-controller="Checklist"
+                                      asp-action="AddItem"
+                                      method="post"
+                                      class="subtask-quick-add">
+
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="commentId" value="@comment.Id" />
-                                    <input type="hidden" name="taskItemId" value="@Model.Id" />
-                                    <button type="submit" class="comment-delete-btn">
-                                        <i class="fa-solid fa-trash"></i>
-                                        حذف
+
+                                    <input type="hidden"
+                                           name="checklistId"
+                                           value="@checklist.Id" />
+
+                                    <input type="hidden"
+                                           name="taskItemId"
+                                           value="@Model.Id" />
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                    <input type="text"
+                                           name="title"
+                                           placeholder="افزودن آیتم..."
+                                           required
+                                           maxlength="250" />
+
+                                    <button type="submit">
+                                        افزودن
                                     </button>
+
                                 </form>
                             }
+
                         </div>
+                    }
+                }
+
+                @if (Model.CanManage)
+                {
+                    <form asp-controller="Checklist"
+                          asp-action="Create"
+                          method="post"
+                          class="checklist-create-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="taskItemId"
+                               value="@Model.Id" />
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        <input type="text"
+                               name="title"
+                               placeholder="افزودن Checklist جدید..."
+                               required
+                               maxlength="200" />
+
+                        <button type="submit">
+                            ایجاد Checklist
+                        </button>
+
+                    </form>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             TIME
+        ================================== -->
+
+        <section class="task-tab-pane"
+                 data-tab-pane="time">
+
+            <div class="details-card">
+
+                <div class="card-title">
+
+                    <div>
+                        <i class="fa-solid fa-stopwatch"></i>
+                        ثبت زمان
+
+                        <span class="subtask-progress-text">
+                            مجموع: @Model.TotalLoggedDisplay
+                        </span>
+                    </div>
+
+                </div>
+
+                @if (Model.MyActiveTimer != null)
+                {
+                    <div class="timer-active-box">
+
+                        <div class="timer-live-display"
+                             id="liveTimer"
+                             data-start="@Model.MyActiveTimer.StartTime.ToString("o")">
+                            ۰۰:۰۰:۰۰
+                        </div>
+
+                        <form asp-controller="TimeLog"
+                              asp-action="Stop"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.MyActiveTimer.Id" />
+
+                            <input type="hidden"
+                                   name="taskItemId"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+
+                                <i class="fa-solid fa-stop"></i>
+                                توقف تایمر
+
+                            </button>
+
+                        </form>
+
                     </div>
                 }
+                else
+                {
+                    <form asp-controller="TimeLog"
+                          asp-action="Start"
+                          method="post"
+                          class="timer-start-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="taskItemId"
+                               value="@Model.Id" />
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="fa-solid fa-play"></i>
+                            شروع تایمر
+
+                        </button>
+
+                    </form>
+                }
+
+                @if (Model.CanManage)
+                {
+                    <form asp-controller="TimeLog"
+                          asp-action="AddManual"
+                          method="post"
+                          class="manual-timelog-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="taskItemId"
+                               value="@Model.Id" />
+
+                        <div class="manual-timelog-fields">
+
+                            <input asp-date-name="startTime"
+                                   asp-include-time="true"
+                                   class="form-control"
+                                   required />
+
+                            <input type="number"
+                                   name="durationMinutes"
+                                   min="1"
+                                   max="1440"
+                                   placeholder="مدت (دقیقه)"
+                                   class="form-control"
+                                   required />
+
+                            <input type="text"
+                                   name="description"
+                                   placeholder="توضیح (اختیاری)"
+                                   class="form-control" />
+
+                            <button type="submit"
+                                    class="btn btn-light">
+
+                                <i class="fa-solid fa-plus"></i>
+                                ثبت دستی
+
+                            </button>
+
+                        </div>
+
+                    </form>
+                }
+
+                @if (!Model.TimeLogs.Any())
+                {
+                    <div class="team-empty-text">
+                        هنوز زمانی ثبت نشده است.
+                    </div>
+                }
+                else
+                {
+                    <div class="timelog-list">
+
+                        @foreach (var log in Model.TimeLogs)
+                        {
+                            <div class="timelog-item">
+
+                                <i class="fa-regular fa-clock"></i>
+
+                                <div class="timelog-info">
+
+                                    <span class="timelog-user">
+
+                                        @log.UserName
+
+                                        @if (log.IsRunning)
+                                        {
+                                            <span class="timelog-running-badge">
+                                                درحال اجرا
+                                            </span>
+                                        }
+
+                                    </span>
+
+                                    <span class="timelog-meta">
+
+                                        @Html.DisplayDate(
+                                            log.StartTime,
+                                            includeTime: true)
+
+                                        @if (!log.IsRunning)
+                                        {
+                                            <text>
+                                                — @log.DurationMinutes دقیقه
+                                            </text>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(log.Description))
+                                        {
+                                            <text>
+                                                — @log.Description
+                                            </text>
+                                        }
+
+                                    </span>
+
+                                </div>
+
+                                @if (log.CanDelete && !log.IsRunning)
+                                {
+                                    <form asp-controller="TimeLog"
+                                          asp-action="Delete"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@log.Id" />
+
+                                        <input type="hidden"
+                                               name="taskItemId"
+                                               value="@Model.Id" />
+
+                                        <button type="submit"
+                                                class="subtask-delete-btn">
+
+                                            <i class="fa-solid fa-trash"></i>
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+                }
+
             </div>
-        }
 
-        <form asp-controller="Comment" asp-action="Add" method="post" class="comment-add-form">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="taskItemId" value="@Model.Id" />
-            <textarea name="content" rows="2" class="form-control" placeholder="نظر خود را بنویسید..." required></textarea>
-            <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-paper-plane"></i>
-                ارسال نظر
-            </button>
-        </form>
-    </div>
+        </section>
 
-    @if (Model.CanManage)
-    {
-        <div class="details-card">
-            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-task-form">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger">
-                    <i class="fa-solid fa-trash"></i>
-                    حذف Task
-                </button>
-            </form>
-        </div>
-    }
+
+        <!-- =================================
+             FILES + COMMENTS
+        ================================== -->
+
+        <section class="task-tab-pane"
+                 data-tab-pane="files">
+
+            <div class="task-collaboration-grid">
+
+                <!-- Files -->
+
+                <div class="details-card">
+
+                    <div class="card-title">
+                        <i class="fa-solid fa-paperclip"></i>
+                        فایل‌های پیوست
+                    </div>
+
+                    @if (!Model.Attachments.Any())
+                    {
+                        <div class="team-empty-text">
+                            هنوز فایلی پیوست نشده است.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="attachment-list">
+
+                            @foreach (var file in Model.Attachments)
+                            {
+                                <div class="attachment-item">
+
+                                    <i class="fa-solid fa-file"></i>
+
+                                    <div class="attachment-info">
+
+                                        <a href="@file.FilePath"
+                                           target="_blank"
+                                           class="attachment-name">
+
+                                            @file.FileName
+
+                                        </a>
+
+                                        <span class="attachment-meta">
+                                            @file.FileSizeDisplay
+                                            —
+                                            @file.UploaderName
+                                            —
+                                            @Html.DisplayDate(file.CreateDate)
+                                        </span>
+
+                                    </div>
+
+                                    @if (file.CanDelete)
+                                    {
+                                        <form asp-controller="Attachment"
+                                              asp-action="Delete"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@file.Id" />
+
+                                            <input type="hidden"
+                                                   name="taskItemId"
+                                                   value="@Model.Id" />
+
+                                            <button type="submit"
+                                                    class="subtask-delete-btn">
+
+                                                <i class="fa-solid fa-trash"></i>
+
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                    @if (Model.CanManage)
+                    {
+                        <form asp-controller="Attachment"
+                              asp-action="Upload"
+                              method="post"
+                              enctype="multipart/form-data"
+                              class="attachment-upload-form">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="taskItemId"
+                                   value="@Model.Id" />
+
+                            <input type="file"
+                                   name="file"
+                                   required />
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="fa-solid fa-upload"></i>
+                                آپلود
+
+                            </button>
+
+                        </form>
+                    }
+
+                </div>
+
+
+                <!-- Comments -->
+
+                <div class="details-card">
+
+                    <div class="card-title">
+
+                        <div>
+                            <i class="fa-solid fa-comments"></i>
+                            گفتگو
+
+                            <span class="subtask-progress-text">
+                                @Model.Comments.Count نظر
+                            </span>
+                        </div>
+
+                    </div>
+
+                    @if (!Model.Comments.Any())
+                    {
+                        <div class="team-empty-text">
+                            هنوز نظری ثبت نشده است.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="comment-list">
+
+                            @foreach (var comment in Model.Comments)
+                            {
+                                <div class="comment-item">
+
+                                    <div class="comment-avatar">
+                                        <i class="fa-regular fa-circle-user"></i>
+                                    </div>
+
+                                    <div class="comment-body">
+
+                                        <div class="comment-header">
+
+                                            <span class="comment-author">
+                                                @comment.AuthorName
+                                            </span>
+
+                                            <span class="comment-date">
+
+                                                @Html.DisplayDate(
+                                                    comment.CreateDate,
+                                                    includeTime: true)
+
+                                                @if (comment.IsEdited)
+                                                {
+                                                    <span>
+                                                        (ویرایش‌شده)
+                                                    </span>
+                                                }
+
+                                            </span>
+
+                                        </div>
+
+                                        <p class="comment-content">
+                                            @comment.Content
+                                        </p>
+
+                                        @if (comment.CanDelete)
+                                        {
+                                            <form asp-controller="Comment"
+                                                  asp-action="Delete"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="commentId"
+                                                       value="@comment.Id" />
+
+                                                <input type="hidden"
+                                                       name="taskItemId"
+                                                       value="@Model.Id" />
+
+                                                <button type="submit"
+                                                        class="comment-delete-btn">
+
+                                                    <i class="fa-solid fa-trash"></i>
+                                                    حذف
+
+                                                </button>
+
+                                            </form>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                    <form asp-controller="Comment"
+                          asp-action="Add"
+                          method="post"
+                          class="comment-add-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="taskItemId"
+                               value="@Model.Id" />
+
+                        <textarea name="content"
+                                  rows="3"
+                                  class="form-control"
+                                  placeholder="نظر خود را بنویسید..."
+                                  required></textarea>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="fa-solid fa-paper-plane"></i>
+                            ارسال نظر
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             INSIGHTS
+        ================================== -->
+
+        <section class="task-tab-pane"
+                 data-tab-pane="insights">
+
+            <!-- SMART PRIORITY -->
+
+            <div class="details-card smart-priority-card">
+
+                <div class="card-title">
+
+                    <div>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        اولویت پیشنهادی هوشمند
+                    </div>
+
+                    <span class="smart-feature-badge">
+                        SmartTask
+                    </span>
+
+                </div>
+
+                <div class="smart-priority-compare">
+
+                    <div class="smart-priority-box">
+
+                        <span>اولویت فعلی</span>
+
+                        <strong class="backlog-priority-badge priority-@Model.SmartPriority.CurrentPriority.ToString().ToLower()">
+                            @Model.SmartPriority.CurrentPriority
+                        </strong>
+
+                    </div>
+
+                    <i class="fa-solid fa-arrow-left-long smart-priority-arrow"></i>
+
+                    <div class="smart-priority-box">
+
+                        <span>پیشنهاد سیستم</span>
+
+                        <strong class="backlog-priority-badge priority-@Model.SmartPriority.SuggestedPriority.ToString().ToLower()">
+                            @Model.SmartPriority.SuggestedPriority
+                        </strong>
+
+                    </div>
+
+                    <div class="smart-priority-score">
+
+                        <span>امتیاز کل</span>
+
+                        <strong>
+                            @Model.SmartPriority.TotalScore
+                            <small>/ 100</small>
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="smart-priority-breakdown">
+
+                    <div class="smart-priority-bar-row">
+
+                        <span>فوریت زمانی</span>
+
+                        <div class="dashboard-bar-track">
+                            <div class="dashboard-bar-fill"
+                                 style="width:@(Model.SmartPriority.UrgencyScore * 100 / 40)%">
+                            </div>
+                        </div>
+
+                        <span>
+                            @Model.SmartPriority.UrgencyScore/40
+                        </span>
+
+                    </div>
+
+                    <div class="smart-priority-bar-row">
+
+                        <span>تأثیر وابستگی</span>
+
+                        <div class="dashboard-bar-track">
+                            <div class="dashboard-bar-fill"
+                                 style="width:@(Model.SmartPriority.DependencyScore * 100 / 35)%">
+                            </div>
+                        </div>
+
+                        <span>
+                            @Model.SmartPriority.DependencyScore/35
+                        </span>
+
+                    </div>
+
+                    <div class="smart-priority-bar-row">
+
+                        <span>ریسک کاربر</span>
+
+                        <div class="dashboard-bar-track">
+                            <div class="dashboard-bar-fill"
+                                 style="width:@(Model.SmartPriority.WorkloadScore * 100 / 25)%">
+                            </div>
+                        </div>
+
+                        <span>
+                            @Model.SmartPriority.WorkloadScore/25
+                        </span>
+
+                    </div>
+
+                </div>
+
+                @if (Model.SmartPriority.Reasons.Any())
+                {
+                    <ul class="smart-priority-reasons">
+
+                        @foreach (var reason in Model.SmartPriority.Reasons)
+                        {
+                            <li>
+                                <i class="fa-solid fa-circle-info"></i>
+                                @reason
+                            </li>
+                        }
+
+                    </ul>
+                }
+
+                @if (Model.SmartPriority.IsDifferent &&
+                     Model.SmartPriority.CanApply)
+                {
+                    <form asp-action="ApplySmartPriority"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="taskId"
+                               value="@Model.Id" />
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="fa-solid fa-check"></i>
+                            اعمال اولویت پیشنهادی
+
+                        </button>
+
+                    </form>
+                }
+                else if (!Model.SmartPriority.IsDifferent)
+                {
+                    <div class="smart-priority-match">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        اولویت فعلی با پیشنهاد سیستم هم‌راستاست.
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- DEPENDENCIES -->
+
+            <div class="details-card">
+
+                <div class="card-title">
+
+                    <div>
+                        <i class="fa-solid fa-diagram-project"></i>
+                        وابستگی‌ها
+                    </div>
+
+                </div>
+
+                @if (Model.CascadeInfo.Any())
+                {
+                    <div class="cascade-info-box">
+
+                        <i class="fa-solid fa-arrows-rotate"></i>
+
+                        <div>
+
+                            <strong>
+                                موعد این Task به‌صورت خودکار تمدید شده است.
+                            </strong>
+
+                            <ul>
+
+                                @foreach (var info in Model.CascadeInfo)
+                                {
+                                    <li>
+
+                                        به‌دلیل تأخیر
+                                        <strong>
+                                            @info.DelayDaysApplied روزه
+                                        </strong>
+                                        در
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@info.SourceTaskId">
+                                            «@info.SourceTaskTitle»
+                                        </a>
+
+                                        —
+                                        آخرین به‌روزرسانی:
+                                        @Html.DisplayDate(
+                                            info.AppliedDate,
+                                            includeTime: true)
+
+                                    </li>
+                                }
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if (Model.Dependency.DelayDays > 0)
+                {
+                    <div class="dependency-alert">
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        این Task
+                        <strong>
+                            @Model.Dependency.DelayDays روز
+                        </strong>
+                        از موعدش گذشته.
+
+                        @if (Model.Dependency.ImpactedTasks.Any(x => x.IsRequiredChain))
+                        {
+                            <text>
+                                این تأخیر روی
+                                <strong>
+                                    @Model.Dependency.ImpactedTasks.Count(x => x.IsRequiredChain)
+                                    Task دیگر
+                                </strong>
+                                تأثیر مستقیم دارد.
+                            </text>
+                        }
+
+                    </div>
+                }
+
+                <div class="dependency-columns">
+
+                    <div class="dependency-column">
+
+                        <h5>
+                            <i class="fa-solid fa-arrow-left-long"></i>
+                            این Task به این‌ها وابسته است
+                        </h5>
+
+                        @if (!Model.Dependency.DependsOn.Any())
+                        {
+                            <p class="team-empty-text">
+                                وابستگی‌ای ثبت نشده است.
+                            </p>
+                        }
+                        else
+                        {
+                            @foreach (var dep in Model.Dependency.DependsOn)
+                            {
+                                <div class="dependency-chip">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@dep.TaskId">
+                                        @dep.TaskTitle
+                                    </a>
+
+                                    <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">
+                                        @dep.TaskStatus
+                                    </span>
+
+                                    @if (!dep.IsRequired)
+                                    {
+                                        <span class="dependency-optional-badge">
+                                            اختیاری
+                                        </span>
+                                    }
+
+                                    @if (Model.Dependency.CanManage)
+                                    {
+                                        <form asp-controller="TaskDependency"
+                                              asp-action="Remove"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@dep.Id" />
+
+                                            <input type="hidden"
+                                                   name="taskItemId"
+                                                   value="@Model.Id" />
+
+                                            <button type="submit"
+                                                    class="delete-dependency-btn">
+
+                                                <i class="fa-solid fa-xmark"></i>
+
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </div>
+                            }
+                        }
+
+                        @if (Model.Dependency.CanManage &&
+                             Model.Dependency.AvailableTasks.Any())
+                        {
+                            <form asp-controller="TaskDependency"
+                                  asp-action="Add"
+                                  method="post"
+                                  class="dependency-add-form">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="taskItemId"
+                                       value="@Model.Id" />
+
+                                <select name="dependsOnTaskId"
+                                        class="form-control"
+                                        required>
+
+                                    <option value="">
+                                        — انتخاب Task —
+                                    </option>
+
+                                    @foreach (var t in Model.Dependency.AvailableTasks)
+                                    {
+                                        <option value="@t.Value">
+                                            @t.Text
+                                        </option>
+                                    }
+
+                                </select>
+
+                                <label class="dependency-required-check">
+
+                                    <input type="checkbox"
+                                           name="isRequired"
+                                           value="true"
+                                           checked />
+
+                                    وابستگی اجباری
+
+                                </label>
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    <i class="fa-solid fa-plus"></i>
+                                    افزودن
+
+                                </button>
+
+                            </form>
+                        }
+
+                    </div>
+
+
+                    <div class="dependency-column">
+
+                        <h5>
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                            این‌ها به این Task وابسته‌اند
+                        </h5>
+
+                        @if (!Model.Dependency.Dependents.Any())
+                        {
+                            <p class="team-empty-text">
+                                هیچ Task ای به این وابسته نیست.
+                            </p>
+                        }
+                        else
+                        {
+                            @foreach (var dep in Model.Dependency.Dependents)
+                            {
+                                <div class="dependency-chip">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@dep.TaskId">
+                                        @dep.TaskTitle
+                                    </a>
+
+                                    <span class="task-status-badge status-@dep.TaskStatus.ToString().ToLower()">
+                                        @dep.TaskStatus
+                                    </span>
+
+                                    @if (!dep.IsRequired)
+                                    {
+                                        <span class="dependency-optional-badge">
+                                            اختیاری
+                                        </span>
+                                    }
+
+                                </div>
+                            }
+                        }
+
+                    </div>
+
+                </div>
+
+
+                @if (Model.Dependency.ImpactedTasks.Any())
+                {
+                    <div class="dependency-impact-box">
+
+                        <h5>
+                            <i class="fa-solid fa-bolt"></i>
+                            نقشه تأثیر کامل
+                        </h5>
+
+                        <div class="dependency-impact-list">
+
+                            @foreach (var impacted in Model.Dependency.ImpactedTasks)
+                            {
+                                <div class="dependency-impact-item @(impacted.IsRequiredChain ? "required" : "optional")">
+
+                                    <span class="dependency-depth-badge">
+                                        سطح @impacted.Depth
+                                    </span>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@impacted.TaskId">
+                                        @impacted.Title
+                                    </a>
+
+                                    @if (impacted.IsRequiredChain &&
+                                         impacted.ProjectedDueDate.HasValue &&
+                                         impacted.ProjectedDueDate != impacted.OriginalDueDate)
+                                    {
+                                        <span class="dependency-projected-date">
+                                            موعد جدید تخمینی:
+                                            @Html.DisplayDate(impacted.ProjectedDueDate)
+                                        </span>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<div class="ai-modal-overlay" id="aiModalOverlay">
+
+<!-- =========================
+     AI MODAL
+========================== -->
+
+<div class="ai-modal-overlay"
+     id="aiModalOverlay">
+
     <div class="ai-modal">
+
         <div class="ai-modal-header">
-            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> پیشنهادهای هوش مصنوعی</h3>
-            <button type="button" id="aiModalClose" class="ai-modal-close"><i class="fa-solid fa-xmark"></i></button>
+
+            <h3>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                پیشنهادهای هوش مصنوعی
+            </h3>
+
+            <button type="button"
+                    id="aiModalClose"
+                    class="ai-modal-close">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
         </div>
 
-        <div class="ai-modal-body" id="aiModalBody"></div>
+        <div class="ai-modal-body"
+             id="aiModalBody">
+        </div>
 
-        <form asp-action="AddAiSubTasks" method="post" id="aiSubTaskForm">
+        <form asp-action="AddAiSubTasks"
+              method="post"
+              id="aiSubTaskForm">
+
             @Html.AntiForgeryToken()
-            <input type="hidden" name="taskId" value="@Model.Id" />
+
+            <input type="hidden"
+                   name="taskId"
+                   value="@Model.Id" />
+
             <div id="aiHiddenInputs"></div>
 
             <div class="ai-modal-footer">
-                <button type="button" id="aiModalCancel" class="btn btn-light">انصراف</button>
-                <button type="submit" class="btn btn-primary">
+
+                <button type="button"
+                        id="aiModalCancel"
+                        class="btn btn-light">
+                    انصراف
+                </button>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
                     <i class="fa-solid fa-plus"></i>
                     افزودن انتخاب‌شده‌ها
+
                 </button>
+
             </div>
+
         </form>
+
     </div>
+
 </div>
+
+
+<!-- =========================
+     TRADE MODAL
+========================== -->
 
 @if (Model.TradeModal != null)
 {
-    <div class="ai-modal-overlay" id="tradeModalOverlay">
+    <div class="ai-modal-overlay"
+         id="tradeModalOverlay">
+
         <div class="ai-modal">
+
             <div class="ai-modal-header">
-                <h3><i class="fa-solid fa-right-left"></i> درخواست ترید تسک</h3>
-                <button type="button" id="tradeModalClose" class="ai-modal-close"><i class="fa-solid fa-xmark"></i></button>
+
+                <h3>
+                    <i class="fa-solid fa-right-left"></i>
+                    درخواست ترید Task
+                </h3>
+
+                <button type="button"
+                        id="tradeModalClose"
+                        class="ai-modal-close">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
             </div>
 
-            <form asp-controller="TaskTrade" asp-action="Create" method="post">
+            <form asp-controller="TaskTrade"
+                  asp-action="Create"
+                  method="post">
+
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="taskId" value="@Model.TradeModal.TaskId" />
-                <input type="hidden" name="projectId" value="@Model.TradeModal.ProjectId" />
+
+                <input type="hidden"
+                       name="taskId"
+                       value="@Model.TradeModal.TaskId" />
+
+                <input type="hidden"
+                       name="projectId"
+                       value="@Model.TradeModal.ProjectId" />
 
                 <div class="ai-modal-body">
 
                     <div class="form-group">
-                        <label>عضو مقابل</label>
-                        <select name="targetUserId" id="tradeTargetUserSelect" class="form-control" required>
-                            <option value="">— انتخاب عضو —</option>
+
+                        <label>
+                            عضو مقابل
+                        </label>
+
+                        <select name="targetUserId"
+                                id="tradeTargetUserSelect"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                — انتخاب عضو —
+                            </option>
+
                             @foreach (var m in Model.TradeModal.ProjectMembers)
                             {
-                                <option value="@m.Value">@m.Text</option>
+                                <option value="@m.Value">
+                                    @m.Text
+                                </option>
                             }
+
                         </select>
+
                     </div>
 
                     <div class="form-group">
-                        <label>تسک درخواستی از طرف مقابل (اختیاری — خالی = واگذاری ساده)</label>
-                        <select name="targetTaskId" id="tradeTargetTaskSelect" class="form-control" disabled>
-                            <option value="">— ابتدا عضو را انتخاب کنید —</option>
+
+                        <label>
+                            Task درخواستی از طرف مقابل
+                            <small>
+                                اختیاری
+                            </small>
+                        </label>
+
+                        <select name="targetTaskId"
+                                id="tradeTargetTaskSelect"
+                                class="form-control"
+                                disabled>
+
+                            <option value="">
+                                — ابتدا عضو را انتخاب کنید —
+                            </option>
+
                         </select>
+
                     </div>
 
                     <div class="form-group">
-                        <label>یادداشت (اختیاری)</label>
-                        <textarea name="message" class="form-control" rows="2" placeholder="مثلاً: چون این هفته درگیر پروژه دیگه‌ای هستم..."></textarea>
+
+                        <label>
+                            یادداشت
+                        </label>
+
+                        <textarea name="message"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="مثلاً: چون این هفته درگیر پروژه دیگری هستم..."></textarea>
+
                     </div>
 
                 </div>
 
                 <div class="ai-modal-footer">
-                    <button type="button" id="tradeModalCancel" class="btn btn-light">انصراف</button>
-                    <button type="submit" class="btn btn-primary">
+
+                    <button type="button"
+                            id="tradeModalCancel"
+                            class="btn btn-light">
+                        انصراف
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
                         <i class="fa-solid fa-paper-plane"></i>
                         ارسال درخواست
+
                     </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
 }
 
+
 @section Scripts
 {
-    <script src="~/js/task.js" asp-append-version="true"></script>
+    <script src="~/js/date-picker-init.js"
+            asp-append-version="true"></script>
+
+    <script src="~/js/task.js"
+            asp-append-version="true"></script>
 }

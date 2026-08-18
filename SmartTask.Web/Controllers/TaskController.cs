@@ -242,38 +242,60 @@ public class TaskController : BaseController
     [HttpGet]
     public async Task<IActionResult> Create(int userStoryId)
     {
-        if (!await _userStoryService.CanManageStoryAsync(userStoryId, CurrentUser.UserId))
+        if (!await _userStoryService.CanManageStoryAsync(
+            userStoryId,
+            CurrentUser.UserId))
         {
-            TempData["Error"] = "شما اجازه ساخت Task در این User Story را ندارید.";
-            return RedirectToAction(nameof(Index), new { userStoryId });
+            return Forbid();
         }
 
-        return View(new CreateTaskViewModel { UserStoryId = userStoryId });
+        return PartialView(
+            "_CreateModal",
+            new CreateTaskViewModel
+            {
+                UserStoryId = userStoryId
+            });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateTaskViewModel model)
     {
-        if (!await _userStoryService.CanManageStoryAsync(model.UserStoryId, CurrentUser.UserId))
+        if (!await _userStoryService.CanManageStoryAsync(
+            model.UserStoryId,
+            CurrentUser.UserId))
         {
-            TempData["Error"] = "شما اجازه ساخت Task در این User Story را ندارید.";
-            return RedirectToAction(nameof(Index), new { userStoryId = model.UserStoryId });
+            return Json(new
+            {
+                success = false,
+                message = "شما اجازه ساخت Task در این User Story را ندارید."
+            });
         }
 
         if (!ModelState.IsValid)
-            return View(model);
-
-        if (await _taskService.ExistsByTitleAsync(model.UserStoryId, model.Title))
         {
-            ModelState.AddModelError("Title", "Task ای با این عنوان قبلاً وجود دارد.");
-            return View(model);
+            return Json(new
+            {
+                success = false,
+                message = "لطفاً اطلاعات وارد شده را بررسی کنید."
+            });
+        }
+
+        if (await _taskService.ExistsByTitleAsync(
+            model.UserStoryId,
+            model.Title))
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Task ای با این عنوان قبلاً وجود دارد."
+            });
         }
 
         var task = new TaskEntity
         {
             UserStoryId = model.UserStoryId,
-            Title = model.Title,
+            Title = model.Title.Trim(),
             Description = model.Description,
             Type = model.Type,
             Priority = model.Priority,
@@ -287,8 +309,13 @@ public class TaskController : BaseController
 
         await _taskService.AddAsync(task);
 
-        TempData["Success"] = "Task با موفقیت ایجاد شد.";
-        return RedirectToAction(nameof(Details), new { id = task.Id });
+        return Json(new
+        {
+            success = true,
+            taskId = task.Id,
+            url = Url.Action(nameof(Details), new { id = task.Id }),
+            message = "Task با موفقیت ایجاد شد."
+        });
     }
 
     [HttpGet]
