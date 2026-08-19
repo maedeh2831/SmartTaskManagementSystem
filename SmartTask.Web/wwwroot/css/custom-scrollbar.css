@@ -1,0 +1,163 @@
+/* ============================================================
+   Custom Scrollbar — Global
+   ============================================================ */
+
+/* --- WebKit (Chrome, Edge, Safari) --- */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray300);
+    border-radius: 10px;
+    transition: background .2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray400);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* --- Firefox --- */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray300) transparent;
+}
+
+/* --- Dark mode --- */
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--gray600);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray500);
+}
+
+[data-theme="dark"] * {
+    scrollbar-color: var(--gray600) transparent;
+}
+
+/* ============================================================
+   Specific scrollbar overrides
+   ============================================================ */
+
+/* Sidebar — hide by default, show on hover */
+.sidebar::-webkit-scrollbar,
+.sidebar-menu::-webkit-scrollbar {
+    width: 3px;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: var(--gray200);
+    border-radius: 10px;
+}
+
+.sidebar:hover::-webkit-scrollbar,
+.sidebar-menu:hover::-webkit-scrollbar {
+    opacity: 1;
+}
+
+/* Firefox: hide sidebar scrollbar until hover */
+.sidebar,
+.sidebar-menu {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.sidebar:hover,
+.sidebar-menu:hover {
+    scrollbar-color: var(--gray200) transparent;
+}
+
+[data-theme="dark"] .sidebar:hover::-webkit-scrollbar-thumb,
+[data-theme="dark"] .sidebar-menu:hover::-webkit-scrollbar-thumb {
+    background: var(--gray700);
+}
+
+[data-theme="dark"] .sidebar:hover,
+[data-theme="dark"] .sidebar-menu:hover {
+    scrollbar-color: var(--gray700) transparent;
+}
+
+/* Collapsed sidebar — no scrollbar at all */
+.sidebar.collapsed::-webkit-scrollbar,
+.sidebar.collapsed .sidebar-menu::-webkit-scrollbar {
+    width: 0;
+    opacity: 0;
+}
+
+.sidebar.collapsed,
+.sidebar.collapsed .sidebar-menu {
+    scrollbar-width: none;
+}
+
+/* Chat messages — smooth */
+.chat-messages::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--gray200);
+    border-radius: 10px;
+}
+
+/* Search results dropdown */
+.search-results-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+    background: var(--gray300);
+}
+
+/* Notification dropdown */
+.notification-dropdown-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.notification-dropdown-list::-webkit-scrollbar-thumb {
+    background: var(--gray300);
+}
+
+/* Kanban board */
+.task-kanban::-webkit-scrollbar {
+    height: 6px;
+}
+
+.task-kanban::-webkit-scrollbar-thumb {
+    background: var(--gray300);
+    border-radius: 10px;
+}
+
+/* ============================================================
+   Smooth scroll behavior
+   ============================================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        transition: none;
+    }
+}

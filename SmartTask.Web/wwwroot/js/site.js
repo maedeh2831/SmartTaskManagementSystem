@@ -109,6 +109,17 @@ SmartTask.initPageScripts = function () {
         s.src = old.src;
         document.body.appendChild(s);
     });
+    // Init sweet-scroll if available
+    if (typeof SweetScroll !== "undefined") {
+        if (!window._sweetScrollInstance) {
+            window._sweetScrollInstance = new SweetScroll({
+                top: 0,
+                easing: "easeInOutQuart",
+                duration: 600,
+                vertical: true
+            });
+        }
+    }
 };
 
 if (!window.__siteJsInit) {
@@ -233,6 +244,8 @@ if (!window.__siteJsInit) {
             var cleanUrl = url.split("?")[0];
             if (cleanUrl === window.location.pathname) return;
             if (link.closest("form")) return;
+            // Skip SPA for Chat page — it needs full page load for SignalR
+            if (cleanUrl.indexOf("/Chat") === 0) return;
 
             e.preventDefault();
             e.stopPropagation();

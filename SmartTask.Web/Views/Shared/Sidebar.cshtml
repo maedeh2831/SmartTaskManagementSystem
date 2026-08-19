@@ -47,7 +47,7 @@
             {
                 var isChildActive = item.Children.Any(c => c.Controller == controllerName);
                 <li class="has-children @(isChildActive ? "open" : "") @(isLocked ? "disabled" : "")">
-                    <a href="#" class="sidebar-parent-link" onclick="return SmartTask.toggleSidebarGroup(this);">
+                    <a href="#" class="sidebar-parent-link" onclick="return SmartTask.toggleSidebarGroup(this);" title="@item.Title">
                         <i class="@item.Icon"></i>
                         <span>@item.Title</span>
                         <i class="fa-solid fa-chevron-down submenu-arrow"></i>
@@ -68,21 +68,21 @@
                                 }
                                 else if (child.RequiresContext == ContextRequirementType.Project)
                                 {
-                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-projectId="@CurrentContext.CurrentProjectId">
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-projectId="@CurrentContext.CurrentProjectId" title="@child.Title">
                                         <i class="@child.Icon"></i>
                                         <span>@child.Title</span>
                                     </a>
                                 }
                                 else if (child.RequiresContext == ContextRequirementType.Workspace)
                                 {
-                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId">
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId" title="@child.Title">
                                         <i class="@child.Icon"></i>
                                         <span>@child.Title</span>
                                     </a>
                                 }
                                 else
                                 {
-                                    <a asp-controller="@child.Controller" asp-action="@child.Action">
+                                    <a asp-controller="@child.Controller" asp-action="@child.Action" title="@child.Title">
                                         <i class="@child.Icon"></i>
                                         <span>@child.Title</span>
                                     </a>
@@ -107,7 +107,7 @@
                     }
                     else if (item.RequiresContext == ContextRequirementType.Workspace)
                     {
-                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId">
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-workspaceId="@CurrentContext.CurrentWorkspaceId" title="@item.Title">
                             <i class="@item.Icon"></i>
                             <span>@item.Title</span>
                             @if (!string.IsNullOrEmpty(item.Badge))
@@ -118,7 +118,7 @@
                     }
                     else if (item.RequiresContext == ContextRequirementType.Project)
                     {
-                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-projectId="@CurrentContext.CurrentProjectId">
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-projectId="@CurrentContext.CurrentProjectId" title="@item.Title">
                             <i class="@item.Icon"></i>
                             <span>@item.Title</span>
                             @if (!string.IsNullOrEmpty(item.Badge))
@@ -129,7 +129,7 @@
                     }
                     else
                     {
-                        <a asp-controller="@item.Controller" asp-action="@item.Action">
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" title="@item.Title">
                             <i class="@item.Icon"></i>
                             <span>@item.Title</span>
                             @if (!string.IsNullOrEmpty(item.Badge))
