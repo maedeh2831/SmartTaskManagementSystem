@@ -26,7 +26,7 @@
 }
 
 .team-card .workspace-status {
-    background: rgba(255, 255, 255, .92);
+    background: var(--card);
 }
 
 .team-archived-badge {
@@ -109,10 +109,15 @@
     color: var(--primary);
 }
 
-    .team-role-badge.role-leader {
-        background: #FEF3C7;
-        color: #B45309;
-    }
+.team-role-badge.role-leader {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+[data-theme="dark"] .team-role-badge.role-leader {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
 
 .team-member-actions {
     display: flex;

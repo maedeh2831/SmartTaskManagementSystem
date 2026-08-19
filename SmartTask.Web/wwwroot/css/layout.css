@@ -31,7 +31,7 @@ main {
     padding: 0 30px;
     position: sticky;
     top: 0;
-    z-index: 1030;
+    z-index: 1060;
 }
 
 .logo {
@@ -54,6 +54,7 @@ main {
     width: 420px;
     height: 45px;
     position: relative;
+    z-index: 10;
 }
 
     
@@ -67,12 +68,16 @@ main {
         padding: 0 45px 0 15px;
     }
 
-.header-search i {
+.header-search > i,
+.header-search > .fa-solid {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray400);
+    pointer-events: none;
+    font-size: 14px;
+    z-index: 1;
 }
 
 
@@ -89,6 +94,7 @@ main {
     border: none;
     border-radius: 12px;
     background: var(--bg);
+    color: var(--muted);
     transition: .25s;
 }
 
@@ -140,6 +146,7 @@ main {
     padding: 10px;
     min-width: 220px;
     background: var(--card);
+    z-index: 1070;
 }
 
 .dropdown-item {
@@ -187,6 +194,24 @@ main {
     display: flex;
     flex-direction: column;
     transition: width .3s ease;
+    position: relative;
+    z-index: 1040;
+}
+
+/* Mobile sidebar overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .4);
+    z-index: 1035;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
 }
 
 .sidebar-header {
@@ -236,7 +261,7 @@ main {
 }
 
 .sidebar-menu li.active .menu-badge {
-    background: white;
+    background: rgba(255,255,255,.9);
     color: var(--primary-dark);
 }
 
@@ -340,7 +365,7 @@ main {
         width: 4px;
         height: 28px;
         border-radius: 10px;
-        background: white;
+        background: var(--card);
     }
 
 
@@ -499,6 +524,7 @@ main {
     flex-direction: column;
     gap: 2px;
     min-width: 0;
+    flex: 1;
 }
 
 .search-result-title {
@@ -775,3 +801,235 @@ main {
     .button-danger:hover {
         background-color: var(--danger-dark);
     }
+
+
+/* ==========================================================
+   Mobile Responsive Sidebar
+   ========================================================== */
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        top: 70px;
+        right: 0;
+        bottom: 0;
+        width: 260px;
+        transform: translateX(100%);
+        transition: transform .3s ease;
+        box-shadow: none;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, .15);
+    }
+
+    .layout-wrapper {
+        flex-direction: column;
+    }
+
+    .content-area {
+        padding: 20px 16px;
+    }
+
+    .main-header {
+        padding: 0 16px;
+    }
+
+    .header-search {
+        width: 200px;
+    }
+
+    .header-search input {
+        height: 38px;
+        font-size: 13px;
+    }
+
+    .logo img {
+        width: 120px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-search {
+        display: none;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .content-area {
+        padding: 16px 12px;
+    }
+}
+
+
+/* ==========================================================
+   Search Loading Indicator
+   ========================================================== */
+
+.header-search.searching::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 1px;
+    animation: searchPulse 1s ease-in-out infinite;
+}
+
+@keyframes searchPulse {
+    0%, 100% { opacity: .3; transform: scaleX(.5); }
+    50% { opacity: 1; transform: scaleX(1); }
+}
+
+.search-results-dropdown .search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    color: var(--gray400);
+    font-size: 13px;
+}
+
+.search-results-dropdown .search-loading::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--gray200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: searchSpin .6s linear infinite;
+}
+
+@keyframes searchSpin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* ==========================================================
+   Focus Visible — Global Consistency
+   ========================================================== */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.icon-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.sidebar-menu a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+}
+
+
+/* ==========================================================
+   Dropdown Dark Mode Fixes
+   ========================================================== */
+
+[data-theme="dark"] .dropdown-menu {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 15px 35px rgba(0,0,0,.3);
+}
+
+[data-theme="dark"] .search-results-dropdown {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 15px 35px rgba(0,0,0,.35);
+}
+
+[data-theme="dark"] .header-search input {
+    background: var(--gray100);
+    color: var(--text);
+}
+
+[data-theme="dark"] .search-result-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .sidebar-menu li.active a::before {
+    background: var(--text);
+}
+
+[data-theme="dark"] .header-search > i,
+[data-theme="dark"] .header-search > .fa-solid {
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .header-actions .icon-btn {
+    color: var(--gray500);
+    background: var(--gray100);
+}
+
+[data-theme="dark"] .header-actions .icon-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .small-arrow {
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .logo i {
+    color: var(--primary);
+}
+
+
+/* ==========================================================
+   Reduced Motion — Accessibility
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ==========================================================
+   Print Styles
+   ========================================================== */
+
+@media print {
+    .sidebar, .main-header, .sidebar-overlay {
+        display: none !important;
+    }
+
+    .content-area {
+        padding: 0;
+        margin: 0;
+    }
+
+    .layout-wrapper {
+        display: block;
+    }
+}

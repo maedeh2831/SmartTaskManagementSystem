@@ -184,6 +184,31 @@
     color: #6D28D9;
 }
 
+[data-theme="dark"] .status-new {
+    background: var(--gray200);
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .status-ready {
+    background: rgba(59, 130, 246, .18);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .status-inprogress {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .status-done {
+    background: rgba(34, 197, 94, .18);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .status-closed {
+    background: rgba(139, 92, 246, .18);
+    color: #A78BFA;
+}
+
 .priority-lowest, .priority-low {
     color: #15803D;
 }

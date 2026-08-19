@@ -176,7 +176,7 @@
         background: var(--primary-dark);
         color: #fff;
         opacity: 1;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: 0 6px 14px rgba(91, 95, 239, .28);
     }
 
@@ -852,7 +852,7 @@ textarea.form-control {
 
     .member-row:hover {
         box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 
 .member-info {

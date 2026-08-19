@@ -213,6 +213,91 @@
         background: #15803D;
     }
 
+/* ============================================================
+   Dark Mode
+   ============================================================ */
+
+[data-theme="dark"] .reminder-item {
+    background: var(--gray100);
+    border-color: var(--gray300);
+}
+
+[data-theme="dark"] .reminder-item.past.sent {
+    background: rgba(34, 197, 94, .12);
+    border-color: rgba(34, 197, 94, .3);
+}
+
+[data-theme="dark"] .reminder-item.past:not(.sent) .reminder-item-icon {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .reminder-item-icon {
+    background: var(--gray200);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .reminder-item-title {
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .reminder-item-title:hover {
+    color: var(--primary);
+}
+
+[data-theme="dark"] .reminder-item-meta {
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .reminder-edit-btn:hover {
+    background: rgba(59, 130, 246, .18);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .reminder-delete-btn:hover {
+    background: rgba(239, 68, 68, .18);
+    color: #F87171;
+}
+
+[data-theme="dark"] .reminder-calendar-nav-btn {
+    background: var(--gray200);
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .reminder-calendar-nav-btn:hover {
+    background: var(--gray300);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .reminder-calendar-weekdays {
+    border-bottom-color: var(--gray300);
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .reminder-calendar-day {
+    border-color: var(--gray300);
+    background: var(--gray100);
+}
+
+[data-theme="dark"] .reminder-calendar-day:hover {
+    background: var(--gray200);
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .reminder-calendar-day.today {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, .12);
+}
+
+[data-theme="dark"] .reminder-calendar-day-number {
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .reminder-calendar-title {
+    color: var(--gray700);
+}
+
+
 @media (max-width: 768px) {
     .reminder-calendar-day {
         min-height: 50px;

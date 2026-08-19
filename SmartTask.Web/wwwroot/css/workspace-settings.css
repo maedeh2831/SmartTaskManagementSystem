@@ -25,7 +25,8 @@
     }
 
 .settings-card {
-    background: white;
+    background: var(--card);
+    border: 1px solid var(--gray200);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
     padding: 28px;

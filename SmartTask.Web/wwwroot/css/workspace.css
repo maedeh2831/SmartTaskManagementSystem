@@ -2,35 +2,12 @@
                     SmartTask Workspace UI
    ========================================================== */
 
+/* workspace.css — no :root overrides here;
+   all design tokens live in site.css */
+
 :root {
-    /* Brand */
-
-    --primary: #5B5FEF;
-    --primary-light: #EEF2FF;
-    --primary-dark: #3F43D8;
-    --secondary: #00C2FF;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
-    /* Gray */
-
-    --gray50: #F8FAFC;
-    --gray100: #F1F5F9;
-    --gray200: #E2E8F0;
-    --gray300: #CBD5E1;
-    --gray400: #94A3B8;
-    --gray500: #64748B;
-    --gray700: #334155;
-    --gray900: #0F172A;
-    /* Radius */
-
     --radius-sm: 14px;
-    --radius: 20px;
     --radius-lg: 28px;
-    /* Shadow */
-
-    --shadow-sm: 0 8px 18px rgba(15,23,42,.05);
-    --shadow: 0 18px 40px rgba(15,23,42,.08);
     --shadow-lg: 0 30px 60px rgba(15,23,42,.12);
     --transition: .28s ease;
 }
@@ -57,9 +34,9 @@
    ========================================================== */
 
 .glass-card {
-    background: rgba(255,255,255,.70);
+    background: var(--card);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,.45);
+    border: 1px solid var(--border);
     box-shadow: var(--shadow);
 }
 
@@ -100,8 +77,8 @@
     justify-content: center;
     gap: 12px;
     min-width: 220px;
-    height: 60px;
-    border-radius: 18px;
+    height: 46px;
+    border-radius: 12px;
     text-decoration: none;
     color: white;
     font-weight: 800;
@@ -112,8 +89,8 @@
 
     .workspace-create-btn:hover {
         color: white;
-        transform: translateY(-5px);
-        box-shadow: 0 25px 45px rgba(91,95,239,.35);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(91,95,239,.30);
     }
 
 /* ==========================================================
@@ -142,7 +119,7 @@
         height: 58px;
         border: none;
         outline: none;
-        background: white;
+        background: var(--card);
         border-radius: 18px;
         padding-right: 58px;
         padding-left: 20px;
@@ -171,7 +148,7 @@
     height: 58px;
     padding: 0 26px;
     border: none;
-    background: white;
+    background: var(--card);
     border-radius: 18px;
     font-weight: 700;
     color: var(--gray700);
@@ -188,9 +165,9 @@
 ==================================================*/
 
 .workspace-empty {
-    background: rgba(255,255,255,.65);
+    background: var(--card);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,.5);
+    border: 1px solid var(--border);
     border-radius: 28px;
     padding: 80px 40px;
     text-align: center;
@@ -256,7 +233,7 @@
 }
 
 .workspace-form-card {
-    background: rgba(255,255,255,.72);
+    background: var(--card);
     backdrop-filter: blur(18px);
     border-radius: 28px;
     padding: 40px;
@@ -398,12 +375,12 @@
 }
 
 .form-control {
-    border: none;
-    background: #F8FAFC;
-    border-radius: 18px;
-    min-height: 54px;
-    padding: 16px 18px;
-    transition: .25s;
+    border: 1px solid var(--gray200);
+    background: var(--bg);
+    border-radius: 10px;
+    min-height: 44px;
+    padding: 12px 14px;
+    transition: .2s;
 }
 
 textarea.form-control {
@@ -411,21 +388,21 @@ textarea.form-control {
 }
 
 .form-control:focus {
-    background: white;
-    box-shadow: 0 0 0 4px rgba(79,70,229,.10);
+    background: var(--card);
+    box-shadow: 0 0 0 3px rgba(79,70,229,.12);
 }
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 16px;
-    margin-top: 40px;
+    gap: 12px;
+    margin-top: 32px;
 }
 
     .form-actions .btn {
-        height: 52px;
-        min-width: 150px;
-        border-radius: 16px;
+        height: 44px;
+        min-width: 140px;
+        border-radius: 10px;
         font-weight: 700;
         align-content: center !important;
     }
@@ -461,8 +438,8 @@ textarea.form-control {
     background: linear-gradient(135deg,var(--primary),#6B5CFF);
     color: #fff;
     border: none;
-    border-radius: 16px;
-    height: 54px;
+    border-radius: 12px;
+    height: 44px;
     padding: 0 30px;
     font-weight: 700;
     transition: .25s;
@@ -477,11 +454,11 @@ textarea.form-control {
 
 .btn-light,
 .workspace-btn-light {
-    background: #fff;
+    background: var(--card);
     color: #475569;
     border: none;
-    border-radius: 16px;
-    height: 54px;
+    border-radius: 12px;
+    height: 44px;
     padding: 0 30px;
     font-weight: 700;
     box-shadow: var(--shadow-sm);
@@ -740,10 +717,10 @@ textarea.form-control {
 
 
 .details-btn {
-    height: 50px;
+    height: 44px;
     padding: 0 22px;
-    border-radius: 16px;
-    background: white;
+    border-radius: 10px;
+    background: var(--card);
     color: var(--gray700);
     text-decoration: none;
     display: flex;
@@ -834,7 +811,7 @@ textarea.form-control {
 
 
 .details-stat-card {
-    background: white;
+    background: var(--card);
     border-radius: 24px;
     padding: 25px;
     display: flex;
@@ -956,7 +933,7 @@ textarea.form-control {
 
 
 .workspace-card {
-    background: white;
+    background: var(--card);
     border-radius: 28px;
     overflow: hidden;
     box-shadow: var(--shadow);
@@ -966,7 +943,7 @@ textarea.form-control {
 
 
     .workspace-card:hover {
-        transform: translateY(-10px);
+        transform: translateY(-4px);
         box-shadow: var(--shadow-lg);
     }
 
@@ -987,7 +964,7 @@ textarea.form-control {
 .workspace-logo {
     width: 70px;
     height: 70px;
-    background: white;
+    background: var(--card);
     color: var(--primary);
     border-radius: 22px;
     display: flex;
@@ -1013,7 +990,7 @@ textarea.form-control {
 
 
 .workspace-status {
-    background: white;
+    background: var(--card);
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 12px;

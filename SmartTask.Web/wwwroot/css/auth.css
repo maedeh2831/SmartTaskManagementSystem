@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gray100);
+    background: var(--bg);
     padding: 30px;
 }
 
@@ -16,6 +16,7 @@
     overflow: hidden;
     display: flex;
     box-shadow: 0 25px 70px rgba(0,0,0,.12);
+    border: 1px solid var(--border);
 }
 
 .auth-banner {
@@ -63,12 +64,12 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    height: 56px;
+    height: 50px;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 12px;
     background: var(--card);
     padding: 0 18px;
-    transition: all .25s ease;
+    transition: all .2s ease;
 }
 
     .input-group-custom:focus-within {
@@ -93,7 +94,8 @@
         background: transparent;
         box-shadow: none !important;
         height: 100%;
-        font-size: 15px;
+        font-size: 14px;
+        color: var(--text);
     }
 
         .input-group-custom input:focus {
@@ -109,19 +111,23 @@
 
 .auth-submit {
     width: 100%;
-    height: 55px;
+    height: 48px;
     border: none;
-    border-radius: 18px;
+    border-radius: 12px;
     background: var(--primary-dark);
     color: white;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
-    transition: .3s;
+    transition: .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
     .auth-submit:hover {
-        transform: translateY(-3px);
         background: var(--primary-darker);
+        box-shadow: 0 8px 20px rgba(79,70,229,.25);
     }
 
 .auth-footer {
@@ -152,7 +158,7 @@
 /* GOOGLE LOGIN */
 .google-btn {
     width: 100%;
-    height: 52px;
+    height: 48px;
     border: 1px solid var(--gray300);
     border-radius: 12px;
     background: var(--card);
@@ -163,6 +169,7 @@
     font-size: 15px;
     font-weight: 600;
     transition: .25s;
+    cursor: pointer;
 }
 
     .google-btn img {

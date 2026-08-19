@@ -9,17 +9,12 @@
     margin-right: 8px;
     padding: 3px 10px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.25);
-    color: inherit;
+    background: var(--gray100);
+    color: var(--gray700);
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.5px;
     vertical-align: middle;
-}
-
-.workspace-card-content .project-key-badge {
-    background: var(--gray100);
-    color: var(--gray700);
 }
 
 /* ================= Status Badge ================= */
@@ -29,7 +24,7 @@
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--gray100);
     color: var(--gray700);
 }
 
@@ -395,4 +390,119 @@
 .team-role-badge.role-guest {
     background: var(--gray100);
     color: var(--gray500);
+}
+
+
+/* ============================================================
+   Dark Mode Overrides
+   ============================================================ */
+
+[data-theme="dark"] .project-status-badge {
+    background: var(--gray200);
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .project-status-badge.status-planning {
+    background: rgba(99, 102, 241, .18);
+    color: #A5B4FC;
+}
+
+[data-theme="dark"] .project-status-badge.status-active {
+    background: rgba(34, 197, 94, .18);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .project-status-badge.status-onhold {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .project-status-badge.status-completed {
+    background: rgba(59, 130, 246, .18);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .project-status-badge.status-cancelled {
+    background: rgba(239, 68, 68, .15);
+    color: #F87171;
+}
+
+[data-theme="dark"] .project-priority-badge.priority-low {
+    background: var(--gray200);
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .project-priority-badge.priority-medium {
+    background: rgba(99, 102, 241, .18);
+    color: #A5B4FC;
+}
+
+[data-theme="dark"] .project-priority-badge.priority-high {
+    background: rgba(249, 115, 22, .18);
+    color: #FB923C;
+}
+
+[data-theme="dark"] .project-priority-badge.priority-critical {
+    background: rgba(239, 68, 68, .15);
+    color: #F87171;
+}
+
+[data-theme="dark"] .team-role-badge.role-owner {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .team-role-badge.role-manager {
+    background: rgba(59, 130, 246, .18);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .team-role-badge.role-developer {
+    background: rgba(99, 102, 241, .18);
+    color: #A5B4FC;
+}
+
+[data-theme="dark"] .team-role-badge.role-tester {
+    background: rgba(34, 197, 94, .18);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .team-role-badge.role-guest {
+    background: var(--gray200);
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .team-project-chip {
+    background: var(--gray200);
+    border-color: var(--gray300);
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .team-detail-card h3,
+[data-theme="dark"] .team-stat-card h4,
+[data-theme="dark"] .team-stat-card span,
+[data-theme="dark"] .project-timeline-row strong,
+[data-theme="dark"] .project-timeline-row span,
+[data-theme="dark"] .dashboard-bar-label,
+[data-theme="dark"] .dashboard-bar-count,
+[data-theme="dark"] .dashboard-activity-text strong,
+[data-theme="dark"] .dashboard-activity-text span,
+[data-theme="dark"] .dashboard-donut-label strong,
+[data-theme="dark"] .dashboard-donut-label span,
+[data-theme="dark"] .health-score-number,
+[data-theme="dark"] .health-score-number span,
+[data-theme="dark"] .health-score-label,
+[data-theme="dark"] .health-factor > span,
+[data-theme="dark"] .health-mini-donut span,
+[data-theme="dark"] .dashboard-timeline-info,
+[data-theme="dark"] .dashboard-timeline-info.overdue {
+    color: inherit;
+}
+
+[data-theme="dark"] .project-tab-btn {
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .project-tab-btn:hover {
+    color: var(--gray700);
 }

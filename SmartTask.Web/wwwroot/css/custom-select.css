@@ -1,0 +1,581 @@
+/* ==========================================================
+   Custom Select & Date Input — Modern Design System
+   ========================================================== */
+
+/* =============================================
+   SELECT — Base Reset + Custom Chevron
+   ============================================= */
+
+select.form-control,
+select.form-select,
+select.settings-select,
+select.backlog-status-select,
+select.backlog-priority-select,
+select.backlog-owner-select,
+select.role-select,
+select.offroad-select-sm,
+select.offroad-status-select,
+select.offroad-priority-select,
+select.agile-sprint-select,
+select[name="sprintId"],
+select[name="assigneeId"],
+select[name="priority"],
+select[name="type"],
+select[name="labelId"],
+select[name="userId"],
+select[name="role"],
+select[name="projectId"],
+select[name="ownerId"],
+select[name="status"],
+select[name="dependsOnTaskId"],
+select[name="targetUserId"],
+select[name="targetTaskId"],
+select[id="storyPriority"],
+select[id="tqaTaskPriority"],
+select[id="workspaceId"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Custom chevron */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 14px center;
+    background-size: 16px;
+
+    /* RTL padding: icon on the right (start), text on left */
+    padding-left: 14px;
+    padding-right: 40px;
+
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .15s ease;
+}
+
+
+/* =============================================
+   SELECT — Standard Size (44px)
+   ============================================= */
+
+select.form-control,
+select.form-select,
+select.settings-select,
+select.role-select,
+select.offroad-select-sm,
+select.offroad-status-select,
+select.offroad-priority-select,
+select.agile-sprint-select {
+    background-color: var(--card);
+    border: 1.5px solid var(--gray200);
+    border-radius: 12px;
+    height: 46px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray800);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+select.form-control:hover,
+select.form-select:hover,
+select.settings-select:hover,
+select.role-select:hover,
+select.offroad-select-sm:hover,
+select.offroad-status-select:hover,
+select.offroad-priority-select:hover,
+select.agile-sprint-select:hover {
+    border-color: var(--gray300);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+}
+
+select.form-control:focus,
+select.form-select:focus,
+select.settings-select:focus,
+select.role-select:focus,
+select.offroad-select-sm:focus,
+select.offroad-status-select:focus,
+select.offroad-priority-select:focus,
+select.agile-sprint-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12), 0 1px 3px rgba(0, 0, 0, .06);
+    outline: none;
+    background-color: var(--card);
+}
+
+select.form-control:active,
+select.form-select:active,
+select.settings-select:active,
+select.role-select:active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .08);
+}
+
+select.form-control:disabled,
+select.form-select:disabled,
+select.settings-select:disabled,
+select.role-select:disabled,
+select[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+    background-color: var(--gray50);
+    border-color: var(--gray100);
+    box-shadow: none;
+}
+
+
+/* =============================================
+   SELECT — Settings (tall)
+   ============================================= */
+
+select.settings-select {
+    height: 50px;
+    font-size: 14px;
+}
+
+
+/* =============================================
+   SELECT — Small / Compact Variants
+   ============================================= */
+
+select.backlog-status-select,
+select.backlog-priority-select,
+select.backlog-owner-select,
+select.offroad-select-sm,
+select.offroad-status-select,
+select.offroad-priority-select {
+    height: 36px;
+    font-size: 12px;
+    font-weight: 600;
+    padding-left: 10px;
+    padding-right: 32px;
+    background-size: 14px;
+    background-position: left 8px center;
+    border-radius: 10px;
+    border-width: 1px;
+}
+
+select.backlog-status-select:focus,
+select.backlog-priority-select:focus,
+select.backlog-owner-select:focus,
+select.offroad-status-select:focus,
+select.offroad-priority-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, .12);
+}
+
+
+/* =============================================
+   SELECT — Role Select (compact)
+   ============================================= */
+
+select.role-select {
+    height: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    padding-left: 10px;
+    padding-right: 34px;
+    background-size: 14px;
+    background-position: left 10px center;
+    border-radius: 10px;
+}
+
+
+/* =============================================
+   SELECT — Task Modal Selects
+   ============================================= */
+
+.task-create-form select.form-control,
+.task-create-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    background-size: 14px;
+    padding-left: 32px !important;
+    padding-right: 14px;
+    height: 42px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1.5px solid var(--gray200);
+    border-radius: 10px;
+    background-color: var(--card);
+    color: var(--gray800);
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.task-create-form select.form-control:focus,
+.task-create-form select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12) !important;
+}
+
+
+/* =============================================
+   SELECT — Quick Add Modal
+   ============================================= */
+
+select[id="tqaTaskPriority"],
+select[id="taskPriority"] {
+    height: 44px;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: var(--bg);
+    border: 1.5px solid var(--gray200);
+    border-radius: 10px;
+    padding-left: 14px;
+    padding-right: 38px;
+    color: var(--gray800);
+    font-family: inherit;
+}
+
+select[id="tqaTaskPriority"]:focus,
+select[id="taskPriority"]:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12) !important;
+    outline: none;
+}
+
+
+/* =============================================
+   SELECT — Offroad Filter Row
+   ============================================= */
+
+.offroad-form-row select {
+    min-height: 42px;
+}
+
+
+/* =============================================
+   DATE INPUT — Modern Styling
+   ============================================= */
+
+input[type="date"],
+input[type="datetime-local"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='4' rx='2' ry='2'/%3E%3Cline x1='16' x2='16' y1='2' y2='6'/%3E%3Cline x1='8' x2='8' y1='2' y2='6'/%3E%3Cline x1='3' x2='21' y1='10' y2='10'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    background-size: 16px;
+    padding-left: 38px !important;
+    padding-right: 14px;
+    height: 46px;
+    border: 1.5px solid var(--gray200);
+    border-radius: 12px;
+    background-color: var(--card);
+    color: var(--gray800);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+input[type="date"]:hover,
+input[type="datetime-local"]:hover {
+    border-color: var(--gray300);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+}
+
+input[type="date"]:focus,
+input[type="datetime-local"]:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12), 0 1px 3px rgba(0, 0, 0, .06) !important;
+    outline: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    opacity: .5;
+    cursor: pointer;
+    transition: opacity .2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    opacity: .8;
+}
+
+
+/* =============================================
+   DATE INPUT — Task Modal
+   ============================================= */
+
+.task-create-form input[type="date"],
+.task-create-form input[type="datetime-local"] {
+    height: 42px;
+    font-size: 13px;
+    border-radius: 10px;
+    background-size: 14px;
+    background-position: left 10px center;
+    padding-left: 34px !important;
+}
+
+
+/* =============================================
+   PERSIAN DATEPICKER — Modern Popup Styling
+   ============================================= */
+
+/* Popup container */
+div.datepicker,
+div.pdp-default {
+    border: 1.5px solid var(--gray200) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .12) !important;
+    background: var(--card) !important;
+    overflow: hidden;
+}
+
+/* Calendar header */
+div.datepicker .pdp-header,
+div.pdp-default .pdp-header {
+    background: var(--primary) !important;
+    border-radius: 0 !important;
+    padding: 14px 16px !important;
+}
+
+div.datepicker .pdp-header *,
+div.pdp-default .pdp-header * {
+    color: #fff !important;
+}
+
+/* Calendar nav buttons */
+div.datepicker .pdp-header .pdp-icon,
+div.pdp-default .pdp-header .pdp-icon {
+    color: rgba(255, 255, 255, .8) !important;
+    transition: color .2s ease;
+}
+
+div.datepicker .pdp-header .pdp-icon:hover,
+div.pdp-default .pdp-header .pdp-icon:hover {
+    color: #fff !important;
+}
+
+/* Day cells */
+div.datepicker .pdp-day,
+div.pdp-default .pdp-day {
+    border-radius: 10px !important;
+    transition: background .15s ease, color .15s ease !important;
+    font-weight: 500;
+}
+
+div.datepicker .pdp-day:hover,
+div.pdp-default .pdp-day:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+}
+
+/* Selected day */
+div.datepicker .pdp-day.pdp-selected,
+div.pdp-default .pdp-day.pdp-selected,
+div.datepicker .pdp-day[data-selected="true"],
+div.pdp-default .pdp-day[data-selected="true"] {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, .3) !important;
+}
+
+/* Today */
+div.datepicker .pdp-day.pdp-today,
+div.pdp-default .pdp-day.pdp-today {
+    border: 1.5px solid var(--primary) !important;
+    font-weight: 700;
+}
+
+/* Disabled day */
+div.datepicker .pdp-day.pdp-deactivated,
+div.pdp-default .pdp-day.pdp-deactivated {
+    color: var(--gray300) !important;
+    opacity: .4;
+}
+
+/* Time picker */
+div.datepicker .pdp-time-picker,
+div.pdp-default .pdp-time-picker {
+    border-top: 1px solid var(--gray100) !important;
+    padding: 12px 16px !important;
+}
+
+div.datepicker .pdp-time-picker input,
+div.pdp-default .pdp-time-picker input {
+    border: 1.5px solid var(--gray200) !important;
+    border-radius: 8px !important;
+    height: 36px;
+    font-size: 14px;
+    text-align: center;
+    color: var(--gray800) !important;
+    background: var(--card) !important;
+}
+
+div.datepicker .pdp-time-picker input:focus,
+div.pdp-default .pdp-time-picker input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, .12) !important;
+}
+
+
+/* =============================================
+   DARK MODE — Selects
+   ============================================= */
+
+[data-theme="dark"] select.form-control,
+[data-theme="dark"] select.form-select,
+[data-theme="dark"] select.settings-select,
+[data-theme="dark"] select.role-select,
+[data-theme="dark"] select.offroad-select-sm,
+[data-theme="dark"] select.offroad-status-select,
+[data-theme="dark"] select.offroad-priority-select,
+[data-theme="dark"] select.agile-sprint-select,
+[data-theme="dark"] select[id="tqaTaskPriority"],
+[data-theme="dark"] select[id="taskPriority"] {
+    background-color: var(--gray100);
+    border-color: var(--gray300);
+    color: var(--gray700);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] select.form-control:hover,
+[data-theme="dark"] select.form-select:hover,
+[data-theme="dark"] select.settings-select:hover,
+[data-theme="dark"] select.role-select:hover,
+[data-theme="dark"] select.offroad-select-sm:hover {
+    border-color: var(--gray400);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+
+[data-theme="dark"] select.form-control:focus,
+[data-theme="dark"] select.form-select:focus,
+[data-theme="dark"] select.settings-select:focus,
+[data-theme="dark"] select.role-select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .2), 0 2px 8px rgba(0, 0, 0, .2) !important;
+    background-color: var(--gray100);
+}
+
+[data-theme="dark"] select.form-control:disabled,
+[data-theme="dark"] select[disabled] {
+    background-color: var(--gray200);
+    border-color: var(--gray300);
+    opacity: .4;
+}
+
+[data-theme="dark"] .task-create-form select,
+[data-theme="dark"] .task-create-form select.form-control {
+    background-color: var(--gray100);
+    border-color: var(--gray300);
+    color: var(--gray700);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .task-create-form select:focus,
+[data-theme="dark"] .task-create-form select.form-control:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .2) !important;
+}
+
+
+/* =============================================
+   DARK MODE — Date Inputs
+   ============================================= */
+
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="datetime-local"] {
+    background-color: var(--gray100);
+    border-color: var(--gray300);
+    color: var(--gray700);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='4' rx='2' ry='2'/%3E%3Cline x1='16' x2='16' y1='2' y2='6'/%3E%3Cline x1='8' x2='8' y1='2' y2='6'/%3E%3Cline x1='3' x2='21' y1='10' y2='10'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] input[type="date"]:hover,
+[data-theme="dark"] input[type="datetime-local"]:hover {
+    border-color: var(--gray400);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+
+[data-theme="dark"] input[type="date"]:focus,
+[data-theme="dark"] input[type="datetime-local"]:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .2), 0 2px 8px rgba(0, 0, 0, .2) !important;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(.7);
+}
+
+
+/* =============================================
+   DARK MODE — Persian Datepicker
+   ============================================= */
+
+[data-theme="dark"] div.datepicker,
+[data-theme="dark"] div.pdp-default {
+    background: var(--card) !important;
+    border-color: var(--gray300) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .4) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-header,
+[data-theme="dark"] div.pdp-default .pdp-header {
+    background: var(--primary-dark) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-day,
+[data-theme="dark"] div.pdp-default .pdp-day {
+    color: var(--gray700) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-day:hover,
+[data-theme="dark"] div.pdp-default .pdp-day:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-day.pdp-deactivated,
+[data-theme="dark"] div.pdp-default .pdp-day.pdp-deactivated {
+    color: var(--gray400) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-time-picker,
+[data-theme="dark"] div.pdp-default .pdp-time-picker {
+    border-top-color: var(--gray200) !important;
+}
+
+[data-theme="dark"] div.datepicker .pdp-time-picker input,
+[data-theme="dark"] div.pdp-default .pdp-time-picker input {
+    background: var(--gray100) !important;
+    border-color: var(--gray300) !important;
+    color: var(--gray700) !important;
+}
+
+
+/* =============================================
+   ACCESSIBILITY
+   ============================================= */
+
+select:focus-visible,
+input[type="date"]:focus-visible,
+input[type="datetime-local"]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+
+/* =============================================
+   REDUCED MOTION
+   ============================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    select,
+    input[type="date"],
+    input[type="datetime-local"] {
+        transition: none !important;
+    }
+}

@@ -137,11 +137,19 @@
     padding: 12px 24px;
     border-radius: 12px;
     background: var(--gray50);
+    border: 1px solid var(--gray200);
     color: var(--gray700);
     font-weight: 700;
     font-size: 14px;
     text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
+
+    .btn-secondary:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+    }
 
 /* Danger Zone */
 .settings-card.danger-zone {
@@ -195,6 +203,48 @@
     .btn-warning:hover {
         background: #FEF3C7;
     }
+
+[data-theme="dark"] .btn-secondary {
+    background: var(--gray200);
+    border-color: var(--gray300);
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-border);
+}
+
+[data-theme="dark"] .btn-warning {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+    border-color: rgba(245, 158, 11, .35);
+}
+
+[data-theme="dark"] .btn-warning:hover {
+    background: rgba(245, 158, 11, .25);
+}
+
+[data-theme="dark"] .settings-card.danger-zone {
+    border-color: rgba(239, 68, 68, .35);
+}
+
+[data-theme="dark"] .settings-card.danger-zone h3 {
+    color: #F87171;
+}
+
+[data-theme="dark"] .danger-row {
+    border-color: var(--gray300);
+}
+
+[data-theme="dark"] .danger-row strong {
+    color: var(--gray700);
+}
+
+[data-theme="dark"] .danger-row p {
+    color: var(--gray500);
+}
 
 .btn-danger {
     display: inline-flex;

@@ -164,6 +164,26 @@
         color: #B91C1C;
     }
 
+[data-theme="dark"] .risk-level-pill.status-low {
+    background: rgba(34, 197, 94, .18);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .risk-level-pill.status-medium {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .risk-level-pill.status-high {
+    background: rgba(249, 115, 22, .18);
+    color: #FB923C;
+}
+
+[data-theme="dark"] .risk-level-pill.status-critical {
+    background: rgba(239, 68, 68, .18);
+    color: #F87171;
+}
+
 /* Risk Factor Rows */
 
 .risk-factor-list {
@@ -281,6 +301,26 @@
         background: #D1FAE5;
         color: #047857;
     }
+
+[data-theme="dark"] .delayrisk-summary-icon.icon-danger {
+    background: rgba(239, 68, 68, .18);
+    color: #F87171;
+}
+
+[data-theme="dark"] .delayrisk-summary-icon.icon-warning {
+    background: rgba(245, 158, 11, .18);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .delayrisk-summary-icon.icon-info {
+    background: rgba(59, 130, 246, .18);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .delayrisk-summary-icon.icon-success {
+    background: rgba(34, 197, 94, .18);
+    color: #4ADE80;
+}
 
 .delayrisk-summary-text {
     display: flex;
@@ -461,6 +501,12 @@
     border-radius: 10px;
     color: #991B1B;
     font-size: 13px;
+}
+
+[data-theme="dark"] .ai-error {
+    background: rgba(239, 68, 68, .15);
+    border-color: rgba(239, 68, 68, .35);
+    color: #FCA5A5;
 }
 
     .ai-error i {
