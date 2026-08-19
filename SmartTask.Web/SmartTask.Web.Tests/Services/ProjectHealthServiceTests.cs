@@ -264,6 +264,7 @@ public class DelayRiskServiceTests
         // base task also overdue
         var baseTask = context.TaskItems.First(t => t.Id == seed.TaskId);
         baseTask.DueDate = DateTime.Now.Date.AddDays(-5);
+        await context.SaveChangesAsync();
 
         _workloadMock.Setup(x => x.GetWorkloadAsync(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(new Models.ViewModels.Workload.WorkloadIndexViewModel

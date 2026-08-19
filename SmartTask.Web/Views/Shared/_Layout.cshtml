@@ -161,8 +161,9 @@
         </div>       
 
         <div class="header-search">
-            <input type="text" placeholder="جستجو..." />
+            <input type="text" id="globalSearchInput" placeholder="جستجو در پروژه‌ها، تسک‌ها، اسپرینت‌ها..." autocomplete="off" />
             <i class="fa fa-search"></i>
+            <div class="search-results-dropdown" id="globalSearchResults"></div>
         </div>
 
         <div class="logo">
@@ -207,6 +208,7 @@
 
     <script src="~/lib/signalr/signalr.min.js"></script>
     <script src="~/js/notification.js" asp-append-version="true"></script>
+    <script src="~/js/GlobalSearch.js" asp-append-version="true"></script>
 
     @if (TempData["Success"] != null)
     {

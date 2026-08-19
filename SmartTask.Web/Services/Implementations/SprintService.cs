@@ -106,15 +106,18 @@ public class SprintService : BaseService<Sprint>, ISprintService
         if (sprint == null)
             return;
 
-        // Deactivate other sprints in one query
-        await _context.Sprints
+        var otherActiveSprints = await _context.Sprints
             .Where(x =>
                 x.ProjectId == sprint.ProjectId &&
                 x.Id != sprintId &&
                 x.Status == SprintStatusType.Active)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.Status, SprintStatusType.Planning)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
+            .ToListAsync();
+
+        foreach (var other in otherActiveSprints)
+        {
+            other.Status = SprintStatusType.Planning;
+            other.ChangeDate = DateTime.Now;
+        }
 
         sprint.Status = SprintStatusType.Active;
         sprint.ChangeDate = DateTime.Now;
@@ -124,19 +127,21 @@ public class SprintService : BaseService<Sprint>, ISprintService
 
     public async Task CompleteAsync(int sprintId)
     {
-        await _context.Sprints
-            .Where(x => x.Id == sprintId)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.Status, SprintStatusType.Completed)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
+        var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == sprintId);
+        if (sprint == null) return;
+
+        sprint.Status = SprintStatusType.Completed;
+        sprint.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 
     public new async Task DeleteAsync(int id)
     {
-        await _context.Sprints
-            .Where(x => x.Id == id)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.ViewState, false));
+        var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == id);
+        if (sprint == null) return;
+
+        sprint.ViewState = false;
+        await _context.SaveChangesAsync();
     }
 
     public async Task<List<BurndownPointDto>> GetBurndownDataAsync(int sprintId)

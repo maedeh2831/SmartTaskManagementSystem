@@ -158,22 +158,18 @@ public class WorkloadAnalysisService : IWorkloadAnalysisService
         return result.OrderByDescending(x => x.UtilizationPercent).ToList();
     }
 
-    /// <summary>
-    /// OPTIMIZED: Single ExecuteUpdateAsync instead of load-modify-save pattern
-    /// </summary>
     public async Task UpdateCapacityAsync(int projectMemberId, int weeklyCapacityHours)
     {
         if (projectMemberId <= 0)
             return;
 
-        var capacityValue = Math.Max(1, weeklyCapacityHours);
-        var now = DateTime.Now;
+        var member = await _context.ProjectMembers
+            .FirstOrDefaultAsync(x => x.Id == projectMemberId && x.ViewState);
+        if (member == null) return;
 
-        await _context.ProjectMembers
-            .Where(x => x.Id == projectMemberId && x.ViewState)
-            .ExecuteUpdateAsync(u => u
-                .SetProperty(x => x.WeeklyCapacityHours, capacityValue)
-                .SetProperty(x => x.ChangeDate, now));
+        member.WeeklyCapacityHours = Math.Max(1, weeklyCapacityHours);
+        member.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 
     /// <summary>

@@ -122,18 +122,17 @@ public class PriorityEngineService : IPriorityEngineService
         };
     }
 
-    // OPTIMIZED: Use ExecuteUpdateAsync instead of load-modify-save
     public async Task ApplySuggestionAsync(int taskId, int currentUserId)
     {
         if (!await _taskService.CanManageTaskAsync(taskId, currentUserId))
             throw new UnauthorizedAccessException("شما اجازه ویرایش این Task را ندارید.");
 
         var suggestion = await GetSuggestionAsync(taskId, currentUserId);
+        var task = await _context.TaskItems.FirstOrDefaultAsync(x => x.Id == taskId);
+        if (task == null) return;
 
-        await _context.TaskItems
-            .Where(x => x.Id == taskId)
-            .ExecuteUpdateAsync(u => u
-                .SetProperty(x => x.Priority, suggestion.SuggestedPriority)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
+        task.Priority = suggestion.SuggestedPriority;
+        task.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 }

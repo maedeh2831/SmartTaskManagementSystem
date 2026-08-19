@@ -90,6 +90,66 @@ public class SearchController : BaseController
             Url = Url.Action("Details", "Task", new { id = x.Id })!
         }));
 
+        // ---- اسپرینت‌ها ----
+        var accessibleWorkspaceIds = await _context.WorkspaceMembers
+            .Where(x => x.ApplicationUserId == userId && x.ViewState)
+            .Select(x => x.WorkspaceId)
+            .ToListAsync();
+
+        var sprintEntities = await _context.Sprints
+            .Where(x => accessibleProjectIds.Contains(x.ProjectId) && x.ViewState && x.Name.Contains(q))
+            .Include(x => x.Project)
+            .OrderByDescending(x => x.StartDate)
+            .Take(5)
+            .ToListAsync();
+
+        results.AddRange(sprintEntities.Select(x => new GlobalSearchResultViewModel
+        {
+            Type = "Sprint",
+            Id = x.Id,
+            Title = x.Name,
+            SubTitle = x.Project.Name,
+            Icon = "fa-solid fa-bolt",
+            Color = x.Project.Color ?? "#F59E0B",
+            Url = Url.Action("Details", "Sprint", new { id = x.Id })!
+        }));
+
+        // ---- فضاهای کاری ----
+        var workspaceEntities = await _context.Workspaces
+            .Where(x => accessibleWorkspaceIds.Contains(x.Id) && x.ViewState && x.Name.Contains(q))
+            .OrderByDescending(x => x.CreateDate)
+            .Take(3)
+            .ToListAsync();
+
+        results.AddRange(workspaceEntities.Select(x => new GlobalSearchResultViewModel
+        {
+            Type = "Workspace",
+            Id = x.Id,
+            Title = x.Name,
+            SubTitle = "فضای کاری",
+            Icon = "fa-solid fa-layer-group",
+            Color = "#6366F1",
+            Url = Url.Action("Details", "Workspace", new { id = x.Id })!
+        }));
+
+        // ---- برچسب‌ها ----
+        var labelEntities = await _context.Labels
+            .Where(x => accessibleProjectIds.Contains(x.ProjectId) && x.ViewState && x.Name.Contains(q))
+            .Include(x => x.Project)
+            .Take(3)
+            .ToListAsync();
+
+        results.AddRange(labelEntities.Select(x => new GlobalSearchResultViewModel
+        {
+            Type = "Label",
+            Id = x.Id,
+            Title = x.Name,
+            SubTitle = x.Project.Name,
+            Icon = "fa-solid fa-tags",
+            Color = x.Color ?? "#8B5CF6",
+            Url = Url.Action("Index", "Label", new { projectId = x.ProjectId })!
+        }));
+
         return Json(results);
     }
 

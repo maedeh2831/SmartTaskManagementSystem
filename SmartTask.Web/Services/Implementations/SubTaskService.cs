@@ -41,25 +41,25 @@ namespace SmartTask.Web.Services.Implementations
             return taskId > 0 && await _taskService.CanManageTaskAsync(taskId, userId);
         }
 
-        // OPTIMIZED: Use ExecuteUpdateAsync for toggle instead of load-modify-save
         public async Task ToggleCompleteAsync(int subTaskId)
         {
-            var now = DateTime.Now;
-            await _context.SubTaskItems
-                .Where(x => x.Id == subTaskId && x.ViewState)
-                .ExecuteUpdateAsync(u => u
-                    .SetProperty(x => x.IsCompleted, x => !x.IsCompleted)
-                    .SetProperty(x => x.ChangeDate, now));
+            var item = await _context.SubTaskItems
+                .FirstOrDefaultAsync(x => x.Id == subTaskId && x.ViewState);
+            if (item == null) return;
+
+            item.IsCompleted = !item.IsCompleted;
+            item.ChangeDate = DateTime.Now;
+            await _context.SaveChangesAsync();
         }
 
-        // OPTIMIZED: Use ExecuteUpdateAsync for soft delete instead of load-modify-save
         public new async Task DeleteAsync(int id)
         {
-            await _context.SubTaskItems
-                .Where(x => x.Id == id)
-                .ExecuteUpdateAsync(u => u
-                    .SetProperty(x => x.ViewState, false)
-                    .SetProperty(x => x.ChangeDate, DateTime.Now));
+            var item = await _context.SubTaskItems.FirstOrDefaultAsync(x => x.Id == id);
+            if (item == null) return;
+
+            item.ViewState = false;
+            item.ChangeDate = DateTime.Now;
+            await _context.SaveChangesAsync();
         }
     }
 }

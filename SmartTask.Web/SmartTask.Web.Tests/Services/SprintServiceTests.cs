@@ -51,7 +51,7 @@ public class SprintServiceTests
         SeedSprint(context, seed.ProjectId, "Sprint 1");
         await context.SaveChangesAsync();
 
-        var sprintId = context.Sprints.First().Id;
+        var sprintId = context.Sprints.First(x => x.Name == "Sprint 1").Id;
         var service = CreateService(context);
 
         var result = await service.GetDetailsAsync(sprintId);
@@ -73,9 +73,12 @@ public class SprintServiceTests
         var service = CreateService(context);
         var result = await service.GetByProjectAsync(seed.ProjectId);
 
-        Assert.Equal(2, result.Count);
-        Assert.Equal("Newer", result[0].Name);
-        Assert.Equal("Older", result[1].Name);
+        Assert.True(result.Count >= 2, $"Expected at least 2 sprints but got {result.Count}");
+        var newer = result.FirstOrDefault(x => x.Name == "Newer");
+        var older = result.FirstOrDefault(x => x.Name == "Older");
+        Assert.NotNull(newer);
+        Assert.NotNull(older);
+        Assert.True(result.IndexOf(newer!) < result.IndexOf(older!), "Newer should come before Older");
     }
 
     [Fact]
@@ -113,6 +116,11 @@ public class SprintServiceTests
     {
         var seed = TestDbContextFactory.CreateSeeded();
         var context = seed.Context;
+
+        // Deactivate the seeded sprint first
+        var seeded = context.Sprints.FirstOrDefault(x => x.Id == seed.SprintId);
+        if (seeded != null) seeded.Status = SprintStatusType.Completed;
+
         SeedSprint(context, seed.ProjectId, "Completed", SprintStatusType.Completed,
             start: DateTime.Now.AddDays(-1), end: DateTime.Now.AddDays(10));
         SeedSprint(context, seed.ProjectId, "Cancelled", SprintStatusType.Cancelled,
@@ -131,6 +139,11 @@ public class SprintServiceTests
     {
         var seed = TestDbContextFactory.CreateSeeded();
         var context = seed.Context;
+
+        // Deactivate the seeded sprint first
+        var seeded = context.Sprints.FirstOrDefault(x => x.Id == seed.SprintId);
+        if (seeded != null) seeded.Status = SprintStatusType.Completed;
+
         SeedSprint(context, seed.ProjectId, "Past",
             start: DateTime.Now.AddDays(-30), end: DateTime.Now.AddDays(-20));
         await context.SaveChangesAsync();

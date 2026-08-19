@@ -118,11 +118,12 @@ public class TaskDependencyService : ITaskDependencyService
         if (id <= 0)
             return false;
 
-        var updated = await _context.TaskDependencies
-            .Where(x => x.Id == id)
-            .ExecuteUpdateAsync(u => u.SetProperty(x => x.ViewState, false));
+        var dep = await _context.TaskDependencies.FirstOrDefaultAsync(x => x.Id == id);
+        if (dep == null) return false;
 
-        return updated > 0;
+        dep.ViewState = false;
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<List<DependencyRiskItemViewModel>> GetProjectRiskOverviewAsync(int projectId)

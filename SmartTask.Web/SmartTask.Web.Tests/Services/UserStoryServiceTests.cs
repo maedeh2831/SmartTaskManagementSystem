@@ -80,7 +80,7 @@ public class UserStoryServiceTests
         var service = CreateService(context);
         var title = context.UserStories.First().Title;
 
-        var exists = await service.ExistsByTitleAsync(seed.UserStoryId, title);
+        var exists = await service.ExistsByTitleAsync(seed.BacklogId, title);
 
         Assert.True(exists);
     }
@@ -185,7 +185,19 @@ public class UserStoryServiceTests
     {
         var seed = TestDbContextFactory.CreateSeeded();
         var context = seed.Context;
-        var stories = context.UserStories.Take(2).ToList();
+
+        // Add a second story since SeedBase only creates one
+        var secondStory = new UserStory
+        {
+            ProjectId = seed.ProjectId,
+            BacklogId = seed.BacklogId,
+            Title = "Second story",
+            ViewState = true
+        };
+        context.UserStories.Add(secondStory);
+        await context.SaveChangesAsync();
+
+        var stories = context.UserStories.Where(x => x.ViewState).ToList();
         var orderedIds = new List<int> { stories[1].Id, stories[0].Id };
 
         var service = CreateService(context);

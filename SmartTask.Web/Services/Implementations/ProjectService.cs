@@ -78,45 +78,47 @@ public class ProjectService : BaseService<Project>, IProjectService
 
     public new async Task DeleteAsync(int id)
     {
-        await _context.Projects
-            .Where(x => x.Id == id)
-            .ExecuteUpdateAsync(p => p.SetProperty(x => x.ViewState, false));
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+        if (project == null) return;
+
+        project.ViewState = false;
+        await _context.SaveChangesAsync();
     }
 
     public async Task ArchiveAsync(int id)
     {
-        var updated = await _context.Projects
-            .Where(x => x.Id == id && x.ViewState && !x.IsArchived)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(x => x.IsArchived, true)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        if (project == null)
+            throw new InvalidOperationException("پروژه یافت نشد.");
 
-        if (updated == 0)
-            throw new InvalidOperationException("پروژه یافت نشد یا قبلاً بایگانی‌شده است.");
+        if (project.IsArchived)
+            return; // already archived, idempotent
+
+        project.IsArchived = true;
+        project.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 
     public async Task RestoreAsync(int id)
     {
-        var updated = await _context.Projects
-            .Where(x => x.Id == id && x.ViewState && x.IsArchived)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(x => x.IsArchived, false)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
-
-        if (updated == 0)
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id && x.ViewState && x.IsArchived);
+        if (project == null)
             throw new InvalidOperationException("پروژه یافت نشد یا قبلاً بازیابی‌شده است.");
+
+        project.IsArchived = false;
+        project.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdatePreferencesAsync(int id, string color, string icon)
     {
-        var updated = await _context.Projects
-            .Where(x => x.Id == id && x.ViewState)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(x => x.Color, color)
-                .SetProperty(x => x.Icon, icon)
-                .SetProperty(x => x.ChangeDate, DateTime.Now));
-
-        if (updated == 0)
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == id && x.ViewState);
+        if (project == null)
             throw new InvalidOperationException("پروژه یافت نشد.");
+
+        project.Color = color;
+        project.Icon = icon;
+        project.ChangeDate = DateTime.Now;
+        await _context.SaveChangesAsync();
     }
 }

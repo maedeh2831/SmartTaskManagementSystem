@@ -114,7 +114,7 @@ public class TaskDependencyServiceTests
         var removed = await service.RemoveDependencyAsync(depIdToRemove);
 
         Assert.True(removed);
-        Assert.Empty(context.TaskDependencies);
+        Assert.Empty(context.TaskDependencies.Where(d => d.ViewState));
     }
 
     [Fact]

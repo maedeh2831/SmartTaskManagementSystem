@@ -6,7 +6,7 @@
     var debounceTimer = null;
     var currentController = null;
 
-    var typeLabel = { Project: "پروژه", UserStory: "User Story", Task: "Task" };
+    var typeLabel = { Project: "پروژه", UserStory: "Story", Task: "Task", Sprint: "اسپرینت", Workspace: "فضای کاری", Label: "برچسب" };
 
     function render(results) {
         if (!results.length) {
@@ -45,7 +45,10 @@
             if (currentController) currentController.abort();
             currentController = new AbortController();
 
-            fetch("/Search/GlobalSearch?q=" + encodeURIComponent(q), { signal: currentController.signal })
+            fetch("/Search/GlobalSearch?q=" + encodeURIComponent(q), {
+                signal: currentController.signal,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
                 .then(function (res) { return res.json(); })
                 .then(render)
                 .catch(function (err) {
