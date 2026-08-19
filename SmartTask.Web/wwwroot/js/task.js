@@ -1,5 +1,36 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
+    // ===== Smart Back Button =====
+    var backBtn = document.getElementById("taskBackBtn");
+    if (backBtn) {
+        var fallback = backBtn.dataset.fallbackUrl || "/";
+        var referrer = document.referrer;
+        var sameOrigin = referrer && referrer.indexOf(window.location.origin) === 0;
+
+        // Detect where the user came from
+        if (sameOrigin) {
+            if (referrer.indexOf("/Sprint/Details") !== -1) {
+                document.getElementById("taskBackLabel").textContent = "بازگشت به اسپرینت";
+            } else if (referrer.indexOf("/Backlog") !== -1) {
+                document.getElementById("taskBackLabel").textContent = "بازگشت به بک‌لاگ";
+            } else if (referrer.indexOf("/TaskBoard") !== -1) {
+                document.getElementById("taskBackLabel").textContent = "بازگشت به TaskBoard";
+            } else if (referrer.indexOf("/UserStory/Details") !== -1) {
+                document.getElementById("taskBackLabel").textContent = "بازگشت به Story";
+            } else {
+                document.getElementById("taskBackLabel").textContent = "بازگشت";
+            }
+        }
+
+        backBtn.addEventListener("click", function () {
+            if (sameOrigin && window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = fallback;
+            }
+        });
+    }
+
     // ===== Delete Task =====
     document.querySelectorAll(".delete-task-form").forEach(form => {
         form.addEventListener("submit", function (e) {
@@ -284,99 +315,51 @@
 
 
 // ==========================================================
-// Task Details — Tab Switching
+// Task Details — Section Nav Scroll Spy
 // ==========================================================
 (function () {
 
-    const tabs = document.querySelectorAll(".task-tab-btn");
-    const panes = document.querySelectorAll(".task-tab-pane");
+    const sectionNav = document.querySelector(".task-section-nav");
+    if (!sectionNav) return;
 
-    if (!tabs.length || !panes.length)
-        return;
+    const links = sectionNav.querySelectorAll(".task-section-link");
+    const sections = document.querySelectorAll(".task-section");
+    if (!links.length || !sections.length) return;
 
-    function activateTab(tabKey, updateUrl = true) {
-
-        tabs.forEach(tab => {
-            const isActive = tab.dataset.tab === tabKey;
-
-            tab.classList.toggle("active", isActive);
-            tab.setAttribute("aria-selected", isActive ? "true" : "false");
+    function activateLink(id) {
+        links.forEach(link => {
+            const isActive = link.getAttribute("href") === "#" + id;
+            link.classList.toggle("active", isActive);
         });
-
-        panes.forEach(pane => {
-            const isActive = pane.dataset.tabPane === tabKey;
-
-            pane.classList.toggle("active", isActive);
-            pane.hidden = !isActive;
-        });
-
-        if (updateUrl) {
-            const url = new URL(window.location.href);
-
-            url.searchParams.set("tab", tabKey);
-
-            window.history.replaceState(
-                { tab: tabKey },
-                "",
-                url
-            );
-        }
     }
 
-    // ------------------------------------------
-    // Tab click
-    // ------------------------------------------
-
-    tabs.forEach(tab => {
-
-        tab.addEventListener("click", function () {
-
-            const tabKey = this.dataset.tab;
-
-            if (!tabKey)
-                return;
-
-            activateTab(tabKey);
-
+    // Intersection Observer for scroll spy
+    const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                activateLink(entry.target.id);
+            }
         });
-
+    }, {
+        rootMargin: "-20% 0px -60% 0px",
+        threshold: 0
     });
 
-    // ------------------------------------------
-    // Browser Back / Forward
-    // ------------------------------------------
+    sections.forEach(section => observer.observe(section));
 
-    window.addEventListener("popstate", function () {
-
-        const url = new URL(window.location.href);
-        const tabKey = url.searchParams.get("tab");
-
-        if (tabKey && document.querySelector(
-            `.task-tab-btn[data-tab="${tabKey}"]`
-        )) {
-            activateTab(tabKey, false);
-        } else {
-            activateTab("overview", false);
-        }
-
+    // Smooth scroll on link click
+    links.forEach(link => {
+        link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href").substring(1);
+            const target = document.getElementById(targetId);
+            if (target) {
+                const navHeight = sectionNav.offsetHeight + 20;
+                const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                window.scrollTo({ top: top, behavior: "smooth" });
+            }
+        });
     });
-
-    // ------------------------------------------
-    // Initial tab
-    // ------------------------------------------
-
-    const url = new URL(window.location.href);
-    const initialTab = url.searchParams.get("tab");
-
-    const validInitialTab =
-        initialTab &&
-            document.querySelector(
-                `.task-tab-btn[data-tab="${initialTab}"]`
-            )
-            ? initialTab
-            : "overview";
-
-    activateTab(validInitialTab, false);
 
 })();
 

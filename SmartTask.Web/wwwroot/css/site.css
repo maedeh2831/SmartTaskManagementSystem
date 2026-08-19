@@ -475,3 +475,40 @@ body.auth-body {
     border-radius: 50%;
     object-fit: cover;
 }
+
+/* ==================================================
+   RTL: Auto-flip directional icons
+   Font Awesome 6 no longer auto-flips in RTL.
+   This flips all arrow/chevron/bracket icons.
+================================================== */
+
+[dir="rtl"] .fa-arrow-right,
+[dir="rtl"] .fa-arrow-left,
+[dir="rtl"] .fa-arrow-up,
+[dir="rtl"] .fa-arrow-down,
+[dir="rtl"] .fa-chevron-right,
+[dir="rtl"] .fa-chevron-left,
+[dir="rtl"] .fa-chevron-up,
+[dir="rtl"] .fa-chevron-down,
+[dir="rtl"] .fa-angle-right,
+[dir="rtl"] .fa-angle-left,
+[dir="rtl"] .fa-angle-up,
+[dir="rtl"] .fa-angle-down,
+[dir="rtl"] .fa-caret-right,
+[dir="rtl"] .fa-caret-left,
+[dir="rtl"] .fa-caret-up,
+[dir="rtl"] .fa-caret-down,
+[dir="rtl"] .fa-chevron-right-long,
+[dir="rtl"] .fa-chevron-left-long,
+[dir="rtl"] .fa-arrow-right-long,
+[dir="rtl"] .fa-arrow-left-long,
+[dir="rtl"] .fa-hand-point-right,
+[dir="rtl"] .fa-hand-point-left,
+[dir="rtl"] .fa-circle-chevron-right,
+[dir="rtl"] .fa-circle-chevron-left,
+[dir="rtl"] .fa-square-caret-right,
+[dir="rtl"] .fa-square-caret-left,
+[dir="rtl"] .fa-toggle-on,
+[dir="rtl"] .fa-toggle-off {
+    transform: scaleX(-1);
+}

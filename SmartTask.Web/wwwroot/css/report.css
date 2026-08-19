@@ -89,6 +89,15 @@
     color: #E11D48;
 }
 
+/* Dark mode */
+[data-theme="dark"] .report-stat-danger .report-stat-value {
+    color: #FB7185;
+}
+
+[data-theme="dark"] .report-stat-value {
+    color: var(--text);
+}
+
 .report-tabs {
     display: flex;
     gap: 8px;
@@ -243,6 +252,25 @@
     .btn-export-excel:hover {
         background: #DCFCE7;
     }
+
+/* Dark mode */
+[data-theme="dark"] .btn-export-pdf {
+    background: rgba(220, 38, 38, .12);
+    color: #F87171;
+}
+
+[data-theme="dark"] .btn-export-pdf:hover {
+    background: rgba(220, 38, 38, .2);
+}
+
+[data-theme="dark"] .btn-export-excel {
+    background: rgba(22, 163, 74, .12);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .btn-export-excel:hover {
+    background: rgba(22, 163, 74, .2);
+}
 
 @media (max-width: 992px) {
     .report-stats-grid,

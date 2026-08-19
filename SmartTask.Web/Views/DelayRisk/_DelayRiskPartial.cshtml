@@ -1,20 +1,172 @@
+@using SmartTask.Web.Models.ViewModels.Search
 @model SmartTask.Web.Models.ViewModels.Risk.DelayRiskViewModel
+@{
+    var riskLevelIcon = Model.RiskLevel switch
+    {
+        "low"      => "fa-solid fa-shield-check",
+        "medium"   => "fa-solid fa-triangle-exclamation",
+        "high"     => "fa-solid fa-circle-exclamation",
+        "critical" => "fa-solid fa-skull-crossbones",
+        _          => "fa-solid fa-circle-info"
+    };
+}
 
-<style>
-    .redirect-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: var(--card); border: 1px solid var(--gray200); border-radius: 12px; }
-    .redirect-icon { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 24px; margin-bottom: 18px; }
-    .redirect-card h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--gray800); }
-    .redirect-card p { margin: 0 0 20px; color: var(--gray500); font-size: 13px; line-height: 1.8; }
-    .redirect-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 6px rgba(91,95,239,.18); transition: background .2s ease, transform .15s ease; }
-    .redirect-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-</style>
+<!-- Risk Summary Stats -->
+<div class="delayrisk-summary" role="list" aria-label="خلاصه ریسک">
 
-<div class="redirect-card">
-    <div class="redirect-icon"><i class="fa-solid fa-chart-line"></i></div>
-    <h3>پیش‌بینی ریسک تأخیر</h3>
-    <p>تحلیل ترکیبی بارکاری، وابستگی‌ها و روند تأخیرها با هوش مصنوعی.</p>
-    <a href="/DelayRisk/Index?projectId=@Model.ProjectId" class="redirect-btn" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        باز کردن پیش‌بینی ریسک
-    </a>
+    <div class="delayrisk-summary-item" role="listitem">
+        <span class="delayrisk-summary-icon icon-danger">
+            <i class="fa-solid fa-calendar-xmark"></i>
+        </span>
+        <div class="delayrisk-summary-text">
+            <span class="delayrisk-summary-value fa-digits">@Model.OverdueTasksCount</span>
+            <span class="delayrisk-summary-label">Task عقب‌افتاده</span>
+        </div>
+    </div>
+
+    <div class="delayrisk-summary-item" role="listitem">
+        <span class="delayrisk-summary-icon icon-warning">
+            <i class="fa-solid fa-users"></i>
+        </span>
+        <div class="delayrisk-summary-text">
+            <span class="delayrisk-summary-value fa-digits">@Model.OverloadedMembersCount</span>
+            <span class="delayrisk-summary-label">عضو اضافه‌بار</span>
+        </div>
+    </div>
+
+    <div class="delayrisk-summary-item" role="listitem">
+        <span class="delayrisk-summary-icon icon-info">
+            <i class="fa-solid fa-link"></i>
+        </span>
+        <div class="delayrisk-summary-text">
+            <span class="delayrisk-summary-value fa-digits">@Model.RiskyDependencyChainsCount</span>
+            <span class="delayrisk-summary-label">زنجیره پرریسک</span>
+        </div>
+    </div>
+
+    <div class="delayrisk-summary-item" role="listitem">
+        <span class="delayrisk-summary-icon icon-success">
+            <i class="fa-solid fa-arrows-rotate"></i>
+        </span>
+        <div class="delayrisk-summary-text">
+            <span class="delayrisk-summary-value fa-digits">@Model.RecentCascadeCount</span>
+            <span class="delayrisk-summary-label">تمدید خودکار</span>
+        </div>
+    </div>
+
 </div>
+
+
+<!-- Risk Gauge Card -->
+<div class="risk-gauge-card" role="region" aria-label="گیج ریسک">
+
+    <div class="dashboard-donut-wrap risk-donut-wrap">
+        <svg viewBox="0 0 120 120"
+             class="dashboard-donut"
+             data-progress="@Model.RiskScore"
+             aria-label="@Model.RiskScore از ۱۰۰">
+            <circle cx="60" cy="60" r="52" class="donut-track"></circle>
+            <circle cx="60" cy="60" r="52"
+                    class="donut-value risk-donut-value status-@Model.RiskLevel"></circle>
+        </svg>
+        <div class="dashboard-donut-label">
+            <strong class="fa-digits">@Model.RiskScore</strong>
+            <span>از ۱۰۰</span>
+        </div>
+    </div>
+
+    <div class="risk-gauge-info">
+
+        <span class="risk-level-pill status-@Model.RiskLevel">
+            <i class="@riskLevelIcon"></i>
+            سطح ریسک: @Model.RiskLevelDisplay
+        </span>
+
+        <div class="risk-factor-list" role="list">
+
+            <div class="risk-factor-row" role="listitem">
+                <span class="risk-factor-label">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                    Task های عقب‌افتاده
+                </span>
+                <span class="risk-factor-value @(Model.OverdueTasksCount > 0 ? "value-danger" : "")">
+                    <span class="fa-digits">@Model.OverdueTasksCount</span> از
+                    <span class="fa-digits">@Model.TotalOpenTasksCount</span>
+                </span>
+            </div>
+
+            <div class="risk-factor-divider"></div>
+
+            <div class="risk-factor-row" role="listitem">
+                <span class="risk-factor-label">
+                    <i class="fa-solid fa-users"></i>
+                    اعضای اضافه‌بار
+                </span>
+                <span class="risk-factor-value @(Model.OverloadedMembersCount > 0 ? "value-warning" : "")">
+                    <span class="fa-digits">@Model.OverloadedMembersCount</span> از
+                    <span class="fa-digits">@Model.TotalMembersCount</span>
+                </span>
+            </div>
+
+            <div class="risk-factor-divider"></div>
+
+            <div class="risk-factor-row" role="listitem">
+                <span class="risk-factor-label">
+                    <i class="fa-solid fa-link"></i>
+                    زنجیره‌های پرریسک وابستگی
+                </span>
+                <span class="risk-factor-value @(Model.RiskyDependencyChainsCount > 0 ? "value-danger" : "")">
+                    <span class="fa-digits">@Model.RiskyDependencyChainsCount</span>
+                </span>
+            </div>
+
+            <div class="risk-factor-divider"></div>
+
+            <div class="risk-factor-row" role="listitem">
+                <span class="risk-factor-label">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    تمدید خودکار (۷ روز اخیر)
+                </span>
+                <span class="risk-factor-value @(Model.RecentCascadeCount > 0 ? "value-warning" : "")">
+                    <span class="fa-digits">@Model.RecentCascadeCount</span>
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- AI Narrative Card -->
+<div class="ai-narrative-card">
+
+    <div class="ai-narrative-header">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <h3>تحلیل هوشمند وضعیت پروژه</h3>
+    </div>
+
+    <div id="narrativeBox" class="ai-narrative-box">
+        <div class="ai-narrative-placeholder">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>برای دریافت تحلیل هوشمند، دکمه زیر را بزنید.</span>
+        </div>
+    </div>
+
+    <button type="button"
+            id="generateNarrativeBtn"
+            class="ai-generate-btn"
+            data-project-id="@Model.ProjectId"
+            aria-label="تولید تحلیل هوشمند">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        تولید تحلیل هوشمند
+    </button>
+
+</div>
+
+<script>
+    document.querySelectorAll('.fa-digits').forEach(function(el) {
+        var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+        el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+    });
+</script>

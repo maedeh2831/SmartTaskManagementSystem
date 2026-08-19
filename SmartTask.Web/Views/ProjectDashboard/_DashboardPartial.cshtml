@@ -1,21 +1,222 @@
-
 @model SmartTask.Web.Models.ViewModels.ProjectDashboard.ProjectDashboardViewModel
 
-<style>
-    .redirect-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: var(--card); border: 1px solid var(--gray200); border-radius: 12px; }
-    .redirect-icon { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 24px; margin-bottom: 18px; }
-    .redirect-card h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--gray800); }
-    .redirect-card p { margin: 0 0 20px; color: var(--gray500); font-size: 13px; line-height: 1.8; }
-    .redirect-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 6px rgba(91,95,239,.18); transition: background .2s ease, transform .15s ease; }
-    .redirect-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-</style>
+@if (Model.Health != null)
+{
+    <div class="health-score-card status-@Model.Health.HealthLevel">
 
-<div class="redirect-card">
-    <div class="redirect-icon"><i class="fa-solid fa-gauge"></i></div>
-    <h3>داشبورد پروژه</h3>
-    <p>نمودارها و آمار پیشرفت پروژه در صفحه اختصاصی داشبورد نمایش داده می‌شوند.</p>
-    <a href="/ProjectDashboard/Index?projectId=@Model.ProjectId" class="redirect-btn" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        باز کردن داشبورد
-    </a>
+        <div class="health-score-main">
+            <i class="@Model.Health.HealthIcon health-score-icon"></i>
+            <div>
+                <div class="health-score-number">@Model.Health.HealthScore<span>/100</span></div>
+                <div class="health-score-label">شاخص سلامت پروژه — @Model.Health.HealthLevelDisplay</div>
+            </div>
+        </div>
+
+        <div class="health-score-breakdown">
+
+            <div class="health-factor">
+                <div class="dashboard-donut-wrap health-mini-donut">
+                    <svg viewBox="0 0 60 60">
+                        <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                        <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.ScheduleHealth"></circle>
+                    </svg>
+                    <span>@Model.Health.ScheduleHealth</span>
+                </div>
+                <span>زمان‌بندی</span>
+            </div>
+
+            <div class="health-factor">
+                <div class="dashboard-donut-wrap health-mini-donut">
+                    <svg viewBox="0 0 60 60">
+                        <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                        <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.WorkloadHealth"></circle>
+                    </svg>
+                    <span>@Model.Health.WorkloadHealth</span>
+                </div>
+                <span>بارکاری</span>
+            </div>
+
+            <div class="health-factor">
+                <div class="dashboard-donut-wrap health-mini-donut">
+                    <svg viewBox="0 0 60 60">
+                        <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                        <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.DependencyHealth"></circle>
+                    </svg>
+                    <span>@Model.Health.DependencyHealth</span>
+                </div>
+                <span>وابستگی</span>
+            </div>
+
+            <div class="health-factor">
+                <div class="dashboard-donut-wrap health-mini-donut">
+                    <svg viewBox="0 0 60 60">
+                        <circle cx="30" cy="30" r="24" class="health-mini-track"></circle>
+                        <circle cx="30" cy="30" r="24" class="health-mini-value" data-value="@Model.Health.DeliveryHealth"></circle>
+                    </svg>
+                    <span>@Model.Health.DeliveryHealth</span>
+                </div>
+                <span>پیشرفت واقعی</span>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+<!-- Stat Cards -->
+<div class="team-stat-grid dashboard-stat-grid">
+
+    <div class="team-stat-card">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+            <h4>@Model.Status.GetDisplayName()</h4>
+            <span>وضعیت پروژه</span>
+        </div>
+    </div>
+
+    <div class="team-stat-card">
+        <i class="fa-solid fa-flag"></i>
+        <div>
+            <h4>@Model.Priority.GetDisplayName()</h4>
+            <span>اولویت</span>
+        </div>
+    </div>
+
+    <div class="team-stat-card">
+        <i class="fa-solid fa-users"></i>
+        <div>
+            <h4>@Model.MembersCount</h4>
+            <span>عضو پروژه</span>
+        </div>
+    </div>
+
+    <div class="team-stat-card">
+        <i class="fa-solid fa-people-group"></i>
+        <div>
+            <h4>@Model.TeamsCount</h4>
+            <span>تیم مرتبط</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Charts Row -->
+<div class="dashboard-charts-grid">
+
+    <!-- Completion Donut -->
+    <div class="team-detail-card dashboard-chart-card">
+        <h3><i class="fa-solid fa-chart-pie"></i> پیشرفت پروژه</h3>
+
+        <div class="dashboard-donut-wrap">
+            <svg viewBox="0 0 120 120" class="dashboard-donut" data-progress="@Model.ProgressPercentage">
+                <circle cx="60" cy="60" r="52" class="donut-track"></circle>
+                <circle cx="60" cy="60" r="52" class="donut-value" style="stroke:@Model.Color"></circle>
+            </svg>
+            <div class="dashboard-donut-label">
+                <strong>@Model.ProgressPercentage%</strong>
+                <span>پیشرفت</span>
+            </div>
+        </div>
+
+        @if (Model.DueDate.HasValue)
+        {
+            <div class="dashboard-timeline-info @(Model.IsOverdue ? "overdue" : "")">
+                <i class="fa-regular fa-calendar"></i>
+                @if (Model.IsOverdue)
+                {
+                    <span>@Math.Abs(Model.DaysRemaining!.Value) روز از موعد گذشته</span>
+                }
+                else if (Model.DaysRemaining.HasValue)
+                {
+                    <span>@Model.DaysRemaining روز تا موعد تحویل باقی مانده</span>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="team-empty-text">موعد تحویلی برای این پروژه تعیین نشده است.</p>
+        }
+    </div>
+
+    <!-- Member Workload -->
+    <div class="team-detail-card dashboard-chart-card">
+        <h3><i class="fa-solid fa-users-gear"></i> توزیع نقش اعضا</h3>
+
+        @if (!Model.RoleDistribution.Any())
+        {
+            <p class="team-empty-text">هنوز عضوی به این پروژه اضافه نشده است.</p>
+        }
+        else
+        {
+            <div class="dashboard-bar-list">
+                @{
+                    var maxCount = Model.RoleDistribution.Max(x => x.Count);
+                }
+                @foreach (var item in Model.RoleDistribution)
+                {
+                    var widthPercent = maxCount == 0 ? 0 : (item.Count * 100 / maxCount);
+                    <div class="dashboard-bar-row">
+                        <span class="dashboard-bar-label">@item.Role.GetDisplayName()</span>
+                        <div class="dashboard-bar-track">
+                            <div class="dashboard-bar-fill role-@item.Role.ToString().ToLower()" style="width:@widthPercent%"></div>
+                        </div>
+                        <span class="dashboard-bar-count">@item.Count</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- Bottom Row -->
+<div class="dashboard-charts-grid">
+
+    <!-- Recent Activity -->
+    <div class="team-detail-card">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> آخرین اعضای اضافه‌شده</h3>
+
+        @if (!Model.RecentMembers.Any())
+        {
+            <p class="team-empty-text">فعالیتی ثبت نشده است.</p>
+        }
+        else
+        {
+            <div class="dashboard-activity-list">
+                @foreach (var member in Model.RecentMembers)
+                {
+                    <div class="dashboard-activity-item">
+                        <div class="preview-logo" style="width:38px;height:38px;font-size:14px;">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="dashboard-activity-text">
+                            <strong>@member.FullName</strong>
+                            <span>با نقش @member.Role.GetDisplayName() به پروژه پیوست</span>
+                        </div>
+                        <small>@Html.DisplayDate(member.JoinedDate)</small>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Team Widget -->
+    <div class="team-detail-card">
+        <h3><i class="fa-solid fa-people-group"></i> تیم‌های مرتبط</h3>
+
+        @if (!Model.TeamNames.Any())
+        {
+            <p class="team-empty-text">هیچ تیمی به این پروژه متصل نیست.</p>
+        }
+        else
+        {
+            <div class="team-project-chips">
+                @foreach (var teamName in Model.TeamNames)
+                {
+                    <span class="team-project-chip">@teamName</span>
+                }
+            </div>
+        }
+    </div>
+
 </div>

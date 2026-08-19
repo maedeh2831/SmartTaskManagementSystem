@@ -1,22 +1,112 @@
-@{
-    int projectId = (int)(ViewData["ProjectId"] ?? 0);
-}
+@model SmartTask.Web.Models.ViewModels.Offroad.OffroadIndexViewModel
+@using SmartTask.Web.Models.Enums
 
-<style>
-    .redirect-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: var(--card); border: 1px solid var(--gray200); border-radius: 12px; }
-    .redirect-icon { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 24px; margin-bottom: 18px; }
-    .redirect-card h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--gray800); }
-    .redirect-card p { margin: 0 0 20px; color: var(--gray500); font-size: 13px; line-height: 1.8; }
-    .redirect-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 6px rgba(91,95,239,.18); transition: background .2s ease, transform .15s ease; }
-    .redirect-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-</style>
+<div class="details-card">
+    <div class="card-title">
+        <i class="fa-solid fa-plus"></i>
+        ثبت کار آفرود جدید
+    </div>
 
-<div class="redirect-card">
-    <div class="redirect-icon"><i class="fa-solid fa-route"></i></div>
-    <h3>آفرود</h3>
-    <p>ابزار مدیریت وظایف خارج از مسیر عادی پروژه.</p>
-    <a href="/Offroad/Index?projectId=@projectId" class="redirect-btn" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        باز کردن آفرود
-    </a>
+    <form asp-action="QuickAdd" asp-controller="Offroad" method="post" class="offroad-quick-add-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+
+        <div class="offroad-form-row">
+            <input type="text" name="Title" class="form-control" placeholder="عنوان کار (مثلاً: رفع مشکل سرور استیجینگ)" required maxlength="200" />
+
+            <select name="Priority" class="form-control offroad-select-sm">
+                <option value="@((int)OffroadPriorityType.Low)">کم</option>
+                <option value="@((int)OffroadPriorityType.Normal)" selected>معمولی</option>
+                <option value="@((int)OffroadPriorityType.Urgent)">فوری</option>
+            </select>
+
+            <select name="AssignedToUserId" class="form-control offroad-select-sm">
+                <option value="">— تخصیص (اختیاری) —</option>
+                @foreach (var member in Model.ProjectMembers)
+                {
+                    <option value="@member.Value">@member.Text</option>
+                }
+            </select>
+
+            <input asp-date-name="DueDate" class="form-control offroad-select-sm" />
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                ثبت
+            </button>
+        </div>
+
+        <textarea name="Description" class="form-control" rows="2" placeholder="توضیح بیشتر (اختیاری)..." style="margin-top:12px;"></textarea>
+    </form>
+</div>
+
+<div class="details-card">
+    <div class="card-title">
+        <i class="fa-solid fa-list-check"></i>
+        لیست کارهای آفرود
+        <span class="subtask-progress-text">(@Model.Tasks.Count)</span>
+    </div>
+
+    @if (!Model.Tasks.Any())
+    {
+        <div class="team-empty-text">هنوز کار آفرودی ثبت نشده است.</div>
+    }
+    else
+    {
+        <div class="offroad-list" data-project-id="@Model.ProjectId">
+            @foreach (var task in Model.Tasks)
+            {
+                <div class="offroad-row @(task.Status == OffroadStatusType.Done ? "done" : "")" data-id="@task.Id">
+
+                    <div class="offroad-row-main">
+                        <h4>@task.Title</h4>
+                        @if (!string.IsNullOrWhiteSpace(task.Description))
+                        {
+                            <p>@task.Description</p>
+                        }
+                        <div class="offroad-row-meta">
+                            <span><i class="fa-regular fa-user"></i> ثبت‌کننده: @task.CreatedByName</span>
+                            @if (!string.IsNullOrWhiteSpace(task.AssignedToName))
+                            {
+                                <span><i class="fa-solid fa-user-check"></i> تخصیص به: @task.AssignedToName</span>
+                            }
+                            @if (task.DueDate.HasValue)
+                            {
+                                <span><i class="fa-regular fa-calendar"></i> موعد: @Html.DisplayDate(task.DueDate)</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="offroad-row-actions">
+
+                        <select class="form-control offroad-status-select" data-id="@task.Id" @(task.CanManage ? "" : "disabled")>
+                            <option value="@((int)OffroadStatusType.ToDo)" selected="@(task.Status == OffroadStatusType.ToDo)">برای انجام</option>
+                            <option value="@((int)OffroadStatusType.InProgress)" selected="@(task.Status == OffroadStatusType.InProgress)">درحال انجام</option>
+                            <option value="@((int)OffroadStatusType.Done)" selected="@(task.Status == OffroadStatusType.Done)">انجام‌شده</option>
+                        </select>
+
+                        <select class="form-control offroad-priority-select priority-@task.Priority.ToString().ToLower()" data-id="@task.Id" @(task.CanManage ? "" : "disabled")>
+                            <option value="@((int)OffroadPriorityType.Low)" selected="@(task.Priority == OffroadPriorityType.Low)">کم</option>
+                            <option value="@((int)OffroadPriorityType.Normal)" selected="@(task.Priority == OffroadPriorityType.Normal)">معمولی</option>
+                            <option value="@((int)OffroadPriorityType.Urgent)" selected="@(task.Priority == OffroadPriorityType.Urgent)">فوری</option>
+                        </select>
+
+                        @if (task.CanManage)
+                        {
+                            <form asp-action="Delete" asp-controller="Offroad" method="post" class="delete-offroad-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@task.Id" />
+                                <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                <button type="submit" class="workspace-delete-btn">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        }
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
 </div>

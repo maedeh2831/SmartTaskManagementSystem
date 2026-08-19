@@ -1,20 +1,187 @@
 @model SmartTask.Web.Models.ViewModels.Dependency.DependencyRiskIndexViewModel
+@{
+    var totalRisky = Model.RiskyTasks.Count;
+    var totalImpacted = Model.RiskyTasks.Sum(r => r.ImpactedTaskCount);
+    var maxDelay = Model.RiskyTasks.Any() ? Model.RiskyTasks.Max(r => r.DelayDays) : 0;
+}
 
-<style>
-    .redirect-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: var(--card); border: 1px solid var(--gray200); border-radius: 12px; }
-    .redirect-icon { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 24px; margin-bottom: 18px; }
-    .redirect-card h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--gray800); }
-    .redirect-card p { margin: 0 0 20px; color: var(--gray500); font-size: 13px; line-height: 1.8; }
-    .redirect-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 6px rgba(91,95,239,.18); transition: background .2s ease, transform .15s ease; }
-    .redirect-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-</style>
+<!-- Risk Stats Summary -->
+@if (Model.RiskyTasks.Any())
+{
+    <div class="dependency-stats-bar" role="region" aria-label="خلاصه ریسک‌ها">
+        <div class="dependency-stat-item stat-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <strong class="fa-digits">@totalRisky</strong>
+            Task ریسک‌دار
+        </div>
+        <span class="dependency-stat-divider"></span>
+        <div class="dependency-stat-item stat-warning">
+            <i class="fa-solid fa-link"></i>
+            <strong class="fa-digits">@totalImpacted</strong>
+            Task متأثر
+        </div>
+        <span class="dependency-stat-divider"></span>
+        <div class="dependency-stat-item stat-danger">
+            <i class="fa-solid fa-hourglass-end"></i>
+            حداکثر تأخیر
+            <strong class="fa-digits">@maxDelay</strong>
+            روز
+        </div>
+    </div>
+}
 
-<div class="redirect-card">
-    <div class="redirect-icon"><i class="fa-solid fa-diagram-project"></i></div>
-    <h3>تحلیل ریسک وابستگی</h3>
-    <p>نمودار گرافی وابستگی تسک‌ها و شناسایی زنجیره‌های پرریسک.</p>
-    <a href="/Dependency/Index?projectId=@Model.ProjectId" class="redirect-btn" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        باز کردن وابستگی
-    </a>
+
+<!-- Tabs -->
+<div class="dependency-tabs" id="dependencyTabs" role="tablist" aria-label="نمای وابستگی‌ها">
+    <button type="button"
+            class="dependency-tab-btn active"
+            data-tab="riskList"
+            role="tab"
+            aria-selected="true"
+            aria-controls="riskList">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        لیست ریسک‌ها
+    </button>
+    <button type="button"
+            class="dependency-tab-btn"
+            data-tab="graphView"
+            role="tab"
+            aria-selected="false"
+            aria-controls="graphView">
+        <i class="fa-solid fa-share-nodes"></i>
+        نمای گراف
+    </button>
 </div>
+
+
+<!-- Tab: Risk List -->
+<div class="dependency-tab-panel"
+     id="riskList"
+     role="tabpanel"
+     aria-label="لیست ریسک‌ها">
+
+    @if (!Model.RiskyTasks.Any())
+    {
+        <div class="workspace-empty">
+            <div class="workspace-empty-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3>هیچ ریسک زنجیره‌ای شناسایی نشد</h3>
+            <p>هیچ Task عقب‌افتاده‌ای وجود ندارد که روی Task دیگری تأثیر بگذارد.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Search -->
+        <div class="dependency-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text"
+                   id="dependencySearchInput"
+                   placeholder="جستجوی Task..."
+                   autocomplete="off"
+                   aria-label="جستجوی ریسک" />
+        </div>
+
+        <div class="dependency-risk-list" id="dependencyRiskList" role="list">
+            @foreach (var risk in Model.RiskyTasks)
+            {
+                <div class="dependency-risk-card"
+                     data-title="@risk.Title.ToLower()"
+                     role="listitem">
+
+                    <div class="dependency-risk-header">
+                        <div>
+                            <h4>
+                                <a asp-controller="Task"
+                                   asp-action="Details"
+                                   asp-route-id="@risk.TaskId">
+                                    @risk.Title
+                                </a>
+                            </h4>
+                            <span class="dependency-risk-delay">
+                                <i class="fa-solid fa-hourglass-end" style="font-size:10px;"></i>
+                                @risk.DelayDays روز تأخیر
+                            </span>
+                        </div>
+                        <span class="dependency-risk-count">
+                            <i class="fa-solid fa-link" style="font-size:10px;"></i>
+                            <span class="fa-digits">@risk.ImpactedTaskCount</span>
+                            Task متأثر
+                        </span>
+                    </div>
+
+                    <div class="dependency-risk-chips">
+                        @foreach (var title in risk.ImpactedTaskTitles)
+                        {
+                            <span class="dependency-risk-chip">
+                                <i class="fa-solid fa-arrow-left" style="font-size:9px; opacity:.5;"></i>
+                                @title
+                            </span>
+                        }
+                        @if (risk.ImpactedTaskCount > risk.ImpactedTaskTitles.Count)
+                        {
+                            <span class="dependency-risk-chip dependency-risk-more">
+                                +@(risk.ImpactedTaskCount - risk.ImpactedTaskTitles.Count) مورد دیگر
+                            </span>
+                        }
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+
+<!-- Tab: Graph View -->
+<div class="dependency-tab-panel d-none"
+     id="graphView"
+     role="tabpanel"
+     aria-label="نمای گراف">
+
+    <div class="dependency-graph-toolbar">
+
+        <div class="dependency-graph-legend" role="img" aria-label="راهنمای رنگ‌ها">
+            <span><i class="dependency-legend-dot normal"></i> عادی</span>
+            <span><i class="dependency-legend-dot overdue"></i> عقب‌افتاده</span>
+            <span><i class="dependency-legend-dot risk"></i> ریسک زنجیره‌ای</span>
+            <span><i class="dependency-legend-dot done"></i> انجام‌شده</span>
+        </div>
+
+        <div class="dependency-graph-actions">
+            <button type="button" id="graphFitBtn" title="نمایش کامل" aria-label="نمایش کامل">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+            <button type="button" id="graphZoomInBtn" title="بزرگنمایی" aria-label="بزرگنمایی">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+            <button type="button" id="graphZoomOutBtn" title="کوچک‌نمایی" aria-label="کوچک‌نمایی">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <div id="dependencyGraph"
+         class="dependency-graph-canvas"
+         data-project-id="@Model.ProjectId"></div>
+
+    <div id="dependencyGraphLoading" class="dependency-graph-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>در حال بارگذاری گراف...</span>
+    </div>
+
+    <div id="dependencyGraphEmpty" class="dependency-graph-state d-none">
+        <i class="fa-solid fa-diagram-project"></i>
+        <span>هیچ وابستگی‌ای بین Taskهای این پروژه ثبت نشده است.</span>
+    </div>
+
+</div>
+
+<script>
+    document.querySelectorAll('.fa-digits').forEach(function(el) {
+        var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+        el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+    });
+</script>

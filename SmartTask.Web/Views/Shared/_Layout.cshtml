@@ -41,6 +41,33 @@
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/custom-select.css" asp-append-version="true" />
+    <!-- Preload all page CSS for instant SPA navigation -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/home-dashboard.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/workspace-dashboard.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/taskboard.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/task.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/task-pages.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/workload.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/dependency.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/delayrisk.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/offroad.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/tasktrade.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/planning.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/label.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/report.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/reminder.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/userstory.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="~/css/project-settings.css" asp-append-version="true" media="print" onload="this.media='all'" />
     <!-- Webpushr -->
     <form id="webpushrAntiForgeryForm" style="display:none;">
         @Html.AntiForgeryToken()

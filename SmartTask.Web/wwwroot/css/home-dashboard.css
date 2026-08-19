@@ -107,6 +107,30 @@
         color: #DC2626;
     }
 
+/* Dark mode: icon colors */
+[data-theme="dark"] .report-stat-icon.icon-success {
+    background: rgba(22, 163, 74, .15);
+    color: #4ADE80;
+}
+
+[data-theme="dark"] .report-stat-icon.icon-info {
+    background: rgba(37, 99, 235, .15);
+    color: #60A5FA;
+}
+
+[data-theme="dark"] .report-stat-icon.icon-danger {
+    background: rgba(220, 38, 38, .15);
+    color: #F87171;
+}
+
+[data-theme="dark"] .report-stat-value {
+    color: var(--text);
+}
+
+[data-theme="dark"] .report-stat-label {
+    color: var(--gray400);
+}
+
 .report-stat-text {
     display: flex;
     flex-direction: column;
@@ -146,6 +170,25 @@
     .report-stat-danger .report-stat-label {
         color: #B91C1C;
     }
+
+/* Dark mode: danger stat */
+[data-theme="dark"] .report-stat-danger {
+    border-color: rgba(239, 68, 68, .25);
+    background: rgba(239, 68, 68, .1);
+}
+
+[data-theme="dark"] .report-stat-danger:hover {
+    border-color: rgba(239, 68, 68, .4);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, .15);
+}
+
+[data-theme="dark"] .report-stat-danger .report-stat-value {
+    color: #F87171;
+}
+
+[data-theme="dark"] .report-stat-danger .report-stat-label {
+    color: #FCA5A5;
+}
 
 
 /* ==========================================================
@@ -304,6 +347,18 @@
 .home-upcoming-days.urgent {
     background: #FEE2E2;
     color: #B91C1C;
+}
+
+/* Dark mode: upcoming days */
+[data-theme="dark"] .home-upcoming-days {
+    background: rgba(254, 243, 199, .12);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .home-upcoming-days.urgent {
+    background: rgba(239, 68, 68, .12);
+    color: #F87171;
+}
 }
 
 

@@ -16,6 +16,8 @@ using SmartTask.Web.Models.ViewModels.Workload;
 using SmartTask.Web.Models.ViewModels.Risk;
 using SmartTask.Web.Models.ViewModels.Dependency;
 using SmartTask.Web.Models.ViewModels.ProjectDashboard;
+using SmartTask.Web.Models.ViewModels.Offroad;
+using SmartTask.Web.Models.ViewModels.TaskTrade;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SmartTask.Web.Controllers;
@@ -29,6 +31,9 @@ public class ProjectController : BaseController
     private readonly ICurrentContextService _currentContextService;
     private readonly IProjectDashboardService _projectDashboardService;
     private readonly IProjectHealthService _projectHealthService;
+    private readonly IOffroadTaskService _offroadTaskService;
+    private readonly ITaskTradeService _taskTradeService;
+    private readonly IProjectMemberService _projectMemberService;
 
     public ProjectController(
         IProjectService projectService,
@@ -37,7 +42,10 @@ public class ProjectController : BaseController
         ApplicationDbContext context,
         ICurrentContextService currentContextService,
         IProjectDashboardService projectDashboardService,
-        IProjectHealthService projectHealthService)
+        IProjectHealthService projectHealthService,
+        IOffroadTaskService offroadTaskService,
+        ITaskTradeService taskTradeService,
+        IProjectMemberService projectMemberService)
         : base(currentUser)
     {
         _projectService = projectService;
@@ -46,6 +54,9 @@ public class ProjectController : BaseController
         _currentContextService = currentContextService;
         _projectDashboardService = projectDashboardService;
         _projectHealthService = projectHealthService;
+        _offroadTaskService = offroadTaskService;
+        _taskTradeService = taskTradeService;
+        _projectMemberService = projectMemberService;
     }
 
     public async Task<IActionResult> Index(int workspaceId)
@@ -111,6 +122,8 @@ public class ProjectController : BaseController
 
         _currentContextService.SetCurrentProject(id);
 
+        var canManage = await _projectService.CanManageProjectAsync(id, CurrentUser.UserId);
+
         var model = new ProjectDetailsViewModel
         {
             Id = project.Id,
@@ -127,10 +140,22 @@ public class ProjectController : BaseController
             EndDate = project.EndDate,
             IsArchived = project.IsArchived,
             CreateDate = project.CreatedDate,
-            CanManage = await _projectService.CanManageProjectAsync(id, CurrentUser.UserId),
+            CanManage = canManage,
             MembersCount = project.Members.Count(m => m.ViewState),
             TeamNames = project.ProjectTeams.Select(pt => pt.Team.Name).ToList()
         };
+
+        // Pre-load all tab data for single-page rendering
+        ViewData["DashboardModel"] = await LoadDashboardTabData(id);
+        ViewData["BacklogModel"] = await LoadBacklogTabData(id, canManage);
+        ViewData["TaskBoardModel"] = await LoadTaskBoardTabData(id, canManage);
+        ViewData["SprintsModel"] = await LoadSprintsTabData(id, canManage);
+        ViewData["MembersModel"] = await LoadMembersTabData(id, project);
+        ViewData["WorkloadModel"] = await LoadWorkloadTabData(id);
+        ViewData["DependencyModel"] = await LoadDependencyTabData(id, project);
+        ViewData["DelayRiskModel"] = await LoadDelayRiskTabData(id, project);
+        ViewData["OffroadModel"] = await LoadOffroadTabData(id);
+        ViewData["TaskTradeModel"] = await LoadTaskTradeTabData(id);
 
         return View(model);
     }
@@ -411,6 +436,213 @@ public class ProjectController : BaseController
         };
     }
 
+    // ===== Data loaders for single-page rendering =====
+
+    private async Task<object?> LoadDashboardTabData(int projectId)
+    {
+        var dashboard = await _projectDashboardService.GetDashboardAsync(projectId);
+        if (dashboard == null) return null;
+        dashboard.Health = await _projectHealthService.GetHealthAsync(projectId, CurrentUser.UserId);
+        return dashboard;
+    }
+
+    private async Task<object?> LoadBacklogTabData(int projectId, bool canManage)
+    {
+        var service = HttpContext.RequestServices.GetRequiredService<IUserStoryService>();
+        var stories = await service.GetBacklogStoriesAsync(projectId);
+        var members = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .Select(x => new { x.ApplicationUserId, x.ApplicationUser.FullName })
+            .ToListAsync();
+        var contributorsMap = await service.GetContributorsMapAsync(projectId);
+        return new BacklogIndexViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = (await _context.Projects.FindAsync(projectId))?.Name ?? "",
+            CanManage = canManage,
+            Stories = stories.Select(s => new UserStoryListItemViewModel
+            {
+                Id = s.Id,
+                Title = s.Title,
+                Status = s.Status,
+                Priority = s.Priority,
+                StoryPoint = s.StoryPoint,
+                BusinessValue = s.BusinessValue,
+                OwnerId = s.OwnerId,
+                OwnerName = s.Owner?.FullName,
+                Contributors = contributorsMap.TryGetValue(s.Id, out var names) ? names : new List<string>()
+            }).ToList(),
+            ProjectMembers = members.Select(m => new ProjectMemberOptionViewModel
+            {
+                UserId = m.ApplicationUserId,
+                FullName = m.FullName
+            }).ToList()
+        };
+    }
+
+    private async Task<object?> LoadTaskBoardTabData(int projectId, bool canManage)
+    {
+        var taskService = HttpContext.RequestServices.GetRequiredService<ITaskService>();
+        var tasks = await taskService.GetProjectBoardAsync(projectId, null, null, null, null);
+        return new TaskBoardViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = (await _context.Projects.FindAsync(projectId))?.Name ?? "",
+            CanManage = canManage,
+            Tasks = tasks.Select(x => new TaskBoardItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Status = x.Status,
+                Priority = x.Priority,
+                Type = x.Type,
+                Estimate = x.Estimate,
+                DueDate = x.DueDate,
+                UserStoryId = x.UserStoryId,
+                UserStoryTitle = x.UserStory?.Title ?? "",
+                AssigneeNames = x.Assignments?.Select(a => a.ApplicationUser?.FullName ?? "").ToList() ?? new List<string>(),
+                Labels = x.TaskLabels?.Select(tl => new BoardLabelBadgeViewModel
+                {
+                    Name = tl.Label?.Name ?? "",
+                    Color = tl.Label?.Color ?? ""
+                }).ToList() ?? new List<BoardLabelBadgeViewModel>()
+            }).ToList()
+        };
+    }
+
+    private async Task<object?> LoadSprintsTabData(int projectId, bool canManage)
+    {
+        var service = HttpContext.RequestServices.GetRequiredService<ISprintService>();
+        var sprints = await service.GetByProjectAsync(projectId);
+        var project = await _context.Projects.FindAsync(projectId);
+        return new SmartTask.Web.Models.ViewModels.Sprint.SprintIndexViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = project?.Name ?? "",
+            CanManageSprints = canManage,
+            Sprints = sprints.Select(x => new SmartTask.Web.Models.ViewModels.Sprint.SprintListItemViewModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Goal = x.Goal,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                Capacity = x.Capacity,
+                Status = x.Status,
+                UserStoriesCount = x.UserStories.Count(s => s.ViewState)
+            }).ToList()
+        };
+    }
+
+    private async Task<object?> LoadMembersTabData(int projectId, Project project)
+    {
+        var members = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .OrderBy(x => x.Role)
+            .Select(x => new SmartTask.Web.Models.ViewModels.ProjectMember.ProjectMemberViewModel
+            {
+                ApplicationUserId = x.ApplicationUserId,
+                FullName = x.ApplicationUser.FullName,
+                Role = x.Role,
+                JoinedDate = x.JoinedDate
+            })
+            .ToListAsync();
+
+        var memberIds = members.Select(m => m.ApplicationUserId).ToList();
+        var available = await _context.WorkspaceMembers
+            .Where(wm => wm.WorkspaceId == project.WorkspaceId && wm.ViewState && !memberIds.Contains(wm.ApplicationUserId))
+            .Include(wm => wm.ApplicationUser)
+            .Select(wm => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = wm.ApplicationUserId.ToString(),
+                Text = wm.ApplicationUser.FullName
+            })
+            .ToListAsync();
+
+        return new SmartTask.Web.Models.ViewModels.ProjectMember.ProjectMemberIndexViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = project.Name,
+            ProjectKey = project.Key,
+            CanManage = await _projectService.CanManageProjectAsync(projectId, CurrentUser.UserId),
+            Members = members,
+            AvailableWorkspaceMembers = available
+        };
+    }
+
+    private async Task<object?> LoadWorkloadTabData(int projectId)
+    {
+        var service = HttpContext.RequestServices.GetRequiredService<IWorkloadAnalysisService>();
+        return await service.GetWorkloadAsync(projectId, CurrentUser.UserId);
+    }
+
+    private async Task<object?> LoadDependencyTabData(int projectId, Project project)
+    {
+        var service = HttpContext.RequestServices.GetRequiredService<ITaskDependencyService>();
+        var risks = await service.GetProjectRiskOverviewAsync(projectId);
+        return new DependencyRiskIndexViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = project.Name,
+            RiskyTasks = risks
+        };
+    }
+
+    private async Task<object?> LoadDelayRiskTabData(int projectId, Project project)
+    {
+        var service = HttpContext.RequestServices.GetRequiredService<IDelayRiskService>();
+        return await service.GetRiskOverviewAsync(projectId, CurrentUser.UserId);
+    }
+
+    private async Task<OffroadIndexViewModel?> LoadOffroadTabData(int projectId)
+    {
+        var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == projectId);
+        if (project == null) return null;
+
+        var tasks = await _offroadTaskService.GetByProjectAsync(projectId);
+        var currentUserId = CurrentUser.UserId;
+
+        var members = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .ToListAsync();
+
+        return new OffroadIndexViewModel
+        {
+            ProjectId = projectId,
+            ProjectName = project.Name,
+            ProjectMembers = members
+                .Select(x => new SelectListItem
+                {
+                    Value = x.ApplicationUserId.ToString(),
+                    Text = x.ApplicationUser.FullName
+                }).ToList(),
+            Tasks = tasks.Select(x => new OffroadTaskListItemViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Description = x.Description,
+                Status = x.Status,
+                Priority = x.Priority,
+                CreatedByName = x.CreatedByUser.FullName,
+                AssignedToName = x.AssignedToUser?.FullName,
+                AssignedToUserId = x.AssignedToUserId,
+                DueDate = x.DueDate,
+                CreateDate = x.CreatedDate,
+                CanManage = x.CreatedByUserId == currentUserId
+            }).ToList()
+        };
+    }
+
+    private async Task<TaskTradeIndexViewModel?> LoadTaskTradeTabData(int projectId)
+    {
+        return await _taskTradeService.GetProjectRequestsAsync(projectId, CurrentUser.UserId);
+    }
+
+    // ===== Renderers for AJAX Tab endpoint (kept for backward compat) =====
+
     private async Task<IActionResult> RenderDashboardTab(int projectId)
     {
         var dashboard = await _projectDashboardService.GetDashboardAsync(projectId);
@@ -554,7 +786,7 @@ public class ProjectController : BaseController
         var service = HttpContext.RequestServices.GetRequiredService<IWorkloadAnalysisService>();
         var vm = await service.GetWorkloadAsync(projectId, CurrentUser.UserId);
         if (vm == null) return Content("<div class='workspace-empty'><p>داده‌ای یافت نشد</p></div>");
-        return PartialView("/Views/Workload/_WorkloadList.cshtml", vm);
+        return PartialView("/Views/Workload/_WorkloadPartial.cshtml", vm);
     }
 
     private async Task<IActionResult> RenderDependencyTab(int projectId, Project project)

@@ -23,13 +23,36 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background .2s ease, color .2s ease;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
 }
 
     .notification-bell-btn:hover {
         background: var(--gray100);
         color: var(--primary);
+        transform: scale(1.08);
     }
+
+    .notification-bell-btn:active {
+        transform: scale(.92);
+    }
+
+    .notification-bell-btn i {
+        transition: transform .3s ease;
+    }
+
+    .notification-bell-btn:hover i {
+        animation: bellRing .5s ease;
+    }
+
+@keyframes bellRing {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(14deg); }
+    30% { transform: rotate(-12deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(-6deg); }
+    75% { transform: rotate(2deg); }
+    100% { transform: rotate(0); }
+}
 
 .notification-badge {
     position: absolute;
@@ -47,17 +70,38 @@
     justify-content: center;
     padding: 0 4px;
     line-height: 1;
+    animation: badgePop .3s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes badgePop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
 .notification-dropdown {
-    width: 360px;
-    max-width: 90vw;
+    position: fixed !important;
+    bottom: 20px;
+    left: 20px;
+    right: auto;
+    top: auto !important;
+    transform: none !important;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 120px);
     padding: 0;
-    border: 1px solid var(--gray200);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, .1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, .15);
     overflow: hidden;
     background: var(--card);
+    z-index: 1080;
+    animation: notifSlideUp .3s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes notifSlideUp {
+    from { opacity: 0; transform: translateY(16px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .notification-dropdown-header {
@@ -100,11 +144,27 @@
     padding: 12px 16px;
     border-bottom: 1px solid var(--gray100);
     cursor: pointer;
-    transition: background .2s ease;
+    transition: background .15s ease, transform .15s ease;
+    animation: notifItemIn .25s ease both;
+}
+
+.notification-dropdown-item:nth-child(1) { animation-delay: .02s; }
+.notification-dropdown-item:nth-child(2) { animation-delay: .04s; }
+.notification-dropdown-item:nth-child(3) { animation-delay: .06s; }
+.notification-dropdown-item:nth-child(4) { animation-delay: .08s; }
+.notification-dropdown-item:nth-child(5) { animation-delay: .10s; }
+.notification-dropdown-item:nth-child(6) { animation-delay: .12s; }
+.notification-dropdown-item:nth-child(7) { animation-delay: .14s; }
+.notification-dropdown-item:nth-child(8) { animation-delay: .16s; }
+
+@keyframes notifItemIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
     .notification-dropdown-item:hover {
         background: var(--gray50);
+        transform: translateX(3px);
     }
 
     .notification-dropdown-item.unread {
@@ -722,4 +782,54 @@
         animation: none !important;
         transition: none !important;
     }
+}
+
+/* ==========================================================
+   Dark Mode
+   ========================================================== */
+
+[data-theme="dark"] .notification-dropdown {
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .4);
+}
+
+[data-theme="dark"] .notification-dropdown-header {
+    border-bottom-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .notification-dropdown-item {
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] .notification-dropdown-item:hover {
+    background: var(--gray100);
+}
+
+[data-theme="dark"] .notification-dropdown-item.unread {
+    background: var(--primary-light);
+}
+
+[data-theme="dark"] .notification-item-icon {
+    background: var(--gray100);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .notification-item-title {
+    color: var(--text);
+}
+
+[data-theme="dark"] .notification-item-message {
+    color: var(--gray400);
+}
+
+[data-theme="dark"] .notification-item-time {
+    color: var(--gray500);
+}
+
+[data-theme="dark"] .notification-dropdown-footer {
+    border-top-color: var(--border);
+    background: var(--card);
+    color: var(--primary);
 }
