@@ -32,16 +32,40 @@ SmartTask.spaNavigate = async function (url) {
 
         if (!newContent) throw new Error("No content");
 
-        // All CSS is preloaded in _Layout.cshtml — no need to load here
+        // All CSS is preloaded in _Layout.cshtml
         contentArea.innerHTML = newContent.innerHTML;
         if (newTitle) document.title = newTitle.textContent;
 
+        // Execute inline scripts from content area
         contentArea.querySelectorAll("script").forEach(function (old) {
             var s = document.createElement("script");
             s.textContent = old.textContent;
             document.body.appendChild(s);
             old.remove();
         });
+
+        // Execute scripts from @section Scripts (marked with data-page-scripts)
+        var pageScriptsEl = doc.querySelector("[data-page-scripts]");
+        if (pageScriptsEl) {
+            // Execute inline scripts (like chatBootstrap JSON)
+            pageScriptsEl.querySelectorAll("script:not([src])").forEach(function (old) {
+                var text = (old.textContent || "").trim();
+                if (!text) return;
+                var s = document.createElement("script");
+                var type = old.getAttribute("type");
+                if (type) s.setAttribute("type", type);
+                s.textContent = text;
+                document.body.appendChild(s);
+            });
+            // Execute src scripts (like chat.js, taskboard.js)
+            pageScriptsEl.querySelectorAll("script[src]").forEach(function (old) {
+                var src = old.getAttribute("src") || "";
+                if (!src) return;
+                var s2 = document.createElement("script");
+                s2.src = src;
+                document.body.appendChild(s2);
+            });
+        }
 
         contentArea.classList.remove("spa-loading");
         contentArea.classList.add("spa-loaded");
@@ -56,10 +80,12 @@ SmartTask.spaNavigate = async function (url) {
 };
 
 SmartTask.initPageScripts = function () {
+    // Persian digits
     document.querySelectorAll(".fa-digits").forEach(function (el) {
         var fa = "\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9";
         el.textContent = el.textContent.replace(/[0-9]/g, function (d) { return fa[+d]; });
     });
+    // Donut charts
     document.querySelectorAll(".dashboard-donut[data-progress]").forEach(function (donut) {
         var progress = parseFloat(donut.dataset.progress) || 0;
         var circle = donut.querySelector(".donut-value");
@@ -71,10 +97,17 @@ SmartTask.initPageScripts = function () {
             circle.style.strokeDashoffset = c - (progress / 100) * c;
         });
     });
+    // Sprint rings
     document.querySelectorAll(".sprint-ring-fill[data-percent]").forEach(function (circle) {
         var c = parseFloat(circle.getAttribute("stroke-dasharray")) || 0;
         var pct = Math.min(100, Math.max(0, parseFloat(circle.dataset.percent) || 0));
         circle.style.strokeDashoffset = String(c * (1 - pct / 100));
+    });
+    // Re-execute page-specific scripts (like chat.js)
+    document.querySelectorAll(".content-area script[src]").forEach(function (old) {
+        var s = document.createElement("script");
+        s.src = old.src;
+        document.body.appendChild(s);
     });
 };
 

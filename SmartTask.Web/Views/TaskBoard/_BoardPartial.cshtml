@@ -3,10 +3,10 @@
 @inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 
 <!-- Filter Bar -->
-<form method="get" class="board-filter-bar" data-project-id="@Model.ProjectId">
+<form method="get" class="board-filter-bar" id="taskboardFilterForm" data-project-id="@Model.ProjectId">
     <input type="hidden" name="projectId" value="@Model.ProjectId" />
 
-    <select name="assigneeId" class="form-control" onchange="this.form.submit()">
+    <select name="assigneeId" class="form-control" onchange="TaskBoardFilter.filter()">
         <option value="">همه افراد</option>
         @foreach (var a in Model.AvailableAssignees)
         {
@@ -14,7 +14,7 @@
         }
     </select>
 
-    <select name="priority" class="form-control" onchange="this.form.submit()">
+    <select name="priority" class="form-control" onchange="TaskBoardFilter.filter()">
         <option value="">همه اولویت‌ها</option>
         @foreach (TaskPriorityType p in Enum.GetValues(typeof(TaskPriorityType)))
         {
@@ -32,7 +32,7 @@
         }
     </select>
 
-    <select name="type" class="form-control" onchange="this.form.submit()">
+    <select name="type" class="form-control" onchange="TaskBoardFilter.filter()">
         <option value="">همه انواع</option>
         @foreach (TaskType t in Enum.GetValues(typeof(TaskType)))
         {
@@ -52,7 +52,7 @@
 
     @if (Model.AvailableLabels.Any())
     {
-        <select name="labelId" class="form-control" onchange="this.form.submit()">
+        <select name="labelId" class="form-control" onchange="TaskBoardFilter.filter()">
             <option value="">همه Label ها</option>
             @foreach (var l in Model.AvailableLabels)
             {
@@ -63,10 +63,10 @@
 
     @if (Model.HasActiveFilters)
     {
-        <a asp-controller="TaskBoard" asp-action="Index" asp-route-projectId="@Model.ProjectId" class="board-clear-filters">
+        <button type="button" class="board-clear-filters" onclick="TaskBoardFilter.clear()">
             <i class="fa-solid fa-xmark"></i>
             پاک‌کردن فیلترها
-        </a>
+        </button>
     }
 </form>
 

@@ -689,13 +689,47 @@ public class ProjectController : BaseController
 
     private async Task<IActionResult> RenderTaskBoardTab(int projectId, bool canManage)
     {
+        return await GetTaskBoardPartial(projectId, canManage, null, null, null, null);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> TaskBoardFiltered(int projectId, int? assigneeId, TaskPriorityType? priority, TaskType? type, int? labelId)
+    {
+        if (!await _projectMemberService.IsMemberAsync(projectId, CurrentUser.UserId))
+            return Content("");
+        var canManage = await _projectService.CanManageProjectsAsync(projectId, CurrentUser.UserId);
+        return await GetTaskBoardPartial(projectId, canManage, assigneeId, priority, type, labelId);
+    }
+
+    private async Task<IActionResult> GetTaskBoardPartial(int projectId, bool canManage, int? assigneeId, TaskPriorityType? priority, TaskType? type, int? labelId)
+    {
         var taskService = HttpContext.RequestServices.GetRequiredService<ITaskService>();
-        var tasks = await taskService.GetProjectBoardAsync(projectId, null, null, null, null);
+        var labelService = HttpContext.RequestServices.GetRequiredService<ILabelService>();
+        var tasks = await taskService.GetProjectBoardAsync(projectId, assigneeId, priority, type, labelId);
+        var projectMembers = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .ToListAsync();
+        var labels = await labelService.GetByProjectAsync(projectId);
         var vm = new TaskBoardViewModel
         {
             ProjectId = projectId,
             ProjectName = (await _context.Projects.FindAsync(projectId))?.Name ?? "",
             CanManage = canManage,
+            SelectedAssigneeId = assigneeId,
+            SelectedPriority = priority,
+            SelectedType = type,
+            SelectedLabelId = labelId,
+            AvailableAssignees = projectMembers.Select(x => new BoardFilterOptionViewModel
+            {
+                Id = x.ApplicationUserId,
+                Name = x.ApplicationUser.FullName
+            }).ToList(),
+            AvailableLabels = labels.Select(x => new BoardFilterOptionViewModel
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList(),
             Tasks = tasks.Select(x => new TaskBoardItemViewModel
             {
                 Id = x.Id,
