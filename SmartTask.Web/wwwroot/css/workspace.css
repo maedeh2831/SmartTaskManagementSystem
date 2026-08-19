@@ -440,7 +440,7 @@ textarea.form-control {
     border: none;
     border-radius: 12px;
     height: 44px;
-    padding: 0 30px;
+    padding: 10px 20px 10px 20px;
     font-weight: 700;
     transition: .25s;
     box-shadow: 0 15px 35px rgba(79,70,229,.22);
@@ -459,7 +459,7 @@ textarea.form-control {
     border: none;
     border-radius: 12px;
     height: 44px;
-    padding: 0 30px;
+    padding: 10px 20px 10px 20px;
     font-weight: 700;
     box-shadow: var(--shadow-sm);
     transition: .25s;
