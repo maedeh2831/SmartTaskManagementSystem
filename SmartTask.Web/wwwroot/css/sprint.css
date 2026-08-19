@@ -1332,7 +1332,7 @@ textarea.form-control {
     background: var(--gray100);
     border-radius: 6px;
     color: var(--gray600);
-    font-size: 12px;
+    font-size: 16px;
     text-decoration: none;
     transition: all 0.2s ease;
     vertical-align: middle;

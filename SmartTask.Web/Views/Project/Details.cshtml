@@ -27,46 +27,75 @@
 
         <div class="workspace-hero-content">
 
-            <div class="team-detail-header">
-                <div class="preview-logo" style="width:64px;height:64px;font-size:26px;background:@Model.Color;">
-                    <i class="@Model.Icon"></i>
-                </div>
-                <div>
-                    <h1>
-                        @Model.Name
-                        <span class="project-key-badge">@Model.Key</span>
-                        @if (Model.IsArchived)
-                        {
-                            <span class="team-archived-badge">آرشیو شده</span>
-                        }
-                    </h1>
-                    <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "بدون توضیحات" : Model.Description)</p>
-                </div>
-            </div>
+<div class="team-detail-header">
+
+    <div class="preview-logo"
+         style="width:64px;height:64px;font-size:26px;background:@Model.Color;">
+        <i class="@Model.Icon"></i>
+    </div>
+
+    <div>
+        <h1 class="project-title-inline mb-0">
+
+            @Model.Name
+
+            <span class="project-key-badge">
+                @Model.Key
+            </span>
+
+            @if (Model.IsArchived)
+            {
+                <span class="team-archived-badge">
+                    آرشیو شده
+                </span>
+            }
+
+            @if (Model.CanManage)
+            {
+                <span class="project-inline-actions">
+
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="project-edit-inline"
+                       title="ویرایش پروژه">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+
+                    <a asp-controller="Project"
+                       asp-action="Settings"
+                       asp-route-id="@Model.Id"
+                       class="project-edit-inline"
+                       title="تنظیمات پروژه">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
+
+                </span>
+            }
+
+        </h1>
+
+        <p style="margin-bottom:5px !important;">
+            @(string.IsNullOrWhiteSpace(Model.Description)
+                ? "بدون توضیحات"
+                : Model.Description)
+        </p>
+    </div>
+
+</div>
 
         </div>
 
         <div class="workspace-hero-actions">
 
-            <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId"
-               class="workspace-filter" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <a asp-action="Index"
+               asp-route-workspaceId="@Model.WorkspaceId"
+               class="workspace-filter"
+               style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+
                 <i class="fa-solid fa-arrow-right"></i>
                 بازگشت
+
             </a>
-
-            @if (Model.CanManage)
-            {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="workspace-create-btn">
-                    <i class="fa-solid fa-pen"></i>
-                    ویرایش پروژه
-                </a>
-
-                <a asp-controller="Project" asp-action="Settings" asp-route-id="@Model.Id"
-                   class="workspace-filter" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                    <i class="fa-solid fa-gear"></i>
-                    تنظیمات
-                </a>
-            }
 
         </div>
 

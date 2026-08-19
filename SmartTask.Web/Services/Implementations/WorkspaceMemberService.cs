@@ -89,7 +89,7 @@ public class WorkspaceMemberService
             .FirstOrDefaultAsync();
 
         if (role == WorkspaceRoleType.Owner)
-            throw new Exception("مالک Workspace قابل حذف نیست.");
+            throw new Exception("مالک فضای کاری قابل حذف نیست.");
 
         await _context.WorkspaceMembers
             .Where(x => x.Id == memberId)

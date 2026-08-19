@@ -86,7 +86,7 @@ namespace SmartTask.Web.Models
             },
             new()
             {
-                Title = "برد",
+                Title = "برد پروژه",
                 Category = "پروژه فعال",
                 Icon = "fa-solid fa-square-check",
                 Controller = "TaskBoard",

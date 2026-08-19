@@ -16,24 +16,15 @@
 
     <div class="members-header">
 
-        <div class="members-title">
+    <div class="members-title">
 
-            <a asp-controller="Workspace"
-               asp-action="Details"
-               asp-route-id="@Model.WorkspaceId"
-               class="back-link">
+        <h1>اعضای Workspace</h1>
 
-                <i class="fa-solid fa-arrow-right"></i>
-                بازگشت به فضای کاری
+        <p>مدیریت اعضا، نقش‌ها و دعوت‌نامه‌های این فضای کاری</p>
 
-            </a>
+    </div>
 
-            <h1>اعضای Workspace</h1>
-
-            <p>مدیریت اعضا، نقش‌ها و دعوت‌نامه‌های این فضای کاری</p>
-
-        </div>
-
+    <div class="members-actions">
         @if (Model.CanManage)
         {
             <a asp-action="Invite"
@@ -46,7 +37,15 @@
             </a>
         }
 
+        
+        <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.WorkspaceId" class="back-link">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به فضای کاری
+        </a>
+
     </div>
+
+</div>
 
     @if (!Model.Members.Any() && !Model.Invitations.Any())
     {

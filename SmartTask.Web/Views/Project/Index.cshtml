@@ -29,17 +29,6 @@
             </div>
 
             <div style="display:flex;gap:12px;">
-
-                <a asp-controller="Workspace"
-                   asp-action="Details"
-                   asp-route-id="@Model.WorkspaceId"
-                   class="workspace-filter" style="text-decoration:none;">
-                    <button type="button">
-                        <i class="fa-solid fa-arrow-right"></i>
-                        بازگشت به Workspace
-                    </button>
-                </a>
-
                 @if (Model.CanManageProjects)
                 {
                     <a asp-action="Create" asp-route-workspaceId="@Model.WorkspaceId" class="workspace-create-btn">
@@ -47,7 +36,15 @@
                         ایجاد پروژه
                     </a>
                 }
-
+                <a asp-controller="Workspace"
+                   asp-action="Details"
+                   asp-route-id="@Model.WorkspaceId"
+                   class="workspace-filter" style="text-decoration:none;">
+                    <button type="button">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        بازگشت به فضای کاری
+                    </button>
+                </a>
             </div>
 
         </div>
