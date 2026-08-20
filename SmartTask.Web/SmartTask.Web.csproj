@@ -15,15 +15,23 @@
   <ItemGroup>
     <!-- Keep the unit-test project (nested under this folder) out of the web app's
          default **/*.cs compile glob -->
+    <Compile Remove="Middlewares\**" />
+    <Compile Remove="Repositories\**" />
     <Compile Remove="SmartTask.Web.Tests/**/*.cs" />
     <Compile Remove="SmartTask.Web.Tests\bin\**" />
     <Compile Remove="SmartTask.Web.Tests\obj\**" />
+    <Content Remove="Middlewares\**" />
+    <Content Remove="Repositories\**" />
     <Content Remove="SmartTask.Web.Tests/**" />
     <Content Remove="SmartTask.Web.Tests\bin\**" />
     <Content Remove="SmartTask.Web.Tests\obj\**" />
+    <None Remove="Middlewares\**" />
+    <None Remove="Repositories\**" />
     <None Remove="SmartTask.Web.Tests/**" />
     <None Remove="SmartTask.Web.Tests\bin\**" />
     <None Remove="SmartTask.Web.Tests\obj\**" />
+    <EmbeddedResource Remove="Middlewares\**" />
+    <EmbeddedResource Remove="Repositories\**" />
     <EmbeddedResource Remove="SmartTask.Web.Tests/**" />
     <EmbeddedResource Remove="SmartTask.Web.Tests\bin\**" />
     <EmbeddedResource Remove="SmartTask.Web.Tests\obj\**" />
@@ -46,9 +54,6 @@
     <Folder Include="Common\Exceptions\" />
     <Folder Include="Common\Constants\" />
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Middlewares\" />
-    <Folder Include="Repositories\Implementations\" />
-    <Folder Include="Repositories\Interfaces\" />
     <Folder Include="wwwroot\fonts\Vazirmatn\" />
     <Folder Include="wwwroot\assets\" />
     <Folder Include="wwwroot\images\auth\" />
