@@ -12,12 +12,10 @@
     font-size: 34px;
     font-weight: 900;
     color: var(--gray900);
-    margin-top: 12px;
 }
 
 .dashboard-title p {
     color: var(--gray500);
-    margin-top: 8px;
 }
 
 /*  Statistics Cards  */

@@ -23,81 +23,96 @@
 
     <div class="details-header">
 
-
         <div class="details-title">
 
-            <div class="details-logo"
-                 style="background:@Model.Color">
+    <div class="details-logo"
+         style="background:@Model.Color">
 
-                @if (!string.IsNullOrWhiteSpace(Model.Logo))
-                {
-                    <img src="@Model.Logo" alt="@Model.Name" />
-                }
-                else
-                {
-                    <i class="fa-solid fa-layer-group"></i>
-                }
+        @if (!string.IsNullOrWhiteSpace(Model.Logo))
+        {
+            <img src="@Model.Logo" alt="@Model.Name" />
+        }
+        else
+        {
+            <i class="fa-solid fa-layer-group"></i>
+        }
 
-            </div>
+    </div>
 
+    <div class="details-title-content">
 
-            <div>
+        <div class="details-title-row">
 
-                <h1>
-                    @Model.Name
-                </h1>
+            <h1>@Model.Name</h1>
 
+            @if (Model.IsOwner)
+            {
+                <div class="details-title-actions">
 
-                <div class="details-meta">
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="details-icon-btn"
+                       title="ویرایش">
+                       <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
 
-
-                    @if (Model.Visibility == SmartTask.Web.Models.Enums.VisibilityType.Private)
-                    {
-                        <span>
-                            <i class="fa-solid fa-lock"></i>
-                            خصوصی
-                        </span>
-                    }
-                    else
-                    {
-                        <span>
-                            <i class="fa-solid fa-globe"></i>
-                            عمومی
-                        </span>
-                    }
-
-                <span>
-                    <i class="fa-solid fa-calendar"></i>
-                    @Html.DisplayDate(Model.CreateDate)
-                </span>
+                    <a asp-controller="Workspace"
+                       asp-action="Settings"
+                       asp-route-id="@Model.Id"
+                       class="details-icon-btn"
+                       title="تنظیمات">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
 
                 </div>
-
-            </div>
+            }
 
         </div>
 
-        <div class="details-actions">
-         
-            @if (Model.IsOwner)
+        <div class="details-meta">
+
+            @if (Model.Visibility == SmartTask.Web.Models.Enums.VisibilityType.Private)
             {
-                <a asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="details-btn">
-                    <i class="fa-solid fa-pen"></i>
-                    ویرایش
-                </a>
-
-            <a asp-controller="Workspace"
-               asp-action="Settings"
-               asp-route-id="@Model.Id"
-               class="details-btn">
-                <i class="fa-solid fa-gear"></i>
-                تنظیمات
-            </a>
-
+                <span>
+                    <i class="fa-solid fa-lock"></i>
+                    خصوصی
+                </span>
+            }
+            else
+            {
+                <span>
+                    <i class="fa-solid fa-globe"></i>
+                    عمومی
+                </span>
             }
 
+            <span>
+                <i class="fa-solid fa-calendar"></i>
+                @Html.DisplayDate(Model.CreateDate)
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <div class="details-actions">
+            <a asp-controller="Project"
+               asp-action="Index"
+               asp-route-workspaceId="@Model.Id"
+               class="details-btn">
+                <i class="fa-solid fa-diagram-project"></i>
+                پروژه‌ها
+            </a>
+
+            <a asp-controller="Team"
+               asp-action="Index"
+               asp-route-workspaceId="@Model.Id"
+               class="details-btn">
+                <i class="fa-solid fa-people-group"></i>
+                تیم‌ها
+            </a>
 
             <a asp-controller="WorkspaceMember"
                asp-action="Index"
@@ -107,23 +122,10 @@
                 اعضا
             </a>
 
-           <a asp-controller="Team"
+            <a asp-controller="WorkspaceDashboard"
                asp-action="Index"
                asp-route-workspaceId="@Model.Id"
-               class="details-btn">
-                <i class="fa-solid fa-people-group"></i>
-                تیم‌ها
-            </a>
-
-            <a asp-controller="Project"
-               asp-action="Index"
-               asp-route-workspaceId="@Model.Id"
-               class="details-btn">
-                <i class="fa-solid fa-diagram-project"></i>
-                پروژه‌ها
-            </a>
-
-            <a asp-controller="WorkspaceDashboard" asp-action="Index" asp-route-workspaceId="@Model.Id" class="workspace-create-btn">
+               class="workspace-create-btn">
                 <i class="fa-solid fa-gauge"></i>
                 داشبورد
             </a>
@@ -145,7 +147,7 @@
 
             <i class="fa-solid fa-align-right"></i>
 
-            درباره Workspace
+            درباره فضای کاری
 
         </div>
 
@@ -260,7 +262,7 @@
 
             <i class="fa-solid fa-user-tie"></i>
 
-            مالک Workspace
+            مالک فضای کاری
 
         </div>
 

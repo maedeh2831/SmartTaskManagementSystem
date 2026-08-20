@@ -14,12 +14,16 @@
 <div class="settings-page">
 
     <div class="settings-header">
-        <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.Id" class="back-link">
+
+        <div class="settings-title">
+            <h1 class="mb-0">تنظیمات @Model.Name</h1>
+            <p>مدیریت لوگو، رنگ تم و منطقه زمانی فضای کاری</p>
+        </div>
+
+       <a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.Id" class="back-link">
             <i class="fa-solid fa-arrow-right"></i>
             بازگشت به فضای کاری
         </a>
-        <h1>تنظیمات @Model.Name</h1>
-        <p>مدیریت لوگو، رنگ تم و منطقه زمانی فضای کاری</p>
     </div>
 
     <form asp-action="Settings" asp-controller="Workspace" method="post" enctype="multipart/form-data" class="settings-card">
