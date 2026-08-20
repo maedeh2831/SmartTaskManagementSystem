@@ -456,12 +456,20 @@ public class ProjectController : BaseController
             .Select(x => new { x.ApplicationUserId, x.ApplicationUser.FullName })
             .ToListAsync();
         var contributorsMap = await service.GetContributorsMapAsync(projectId);
+
+        var storyIds = stories.Select(s => s.Id).ToList();
+        var tasksByStory = await _context.TaskItems
+            .Where(t => storyIds.Contains(t.UserStoryId))
+            .Include(t => t.Assignments).ThenInclude(a => a.ApplicationUser)
+            .GroupBy(t => t.UserStoryId)
+            .ToDictionaryAsync(g => g.Key, g => g.ToList());
+
         return new BacklogIndexViewModel
         {
             ProjectId = projectId,
             ProjectName = (await _context.Projects.FindAsync(projectId))?.Name ?? "",
             CanManage = canManage,
-            Stories = stories.Select(s => new UserStoryListItemViewModel
+            UnassignedStories = stories.Select(s => new UserStoryListItemViewModel
             {
                 Id = s.Id,
                 Title = s.Title,
@@ -471,7 +479,18 @@ public class ProjectController : BaseController
                 BusinessValue = s.BusinessValue,
                 OwnerId = s.OwnerId,
                 OwnerName = s.Owner?.FullName,
-                Contributors = contributorsMap.TryGetValue(s.Id, out var names) ? names : new List<string>()
+                Contributors = contributorsMap.TryGetValue(s.Id, out var names) ? names : new List<string>(),
+                Tasks = tasksByStory.TryGetValue(s.Id, out var tList) ? tList.Select(t => new BacklogTaskItemViewModel
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Status = t.Status,
+                    Priority = t.Priority,
+                    Type = t.Type,
+                    Estimate = t.Estimate,
+                    DueDate = t.DueDate,
+                    AssigneeName = t.Assignments.FirstOrDefault()?.ApplicationUser?.FullName
+                }).ToList() : new List<BacklogTaskItemViewModel>()
             }).ToList(),
             ProjectMembers = members.Select(m => new ProjectMemberOptionViewModel
             {
@@ -661,12 +680,20 @@ public class ProjectController : BaseController
             .Select(x => new { x.ApplicationUserId, x.ApplicationUser.FullName })
             .ToListAsync();
         var contributorsMap = await service.GetContributorsMapAsync(projectId);
+
+        var storyIds = stories.Select(s => s.Id).ToList();
+        var tasksByStory = await _context.TaskItems
+            .Where(t => storyIds.Contains(t.UserStoryId))
+            .Include(t => t.Assignments).ThenInclude(a => a.ApplicationUser)
+            .GroupBy(t => t.UserStoryId)
+            .ToDictionaryAsync(g => g.Key, g => g.ToList());
+
         var vm = new BacklogIndexViewModel
         {
             ProjectId = projectId,
             ProjectName = (await _context.Projects.FindAsync(projectId))?.Name ?? "",
             CanManage = canManage,
-            Stories = stories.Select(s => new UserStoryListItemViewModel
+            UnassignedStories = stories.Select(s => new UserStoryListItemViewModel
             {
                 Id = s.Id,
                 Title = s.Title,
@@ -676,7 +703,18 @@ public class ProjectController : BaseController
                 BusinessValue = s.BusinessValue,
                 OwnerId = s.OwnerId,
                 OwnerName = s.Owner?.FullName,
-                Contributors = contributorsMap.TryGetValue(s.Id, out var names) ? names : new List<string>()
+                Contributors = contributorsMap.TryGetValue(s.Id, out var names) ? names : new List<string>(),
+                Tasks = tasksByStory.TryGetValue(s.Id, out var tList) ? tList.Select(t => new BacklogTaskItemViewModel
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Status = t.Status,
+                    Priority = t.Priority,
+                    Type = t.Type,
+                    Estimate = t.Estimate,
+                    DueDate = t.DueDate,
+                    AssigneeName = t.Assignments.FirstOrDefault()?.ApplicationUser?.FullName
+                }).ToList() : new List<BacklogTaskItemViewModel>()
             }).ToList(),
             ProjectMembers = members.Select(m => new ProjectMemberOptionViewModel
             {

@@ -137,6 +137,26 @@ if (!window.__siteJsInit) {
             });
         });
 
+        // Tippy.js — convert all title attributes to tippy tooltips
+        if (typeof tippy !== "undefined") {
+            document.querySelectorAll("[title]").forEach(function (el) {
+                var text = el.getAttribute("title");
+                if (!text || !text.trim()) return;
+                el.setAttribute("data-tippy-content", text);
+                el.removeAttribute("title");
+            });
+            tippy("[data-tippy-content]", {
+                placement: "top",
+                theme: "smarttask",
+                animation: "fade",
+                delay: [200, 0],
+                duration: [150, 100],
+                arrow: true,
+                offset: [0, 8],
+                maxWidth: 250,
+                appendTo: function () { return document.body; }
+            });
+        }
 
     });
 }

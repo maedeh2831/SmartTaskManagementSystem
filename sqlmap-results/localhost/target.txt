@@ -1,0 +1,3 @@
+http://localhost:5182/Backlog/QuickAdd (POST)  # sqlmap.py --url http://localhost:5182/Backlog/QuickAdd --data=ProjectId=1&Title=test --batch --level=3 --risk=2 --output-dir=E:/taskManager/SmartTaskManagementSystem/sqlmap-results
+
+ProjectId=1&Title=test

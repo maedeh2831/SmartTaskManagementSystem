@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "sweet-scroll": "^4.0.0"
+    "sweet-scroll": "^4.0.0",
+    "tippy.js": "^6.3.7"
   }
 }

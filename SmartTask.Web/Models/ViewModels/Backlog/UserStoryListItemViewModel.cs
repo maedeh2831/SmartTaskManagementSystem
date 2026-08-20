@@ -14,4 +14,5 @@ public class UserStoryListItemViewModel
     public int? OwnerId { get; set; }
     public string? OwnerName { get; set; }
     public List<string> Contributors { get; set; } = new();
+    public List<BacklogTaskItemViewModel> Tasks { get; set; } = new();
 }

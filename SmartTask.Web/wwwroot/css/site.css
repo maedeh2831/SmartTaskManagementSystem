@@ -512,3 +512,60 @@ body.auth-body {
 [dir="rtl"] .fa-toggle-off {
     transform: scaleX(-1);
 }
+
+/* ============================================================
+   Tippy.js — SmartTask Theme
+   ============================================================ */
+
+.tippy-box[data-theme="smarttask"] {
+    background: var(--gray800);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    line-height: 1.5;
+    direction: rtl;
+    text-align: right;
+}
+
+.tippy-box[data-theme="smarttask"] .tippy-arrow {
+    color: var(--gray800);
+}
+
+
+
+[data-theme="dark"] .tippy-box[data-theme="smarttask"] {
+    background: var(--gray600);
+    color: var(--gray900);
+}
+
+[data-theme="dark"] .tippy-box[data-theme="smarttask"] .tippy-arrow {
+    color: var(--gray600);
+}
+
+/* Custom fade animation for tippy */
+@keyframes tippyFade {
+    0% {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tippy-box[data-theme="smarttask"][data-animation="fade"] {
+    animation: tippyFade .15s ease-out;
+}
+
+.tippy-box[data-theme="smarttask"][data-animation="fade"][data-state="hidden"] {
+    animation: tippyFade .1s ease-in reverse;
+}
+
+/* ============================================================
+   Reduced Motion — respect user preference
+   ============================================================ */
+

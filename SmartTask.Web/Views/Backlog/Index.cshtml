@@ -45,7 +45,7 @@
         </form>
     }
 
-    @if (!Model.Stories.Any())
+    @if (!Model.Sprints.Any() && !Model.UnassignedStories.Any())
     {
         <div class="workspace-empty">
             <i class="fa-solid fa-layer-group"></i>
@@ -55,6 +55,69 @@
     }
     else
     {
+        var _totalTasks = Model.Sprints.SelectMany(sp => sp.Stories).Sum(s => s.Tasks.Count) + Model.UnassignedStories.Sum(s => s.Tasks.Count);
+        var _totalStories = Model.Sprints.SelectMany(sp => sp.Stories).Count() + Model.UnassignedStories.Count;
+
+        <div class="bp-filter-bar" id="bpFilterBar">
+            <input type="text" class="bp-filter-search" id="bpSearch" placeholder="جستجو در داستان‌ها و تسک‌ها..." />
+
+            <select id="bpStoryStatus">
+                <option value="">وضعیت داستان</option>
+                <option value="New">جدید</option>
+                <option value="Ready">آماده</option>
+                <option value="InProgress">درحال انجام</option>
+                <option value="Done">انجام‌شده</option>
+                <option value="Closed">بسته‌شده</option>
+            </select>
+
+            <select id="bpTaskStatus">
+                <option value="">وضعیت تسک</option>
+                <option value="ToDo">انجام نشده</option>
+                <option value="InProgress">درحال انجام</option>
+                <option value="InReview">در حال بررسی</option>
+                <option value="Done">انجام شده</option>
+                <option value="Cancelled">لغو شده</option>
+            </select>
+
+            <select id="bpPriority">
+                <option value="">اولویت</option>
+                <option value="Lowest">خیلی کم</option>
+                <option value="Low">کم</option>
+                <option value="Medium">متوسط</option>
+                <option value="High">زیاد</option>
+                <option value="Highest">خیلی زیاد</option>
+            </select>            <select id="bpTaskType">
+                <option value="">نوع تسک</option>
+                <option value="Task">تسک</option>
+                <option value="Bug">باگ</option>
+                <option value="Feature">فیچر</option>
+            </select>
+
+            <select id="bpSort">
+                <option value="">مرتب‌سازی</option>
+                <option value="id-asc">شماره ↑</option>
+                <option value="id-desc">شماره ↓</option>
+                <option value="priority-desc">اولویت ↓</option>
+                <option value="priority-asc">اولویت ↑</option>
+                <option value="sp-desc">Story Point ↓</option>
+                <option value="sp-asc">Story Point ↑</option>
+                <option value="tasks-desc">تعداد تسک ↓</option>
+            </select>
+
+            <div class="bp-filter-actions">
+                <button class="bp-filter-btn" onclick="bpExpandAll()">
+                    <i class="fa-solid fa-expand"></i> باز کردن همه
+                </button>
+                <button class="bp-filter-btn" onclick="bpCollapseAll()">
+                    <i class="fa-solid fa-compress"></i> بستن همه
+                </button>
+                <span class="bp-filter-count">
+                    <strong class="fa-digits" id="bpStoryCount">@_totalStories</strong> داستان ·
+                    <strong class="fa-digits" id="bpTaskCount">@_totalTasks</strong> تسک
+                </span>
+            </div>
+        </div>
+
         <div class="backlog-table-wrap">
             <table class="backlog-table">
                 <thead>
@@ -78,159 +141,432 @@
                     </tr>
                 </thead>
                 <tbody id="backlogList" data-project-id="@Model.ProjectId">
-                    @foreach (var story in Model.Stories)
+                    @* Display Sprints with their User Stories *@
+                    @foreach (var sprint in Model.Sprints)
                     {
-                        <tr class="backlog-row" data-id="@story.Id" data-title="@story.Title">
-
+                        <tr class="sprint-row" data-sprint-id="@sprint.SprintId">
                             @if (Model.CanManage)
                             {
-                                <td class="col-drag">
-                                    <i class="fa-solid fa-grip-vertical backlog-drag-handle"></i>
-                                </td>
+                                <td class="col-drag"></td>
                             }
-
-                            <td class="col-id">
-                                <span class="backlog-id-badge">#@story.Id</span>
+                            <td colspan="@(Model.CanManage ? 9 : 8)" class="sprint-header">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <strong>@sprint.SprintName</strong>
+                                <span class="sprint-dates">
+                                    (@sprint.StartDate.ToString("yyyy/MM/dd") - @sprint.EndDate.ToString("yyyy/MM/dd"))
+                                </span>
+                                <span class="sprint-status-badge status-@sprint.Status.ToString().ToLower()">
+                                    @(sprint.Status switch
+                                    {
+                                        SprintStatusType.Planning => "برنامه‌ریزی",
+                                        SprintStatusType.Active => "فعال",
+                                        SprintStatusType.Completed => "تکمیل شده",
+                                        _ => sprint.Status.ToString()
+                                    })
+                                </span>
                             </td>
-
-                            <td class="col-title">
-                                <a asp-controller="UserStory" asp-action="Details" asp-route-id="@story.Id" class="story-title-link">
-                                    @story.Title
-                                </a>
-                            </td>
-
-                            <td class="col-status">
-                                @if (Model.CanManage)
-                                {
-                                    <form asp-action="ChangeStatus" method="post" class="backlog-inline-form">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="storyId" value="@story.Id" />
-                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                                        <select name="status" class="backlog-status-select status-@story.Status.ToString().ToLower()" onchange="this.form.submit()">
-                                            @foreach (StoryStatusType s in Enum.GetValues(typeof(StoryStatusType)))
-                                            {
-                                                <option value="@s" selected="@(s == story.Status)">
-                                                    @(s switch
-                                                    {
-                                                        StoryStatusType.New => "جدید",
-                                                        StoryStatusType.Ready => "آماده",
-                                                        StoryStatusType.InProgress => "درحال انجام",
-                                                        StoryStatusType.Done => "انجام‌شده",
-                                                        StoryStatusType.Closed => "بسته‌شده",
-                                                        _ => "-"
-                                                    })
-                                </option>
-                                                                }
-                                        </select>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">
-                                        @story.Status
-                                    </span>
-                                }
-                            </td>
-
-                            <td class="col-priority">
-                                @if (Model.CanManage)
-                                {
-                                    <form asp-action="ChangePriority" method="post" class="backlog-inline-form">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="storyId" value="@story.Id" />
-                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                                        <select name="priority" class="backlog-priority-select priority-@story.Priority.ToString().ToLower()" onchange="this.form.submit()">
-                                            @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
-                                            {
-                                                <option value="@p" selected="@(p == story.Priority)">
-                                                    @(p switch
-                                                    {
-                                                        StoryPriorityType.Lowest => "خیلی کم",
-                                                        StoryPriorityType.Low => "کم",
-                                                        StoryPriorityType.Medium => "متوسط",
-                                                        StoryPriorityType.High => "زیاد",
-                                                        StoryPriorityType.Highest => "خیلی زیاد",
-                                                        _ => "-"
-                                                    })
-                                </option>
-                                                                }
-                                        </select>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">
-                                        @story.Priority
-                                    </span>
-                                }
-                            </td>
-
-                            <td class="col-sp">
-                                <span class="backlog-sp-badge">@story.StoryPoint</span>
-                            </td>
-
-                            <td class="col-bv">
-                                <span class="backlog-bv-badge">@story.BusinessValue</span>
-                            </td>
-
-                            <td class="col-owner">
-                                @if (Model.CanManage)
-                                {
-                                    <form asp-action="ChangeOwner" method="post" class="backlog-inline-form">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="storyId" value="@story.Id" />
-                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                                        <select name="ownerId" class="backlog-owner-select" onchange="this.form.submit()">
-                                            <option value="">— بدون مسئول —</option>
-                                            @foreach (var member in Model.ProjectMembers)
-                                            {
-                                                <option value="@member.UserId" selected="@(member.UserId == story.OwnerId)">
-                                                    @member.FullName
-                                                </option>
-                                            }
-                                        </select>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span>@(story.OwnerName ?? "—")</span>
-                                }
-                            </td>
-
-                            <td class="col-contributors">
-                                @if (!story.Contributors.Any())
-                                {
-                                    <span class="backlog-contributors-empty">
-                                        <i class="fa-regular fa-circle-user"></i>
-                                        —
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="backlog-contributors-list" title="@string.Join("، ", story.Contributors)">
-                                        <i class="fa-regular fa-circle-user"></i>
-                                        @(story.Contributors.Count == 1
-                                                                    ? story.Contributors[0]
-                                                                    : $"{story.Contributors[0]} +{story.Contributors.Count - 1}")
-                        </span>
-                                                }
-                            </td>
-
-                            @if (Model.CanManage)
-                            {
-                                <td class="col-actions">
-                                    <form asp-action="Delete" method="post" class="delete-story-form">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@story.Id" />
-                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                                        <button type="submit" class="workspace-delete-btn">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            }
-
                         </tr>
+
+                        @* Display User Stories for this Sprint *@
+                        @foreach (var story in sprint.Stories)
+                        {
+                            var _taskCount = story.Tasks.Count;
+                            var _sp = story.Priority switch { StoryPriorityType.Highest => 5, StoryPriorityType.High => 4, StoryPriorityType.Medium => 3, StoryPriorityType.Low => 2, StoryPriorityType.Lowest => 1, _ => 0 };
+                            <tr class="backlog-row story-subitem" data-id="@story.Id" data-title="@story.Title" data-sprint-id="@sprint.SprintId"
+                                data-search="@story.Title @story.OwnerName" data-status="@story.Status" data-priority="@_sp" data-sp="@story.StoryPoint" data-tasks="@story.Tasks.Count">
+
+                                @if (Model.CanManage)
+                                {
+                                    <td class="col-drag">
+                                        <i class="fa-solid fa-grip-vertical backlog-drag-handle"></i>
+                                    </td>
+                                }
+
+                                <td class="col-id">
+                                    <span class="backlog-id-badge">#@story.Id</span>
+                                </td>
+
+                                <td class="col-title">
+                                    <span class="story-indent"></span>
+                                    <a asp-controller="UserStory" asp-action="Details" asp-route-id="@story.Id" class="story-title-link">
+                                        @story.Title
+                                    </a>
+                                </td>
+
+                                <td class="col-status">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangeStatus" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="status" class="backlog-status-select status-@story.Status.ToString().ToLower()" onchange="this.form.submit()">
+                                                @foreach (StoryStatusType s in Enum.GetValues(typeof(StoryStatusType)))
+                                                {
+                                                    <option value="@s" selected="@(s == story.Status)">
+                                                        @(s switch
+                                                        {
+                                                            StoryStatusType.New => "جدید",
+                                                            StoryStatusType.Ready => "آماده",
+                                                            StoryStatusType.InProgress => "درحال انجام",
+                                                            StoryStatusType.Done => "انجام‌شده",
+                                                            StoryStatusType.Closed => "بسته‌شده",
+                                                            _ => "-"
+                                                        })
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">
+                                            @story.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="col-priority">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangePriority" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="priority" class="backlog-priority-select priority-@story.Priority.ToString().ToLower()" onchange="this.form.submit()">
+                                                @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
+                                                {
+                                                    <option value="@p" selected="@(p == story.Priority)">
+                                                        @(p switch
+                                                        {
+                                                            StoryPriorityType.Lowest => "خیلی کم",
+                                                            StoryPriorityType.Low => "کم",
+                                                            StoryPriorityType.Medium => "متوسط",
+                                                            StoryPriorityType.High => "زیاد",
+                                                            StoryPriorityType.Highest => "خیلی زیاد",
+                                                            _ => "-"
+                                                        })
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                            @story.Priority
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="col-sp">
+                                    <span class="backlog-sp-badge">@story.StoryPoint</span>
+                                </td>
+
+                                <td class="col-bv">
+                                    <span class="backlog-bv-badge">@story.BusinessValue</span>
+                                </td>
+
+                                <td class="col-owner">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangeOwner" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="ownerId" class="backlog-owner-select" onchange="this.form.submit()">
+                                                <option value="">— بدون مسئول —</option>
+                                                @foreach (var member in Model.ProjectMembers)
+                                                {
+                                                    <option value="@member.UserId" selected="@(member.UserId == story.OwnerId)">
+                                                        @member.FullName
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span>@(story.OwnerName ?? "—")</span>
+                                    }
+                                </td>
+
+                                <td class="col-contributors">
+                                    @if (!story.Contributors.Any())
+                                    {
+                                        <span class="backlog-contributors-empty">
+                                            <i class="fa-regular fa-circle-user"></i>
+                                            —
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-contributors-list" title="@string.Join("، ", story.Contributors)">
+                                            <i class="fa-regular fa-circle-user"></i>
+                                            @(story.Contributors.Count == 1
+                                                ? story.Contributors[0]
+                                                : $"{story.Contributors[0]} +{story.Contributors.Count - 1}")
+                                        </span>
+                                    }
+                                </td>
+
+                                @if (Model.CanManage)
+                                {
+                                    <td class="col-actions">
+                                        <form asp-action="Delete" method="post" class="delete-story-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <button type="submit" class="workspace-delete-btn">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                }
+
+                            </tr>
+                            @if (_taskCount > 0)
+                            {
+                                foreach (var t in story.Tasks)
+                                {
+                                    var tStatusClass = t.Status switch { TaskStatusType.ToDo => "todo", TaskStatusType.InProgress => "inprogress", TaskStatusType.InReview => "inreview", TaskStatusType.Done => "done", TaskStatusType.Cancelled => "cancelled", _ => "todo" };
+                                    var tStatusLabel = t.Status switch { TaskStatusType.ToDo => "انجام نشده", TaskStatusType.InProgress => "درحال انجام", TaskStatusType.InReview => "در حال بررسی", TaskStatusType.Done => "انجام شده", TaskStatusType.Cancelled => "لغو شده", _ => t.Status.ToString() };
+                                    var tTypeLabel = t.Type switch { TaskType.Task => "تسک", TaskType.Bug => "باگ", TaskType.Feature => "فیچر", _ => t.Type.ToString() };
+                                    var _tp = t.Priority switch { TaskPriorityType.Highest => 5, TaskPriorityType.High => 4, TaskPriorityType.Medium => 3, TaskPriorityType.Low => 2, TaskPriorityType.Lowest => 1, _ => 0 };
+                                    <tr class="bp-task-row" data-story-id="@story.Id" style="display:none;"
+                                        data-search="@t.Title @t.AssigneeName" data-task-status="@t.Status" data-task-priority="@_tp" data-task-type="@t.Type">
+                                        @if (Model.CanManage) { <td></td> }
+                                        <td style="font-size:11px;color:var(--gray400);">#@t.Id</td>
+                                        <td class="col-title" style="padding-right:40px;">
+                                            <span class="bp-task-type-badge" style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--gray100);color:var(--gray600);margin-right:6px;">@tTypeLabel</span>
+                                            <span style="font-weight:500;color:var(--gray700);">@t.Title</span>
+                                        </td>
+                                        <td><span class="bp-task-status @tStatusClass" style="display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">@tStatusLabel</span></td>
+                                        <td style="color:var(--gray600);font-size:12px;">@t.Priority</td>
+                                        <td><span class="backlog-sp-badge">@t.Estimate</span></td>
+                                        <td style="font-size:12px;">@(t.AssigneeName ?? "—")</td>
+                                        @if (Model.CanManage) { <td></td> }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr class="bp-task-row" data-story-id="@story.Id" style="display:none;">
+                                    @if (Model.CanManage) { <td></td> }
+                                    <td colspan="6" style="font-size:12px;color:var(--gray400);font-style:italic;padding:8px 40px;">هنوز تسکی ثبت نشده است.</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                    @* Display Unassigned Stories *@
+                    @if (Model.UnassignedStories.Any())
+                    {
+                        <tr class="sprint-row unassigned-section">
+                            @if (Model.CanManage)
+                            {
+                                <td class="col-drag"></td>
+                            }
+                            <td colspan="@(Model.CanManage ? 9 : 8)" class="sprint-header">
+                                <i class="fa-solid fa-layer-group"></i>
+                                <strong>User Storyهای اختصاص نیافته</strong>
+                            </td>
+                        </tr>
+
+                        @foreach (var story in Model.UnassignedStories)
+                        {
+                            var _taskCount2 = story.Tasks.Count;
+                            var _sp2 = story.Priority switch { StoryPriorityType.Highest => 5, StoryPriorityType.High => 4, StoryPriorityType.Medium => 3, StoryPriorityType.Low => 2, StoryPriorityType.Lowest => 1, _ => 0 };
+                            <tr class="backlog-row story-subitem" data-id="@story.Id" data-title="@story.Title"
+                                data-search="@story.Title @story.OwnerName" data-status="@story.Status" data-priority="@_sp2" data-sp="@story.StoryPoint" data-tasks="@story.Tasks.Count">
+
+                                @if (Model.CanManage)
+                                {
+                                    <td class="col-drag">
+                                        <i class="fa-solid fa-grip-vertical backlog-drag-handle"></i>
+                                    </td>
+                                }
+
+                                <td class="col-id">
+                                    <span class="backlog-id-badge">#@story.Id</span>
+                                </td>
+
+                                <td class="col-title">
+                                    <button class="bp-expand-btn" onclick="toggleBacklogStory(this)" title="نمایش تسک‌ها" style="background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--gray400);margin-left:6px;">
+                                        <i class="fa-solid fa-chevron-right" style="font-size:11px;transition:transform .2s ease;"></i>
+                                    </button>
+                                    <span class="story-indent"></span>
+                                    <a asp-controller="UserStory" asp-action="Details" asp-route-id="@story.Id" class="story-title-link">
+                                        @story.Title
+                                    </a>
+                                    <span style="font-size:11px;color:var(--gray400);margin-right:8px;">
+                                        <i class="fa-solid fa-list-check" style="font-size:10px;"></i>
+                                        <span class="fa-digits">@_taskCount2</span> تسک
+                                    </span>
+                                </td>
+
+                                <td class="col-status">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangeStatus" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="status" class="backlog-status-select status-@story.Status.ToString().ToLower()" onchange="this.form.submit()">
+                                                @foreach (StoryStatusType s in Enum.GetValues(typeof(StoryStatusType)))
+                                                {
+                                                    <option value="@s" selected="@(s == story.Status)">
+                                                        @(s switch
+                                                        {
+                                                            StoryStatusType.New => "جدید",
+                                                            StoryStatusType.Ready => "آماده",
+                                                            StoryStatusType.InProgress => "درحال انجام",
+                                                            StoryStatusType.Done => "انجام‌شده",
+                                                            StoryStatusType.Closed => "بسته‌شده",
+                                                            _ => "-"
+                                                        })
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-status-badge status-@story.Status.ToString().ToLower()">
+                                            @story.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="col-priority">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangePriority" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="priority" class="backlog-priority-select priority-@story.Priority.ToString().ToLower()" onchange="this.form.submit()">
+                                                @foreach (StoryPriorityType p in Enum.GetValues(typeof(StoryPriorityType)))
+                                                {
+                                                    <option value="@p" selected="@(p == story.Priority)">
+                                                        @(p switch
+                                                        {
+                                                            StoryPriorityType.Lowest => "خیلی کم",
+                                                            StoryPriorityType.Low => "کم",
+                                                            StoryPriorityType.Medium => "متوسط",
+                                                            StoryPriorityType.High => "زیاد",
+                                                            StoryPriorityType.Highest => "خیلی زیاد",
+                                                            _ => "-"
+                                                        })
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-priority-badge priority-@story.Priority.ToString().ToLower()">
+                                            @story.Priority
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="col-sp">
+                                    <span class="backlog-sp-badge">@story.StoryPoint</span>
+                                </td>
+
+                                <td class="col-bv">
+                                    <span class="backlog-bv-badge">@story.BusinessValue</span>
+                                </td>
+
+                                <td class="col-owner">
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-action="ChangeOwner" method="post" class="backlog-inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="storyId" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <select name="ownerId" class="backlog-owner-select" onchange="this.form.submit()">
+                                                <option value="">— بدون مسئول —</option>
+                                                @foreach (var member in Model.ProjectMembers)
+                                                {
+                                                    <option value="@member.UserId" selected="@(member.UserId == story.OwnerId)">
+                                                        @member.FullName
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span>@(story.OwnerName ?? "—")</span>
+                                    }
+                                </td>
+
+                                <td class="col-contributors">
+                                    @if (!story.Contributors.Any())
+                                    {
+                                        <span class="backlog-contributors-empty">
+                                            <i class="fa-regular fa-circle-user"></i>
+                                            —
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="backlog-contributors-list" title="@string.Join("، ", story.Contributors)">
+                                            <i class="fa-regular fa-circle-user"></i>
+                                            @(story.Contributors.Count == 1
+                                                ? story.Contributors[0]
+                                                : $"{story.Contributors[0]} +{story.Contributors.Count - 1}")
+                                        </span>
+                                    }
+                                </td>
+
+                                @if (Model.CanManage)
+                                {
+                                    <td class="col-actions">
+                                        <form asp-action="Delete" method="post" class="delete-story-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@story.Id" />
+                                            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                            <button type="submit" class="workspace-delete-btn">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                }
+
+                            </tr>
+                            @if (_taskCount2 > 0)
+                            {
+                                foreach (var t in story.Tasks)
+                                {
+                                    var tStatusClass2 = t.Status switch { TaskStatusType.ToDo => "todo", TaskStatusType.InProgress => "inprogress", TaskStatusType.InReview => "inreview", TaskStatusType.Done => "done", TaskStatusType.Cancelled => "cancelled", _ => "todo" };
+                                    var tStatusLabel2 = t.Status switch { TaskStatusType.ToDo => "انجام نشده", TaskStatusType.InProgress => "درحال انجام", TaskStatusType.InReview => "در حال بررسی", TaskStatusType.Done => "انجام شده", TaskStatusType.Cancelled => "لغو شده", _ => t.Status.ToString() };
+                                    var tTypeLabel2 = t.Type switch { TaskType.Task => "تسک", TaskType.Bug => "باگ", TaskType.Feature => "فیچر", _ => t.Type.ToString() };
+                                    <tr class="bp-task-row" data-story-id="@story.Id" style="display:none;">
+                                        @if (Model.CanManage) { <td></td> }
+                                        <td style="font-size:11px;color:var(--gray400);">#@t.Id</td>
+                                        <td class="col-title" style="padding-right:40px;">
+                                            <span class="bp-task-type-badge" style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--gray100);color:var(--gray600);margin-right:6px;">@tTypeLabel2</span>
+                                            <span style="font-weight:500;color:var(--gray700);">@t.Title</span>
+                                        </td>
+                                        <td><span class="bp-task-status @tStatusClass2" style="display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">@tStatusLabel2</span></td>
+                                        <td style="color:var(--gray600);font-size:12px;">@t.Priority</td>
+                                        <td><span class="backlog-sp-badge">@t.Estimate</span></td>
+                                        <td style="font-size:12px;">@(t.AssigneeName ?? "—")</td>
+                                        @if (Model.CanManage) { <td></td> }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr class="bp-task-row" data-story-id="@story.Id" style="display:none;">
+                                    @if (Model.CanManage) { <td></td> }
+                                    <td colspan="6" style="font-size:12px;color:var(--gray400);font-style:italic;padding:8px 40px;">هنوز تسکی ثبت نشده است.</td>
+                                </tr>
+                            }
+                        }
                     }
                 </tbody>
             </table>
@@ -243,4 +579,160 @@
 {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
     <script src="~/js/backlog.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            var search = document.getElementById('bpSearch');
+            var storyStatus = document.getElementById('bpStoryStatus');
+            var taskStatus = document.getElementById('bpTaskStatus');
+            var priority = document.getElementById('bpPriority');
+            var taskType = document.getElementById('bpTaskType');
+            var sort = document.getElementById('bpSort');
+            var body = document.querySelector('#backlogList');
+            if (!body) return;
+
+            function applyFilters() {
+                var q = (search.value || '').toLowerCase();
+                var sStatus = storyStatus.value;
+                var tStatus = taskStatus.value;
+                var prio = priority.value;
+                var tType = taskType.value;
+                var sortVal = sort.value;
+
+                var storyRows = body.querySelectorAll('.story-subitem, .bp-story-row');
+                var visibleStories = 0;
+                var visibleTasks = 0;
+
+                storyRows.forEach(function (row) {
+                    if (!row.hasAttribute('data-status')) return;
+                    var storySearch = (row.getAttribute('data-search') || '').toLowerCase();
+                    var storyStatusVal = row.getAttribute('data-status');
+                    var storyPrio = parseInt(row.getAttribute('data-priority') || '0');
+
+                    var matchSearch = !q || storySearch.indexOf(q) !== -1;
+                    var matchStatus = !sStatus || storyStatusVal === sStatus;
+                    var matchPrio = !prio || String(storyPrio) === prio;
+
+                    var storyId = row.getAttribute('data-id');
+                    var taskRows = body.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+                    var storyHasVisibleTask = false;
+
+                    taskRows.forEach(function (tr) {
+                        var taskSearch = (tr.getAttribute('data-search') || '').toLowerCase();
+                        var taskStatusVal = tr.getAttribute('data-task-status') || '';
+                        var taskPrio = tr.getAttribute('data-task-priority') || '';
+                        var taskTypeVal = tr.getAttribute('data-task-type') || '';
+
+                        var tMatchSearch = !q || taskSearch.indexOf(q) !== -1 || matchSearch;
+                        var tMatchStatus = !tStatus || taskStatusVal === tStatus;
+                        var tMatchPrio = !prio || taskPrio === prio;
+                        var tMatchType = !tType || taskTypeVal === tType;
+
+                        if (tMatchSearch && tMatchStatus && tMatchPrio && tMatchType && matchStatus) {
+                            tr.style.display = '';
+                            storyHasVisibleTask = true;
+                            visibleTasks++;
+                        } else {
+                            tr.style.display = 'none';
+                        }
+                    });
+
+                    var storyVisible = matchSearch && matchStatus && matchPrio;
+                    if (storyVisible || (storyHasVisibleTask && matchStatus)) {
+                        row.style.display = '';
+                        visibleStories++;
+                        if ((tStatus || tType) && storyHasVisibleTask) {
+                            var btn = row.querySelector('.bp-expand-btn');
+                            if (btn && !btn.classList.contains('open')) {
+                                btn.classList.add('open');
+                                taskRows.forEach(function (tr) { if (tr.style.display !== 'none') tr.style.display = ''; });
+                            }
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Apply sort
+                if (sortVal) {
+                    var storyGroups = [];
+                    var current = null;
+                    Array.from(body.children).forEach(function (row) {
+                        if (row.classList.contains('backlog-row') || row.classList.contains('bp-story-row')) {
+                            current = { story: row, tasks: [] };
+                            storyGroups.push(current);
+                        } else if (current && (row.classList.contains('bp-task-row') || row.classList.contains('story-subitem') === false)) {
+                            current.tasks.push(row);
+                        }
+                    });
+                    storyGroups.sort(function (a, b) {
+                        var aEl = a.story, bEl = b.story;
+                        var aId = parseInt(aEl.getAttribute('data-id') || aEl.getAttribute('data-story-id') || '0');
+                        var bId = parseInt(bEl.getAttribute('data-id') || bEl.getAttribute('data-story-id') || '0');
+                        var aPrio = parseInt(aEl.getAttribute('data-priority') || '0');
+                        var bPrio = parseInt(bEl.getAttribute('data-priority') || '0');
+                        var aSp = parseInt(aEl.getAttribute('data-sp') || '0');
+                        var bSp = parseInt(bEl.getAttribute('data-sp') || '0');
+                        var aTasks = parseInt(aEl.getAttribute('data-tasks') || '0');
+                        var bTasks = parseInt(bEl.getAttribute('data-tasks') || '0');
+                        switch (sortVal) {
+                            case 'id-asc': return aId - bId;
+                            case 'id-desc': return bId - aId;
+                            case 'priority-desc': return bPrio - aPrio;
+                            case 'priority-asc': return aPrio - bPrio;
+                            case 'sp-desc': return bSp - aSp;
+                            case 'sp-asc': return aSp - bSp;
+                            case 'tasks-desc': return bTasks - aTasks;
+                            default: return 0;
+                        }
+                    });
+                    storyGroups.forEach(function (g) {
+                        body.appendChild(g.story);
+                        g.tasks.forEach(function (t) { body.appendChild(t); });
+                    });
+                }
+
+                var sc = document.getElementById('bpStoryCount');
+                var tc = document.getElementById('bpTaskCount');
+                if (sc) sc.textContent = visibleStories;
+                if (tc) tc.textContent = visibleTasks;
+            }
+
+            if (search) search.addEventListener('input', applyFilters);
+            if (storyStatus) storyStatus.addEventListener('change', applyFilters);
+            if (taskStatus) taskStatus.addEventListener('change', applyFilters);
+            if (priority) priority.addEventListener('change', applyFilters);
+            if (taskType) taskType.addEventListener('change', applyFilters);
+            if (sort) sort.addEventListener('change', applyFilters);
+        })();
+
+        window.toggleBacklogStory = function (btn) {
+            var row = btn.closest('tr');
+            var storyId = row.getAttribute('data-id') || row.getAttribute('data-story-id');
+            var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+            var isOpen = btn.classList.contains('open');
+            taskRows.forEach(function(r) { r.style.display = isOpen ? 'none' : ''; });
+            btn.classList.toggle('open');
+        };
+
+        window.bpExpandAll = function () {
+            document.querySelectorAll('.backlog-row, .bp-story-row').forEach(function (row) {
+                if (row.style.display === 'none') return;
+                var storyId = row.getAttribute('data-id') || row.getAttribute('data-story-id');
+                var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+                taskRows.forEach(function (tr) { tr.style.display = ''; });
+                var btn = row.querySelector('.bp-expand-btn');
+                if (btn) btn.classList.add('open');
+            });
+        };
+
+        window.bpCollapseAll = function () {
+            document.querySelectorAll('.backlog-row, .bp-story-row').forEach(function (row) {
+                var storyId = row.getAttribute('data-id') || row.getAttribute('data-story-id');
+                var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+                taskRows.forEach(function (tr) { tr.style.display = 'none'; });
+                var btn = row.querySelector('.bp-expand-btn');
+                if (btn) btn.classList.remove('open');
+            });
+        };
+    </script>
 }

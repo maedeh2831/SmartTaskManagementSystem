@@ -26,9 +26,90 @@
     .bp-empty { text-align: center; padding: 40px; color: var(--gray500); }
     .bp-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 8px 16px; border-radius: 8px; background: var(--primary-light); color: var(--primary); font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s ease; }
     .bp-link:hover { background: var(--primary); color: #fff; }
+
+    /* Expand button */
+    .bp-expand-btn { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background .15s ease; color: var(--gray400); display: inline-flex; align-items: center; justify-content: center; }
+    .bp-expand-btn:hover { background: var(--gray100); color: var(--primary); }
+    .bp-expand-btn i { transition: transform .2s ease; font-size: 11px; }
+    .bp-expand-btn.open i { transform: rotate(90deg); }
+
+    /* Story row */
+    .bp-story-row td { border-bottom: 1px solid var(--gray200); background: var(--gray50); }
+    .bp-story-row:hover td { background: var(--gray100) !important; }
+    .bp-story-row .bp-title { font-weight: 700; font-size: 13.5px; }
+    .bp-task-count { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--gray400); margin-right: 8px; }
+    .bp-task-count i { font-size: 10px; }
+
+    /* Task sub-row */
+    .bp-task-row td { padding: 8px 14px 8px 40px; background: var(--card); border-bottom: 1px solid var(--gray100); }
+    .bp-task-row:hover td { background: var(--gray50); }
+    .bp-task-row .bp-title { font-weight: 500; font-size: 13px; color: var(--gray700); }
+    .bp-task-id { color: var(--gray400); font-size: 11px; }
+    .bp-task-type-badge { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; white-space: nowrap; background: var(--gray100); color: var(--gray600); margin-right: 6px; }
+    .bp-task-type-badge.type-task { background: #DBEAFE; color: #1D4ED8; }
+    .bp-task-type-badge.type-bug { background: #FEE2E2; color: #B91C1C; }
+    .bp-task-type-badge.type-feature { background: #FEF3C7; color: #B45309; }
+    .bp-task-status { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+    .bp-task-status.todo { background: var(--gray100); color: var(--gray600); }
+    .bp-task-status.inprogress { background: #FEF3C7; color: #B45309; }
+    .bp-task-status.inreview { background: #E0E7FF; color: #4338CA; }
+    .bp-task-status.done { background: #D1FAE5; color: #047857; }
+    .bp-task-status.cancelled { background: var(--gray100); color: var(--gray500); }
+    .bp-no-tasks { color: var(--gray400); font-size: 12px; font-style: italic; padding: 8px 0; }
+
+    /* Filter bar */
+    .bp-filter-bar {
+        display: grid; grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px; padding: 16px; margin-bottom: 16px;
+        background: var(--card); border: 1px solid var(--gray200);
+        border-radius: 8px; box-shadow: var(--shadow-sm);
+    }
+    .bp-filter-bar .bp-filter-search {
+        grid-column: 1 / -1;
+        width: 100%; height: 40px; padding: 0 14px; font-size: 14px;
+        border: 1px solid var(--gray200); border-radius: 6px;
+        background: var(--bg); color: var(--text); outline: none;
+        transition: border-color .2s ease;
+    }
+    .bp-filter-bar .bp-filter-search:focus { border-color: var(--primary); }
+    .bp-filter-bar .bp-filter-search::placeholder { color: var(--gray400); }
+    .bp-filter-bar select {
+        width: 100%; height: 40px; padding: 0 32px 0 12px; font-size: 13px;
+        border: 1px solid var(--gray200); border-radius: 6px;
+        background: var(--bg); color: var(--text); outline: none; cursor: pointer;
+        appearance: none; -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: left 10px center;
+        transition: border-color .2s ease;
+    }
+    .bp-filter-bar select:focus { border-color: var(--primary); }
+    .bp-filter-actions {
+        grid-column: 1 / -1;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .bp-filter-btn {
+        height: 38px; padding: 0 16px; font-size: 13px; font-weight: 600;
+        border: 1px solid var(--gray200); border-radius: 6px;
+        background: var(--bg); color: var(--gray600); cursor: pointer;
+        display: inline-flex; align-items: center; gap: 6px;
+        transition: all .15s ease;
+    }
+    .bp-filter-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+    .bp-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .bp-filter-count {
+        font-size: 12px; color: var(--gray400); margin-right: auto;
+        padding: 4px 12px; background: var(--gray100); border-radius: 12px;
+    }
+    .bp-filter-count strong { color: var(--text); }
+
+    @@media (max-width: 768px) {
+        .bp-filter-bar { grid-template-columns: 1fr; }
+    }
+
+    .bp-row-hidden { display: none !important; }
 </style>
 
-@if (!Model.Stories.Any())
+@if (!Model.UnassignedStories.Any())
 {
     <div class="bp-empty">
         <i class="fa-solid fa-layer-group" style="font-size:28px; color:var(--gray400); margin-bottom:12px; display:block;"></i>
@@ -37,10 +118,75 @@
 }
 else
 {
+    var totalTasks = Model.UnassignedStories.Sum(s => s.Tasks.Count);
+
+    <div class="bp-filter-bar" id="bpFilterBar">
+        <input type="text" class="bp-filter-search" id="bpSearch" placeholder="جستجو در داستان‌ها و تسک‌ها..." />
+
+        <select id="bpStoryStatus">
+            <option value="">وضعیت داستان</option>
+            <option value="New">جدید</option>
+            <option value="Ready">آماده</option>
+            <option value="InProgress">درحال انجام</option>
+            <option value="Done">انجام‌شده</option>
+            <option value="Closed">بسته‌شده</option>
+        </select>
+
+        <select id="bpTaskStatus">
+            <option value="">وضعیت تسک</option>
+            <option value="ToDo">انجام نشده</option>
+            <option value="InProgress">درحال انجام</option>
+            <option value="InReview">در حال بررسی</option>
+            <option value="Done">انجام شده</option>
+            <option value="Cancelled">لغو شده</option>
+        </select>
+
+        <select id="bpPriority">
+            <option value="">اولویت</option>
+            <option value="Lowest">خیلی کم</option>
+            <option value="Low">کم</option>
+            <option value="Medium">متوسط</option>
+            <option value="High">زیاد</option>
+            <option value="Highest">خیلی زیاد</option>
+        </select>
+
+        <select id="bpTaskType">
+            <option value="">نوع تسک</option>
+            <option value="Task">تسک</option>
+            <option value="Bug">باگ</option>
+            <option value="Feature">فیچر</option>
+        </select>
+
+        <select id="bpSort">
+            <option value="">مرتب‌سازی</option>
+            <option value="id-asc">شماره ↑</option>
+            <option value="id-desc">شماره ↓</option>
+            <option value="priority-desc">اولویت ↓</option>
+            <option value="priority-asc">اولویت ↑</option>
+            <option value="sp-desc">Story Point ↓</option>
+            <option value="sp-asc">Story Point ↑</option>
+            <option value="tasks-desc">تعداد تسک ↓</option>
+        </select>
+
+        <div class="bp-filter-actions">
+            <button class="bp-filter-btn" onclick="bpExpandAll()">
+                <i class="fa-solid fa-expand"></i> باز کردن همه
+            </button>
+            <button class="bp-filter-btn" onclick="bpCollapseAll()">
+                <i class="fa-solid fa-compress"></i> بستن همه
+            </button>
+            <span class="bp-filter-count">
+                <strong class="fa-digits" id="bpStoryCount">@Model.UnassignedStories.Count</strong> داستان ·
+                <strong class="fa-digits" id="bpTaskCount">@totalTasks</strong> تسک
+            </span>
+        </div>
+    </div>
+
     <div class="bp-table-wrap">
         <table class="bp-table">
             <thead>
                 <tr>
+                    <th style="width:36px;"></th>
                     <th>#</th>
                     <th>عنوان</th>
                     <th>وضعیت</th>
@@ -49,8 +195,8 @@ else
                     <th>مسئول</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var s in Model.Stories)
+            <tbody id="bpBody">
+                @foreach (var s in Model.UnassignedStories.OrderBy(s => s.Id))
                 {
                     var statusClass = s.Status.ToString().ToLower();
                     var statusLabel = s.Status switch
@@ -62,16 +208,111 @@ else
                         StoryStatusType.Closed => "بسته‌شده",
                         _ => s.Status.ToString()
                     };
-                    <tr>
-                        <td><span class="bp-id">#@s.Id</span></td>
+                    var taskCount = s.Tasks.Count;
+                    var priorityOrder = s.Priority switch
+                    {
+                        StoryPriorityType.Highest => 5,
+                        StoryPriorityType.High => 4,
+                        StoryPriorityType.Medium => 3,
+                        StoryPriorityType.Low => 2,
+                        StoryPriorityType.Lowest => 1,
+                        _ => 0
+                    };
+                    <tr class="bp-story-row" data-story-id="@s.Id"
+                        data-search="@s.Title @s.OwnerName"
+                        data-status="@s.Status"
+                        data-priority="@priorityOrder"
+                        data-sp="@s.StoryPoint"
+                        data-tasks="@taskCount">
+                        <td>
+                            <button class="bp-expand-btn" onclick="toggleBacklogStory(this)">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </td>
+                        <td><span class="bp-id fa-digits">#@s.Id</span></td>
                         <td class="bp-title">
                             <a href="/UserStory/Details/@s.Id">@s.Title</a>
+                            <span class="bp-task-count">
+                                <i class="fa-solid fa-list-check"></i>
+                                <span class="fa-digits">@taskCount</span> تسک
+                            </span>
                         </td>
                         <td><span class="bp-badge bp-status-@statusClass">@statusLabel</span></td>
                         <td><span class="bp-priority-@s.Priority.ToString().ToLower()">@s.Priority</span></td>
                         <td><span class="bp-sp fa-digits">@s.StoryPoint</span></td>
                         <td>@(s.OwnerName ?? "—")</td>
                     </tr>
+
+                    if (taskCount > 0)
+                    {
+                        foreach (var t in s.Tasks)
+                        {
+                            var taskStatusClass = t.Status.ToString().ToLower() switch
+                            {
+                                "todo" => "todo",
+                                "inprogress" => "inprogress",
+                                "inreview" => "inreview",
+                                "done" => "done",
+                                "cancelled" => "cancelled",
+                                _ => "todo"
+                            };
+                            var taskStatusLabel = t.Status switch
+                            {
+                                TaskStatusType.ToDo => "انجام نشده",
+                                TaskStatusType.InProgress => "درحال انجام",
+                                TaskStatusType.InReview => "در حال بررسی",
+                                TaskStatusType.Done => "انجام شده",
+                                TaskStatusType.Cancelled => "لغو شده",
+                                _ => t.Status.ToString()
+                            };
+                            var typeClass = t.Type.ToString().ToLower() switch
+                            {
+                                "bug" => "type-bug",
+                                "feature" => "type-feature",
+                                _ => "type-task"
+                            };
+                            var typeLabel = t.Type switch
+                            {
+                                TaskType.Task => "تسک",
+                                TaskType.Bug => "باگ",
+                                TaskType.Feature => "فیچر",
+                                _ => t.Type.ToString()
+                            };
+                            var taskPriorityOrder = t.Priority switch
+                            {
+                                TaskPriorityType.Highest => 5,
+                                TaskPriorityType.High => 4,
+                                TaskPriorityType.Medium => 3,
+                                TaskPriorityType.Low => 2,
+                                TaskPriorityType.Lowest => 1,
+                                _ => 0
+                            };
+                            <tr class="bp-task-row" data-story-id="@s.Id" style="display:none;"
+                                data-search="@t.Title @t.AssigneeName"
+                                data-task-status="@t.Status"
+                                data-task-priority="@taskPriorityOrder"
+                                data-task-type="@t.Type"
+                                data-task-estimate="@t.Estimate">
+                                <td></td>
+                                <td><span class="bp-task-id fa-digits">#@t.Id</span></td>
+                                <td class="bp-title">
+                                    <span class="bp-task-type-badge @typeClass">@typeLabel</span>
+                                    <a href="/Task/Details/@t.Id">@t.Title</a>
+                                </td>
+                                <td><span class="bp-task-status @taskStatusClass">@taskStatusLabel</span></td>
+                                <td><span class="bp-priority-@t.Priority.ToString().ToLower()">@t.Priority</span></td>
+                                <td><span class="bp-sp fa-digits">@t.Estimate</span></td>
+                                <td>@(t.AssigneeName ?? "—")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="bp-task-row" data-story-id="@s.Id" style="display:none;">
+                            <td></td>
+                            <td colspan="6"><span class="bp-no-tasks">هنوز تسکی ثبت نشده است.</span></td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
@@ -84,8 +325,163 @@ else
 }
 
 <script>
-    document.querySelectorAll('.fa-digits').forEach(function(el) {
+    (function () {
+        var search = document.getElementById('bpSearch');
+        var storyStatus = document.getElementById('bpStoryStatus');
+        var taskStatus = document.getElementById('bpTaskStatus');
+        var priority = document.getElementById('bpPriority');
+        var taskType = document.getElementById('bpTaskType');
+        var sort = document.getElementById('bpSort');
+        var body = document.getElementById('bpBody');
+        if (!body) return;
+
+        function applyFilters() {
+            var q = (search.value || '').toLowerCase();
+            var sStatus = storyStatus.value;
+            var tStatus = taskStatus.value;
+            var prio = priority.value;
+            var tType = taskType.value;
+            var sortVal = sort.value;
+
+            var storyRows = body.querySelectorAll('.bp-story-row');
+            var visibleStories = 0;
+            var visibleTasks = 0;
+
+            storyRows.forEach(function (row) {
+                var storySearch = (row.getAttribute('data-search') || '').toLowerCase();
+                var storyStatusVal = row.getAttribute('data-status');
+                var storyPrio = parseInt(row.getAttribute('data-priority') || '0');
+
+                var matchSearch = !q || storySearch.indexOf(q) !== -1;
+                var matchStatus = !sStatus || storyStatusVal === sStatus;
+                var matchPrio = !prio || String(storyPrio) === prio;
+
+                var taskRows = body.querySelectorAll('.bp-task-row[data-story-id="' + row.getAttribute('data-story-id') + '"]');
+                var storyHasVisibleTask = false;
+
+                taskRows.forEach(function (tr) {
+                    var taskSearch = (tr.getAttribute('data-search') || '').toLowerCase();
+                    var taskStatusVal = tr.getAttribute('data-task-status') || '';
+                    var taskPrio = tr.getAttribute('data-task-priority') || '';
+                    var taskTypeVal = tr.getAttribute('data-task-type') || '';
+
+                    var tMatchSearch = !q || taskSearch.indexOf(q) !== -1 || matchSearch;
+                    var tMatchStatus = !tStatus || taskStatusVal === tStatus;
+                    var tMatchPrio = !prio || taskPrio === prio;
+                    var tMatchType = !tType || taskTypeVal === tType;
+
+                    if (tMatchSearch && tMatchStatus && tMatchPrio && tMatchType && matchStatus) {
+                        tr.style.display = '';
+                        storyHasVisibleTask = true;
+                        visibleTasks++;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                });
+
+                // Story matches or has visible tasks
+                var storyVisible = matchSearch && matchStatus && matchPrio;
+                if (storyVisible || (storyHasVisibleTask && matchStatus)) {
+                    row.style.display = '';
+                    visibleStories++;
+                    // If task filters are active, auto-expand stories with matching tasks
+                    if ((tStatus || tType) && storyHasVisibleTask) {
+                        var btn = row.querySelector('.bp-expand-btn');
+                        if (btn && !btn.classList.contains('open')) {
+                            btn.classList.add('open');
+                            taskRows.forEach(function (tr) { if (tr.style.display !== 'none') tr.style.display = ''; });
+                        }
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Apply sort
+            if (sortVal) {
+                var rows = Array.from(body.children);
+                var storyGroups = [];
+                var current = null;
+
+                rows.forEach(function (row) {
+                    if (row.classList.contains('bp-story-row')) {
+                        current = { story: row, tasks: [] };
+                        storyGroups.push(current);
+                    } else if (current && row.classList.contains('bp-task-row')) {
+                        current.tasks.push(row);
+                    }
+                });
+
+                storyGroups.sort(function (a, b) {
+                    var aEl = a.story, bEl = b.story;
+                    switch (sortVal) {
+                        case 'id-asc': return parseInt(aEl.dataset.storyId) - parseInt(bEl.dataset.storyId);
+                        case 'id-desc': return parseInt(bEl.dataset.storyId) - parseInt(aEl.dataset.storyId);
+                        case 'priority-desc': return parseInt(bEl.dataset.priority) - parseInt(aEl.dataset.priority);
+                        case 'priority-asc': return parseInt(aEl.dataset.priority) - parseInt(bEl.dataset.priority);
+                        case 'sp-desc': return parseInt(bEl.dataset.sp || '0') - parseInt(aEl.dataset.sp || '0');
+                        case 'sp-asc': return parseInt(aEl.dataset.sp || '0') - parseInt(bEl.dataset.sp || '0');
+                        case 'tasks-desc': return parseInt(bEl.dataset.tasks || '0') - parseInt(aEl.dataset.tasks || '0');
+                        default: return 0;
+                    }
+                });
+
+                storyGroups.forEach(function (g) {
+                    body.appendChild(g.story);
+                    g.tasks.forEach(function (t) { body.appendChild(t); });
+                });
+            }
+
+            // Update counts
+            var sc = document.getElementById('bpStoryCount');
+            var tc = document.getElementById('bpTaskCount');
+            if (sc) sc.textContent = visibleStories;
+            if (tc) tc.textContent = visibleTasks;
+        }
+
+        if (search) search.addEventListener('input', applyFilters);
+        if (storyStatus) storyStatus.addEventListener('change', applyFilters);
+        if (taskStatus) taskStatus.addEventListener('change', applyFilters);
+        if (priority) priority.addEventListener('change', applyFilters);
+        if (taskType) taskType.addEventListener('change', applyFilters);
+        if (sort) sort.addEventListener('change', applyFilters);
+    })();
+
+    window.toggleBacklogStory = function (btn) {
+        var storyRow = btn.closest('.bp-story-row');
+        var storyId = storyRow.getAttribute('data-story-id');
+        var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+        var isOpen = btn.classList.contains('open');
+        taskRows.forEach(function (row) {
+            if (row.classList.contains('bp-row-hidden')) return;
+            row.style.display = isOpen ? 'none' : '';
+        });
+        btn.classList.toggle('open');
+    };
+
+    window.bpExpandAll = function () {
+        document.querySelectorAll('.bp-story-row').forEach(function (row) {
+            if (row.style.display === 'none') return;
+            var btn = row.querySelector('.bp-expand-btn');
+            var storyId = row.getAttribute('data-story-id');
+            var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+            taskRows.forEach(function (tr) { if (!tr.classList.contains('bp-row-hidden')) tr.style.display = ''; });
+            if (btn) btn.classList.add('open');
+        });
+    };
+
+    window.bpCollapseAll = function () {
+        document.querySelectorAll('.bp-story-row').forEach(function (row) {
+            var btn = row.querySelector('.bp-expand-btn');
+            var storyId = row.getAttribute('data-story-id');
+            var taskRows = document.querySelectorAll('.bp-task-row[data-story-id="' + storyId + '"]');
+            taskRows.forEach(function (tr) { tr.style.display = 'none'; });
+            if (btn) btn.classList.remove('open');
+        });
+    };
+
+    document.querySelectorAll('.fa-digits').forEach(function (el) {
         var fa = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
-        el.textContent = el.textContent.replace(/[0-9]/g, function(d) { return fa[+d]; });
+        el.textContent = el.textContent.replace(/[0-9]/g, function (d) { return fa[+d]; });
     });
 </script>
