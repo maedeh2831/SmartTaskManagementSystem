@@ -39,10 +39,10 @@
     transition: var(--transition);
 }
 
-.stat-card:hover {
-    box-shadow: var(--shadow);
-    transform: translateY(-1px);
-}
+    .stat-card:hover {
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+    }
 
 .stat-icon {
     width: 54px;

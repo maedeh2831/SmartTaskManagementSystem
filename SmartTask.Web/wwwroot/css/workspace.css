@@ -889,6 +889,7 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
 }
+
 .workspace-delete-btn {
     width: 40px;
     height: 40px;
@@ -905,6 +906,7 @@ textarea.form-control {
         color: white;
         transform: translateY(-3px);
     }
+
 .workspace-footer {
     position: relative;
     z-index: 20;
