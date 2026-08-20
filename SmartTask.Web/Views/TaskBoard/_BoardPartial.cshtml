@@ -1,20 +1,210 @@
 @model SmartTask.Web.Models.ViewModels.TaskBoard.TaskBoardViewModel
+@using SmartTask.Web.Models.Enums
+@inject SmartTask.Web.Services.Interfaces.IDateFormatService DateFormatService
 
-<style>
-    .redirect-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; background: var(--card); border: 1px solid var(--gray200); border-radius: 12px; }
-    .redirect-icon { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 24px; margin-bottom: 18px; }
-    .redirect-card h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--gray800); }
-    .redirect-card p { margin: 0 0 20px; color: var(--gray500); font-size: 13px; line-height: 1.8; }
-    .redirect-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 6px rgba(91,95,239,.18); transition: background .2s ease, transform .15s ease; }
-    .redirect-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-</style>
+<!-- Filter Bar -->
+<form method="get" class="board-filter-bar" data-project-id="@Model.ProjectId">
+    <input type="hidden" name="projectId" value="@Model.ProjectId" />
 
-<div class="redirect-card">
-    <div class="redirect-icon"><i class="fa-solid fa-table-columns"></i></div>
-    <h3>Task Board</h3>
-    <p>تابلوی بصری مدیریت تسک‌ها با قابلیت Drag & Drop.</p>
-    <a href="/TaskBoard/Index?projectId=@Model.ProjectId" class="redirect-btn" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        باز کردن Task Board
-    </a>
-</div>
+    <select name="assigneeId" class="form-control" onchange="this.form.submit()">
+        <option value="">همه افراد</option>
+        @foreach (var a in Model.AvailableAssignees)
+        {
+            <option value="@a.Id" selected="@(a.Id == Model.SelectedAssigneeId)">@a.Name</option>
+        }
+    </select>
+
+    <select name="priority" class="form-control" onchange="this.form.submit()">
+        <option value="">همه اولویت‌ها</option>
+        @foreach (TaskPriorityType p in Enum.GetValues(typeof(TaskPriorityType)))
+        {
+            <option value="@p" selected="@(p == Model.SelectedPriority)">
+                @(p switch
+                {
+                    TaskPriorityType.Lowest => "خیلی کم",
+                    TaskPriorityType.Low => "کم",
+                    TaskPriorityType.Medium => "متوسط",
+                    TaskPriorityType.High => "زیاد",
+                    TaskPriorityType.Highest => "خیلی زیاد",
+                    _ => "-"
+                })
+            </option>
+        }
+    </select>
+
+    <select name="type" class="form-control" onchange="this.form.submit()">
+        <option value="">همه انواع</option>
+        @foreach (TaskType t in Enum.GetValues(typeof(TaskType)))
+        {
+            <option value="@t" selected="@(t == Model.SelectedType)">
+                @(t switch
+                {
+                    TaskType.Task => "Task",
+                    TaskType.Bug => "Bug",
+                    TaskType.Feature => "Feature",
+                    TaskType.Improvement => "بهبود",
+                    TaskType.TechnicalDebt => "بدهی فنی",
+                    _ => "-"
+                })
+            </option>
+        }
+    </select>
+
+    @if (Model.AvailableLabels.Any())
+    {
+        <select name="labelId" class="form-control" onchange="this.form.submit()">
+            <option value="">همه Label ها</option>
+            @foreach (var l in Model.AvailableLabels)
+            {
+                <option value="@l.Id" selected="@(l.Id == Model.SelectedLabelId)">@l.Name</option>
+            }
+        </select>
+    }
+
+    @if (Model.HasActiveFilters)
+    {
+        <a asp-controller="TaskBoard" asp-action="Index" asp-route-projectId="@Model.ProjectId" class="board-clear-filters">
+            <i class="fa-solid fa-xmark"></i>
+            پاک‌کردن فیلترها
+        </a>
+    }
+</form>
+
+@if (!Model.Tasks.Any())
+{
+    <div class="workspace-empty">
+        <i class="fa-solid fa-table-columns"></i>
+        <h3>هیچ Task ای با این فیلترها پیدا نشد.</h3>
+        <p>فیلترها را تغییر دهید یا از منوی هر User Story یک Task جدید بسازید.</p>
+    </div>
+}
+else
+{
+    <div class="task-kanban" id="boardKanban">
+
+        @{
+            var columns = new[]
+            {
+                (Status: TaskStatusType.ToDo, Label: "برای انجام", Icon: "fa-circle"),
+                (Status: TaskStatusType.InProgress, Label: "درحال انجام", Icon: "fa-spinner"),
+                (Status: TaskStatusType.InReview, Label: "درحال بررسی", Icon: "fa-magnifying-glass"),
+                (Status: TaskStatusType.Done, Label: "انجام‌شده", Icon: "fa-circle-check"),
+                (Status: TaskStatusType.Cancelled, Label: "لغو‌شده", Icon: "fa-circle-xmark")
+            };
+        }
+
+        @foreach (var col in columns)
+        {
+            var columnTasks = Model.Tasks.Where(x => x.Status == col.Status).ToList();
+
+            <div class="task-column">
+                <div class="task-column-header status-@col.Status.ToString().ToLower()">
+                    <i class="fa-solid @col.Icon"></i>
+                    @col.Label
+                    <span class="planning-count">@columnTasks.Count</span>
+                </div>
+
+                <div class="task-list"
+                     data-status="@((int)col.Status)"
+                     data-can-manage="@Model.CanManage.ToString().ToLower()">
+
+                    @foreach (var task in columnTasks)
+                    {
+                        <div class="task-card board-task-card" draggable="@(Model.CanManage ? "true" : "false")"
+                             data-id="@task.Id" data-title="@task.Title">
+
+                            @if (Model.CanManage)
+                            {
+                                <i class="fa-solid fa-grip-vertical task-drag-handle"></i>
+                            }
+
+                            <div class="task-card-body">
+                                <a asp-controller="Task" asp-action="Details" asp-route-id="@task.Id" class="task-card-title">
+                                    @task.Title
+                                </a>
+
+                                <span class="board-story-tag">
+                                    <i class="fa-solid fa-book-open"></i>
+                                    @task.UserStoryTitle
+                                </span>
+
+                                @if (task.Labels.Any())
+                                {
+                                    <div class="board-label-mini-list">
+                                        @foreach (var label in task.Labels)
+                                        {
+                                            <span class="board-label-mini" style="background:@label.Color" title="@label.Name"></span>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="task-card-meta">
+                                    <span class="task-type-badge type-@task.Type.ToString().ToLower()">
+                                        @(task.Type switch
+                                        {
+                                            TaskType.Task => "Task",
+                                            TaskType.Bug => "Bug",
+                                            TaskType.Feature => "Feature",
+                                            TaskType.Improvement => "بهبود",
+                                            TaskType.TechnicalDebt => "بدهی فنی",
+                                            _ => "-"
+                                        })
+                                    </span>
+                                    <span class="backlog-priority-badge priority-@task.Priority.ToString().ToLower()">
+                                        @(task.Priority switch
+                                        {
+                                            TaskPriorityType.Lowest => "خیلی کم",
+                                            TaskPriorityType.Low => "کم",
+                                            TaskPriorityType.Medium => "متوسط",
+                                            TaskPriorityType.High => "زیاد",
+                                            TaskPriorityType.Highest => "خیلی زیاد",
+                                            _ => "-"
+                                        })
+                                    </span>
+                                </div>
+
+                                <div class="task-card-footer">
+                                    @if (task.Estimate > 0)
+                                    {
+                                        <span><i class="fa-regular fa-clock"></i> @task.Estimate ساعت</span>
+                                    }
+                                    @if (task.DueDate.HasValue)
+                                    {
+                                        <span><i class="fa-regular fa-calendar"></i> @DateFormatService.ToShortDisplayString(task.DueDate.Value)</span>
+                                    }
+                                </div>
+
+                                @if (task.AssigneeNames.Any())
+                                {
+                                    <div class="board-assignee-list">
+                                        @foreach (var name in task.AssigneeNames.Take(3))
+                                        {
+                                            <span class="board-assignee-avatar" title="@name">
+                                                @name.Substring(0, 1)
+                                            </span>
+                                        }
+                                        @if (task.AssigneeNames.Count > 3)
+                                        {
+                                            <span class="board-assignee-avatar board-assignee-more">
+                                                +@(task.AssigneeNames.Count - 3)
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+<form id="antiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<partial name="_TaskQuickAddModal" />

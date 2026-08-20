@@ -10,6 +10,15 @@
     <link rel="stylesheet" href="~/css/team.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/project.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/project-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/backlog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/taskboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprint.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workload.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dependency.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/delayrisk.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/offroad.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tasktrade.css" asp-append-version="true" />
 }
 
 <div class="workspace-container">
@@ -95,68 +104,58 @@
     <!-- =====================================================
          Tab Bar
          ===================================================== -->
-    <div class="project-tabs" id="projectTabs" role="tablist" role="tablist" aria-label="بخش‌های پروژه">
-        <button class="project-tab-btn active" data-tab="overview" role="tab" aria-selected="true">
+    <div class="project-tabs" id="projectTabs">
+        <button class="project-tab-btn active" data-tab="overview">
             <i class="fa-solid fa-bullseye"></i>
-            <span class="project-tab-btn-label">نمای کلی</span>
+            <span>نمای کلی</span>
         </button>
-        <button class="project-tab-btn" data-tab="dashboard"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=dashboard" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="dashboard">
             <i class="fa-solid fa-gauge"></i>
-            <span class="project-tab-btn-label">داشبورد</span>
+            <span>داشبورد</span>
         </button>
-        <button class="project-tab-btn" data-tab="backlog"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=backlog" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="backlog">
             <i class="fa-solid fa-layer-group"></i>
-            <span class="project-tab-btn-label">بک‌لاگ</span>
+            <span>بک‌لاگ</span>
         </button>
-        <button class="project-tab-btn" data-tab="taskboard"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=taskboard" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="taskboard">
             <i class="fa-solid fa-table-columns"></i>
-            <span class="project-tab-btn-label">Task Board</span>
+            <span>Task Board</span>
         </button>
-        <button class="project-tab-btn" data-tab="sprints"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=sprints" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="sprints">
             <i class="fa-solid fa-flag-checkered"></i>
-            <span class="project-tab-btn-label">اسپرینت‌ها</span>
+            <span>اسپرینت‌ها</span>
         </button>
-        <button class="project-tab-btn" data-tab="workload"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=workload" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="workload">
             <i class="fa-solid fa-gauge-high"></i>
-            <span class="project-tab-btn-label">بارکاری</span>
+            <span>بارکاری</span>
         </button>
-        <button class="project-tab-btn" data-tab="members"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=members" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="members">
             <i class="fa-solid fa-users"></i>
-            <span class="project-tab-btn-label">اعضا</span>
+            <span>اعضا</span>
         </button>
-        <button class="project-tab-btn" data-tab="dependency"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=dependency" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="dependency">
             <i class="fa-solid fa-diagram-project"></i>
-            <span class="project-tab-btn-label">وابستگی</span>
+            <span>وابستگی</span>
         </button>
-        <button class="project-tab-btn" data-tab="delayrisk"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=delayrisk" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="delayrisk">
             <i class="fa-solid fa-chart-line"></i>
-            <span class="project-tab-btn-label">پیش‌بینی ریسک</span>
+            <span>پیش‌بینی ریسک</span>
         </button>
-        <button class="project-tab-btn" data-tab="offroad"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=offroad" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="offroad">
             <i class="fa-solid fa-route"></i>
-            <span class="project-tab-btn-label">آفرود</span>
+            <span>آفرود</span>
         </button>
-        <button class="project-tab-btn" data-tab="tasktrade"
-                data-lazy-url="/Project/Tab/@Model.Id?tab=tasktrade" role="tab" aria-selected="false">
+        <button class="project-tab-btn" data-tab="tasktrade">
             <i class="fa-solid fa-right-left"></i>
-            <span class="project-tab-btn-label">ترید تسک</span>
+            <span>ترید تسک</span>
         </button>
     </div>
 
 
     <!-- =====================================================
-         Tab: نمای کلی (inline)
+         Tab: نمای کلی
          ===================================================== -->
-    <div class="project-tab-pane active" id="tab-overview" role="tabpanel">
+    <div class="project-tab-pane active" id="tab-overview">
 
         <div class="team-stat-grid">
             <div class="team-stat-card">
@@ -239,108 +238,175 @@
                 </form>
             </div>
         }
-
     </div>
 
 
     <!-- =====================================================
-         Tab: داشبورد (lazy-load)
+         Tab: داشبورد
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-dashboard" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری داشبورد...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-dashboard">
+        @if (ViewData["DashboardModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/ProjectDashboard/_DashboardPartial.cshtml", ViewData["DashboardModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
-    <!-- =====================================================
-         Tab: بک‌لاگ (lazy-load)
-         ===================================================== -->
-    <div class="project-tab-pane" id="tab-backlog" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری بک‌لاگ...</span>
-        </div>
-    </div>
 
     <!-- =====================================================
-         Tab: Task Board (lazy-load)
+         Tab: بک‌لاگ
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-taskboard" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری Task Board...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-backlog">
+        @if (ViewData["BacklogModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/Backlog/_BacklogPartial.cshtml", ViewData["BacklogModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
-    <!-- =====================================================
-         Tab: اسپرینت‌ها (lazy-load)
-         ===================================================== -->
-    <div class="project-tab-pane" id="tab-sprints" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری اسپرینت‌ها...</span>
-        </div>
-    </div>
 
     <!-- =====================================================
-         Tab: بارکاری (lazy-load)
+         Tab: Task Board
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-workload" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری بارکاری...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-taskboard">
+        @if (ViewData["TaskBoardModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/TaskBoard/_BoardPartial.cshtml", ViewData["TaskBoardModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
-    <!-- =====================================================
-         Tab: اعضا (lazy-load)
-         ===================================================== -->
-    <div class="project-tab-pane" id="tab-members" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری اعضا...</span>
-        </div>
-    </div>
 
     <!-- =====================================================
-         Tab: وابستگی (lazy-load)
+         Tab: اسپرینت‌ها
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-dependency" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری وابستگی...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-sprints">
+        @if (ViewData["SprintsModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/Sprint/_SprintListPartial.cshtml", ViewData["SprintsModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
-    <!-- =====================================================
-         Tab: پیش‌بینی ریسک (lazy-load)
-         ===================================================== -->
-    <div class="project-tab-pane" id="tab-delayrisk" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری پیش‌بینی ریسک...</span>
-        </div>
-    </div>
 
     <!-- =====================================================
-         Tab: آفرود (lazy-load)
+         Tab: بارکاری
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-offroad" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری آفرود...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-workload">
+        @if (ViewData["WorkloadModel"] is SmartTask.Web.Models.ViewModels.Workload.WorkloadIndexViewModel workloadVm)
+        {
+            if (workloadVm.HasActiveSprint)
+            {
+                <div class="details-card workload-sprint-info">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <div>
+                        <strong>@workloadVm.ActiveSprintName</strong>
+                        <span>پایان اسپرینت: @Html.DisplayDate(workloadVm.ActiveSprintEndDate)</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="workspace-empty" style="margin-bottom:16px;">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <h3>اسپرینت فعالی وجود ندارد.</h3>
+                    <p>بارکاری کل پروژه نمایش داده می‌شود.</p>
+                </div>
+            }
+
+            @await Html.PartialAsync("/Views/Workload/_WorkloadList.cshtml", workloadVm.SprintWorkload)
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
+
     <!-- =====================================================
-         Tab: ترید تسک (lazy-load)
+         Tab: اعضا
          ===================================================== -->
-    <div class="project-tab-pane" id="tab-tasktrade" role="tabpanel">
-        <div class="project-tab-loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری ترید تسک...</span>
-        </div>
+    <div class="project-tab-pane" id="tab-members">
+        @if (ViewData["MembersModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/ProjectMember/_MembersPartial.cshtml", ViewData["MembersModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
+    </div>
+
+
+    <!-- =====================================================
+         Tab: وابستگی
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-dependency">
+        @if (ViewData["DependencyModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/Dependency/_DependencyPartial.cshtml", ViewData["DependencyModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
+    </div>
+
+
+    <!-- =====================================================
+         Tab: پیش‌بینی ریسک
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-delayrisk">
+        @if (ViewData["DelayRiskModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/DelayRisk/_DelayRiskPartial.cshtml", ViewData["DelayRiskModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
+    </div>
+
+
+    <!-- =====================================================
+         Tab: آفرود
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-offroad">
+        @if (ViewData["OffroadModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/Offroad/_OffroadPartial.cshtml", ViewData["OffroadModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
+    </div>
+
+
+    <!-- =====================================================
+         Tab: ترید تسک
+         ===================================================== -->
+    <div class="project-tab-pane" id="tab-tasktrade">
+        @if (ViewData["TaskTradeModel"] != null)
+        {
+            @await Html.PartialAsync("/Views/TaskTrade/_TaskTradePartial.cshtml", ViewData["TaskTradeModel"])
+        }
+        else
+        {
+            <div class="workspace-empty"><p>داده‌ای یافت نشد</p></div>
+        }
     </div>
 
 </div>
@@ -348,4 +414,16 @@
 @section Scripts
 {
     <script src="~/js/project.js" asp-append-version="true"></script>
+    <script src="~/js/project-dashboard.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <script src="~/js/taskboard.js" asp-append-version="true"></script>
+    <script src="~/js/task-quick-add.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape-dagre/2.5.0/cytoscape-dagre.min.js"></script>
+    <script src="~/js/dependency-graph.js" asp-append-version="true"></script>
+    <script src="~/js/dependency.js" asp-append-version="true"></script>
+    <script src="~/js/delayrisk.js" asp-append-version="true"></script>
+    <script src="~/js/offroad.js" asp-append-version="true"></script>
+    <script src="~/js/tasktrade.js" asp-append-version="true"></script>
 }

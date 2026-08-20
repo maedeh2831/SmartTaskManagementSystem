@@ -6,8 +6,9 @@
     position: relative;
     display: flex;
     gap: 16px;
-    height: calc(100vh - 210px);
-    min-height: 520px;
+    height: calc(100vh - 160px);
+    min-height: 400px;
+    max-height: calc(100vh - 160px);
 }
 
 .chat-app .d-none {

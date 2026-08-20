@@ -109,14 +109,14 @@
 
             <div class="task-header-actions">
 
-                <a asp-controller="TaskBoard"
-                   asp-action="Index"
-                   asp-route-projectId="@Model.ProjectId"
-                   class="task-action-btn secondary">
+                <button type="button"
+                        id="taskBackBtn"
+                        class="task-action-btn secondary"
+                        data-fallback-url="/TaskBoard/Index?projectId=@Model.ProjectId">
 
                     <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به TaskBoard
-                </a>
+                    <span id="taskBackLabel">بازگشت</span>
+                </button>
 
                 @if (Model.CanManage)
                 {
@@ -235,83 +235,51 @@
 
 
     <!-- =========================
-         TABS
+         SECTION NAV (sticky jump links)
     ========================== -->
 
-    <nav class="task-tabs" id="taskTabs">
+    <nav class="task-section-nav" id="taskSectionNav">
 
-        <button type="button"
-                class="task-tab-btn active"
-                data-tab="overview">
-
+        <a href="#section-overview" class="task-section-link active">
             <i class="fa-solid fa-circle-info"></i>
-
             <span>نمای کلی</span>
+        </a>
 
-        </button>
-
-
-        <button type="button"
-                class="task-tab-btn"
-                data-tab="subtasks">
-
+        <a href="#section-subtasks" class="task-section-link">
             <i class="fa-solid fa-list-check"></i>
-
             <span>زیروظایف</span>
-
             @if (subtaskAndChecklistCount > 0)
             {
                 <span class="task-tab-badge">
                     @subtaskAndChecklistCount
                 </span>
             }
+        </a>
 
-        </button>
-
-
-        <button type="button"
-                class="task-tab-btn"
-                data-tab="time">
-
+        <a href="#section-time" class="task-section-link">
             <i class="fa-solid fa-stopwatch"></i>
-
             <span>زمان</span>
-
             @if (Model.MyActiveTimer != null)
             {
                 <span class="task-tab-badge task-tab-badge-live"></span>
             }
+        </a>
 
-        </button>
-
-
-        <button type="button"
-                class="task-tab-btn"
-                data-tab="files">
-
+        <a href="#section-files" class="task-section-link">
             <i class="fa-solid fa-comments"></i>
-
             <span>مستندات و گفتگو</span>
-
             @if (filesAndCommentsCount > 0)
             {
                 <span class="task-tab-badge">
                     @filesAndCommentsCount
                 </span>
             }
+        </a>
 
-        </button>
-
-
-        <button type="button"
-                class="task-tab-btn"
-                data-tab="insights">
-
+        <a href="#section-insights" class="task-section-link">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-
             <span>تحلیل و وابستگی‌ها</span>
-
-        </button>
+        </a>
 
     </nav>
 
@@ -327,8 +295,12 @@
              OVERVIEW
         ================================== -->
 
-        <section class="task-tab-pane active"
-                 data-tab-pane="overview">
+        <section class="task-section" id="section-overview">
+
+            <div class="section-title">
+                <i class="fa-solid fa-circle-info"></i>
+                نمای کلی
+            </div>
 
             <div class="task-overview-grid">
 
@@ -647,8 +619,12 @@
              SUBTASKS
         ================================== -->
 
-        <section class="task-tab-pane"
-                 data-tab-pane="subtasks">
+        <section class="task-section" id="section-subtasks">
+
+            <div class="section-title">
+                <i class="fa-solid fa-list-check"></i>
+                زیروظایف و Checklist ها
+            </div>
 
             <div class="details-card">
 
@@ -981,8 +957,12 @@
              TIME
         ================================== -->
 
-        <section class="task-tab-pane"
-                 data-tab-pane="time">
+        <section class="task-section" id="section-time">
+
+            <div class="section-title">
+                <i class="fa-solid fa-stopwatch"></i>
+                ثبت زمان
+            </div>
 
             <div class="details-card">
 
@@ -1201,8 +1181,12 @@
              FILES + COMMENTS
         ================================== -->
 
-        <section class="task-tab-pane"
-                 data-tab-pane="files">
+        <section class="task-section" id="section-files">
+
+            <div class="section-title">
+                <i class="fa-solid fa-comments"></i>
+                مستندات و گفتگو
+            </div>
 
             <div class="task-collaboration-grid">
 
@@ -1450,10 +1434,12 @@
 
         <!-- =================================
              INSIGHTS
-        ================================== -->
+        ================================== -->        <section class="task-section" id="section-insights">
 
-        <section class="task-tab-pane"
-                 data-tab-pane="insights">
+            <div class="section-title">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                تحلیل و وابستگی‌ها
+            </div>
 
             <!-- SMART PRIORITY -->
 

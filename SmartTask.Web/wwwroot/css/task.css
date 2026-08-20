@@ -1348,57 +1348,62 @@ body.task-modal-open {
 }
 
 
-/* TABS */
+/* SECTION NAV (replaces tabs) */
 
-.task-tabs {
-    margin-top: 12rem;
+.task-section-nav {
+    margin-top: 1rem;
     position: sticky;
-    top: 10px;
+    top: 0;
     z-index: 20;
     display: flex;
     align-items: center;
-    gap: 6px;
-    border-bottom: 1px solid var(--gray200);
-    margin-bottom: 20px;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--card);
+    border: 1px solid var(--gray200);
+    border-radius: 14px;
+    margin-bottom: 24px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
 }
 
-    .task-tabs::-webkit-scrollbar {
+    .task-section-nav::-webkit-scrollbar {
         display: none;
     }
 
-.task-tab-btn {
+.task-section-link {
     position: relative;
-    min-height: 46px;
-    padding: 0 16px;
+    min-height: 38px;
+    padding: 0 14px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 7px;
     border: 0;
-    border-bottom: 2px solid transparent;
     background: transparent;
     color: var(--gray500);
     font-family: inherit;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: color .2s ease, border-color .2s ease;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: color .2s, background .2s;
 }
 
-    .task-tab-btn:hover {
+    .task-section-link:hover {
         color: var(--gray700);
+        background: var(--gray100);
     }
 
-    .task-tab-btn.active {
+    .task-section-link.active {
         color: var(--primary);
-        border-bottom-color: var(--primary);
+        background: var(--primary-light);
     }
 
-    .task-tab-btn i {
+    .task-section-link i {
         font-size: 13px;
     }
 
@@ -1417,7 +1422,7 @@ body.task-modal-open {
     line-height: 1;
 }
 
-.task-tab-btn.active .task-tab-badge {
+.task-section-link.active .task-tab-badge {
     background: var(--primary-light);
     color: var(--primary);
 }
@@ -1445,40 +1450,38 @@ body.task-modal-open {
 }
 
 
-/* TAB CONTENT */
+/* SECTION CONTENT (single page) */
 
 .task-tab-content {
     min-width: 0;
 }
 
-.task-tab-pane {
-    display: none;
+.task-section {
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--gray200);
 }
 
-    .task-tab-pane.active {
-        display: block;
-        animation: taskTabFade .2s ease;
+    .task-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
     }
 
-    .task-tab-pane[hidden] {
-        display: none !important;
+    .task-section > .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gray800);
     }
 
-    .task-tab-pane[hidden] {
-        display: none !important;
-    }
-
-@keyframes taskTabFade {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .task-section > .section-title i {
+            color: var(--primary);
+            font-size: 15px;
+        }
 
 
 /* CARDS */
@@ -1497,7 +1500,7 @@ body.task-modal-open {
         box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
     }
 
-.task-tab-content .card-title,
+.task-section .card-title,
 .task-details-page .card-title {
     display: flex;
     align-items: center;
@@ -2893,4 +2896,37 @@ body.task-modal-open {
     .task-form-row {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* ============================================
+   DARK MODE
+============================================ */
+
+[data-theme="dark"] .task-section-nav {
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+}
+
+[data-theme="dark"] .task-section-link {
+    color: var(--gray400);
+}
+
+[data-theme="dark"] .task-section-link:hover {
+    color: var(--gray200);
+    background: rgba(255, 255, 255, .05);
+}
+
+[data-theme="dark"] .task-section-link.active {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+[data-theme="dark"] .task-section {
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] .section-title {
+    color: var(--gray100);
 }
