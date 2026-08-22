@@ -62,6 +62,7 @@ namespace SmartTask.Web.Data.Context
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<TimeLog> TimeLogs { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
+        public DbSet<UserSession> UserSessions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

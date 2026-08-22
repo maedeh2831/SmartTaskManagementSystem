@@ -184,6 +184,7 @@
 
             <!-- Security -->
             <section class="settings-tab-panel" data-tab-panel="security">
+                @Html.AntiForgeryToken()
                 <div class="settings-card">
 
                     <div class="settings-card-header">
@@ -203,20 +204,34 @@
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
 
-                        <div class="settings-security-link disabled">
+                        <div class="settings-security-link" id="logoutAllDevicesBtn" role="button" tabindex="0">
                             <div class="settings-security-link-info">
                                 <i class="fa-solid fa-right-from-bracket"></i>
-                                <span>خروج از همه دستگاه‌ها</span>
+                                <div>
+                                    <span>خروج از همه دستگاه‌ها</span>
+                                    <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">مشاهده و مدیریت دستگاه‌هایی که با حساب شما وارد شده‌اند</p>
+                                </div>
                             </div>
-                            <span class="settings-badge-soon">به‌زودی</span>
+                            <i class="fa-solid fa-chevron-left"></i>
                         </div>
 
-                        <div class="settings-security-link disabled">
-                            <div class="settings-security-link-info">
-                                <i class="fa-solid fa-clock-rotate-left"></i>
-                                <span>ورودهای اخیر</span>
+                        <!-- Active Devices List -->
+                        <div class="settings-device-list" id="activeDevicesList" style="display:none;">
+                            <div style="padding:12px 16px;color:var(--muted);font-size:12px;" id="devicesLoading">
+                                <i class="fa-solid fa-spinner fa-spin"></i> در حال بارگذاری...
                             </div>
-                            <span class="settings-badge-soon">به‌زودی</span>
+                            <div id="devicesContainer"></div>
+                        </div>
+
+                        <div class="settings-security-link" id="deleteAccountBtn" role="button" tabindex="0">
+                            <div class="settings-security-link-info">
+                                <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i>
+                                <div>
+                                    <span style="color:var(--danger);">حذف حساب کاربری</span>
+                                    <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">حذف دائمی حساب و اطلاعات مرتبط با آن</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-left"></i>
                         </div>
 
                     </div>

@@ -19,13 +19,15 @@ namespace SmartTask.Web.Controllers
         private readonly IWorkspaceInvitationService _invitationService;
         private readonly ICurrentUserService _currentUser;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IUserSessionTracker _sessionTracker;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailService emailService,
             IWorkspaceInvitationService invitationService,
             ICurrentUserService currentUser,
-            IFileUploadService fileUploadService)
+            IFileUploadService fileUploadService,
+            IUserSessionTracker sessionTracker)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -33,6 +35,7 @@ namespace SmartTask.Web.Controllers
             _invitationService = invitationService;
             _currentUser = currentUser;
             _fileUploadService = fileUploadService;
+            _sessionTracker = sessionTracker;
         }
 
         [HttpGet]
@@ -190,6 +193,12 @@ namespace SmartTask.Web.Controllers
                 user.LastLoginDate = DateTime.Now;
                 await _userManager.UpdateAsync(user);
 
+                // Track this login session
+                var ua = Request.Headers.UserAgent.ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var session = await _sessionTracker.TrackLoginAsync(user.Id, ua, ip, HttpContext);
+                HttpContext.Session.SetString("UserSessionToken", session.SessionToken);
+
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return LocalRedirect(returnUrl);
 
@@ -314,6 +323,12 @@ namespace SmartTask.Web.Controllers
 
             await _signInManager.SignInAsync(user, false);
 
+            // Track this login session
+            var ua = Request.Headers.UserAgent.ToString();
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var session = await _sessionTracker.TrackLoginAsync(user.Id, ua, ip, HttpContext);
+            HttpContext.Session.SetString("UserSessionToken", session.SessionToken);
+
             TempData["Success"] = "ورود با گوگل انجام شد.";
 
             return LocalRedirect(returnUrl);
@@ -323,6 +338,16 @@ namespace SmartTask.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            // Revoke current session
+            var currentToken = HttpContext.Session.GetString("UserSessionToken");
+            if (!string.IsNullOrEmpty(currentToken))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                    await _sessionTracker.RevokeSessionAsync(user.Id, currentToken);
+            }
+            HttpContext.Session.Remove("UserSessionToken");
+
             await _signInManager.SignOutAsync();
 
             return RedirectToAction(nameof(Login));
