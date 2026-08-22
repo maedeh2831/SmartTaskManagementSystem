@@ -34,7 +34,30 @@ namespace SmartTask.Web.Models.ViewModels.Chat
 
         public bool IsEdited { get; set; }
 
+        public bool IsPinned { get; set; }
+
+        public string? PinnedDate { get; set; }
+
+        /// <summary>لیست واکنش‌های ایموجی این پیام.</summary>
+        public List<ChatReactionViewModel> Reactions { get; set; } = new();
+
+        /// <summary>شناسه کاربرانی که در متن پیام mention شده‌اند.</summary>
+        public List<int> MentionedUserIds { get; set; } = new();
+
         /// <summary>زمان ارسال به‌صورت ISO-8601 با کیفیت UTC تا کلاینت آن را به وقت محلی تبدیل کند.</summary>
         public string CreatedDate { get; set; } = string.Empty;
+    }
+
+    public class ChatReactionViewModel
+    {
+        public string Emoji { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        /// <summary>آیا کاربر جاری این واکنش را انتخاب کرده؟</summary>
+        public bool HasReacted { get; set; }
+
+        /// <summary>شناسه کاربرانی که این واکنش را زده‌اند (برای نمایش tooltip).</summary>
+        public List<int> UserIds { get; set; } = new();
     }
 }

@@ -54,6 +54,7 @@ namespace SmartTask.Web.Data.Context
         // Chat
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ChatReadState> ChatReadStates { get; set; }
+        public DbSet<ChatMessageReaction> ChatMessageReactions { get; set; }
 
         // Tracking
         public DbSet<Reminder> Reminders { get; set; }

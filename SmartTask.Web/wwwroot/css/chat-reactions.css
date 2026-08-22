@@ -1,0 +1,317 @@
+/* ==========================================================
+   SmartTask Chat - Reactions, Pins, Mentions
+   ========================================================== */
+
+/* ===== Reactions ===== */
+
+.chat-msg-reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.chat-reaction-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--gray50);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .15s ease;
+    line-height: 1.4;
+}
+
+.chat-reaction-chip:hover {
+    background: var(--gray100);
+    border-color: var(--primary-mid);
+}
+
+.chat-reaction-chip.reacted {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.chat-msg.own .chat-reaction-chip {
+    background: rgba(255,255,255,.16);
+    border-color: rgba(255,255,255,.3);
+    color: #fff;
+}
+
+.chat-msg.own .chat-reaction-chip.reacted {
+    background: rgba(255,255,255,.28);
+    border-color: rgba(255,255,255,.5);
+}
+
+.chat-reaction-emoji {
+    font-size: 14px;
+}
+
+.chat-reaction-count {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.chat-reaction-add {
+    width: 26px;
+    height: 26px;
+    border: 1px dashed var(--border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--gray400);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s ease;
+    opacity: 0;
+}
+
+.chat-msg:hover .chat-reaction-add {
+    opacity: 1;
+}
+
+.chat-reaction-add:hover {
+    background: var(--gray100);
+    color: var(--primary);
+    border-color: var(--primary-mid);
+}
+
+/* ===== Emoji Picker ===== */
+
+.chat-emoji-picker {
+    position: fixed;
+    z-index: 1000;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    gap: 4px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.12);
+}
+
+.chat-emoji-option {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s ease;
+}
+
+.chat-emoji-option:hover {
+    background: var(--gray100);
+    transform: scale(1.15);
+}
+
+/* ===== Pin Badge ===== */
+
+.chat-msg-pin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+}
+
+.chat-msg.own .chat-msg-pin-badge {
+    color: rgba(255,255,255,.9);
+    background: rgba(255,255,255,.2);
+}
+
+.chat-msg.pinned {
+    border-left: 3px solid var(--primary);
+}
+
+.chat-msg.own.pinned {
+    border-left: none;
+    border-right: 3px solid rgba(255,255,255,.5);
+}
+
+/* ===== Pinned Messages Bar ===== */
+
+.chat-pinned-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--primary-light);
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+.chat-pinned-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-pinned-bar-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.chat-pinned-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all .15s ease;
+}
+
+.chat-pinned-item:hover {
+    background: var(--gray100);
+    border-color: var(--primary-mid);
+}
+
+.chat-pinned-item i {
+    color: var(--primary);
+    font-size: 10px;
+}
+
+.chat-pinned-sender {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.chat-pinned-text {
+    color: var(--muted);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Mention Highlight ===== */
+
+.chat-mention {
+    background: rgba(23, 162, 184, .18);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-msg.own .chat-mention {
+    background: rgba(255, 255, 255, .22);
+    color: #fff;
+}
+
+/* ===== Mention Autocomplete Dropdown ===== */
+
+.chat-mention-dropdown {
+    position: fixed;
+    z-index: 1000;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.12);
+    max-height: 240px;
+    overflow-y: auto;
+    min-width: 200px;
+}
+
+.chat-mention-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .12s ease;
+}
+
+.chat-mention-option:hover,
+.chat-mention-option.selected {
+    background: var(--primary-light);
+}
+
+.chat-mention-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.chat-mention-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chat-mention-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* ===== Dark mode overrides ===== */
+
+[data-theme="dark"] .chat-emoji-picker {
+    background: var(--gray800);
+    border-color: var(--gray600);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+
+[data-theme="dark"] .chat-mention-dropdown {
+    background: var(--gray800);
+    border-color: var(--gray600);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+
+[data-theme="dark"] .chat-reaction-chip {
+    background: var(--gray700);
+    border-color: var(--gray600);
+    color: var(--gray200);
+}
+
+[data-theme="dark"] .chat-reaction-chip.reacted {
+    background: rgba(23,162,184,.2);
+    border-color: rgba(23,162,184,.4);
+}
+
+[data-theme="dark"] .chat-pinned-item {
+    background: var(--gray700);
+    border-color: var(--gray600);
+}
+
+[data-theme="dark"] .chat-mention {
+    background: rgba(23,162,184,.25);
+    color: var(--primary);
+}

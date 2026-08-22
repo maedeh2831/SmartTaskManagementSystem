@@ -75,18 +75,25 @@
     <form id="webpushrAntiForgeryForm" style="display:none;">
         @Html.AntiForgeryToken()
     </form>
+    <script src="https://cdn.webpushr.com/app.min.js" async charset="UTF-8"></script>
     <script>
-        (function (w, d) {
-            w._wpx = w._wpx || {};
-            var s = d.createElement('script');
-            s.type = 'text/javascript';
-            s.async = true;
-            s.src = 'https://cdn.webpushr.com/app.min.js';
-            var h = d.getElementsByTagName('script')[0];
-            h.parentNode.insertBefore(s, h);
-        })(window, document);
-        webpushr('setup', { 'key': '7b8acf774ea9e965e393120da0b7d643' });
+        /* Wait for SDK to load, then setup */
+        function _wpSetup() {
+            if (typeof webpushr === 'undefined') {
+                setTimeout(_wpSetup, 200);
+                return;
+            }
+            webpushr('setup', { 'key': '7b8acf774ea9e965e393120da0b7d643' });
+        }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(_wpSetup, 100);
+        } else {
+            document.addEventListener('DOMContentLoaded', function () { setTimeout(_wpSetup, 100); });
+        }
+    </script>
 
+    <script>
+        /* --- Webpushr helpers --- */
         function webpushrToken() {
             var el = document.querySelector(
                 '#webpushrAntiForgeryForm input[name="__RequestVerificationToken"]');
@@ -107,23 +114,45 @@
             });
         }
 
-        window.ensureWebpushrSubscription = function () {
+        function initWebpushrSubscription(retries) {
+            retries = retries || 0;
             if (typeof webpushr === "undefined") {
-                console.error("Webpushr SDK not loaded.");
+                if (retries < 20) {
+                    setTimeout(function () { initWebpushrSubscription(retries + 1); }, 500);
+                } else {
+                    console.warn("[Webpushr] SDK did not load after 10s.");
+                }
                 return;
             }
+
+            if (typeof Notification !== "undefined" && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+
             webpushr('fetch_id', function (sid) {
                 if (!sid) {
-                    console.warn("Webpushr subscriber id not available yet.");
+                    console.warn("[Webpushr] fetch_id returned null – SDK may need more time.");
+                    if (retries < 10) {
+                        setTimeout(function () {
+                            webpushr('fetch_id', function (sid2) {
+                                if (sid2) saveWebpushrSubscriber(sid2);
+                            });
+                        }, 2000);
+                    }
                     return;
                 }
+                console.log("[Webpushr] SID saved:", sid);
                 saveWebpushrSubscriber(sid);
             });
+        }
+
+        window.ensureWebpushrSubscription = function () {
+            initWebpushrSubscription(0);
         };
     </script>
-    <!-- end webpushr code -->
 
     <script>
+        /* --- Webpushr diagnostic (call webpushrDiagnostic() from console) --- */
         window.webpushrDiagnostic = function () {
             var info = {
                 permission: (typeof Notification !== "undefined") ? Notification.permission : "n/a",
@@ -161,18 +190,12 @@
     </script>
 
     <script>
+        /* --- Auto-save SID on page load --- */
         window.addEventListener("load", function () {
+            /* Give the async SDK time to load */
             setTimeout(function () {
-                if (typeof webpushr === "undefined") return;
-
-                if (Notification.permission === "granted") {
-                    webpushr('fetch_id', function (sid) {
-                        if (sid) saveWebpushrSubscriber(sid);
-                    });
-                } else if (Notification.permission === "default") {
-                    window.ensureWebpushrSubscription && window.ensureWebpushrSubscription();
-                }
-            }, 1500);
+                initWebpushrSubscription(0);
+            }, 2000);
         });
     </script>
 

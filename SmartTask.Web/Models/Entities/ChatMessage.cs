@@ -32,6 +32,10 @@ namespace SmartTask.Web.Models.Entities
 
         public DateTime? EditedDate { get; set; }
 
+        public bool IsPinned { get; set; }
+
+        public DateTime? PinnedDate { get; set; }
+
         // Navigation Properties
 
         public Project Project { get; set; } = null!;

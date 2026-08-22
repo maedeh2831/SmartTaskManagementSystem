@@ -117,14 +117,17 @@ public class ChatController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search(int projectId, string term)
+    public async Task<IActionResult> Search(int projectId, string term, int skip = 0, int take = 50)
     {
         if (!await _chatService.IsMemberAsync(projectId, CurrentUser.UserId))
             return Forbid();
 
-        var messages = await _chatService.SearchAsync(projectId, term);
+        take = Math.Clamp(take, 1, 100);
+        skip = Math.Max(0, skip);
 
-        return Json(messages);
+        var messages = await _chatService.SearchAsync(projectId, term, take, skip);
+
+        return Json(new { messages, hasMore = messages.Count == take, nextSkip = skip + messages.Count });
     }
 
     [HttpGet]
@@ -136,6 +139,17 @@ public class ChatController : BaseController
         var members = await _chatService.GetMembersAsync(projectId);
 
         return Json(members);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Pinned(int projectId)
+    {
+        if (!await _chatService.IsMemberAsync(projectId, CurrentUser.UserId))
+            return Forbid();
+
+        var messages = await _chatService.GetPinnedMessagesAsync(projectId);
+
+        return Json(messages);
     }
 
     [HttpPost]

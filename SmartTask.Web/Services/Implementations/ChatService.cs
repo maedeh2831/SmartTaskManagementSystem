@@ -5,22 +5,39 @@ using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
 using SmartTask.Web.Models.ViewModels.Chat;
+using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Interfaces;
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace SmartTask.Web.Services.Implementations;
 
 public class ChatService : IChatService
 {
     private const int MaxContentLength = 4000;
+    private const int RateLimitWindowSeconds = 3;
+    private const int RateLimitMaxMessages = 5;
 
     private readonly ApplicationDbContext _context;
     private readonly IPresenceTracker _presenceTracker;
+
+    // Simple in-memory rate limiter: userId -> list of timestamps
+    private static readonly ConcurrentDictionary<int, List<DateTime>> _sendTimestamps = new();
+
+    // Mention pattern: @name (Persian/English names, no space before)
+    private static readonly Regex MentionPattern = new(
+        @"@([\p{L}\p{N}_]+)",
+        RegexOptions.Compiled);
 
     public ChatService(ApplicationDbContext context, IPresenceTracker presenceTracker)
     {
         _context = context;
         _presenceTracker = presenceTracker;
     }
+
+    // =========================================================
+    // MEMBERSHIP
+    // =========================================================
 
     public async Task<bool> IsMemberAsync(int projectId, int userId)
     {
@@ -39,6 +56,10 @@ public class ChatService : IChatService
             .Distinct()
             .ToListAsync();
     }
+
+    // =========================================================
+    // CHAT LIST
+    // =========================================================
 
     public async Task<List<ChatListItemViewModel>> GetChatListAsync(int userId)
     {
@@ -105,6 +126,10 @@ public class ChatService : IChatService
             .ToList();
     }
 
+    // =========================================================
+    // ROOM
+    // =========================================================
+
     public async Task<ChatRoomViewModel?> GetRoomAsync(int projectId, int userId, int take = 40)
     {
         if (!await IsMemberAsync(projectId, userId))
@@ -116,7 +141,6 @@ public class ChatService : IChatService
         if (project == null)
             return null;
 
-        // یکی بیشتر می‌گیریم تا مشخص شود پیام قدیمی‌تری هم وجود دارد یا نه.
         var rows = await BuildMessageQuery(projectId)
             .OrderByDescending(x => x.Id)
             .Take(take + 1)
@@ -130,6 +154,11 @@ public class ChatService : IChatService
         rows.Reverse();
 
         var messages = rows.Select(Map).ToList();
+
+        // Load reactions for all messages
+        var messageIds = messages.Select(m => m.Id).ToList();
+        var reactions = await LoadReactionsAsync(messageIds, userId);
+        ApplyReactions(messages, reactions);
 
         var role = await _context.ProjectMembers
             .Where(x => x.ProjectId == projectId && x.ApplicationUserId == userId && x.ViewState)
@@ -150,6 +179,10 @@ public class ChatService : IChatService
         };
     }
 
+    // =========================================================
+    // MESSAGES
+    // =========================================================
+
     public async Task<List<ChatMessageViewModel>> GetMessagesAsync(int projectId, int? beforeId, int take = 40)
     {
         var query = BuildMessageQuery(projectId);
@@ -164,10 +197,20 @@ public class ChatService : IChatService
 
         rows.Reverse();
 
-        return rows.Select(Map).ToList();
+        var messages = rows.Select(Map).ToList();
+
+        var messageIds = messages.Select(m => m.Id).ToList();
+        var reactions = await LoadReactionsAsync(messageIds, userId: 0);
+        ApplyReactions(messages, reactions);
+
+        return messages;
     }
 
-    public async Task<List<ChatMessageViewModel>> SearchAsync(int projectId, string term, int take = 50)
+    // =========================================================
+    // SEARCH (with pagination)
+    // =========================================================
+
+    public async Task<List<ChatMessageViewModel>> SearchAsync(int projectId, string term, int take = 50, int skip = 0)
     {
         if (string.IsNullOrWhiteSpace(term))
             return new List<ChatMessageViewModel>();
@@ -177,11 +220,22 @@ public class ChatService : IChatService
         var rows = await BuildMessageQuery(projectId)
             .Where(x => x.Content.Contains(term))
             .OrderByDescending(x => x.Id)
+            .Skip(skip)
             .Take(take)
             .ToListAsync();
 
-        return rows.Select(Map).ToList();
+        var messages = rows.Select(Map).ToList();
+
+        var messageIds = messages.Select(m => m.Id).ToList();
+        var reactions = await LoadReactionsAsync(messageIds, userId: 0);
+        ApplyReactions(messages, reactions);
+
+        return messages;
     }
+
+    // =========================================================
+    // SEND MESSAGE
+    // =========================================================
 
     public async Task<ChatMessageViewModel> SendMessageAsync(
         int projectId,
@@ -214,6 +268,9 @@ public class ChatService : IChatService
                 replyToMessageId = null;
         }
 
+        // Parse mentions from content
+        var mentionedUserIds = await ParseMentions(content, projectId);
+
         var message = new ChatMessage
         {
             ProjectId = projectId,
@@ -237,8 +294,15 @@ public class ChatService : IChatService
         var row = await BuildMessageQuery(projectId)
             .FirstAsync(x => x.Id == message.Id);
 
-        return Map(row);
+        var viewModel = Map(row);
+        viewModel.MentionedUserIds = mentionedUserIds;
+
+        return viewModel;
     }
+
+    // =========================================================
+    // EDIT MESSAGE
+    // =========================================================
 
     public async Task<ChatMessageViewModel?> EditMessageAsync(int messageId, int userId, string content)
     {
@@ -272,7 +336,11 @@ public class ChatService : IChatService
         return Map(row);
     }
 
-    public async Task<int?> DeleteMessageAsync(int messageId, int userId)
+    // =========================================================
+    // DELETE MESSAGE (with physical file deletion)
+    // =========================================================
+
+    public async Task<int?> DeleteMessageAsync(int messageId, int userId, IFileUploadService? fileUploadService = null)
     {
         var message = await _context.ChatMessages
             .FirstOrDefaultAsync(x => x.Id == messageId);
@@ -292,6 +360,13 @@ public class ChatService : IChatService
                 return null;
         }
 
+        // Delete physical attachment file from storage
+        if (fileUploadService != null &&
+            !string.IsNullOrWhiteSpace(message.AttachmentPath))
+        {
+            fileUploadService.DeleteFile(message.AttachmentPath);
+        }
+
         message.ViewState = false;
         message.ChangeDate = DateTime.UtcNow;
 
@@ -299,6 +374,10 @@ public class ChatService : IChatService
 
         return message.ProjectId;
     }
+
+    // =========================================================
+    // MARK AS READ
+    // =========================================================
 
     public async Task MarkAsReadAsync(int projectId, int userId)
     {
@@ -316,6 +395,10 @@ public class ChatService : IChatService
 
         await MarkAsReadInternalAsync(projectId, userId, lastMessageId);
     }
+
+    // =========================================================
+    // UNREAD COUNTS
+    // =========================================================
 
     public async Task<int> GetUnreadCountAsync(int projectId, int userId)
     {
@@ -343,6 +426,10 @@ public class ChatService : IChatService
                                    .Select(r => (int?)r.LastReadMessageId)
                                    .FirstOrDefault() ?? 0));
     }
+
+    // =========================================================
+    // MEMBERS
+    // =========================================================
 
     public async Task<List<ChatMemberViewModel>> GetMembersAsync(int projectId)
     {
@@ -390,11 +477,131 @@ public class ChatService : IChatService
             .ToListAsync();
     }
 
-    // ===== Helpers =====
+    // =========================================================
+    // REACTIONS
+    // =========================================================
 
-    /// <summary>
-    /// پروجکشن خام پیام. قالب‌بندی تاریخ در حافظه انجام می‌شود چون قابل ترجمه به SQL نیست.
-    /// </summary>
+    public async Task<ChatMessageViewModel?> ToggleReactionAsync(int messageId, int userId, string emoji)
+    {
+        var message = await _context.ChatMessages
+            .FirstOrDefaultAsync(x => x.Id == messageId);
+
+        if (message == null)
+            return null;
+
+        // Check membership
+        if (!await IsMemberAsync(message.ProjectId, userId))
+            return null;
+
+        var existing = await _context.ChatMessageReactions
+            .FirstOrDefaultAsync(x => x.ChatMessageId == messageId && x.UserId == userId);
+
+        if (existing != null)
+        {
+            if (existing.Emoji == emoji)
+            {
+                // Remove existing reaction (toggle off)
+                _context.ChatMessageReactions.Remove(existing);
+            }
+            else
+            {
+                // Change reaction
+                existing.Emoji = emoji;
+                existing.ChangeDate = DateTime.UtcNow;
+            }
+        }
+        else
+        {
+            // Add new reaction
+            _context.ChatMessageReactions.Add(new ChatMessageReaction
+            {
+                ChatMessageId = messageId,
+                UserId = userId,
+                Emoji = emoji,
+                CreatedDate = DateTime.UtcNow,
+                ViewState = true
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        return await BuildMessageWithReactionsAsync(message.ProjectId, messageId, userId);
+    }
+
+    // =========================================================
+    // PIN
+    // =========================================================
+
+    public async Task<ChatMessageViewModel?> TogglePinAsync(int messageId, int userId)
+    {
+        var message = await _context.ChatMessages
+            .FirstOrDefaultAsync(x => x.Id == messageId);
+
+        if (message == null)
+            return null;
+
+        // Only owner/manager can pin
+        var role = await _context.ProjectMembers
+            .Where(x => x.ProjectId == message.ProjectId && x.ApplicationUserId == userId && x.ViewState)
+            .Select(x => (ProjectRoleType?)x.Role)
+            .FirstOrDefaultAsync();
+
+        if (role is not (ProjectRoleType.Owner or ProjectRoleType.Manager))
+            return null;
+
+        message.IsPinned = !message.IsPinned;
+        message.PinnedDate = message.IsPinned ? DateTime.UtcNow : null;
+        message.ChangeDate = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return await BuildMessageWithReactionsAsync(message.ProjectId, messageId, userId);
+    }
+
+    public async Task<List<ChatMessageViewModel>> GetPinnedMessagesAsync(int projectId)
+    {
+        var rows = await BuildMessageQuery(projectId)
+            .Where(x => x.IsPinned)
+            .OrderByDescending(x => x.PinnedDate)
+            .ToListAsync();
+
+        var messages = rows.Select(Map).ToList();
+
+        var messageIds = messages.Select(m => m.Id).ToList();
+        var reactions = await LoadReactionsAsync(messageIds, userId: 0);
+        ApplyReactions(messages, reactions);
+
+        return messages;
+    }
+
+    // =========================================================
+    // RATE LIMITING
+    // =========================================================
+
+    public Task<bool> CanSendMessageAsync(int projectId, int userId)
+    {
+        var now = DateTime.UtcNow;
+        var cutoff = now.AddSeconds(-RateLimitWindowSeconds);
+
+        var timestamps = _sendTimestamps.GetOrAdd(userId, _ => new List<DateTime>());
+
+        lock (timestamps)
+        {
+            // Remove old timestamps
+            timestamps.RemoveAll(t => t < cutoff);
+
+            if (timestamps.Count >= RateLimitMaxMessages)
+                return Task.FromResult(false);
+
+            timestamps.Add(now);
+            return Task.FromResult(true);
+        }
+    }
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
     private sealed class MessageProjection
     {
         public int Id { get; init; }
@@ -411,6 +618,8 @@ public class ChatService : IChatService
         public string? ReplyToSenderName { get; init; }
         public string? ReplyToContent { get; init; }
         public bool IsEdited { get; init; }
+        public bool IsPinned { get; init; }
+        public DateTime? PinnedDate { get; init; }
         public DateTime CreatedDate { get; init; }
     }
 
@@ -438,6 +647,8 @@ public class ChatService : IChatService
                         : x.ReplyToMessage.AttachmentName)
                     : null,
                 IsEdited = x.IsEdited,
+                IsPinned = x.IsPinned,
+                PinnedDate = x.PinnedDate,
                 CreatedDate = x.CreatedDate
             });
     }
@@ -458,8 +669,100 @@ public class ChatService : IChatService
         ReplyToSenderName = x.ReplyToSenderName,
         ReplyToContent = x.ReplyToContent,
         IsEdited = x.IsEdited,
+        IsPinned = x.IsPinned,
+        PinnedDate = x.PinnedDate.HasValue ? ToIso(x.PinnedDate.Value) : null,
         CreatedDate = ToIso(x.CreatedDate)
     };
+
+    private async Task<ChatMessageViewModel?> BuildMessageWithReactionsAsync(int projectId, int messageId, int userId)
+    {
+        var row = await BuildMessageQuery(projectId)
+            .FirstOrDefaultAsync(x => x.Id == messageId);
+
+        if (row == null)
+            return null;
+
+        var message = Map(row);
+        var reactions = await LoadReactionsAsync(new List<int> { messageId }, userId);
+        ApplyReactions(new List<ChatMessageViewModel> { message }, reactions);
+
+        return message;
+    }
+
+    private async Task<Dictionary<int, List<ChatMessageReaction>>> LoadReactionsAsync(List<int> messageIds, int userId)
+    {
+        if (messageIds.Count == 0)
+            return new Dictionary<int, List<ChatMessageReaction>>();
+
+        var reactions = await _context.ChatMessageReactions
+            .Where(x => messageIds.Contains(x.ChatMessageId) && x.ViewState)
+            .ToListAsync();
+
+        return reactions
+            .GroupBy(x => x.ChatMessageId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    private static void ApplyReactions(
+        List<ChatMessageViewModel> messages,
+        Dictionary<int, List<ChatMessageReaction>> reactions)
+    {
+        foreach (var msg in messages)
+        {
+            if (!reactions.TryGetValue(msg.Id, out var msgReactions))
+                continue;
+
+            msg.Reactions = msgReactions
+                .GroupBy(r => r.Emoji)
+                .Select(g => new ChatReactionViewModel
+                {
+                    Emoji = g.Key,
+                    Count = g.Count(),
+                    UserIds = g.Select(r => r.UserId).ToList()
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+        }
+    }
+
+    /// <summary>
+    /// Parse @mentions from message content and return mentioned user IDs.
+    /// </summary>
+    private async Task<List<int>> ParseMentions(string content, int projectId)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return new List<int>();
+
+        var matches = MentionPattern.Matches(content);
+        if (matches.Count == 0)
+            return new List<int>();
+
+        var mentionNames = matches
+            .Select(m => m.Groups[1].Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        // Get all project members
+        var members = await _context.ProjectMembers
+            .Where(x => x.ProjectId == projectId && x.ViewState)
+            .Include(x => x.ApplicationUser)
+            .Select(x => new { x.ApplicationUserId, x.ApplicationUser.FullName })
+            .ToListAsync();
+
+        var mentionedIds = new List<int>();
+
+        foreach (var name in mentionNames)
+        {
+            var member = members.FirstOrDefault(m =>
+                m.FullName.Replace(" ", "").Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                m.FullName.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            if (member != null)
+                mentionedIds.Add(member.ApplicationUserId);
+        }
+
+        return mentionedIds;
+    }
 
     private async Task MarkAsReadInternalAsync(int projectId, int userId, int lastMessageId)
     {
