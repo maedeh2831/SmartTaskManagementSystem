@@ -1,7 +1,7 @@
 ﻿/*
 | Module      : Workspace
 | ViewModel   : WorkspaceMemberViewModel
-| Purpose     : نمایش اعضای Workspace.
+| Purpose     : نمایش اعضای فضای کاری.
 */
 
 using SmartTask.Web.Models.Enums;

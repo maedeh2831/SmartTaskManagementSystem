@@ -440,10 +440,6 @@
     transition: background .2s ease;
 }
 
-    .activity-row:hover {
-        background: var(--gray50);
-    }
-
 .activity-icon {
     width: 36px;
     height: 36px;
@@ -495,8 +491,8 @@
     content: '';
     position: absolute;
     right: 29px;
-    top: 46px;
-    bottom: -6px;
+    top: 54px;
+    bottom: -20px;
     width: 2px;
     background: var(--gray200);
     border-radius: 1px;

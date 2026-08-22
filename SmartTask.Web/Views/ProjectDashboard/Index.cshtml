@@ -15,10 +15,10 @@
 
 <div class="workspace-container">
 
-    <!-- Hero -->
-    <div class="workspace-hero">
+    <!-- Header -->
+    <div class="dashboard-header">
 
-        <div class="workspace-hero-content">
+        <div class="dashboard-title">
             <div class="team-detail-header">
                 <div class="preview-logo" style="width:60px;height:60px;font-size:24px;background:@Model.Color;">
                     <i class="@Model.Icon"></i>
@@ -33,12 +33,10 @@
             </div>
         </div>
 
-        <div class="workspace-toolbar">
-            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به پروژه
-                </button>
+        <div class="members-actions">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
             </a>
         </div>
 

@@ -2,7 +2,7 @@
 @model SmartTask.Web.Models.ViewModels.Workspace.WorkspaceMemberIndexViewModel
 
 @{
-    ViewData["Title"] = "اعضای Workspace";
+    ViewData["Title"] = "اعضای فضای کاری";
 }
 
 @section Styles
@@ -18,7 +18,7 @@
 
     <div class="members-title">
 
-        <h1>اعضای Workspace</h1>
+        <h1>اعضای فضای کاری</h1>
 
         <p>مدیریت اعضا، نقش‌ها و دعوت‌نامه‌های این فضای کاری</p>
 
@@ -27,14 +27,15 @@
     <div class="members-actions">
         @if (Model.CanManage)
         {
-            <a asp-action="Invite"
-               asp-route-workspaceId="@Model.WorkspaceId"
-               class="workspace-create-btn">
+            <button type="button"
+                    class="workspace-create-btn"
+                    id="openInviteModalBtn"
+                    data-workspace-id="@Model.WorkspaceId">
 
                 <i class="fa-solid fa-user-plus"></i>
                 دعوت عضو
 
-            </a>
+            </button>
         }
 
         
@@ -190,7 +191,10 @@
 
 </div>
 
+<div id="inviteModalContainer"></div>
+
 @section Scripts
 {
+    <partial name="_ValidationScriptsPartial" />
     <script src="~/js/workspace-member.js" asp-append-version="true"></script>
 }

@@ -33,14 +33,13 @@ namespace SmartTask.Web.Models.Entities
 
         public DateTime? LastLoginDate { get; set; }
 
-        public LanguageType Language { get; set; } = LanguageType.Persian;
-
         public ThemeType Theme { get; set; } = ThemeType.Light;
 
         public string TimeZone { get; set; } = "Asia/Tehran";
         public DateFormatType DateFormat { get; set; } = DateFormatType.Jalali;
         public bool ShowFullName { get; set; } = true;
         public TaskDensityType TaskDensity { get; set; } = TaskDensityType.Comfortable;
+        public bool AutoCascadeDependencyDates { get; set; } = true;
         public int? DefaultWorkspaceId { get; set; }
         public Workspace? DefaultWorkspace { get; set; }
 

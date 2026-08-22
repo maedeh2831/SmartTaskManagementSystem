@@ -26,10 +26,8 @@
 
         <div class="workspace-toolbar">
             <a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId" class="workspace-filter" style="text-decoration:none;">
-                <button type="button">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    بازگشت به پروژه
-                </button>
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
             </a>
         </div>
 
@@ -43,7 +41,7 @@
 
             @if (!Model.AvailableWorkspaceMembers.Any())
             {
-                <p class="team-empty-text">همه اعضای Workspace قبلاً به این پروژه اضافه شده‌اند.</p>
+                <p class="team-empty-text">همه اعضای فضای کاری قبلاً به این پروژه اضافه شده‌اند.</p>
             }
             else
             {

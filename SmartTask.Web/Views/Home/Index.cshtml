@@ -45,11 +45,11 @@
             </span>
             <div class="report-stat-text">
                 <span class="report-stat-value fa-digits">@Model.TotalAssignedTasks</span>
-                <span class="report-stat-label">Task تخصیص‌یافته</span>
+                <span class="report-stat-label">وظیفه تخصیص‌یافته</span>
             </div>
         </div>
 
-        <div class="report-stat-card report-stat-danger" role="listitem">
+        <div class="report-stat-card" role="listitem">
             <span class="report-stat-icon icon-danger">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </span>
@@ -67,7 +67,7 @@
             <div class="widget-header">
                 <h3>
                     <i class="fa-solid fa-chart-pie" style="font-size:14px; color:var(--primary); margin-left:6px;"></i>
-                    وضعیت Task های من
+                    وضعیت وظایف من
                 </h3>
             </div>
             <canvas id="myTaskStatusChart"></canvas>
@@ -77,19 +77,19 @@
             <div class="widget-header">
                 <h3>
                     <i class="fa-solid fa-clock" style="font-size:14px; color:var(--warning); margin-left:6px;"></i>
-                    Task های نزدیک به موعد
+                    وظایف نزدیک به موعد
                 </h3>
             </div>
             @if (!Model.UpcomingTasks.Any())
             {
                 <div class="widget-empty">
                     <i class="fa-solid fa-mug-hot"></i>
-                    <p>هیچ Task نزدیک به موعدی نداری.</p>
+                    <p>هیچ وظیفه نزدیک به موعدی نداری.</p>
                 </div>
             }
             else
             {
-                <div class="home-upcoming-list" role="list" aria-label="Task های نزدیک به موعد">
+                <div class="home-upcoming-list" role="list" aria-label="وظایف نزدیک به موعد">
                     @foreach (var t in Model.UpcomingTasks)
                     {
                         <a asp-controller="Task"
@@ -121,7 +121,7 @@
             </h3>
             <a asp-controller="Workspace" asp-action="Index" class="widget-header-link">
                 مشاهده همه
-                <i class="fa-solid fa-arrow-left"></i>
+                <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
         @if (!Model.MyWorkspaces.Any())

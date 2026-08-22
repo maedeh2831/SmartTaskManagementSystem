@@ -23,6 +23,17 @@
         </div>
 
         <div class="label-hero-actions">
+            @if (Model.Labels.Any())
+            {
+                <div class="label-search" style="margin-inline-end:auto;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text"
+                           id="labelSearchInput"
+                           placeholder="جستجوی Label..."
+                           autocomplete="off"
+                           aria-label="جستجوی Label" />
+                </div>
+            }
             <a asp-controller="Project"
                asp-action="Details"
                asp-route-id="@Model.ProjectId"
@@ -94,22 +105,11 @@
     @if (Model.Labels.Any())
     {
         <div class="label-toolbar">
-
-            <div class="label-search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text"
-                       id="labelSearchInput"
-                       placeholder="جستجوی Label..."
-                       autocomplete="off"
-                       aria-label="جستجوی Label" />
-            </div>
-
             <span class="label-count-badge">
                 <i class="fa-solid fa-tags" style="font-size:11px; opacity:.7;"></i>
                 <strong class="fa-digits">@Model.Labels.Count</strong>
                 Label
             </span>
-
         </div>
     }
 
