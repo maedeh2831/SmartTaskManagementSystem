@@ -54,19 +54,32 @@ public class WorkspaceMemberController : BaseController
     {
         if (!await _workspaceMemberService.IsOwnerOrAdminAsync(workspaceId, CurrentUser.UserId))
         {
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = false, message = "شما اجازه دعوت عضو جدید را ندارید." });
+
             TempData["Error"] = "شما اجازه دعوت عضو جدید را ندارید.";
             return RedirectToAction(nameof(Index), new { workspaceId });
         }
 
-        return View(new InviteMemberViewModel { WorkspaceId = workspaceId });
+        var model = new InviteMemberViewModel { WorkspaceId = workspaceId };
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("_InviteModal", model);
+
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Invite(InviteMemberViewModel model)
     {
+        var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
         if (!await _workspaceMemberService.IsOwnerOrAdminAsync(model.WorkspaceId, CurrentUser.UserId))
         {
+            if (isAjax)
+                return Json(new { success = false, message = "شما اجازه دعوت عضو جدید را ندارید." });
+
             TempData["Error"] = "شما اجازه دعوت عضو جدید را ندارید.";
             return RedirectToAction(nameof(Index), new { workspaceId = model.WorkspaceId });
         }
@@ -74,6 +87,10 @@ public class WorkspaceMemberController : BaseController
         if (!model.UserIds.Any() && !model.Emails.Any())
         {
             ModelState.AddModelError("", "حداقل یک کاربر یا ایمیل را انتخاب کنید.");
+
+            if (isAjax)
+                return BadRequest(new { success = false, errors = ModelState.ToDictionary(k => k.Key, v => v.Value?.Errors.Select(e => e.ErrorMessage).ToArray()) });
+
             return View(model);
         }
 
@@ -82,10 +99,16 @@ public class WorkspaceMemberController : BaseController
             await _invitationService.InviteAsync(
                 model.WorkspaceId, model.UserIds, model.Emails, model.Role, CurrentUser.UserId);
 
+            if (isAjax)
+                return Json(new { success = true, message = "دعوت‌نامه‌ها با موفقیت ارسال شد." });
+
             TempData["Success"] = "دعوت‌نامه‌ها با موفقیت ارسال شد.";
         }
         catch (Exception ex)
         {
+            if (isAjax)
+                return Json(new { success = false, message = ex.Message });
+
             TempData["Error"] = ex.Message;
         }
 

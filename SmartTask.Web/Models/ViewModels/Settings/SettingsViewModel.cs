@@ -8,5 +8,6 @@ namespace SmartTask.Web.Models.ViewModels.Settings
         public List<NotificationPreferenceItemViewModel> Notifications { get; set; } = new();
         public AppearanceSettingsViewModel Appearance { get; set; } = new();
         public WorkspaceSettingsViewModel Workspace { get; set; } = new();
+        public ManagementSettingsViewModel Management { get; set; } = new();
     }
 }

@@ -48,6 +48,10 @@
                 <i class="fa-solid fa-building"></i>
                 <span>فضای کاری</span>
             </button>
+            <button type="button" class="settings-tab-btn" data-tab="management">
+                <i class="fa-solid fa-sliders"></i>
+                <span>تنظیمات مدیریتی</span>
+            </button>
         </div>
 
         <div class="settings-content">
@@ -60,18 +64,11 @@
                     <div class="settings-card-header">
                         <div>
                             <h2>تنظیمات حساب</h2>
-                            <p>زبان، منطقه زمانی و نحوه‌ی نمایش نام خود را تنظیم کنید.</p>
+                            <p>منطقه زمانی و فرمت تاریخ خود را تنظیم کنید.</p>
                         </div>
                     </div>
 
                     <div class="settings-form-grid">
-
-                        <div class="settings-field">
-                            <label asp-for="Account.Language"></label>
-                            <select asp-for="Account.Language"
-                                    asp-items="Html.GetEnumSelectList<LanguageType>()"
-                                    class="settings-select"></select>
-                        </div>
 
                         <div class="settings-field">
                             <label asp-for="Account.TimeZone"></label>
@@ -261,6 +258,44 @@
                         <button type="submit" class="settings-save-btn">
                             <i class="fa-solid fa-check"></i>
                             ذخیره
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Management -->
+            <section class="settings-tab-panel" data-tab-panel="management">
+                <form asp-controller="Settings" asp-action="UpdateManagement" method="post" class="settings-card">
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-card-header">
+                        <div>
+                            <h2>تنظیمات مدیریتی</h2>
+                            <p>تنظیمات خودکار و فرآیندهای پس‌زمینه سامانه را مدیریت کنید.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-notification-list">
+                        <div class="settings-notification-item">
+                            <div>
+                                <span>به‌روزرسانی خودکار موعد تسک‌های وابسته</span>
+                                <p style="font-size:12px;color:var(--muted);margin:4px 0 0;line-height:1.8;">در صورت تأخیر یک تسک، موعد تسک‌های وابسته به‌صورت خودکار بر اساس میزان تأخیر جابه‌جا می‌شود.</p>
+                            </div>
+                            <label class="settings-switch">
+                                <input asp-for="Management.AutoCascadeDependencyDates" type="checkbox" />
+                                <span class="settings-switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-save-bar">
+                        <div class="settings-save-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            تغییرات بعد از ذخیره اعمال می‌شوند.
+                        </div>
+                        <button type="submit" class="settings-save-btn">
+                            <i class="fa-solid fa-check"></i>
+                            ذخیره تغییرات
                         </button>
                     </div>
                 </form>

@@ -9,5 +9,6 @@ namespace SmartTask.Web.Services.Interfaces
         Task UpdateAppearanceAsync(int userId, AppearanceSettingsViewModel model);
         Task UpdateNotificationsAsync(int userId, List<NotificationPreferenceItemViewModel> model);
         Task UpdateDefaultWorkspaceAsync(int userId, int? workspaceId);
+        Task UpdateManagementAsync(int userId, ManagementSettingsViewModel model);
     }
 }

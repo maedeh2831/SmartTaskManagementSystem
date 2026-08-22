@@ -56,7 +56,6 @@ namespace SmartTask.Web.Services.Implementations
             {
                 Account = new AccountSettingsViewModel
                 {
-                    Language = user.Language,
                     TimeZone = user.TimeZone,
                     DateFormat = user.DateFormat,
                 },
@@ -70,6 +69,10 @@ namespace SmartTask.Web.Services.Implementations
                 {
                     DefaultWorkspaceId = user.DefaultWorkspaceId,
                     Workspaces = workspaces
+                },
+                Management = new ManagementSettingsViewModel
+                {
+                    AutoCascadeDependencyDates = user.AutoCascadeDependencyDates
                 }
             };
         }
@@ -79,7 +82,6 @@ namespace SmartTask.Web.Services.Implementations
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId)
                 ?? throw new InvalidOperationException("کاربر یافت نشد.");
 
-            user.Language = model.Language;
             user.TimeZone = model.TimeZone;
             user.DateFormat = model.DateFormat;
             user.ChangeDate = DateTime.UtcNow;
@@ -133,6 +135,17 @@ namespace SmartTask.Web.Services.Implementations
                 ?? throw new InvalidOperationException("کاربر یافت نشد.");
 
             user.DefaultWorkspaceId = workspaceId;
+            user.ChangeDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateManagementAsync(int userId, ManagementSettingsViewModel model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId)
+                ?? throw new InvalidOperationException("کاربر یافت نشد.");
+
+            user.AutoCascadeDependencyDates = model.AutoCascadeDependencyDates;
             user.ChangeDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

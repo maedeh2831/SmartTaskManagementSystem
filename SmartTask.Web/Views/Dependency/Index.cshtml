@@ -210,16 +210,18 @@
 
         <div id="dependencyGraph"
              class="dependency-graph-canvas"
-             data-project-id="@Model.ProjectId"></div>
+             data-project-id="@Model.ProjectId">
 
-        <div id="dependencyGraphLoading" class="dependency-graph-state">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>در حال بارگذاری گراف...</span>
-        </div>
+            <div id="dependencyGraphLoading" class="dependency-graph-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>در حال بارگذاری گراف...</span>
+            </div>
 
-        <div id="dependencyGraphEmpty" class="dependency-graph-state d-none">
-            <i class="fa-solid fa-diagram-project"></i>
-            <span>هیچ وابستگی‌ای بین Taskهای این پروژه ثبت نشده است.</span>
+            <div id="dependencyGraphEmpty" class="dependency-graph-state d-none">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>هیچ وابستگی‌ای بین Taskهای این پروژه ثبت نشده است.</span>
+            </div>
+
         </div>
 
     </div>

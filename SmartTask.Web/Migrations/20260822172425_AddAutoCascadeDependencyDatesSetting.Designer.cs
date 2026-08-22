@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTask.Web.Data.Context;
 
@@ -11,9 +12,11 @@ using SmartTask.Web.Data.Context;
 namespace SmartTask.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260822172425_AddAutoCascadeDependencyDatesSetting")]
+    partial class AddAutoCascadeDependencyDatesSetting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,6 +275,9 @@ namespace SmartTask.Web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("LastLoginDate")
                         .HasColumnType("datetime2");
 
@@ -499,12 +505,6 @@ namespace SmartTask.Web.Migrations
                     b.Property<bool>("IsEdited")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPinned")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("PinnedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
@@ -529,52 +529,6 @@ namespace SmartTask.Web.Migrations
                     b.HasIndex("ProjectId", "Id");
 
                     b.ToTable("ChatMessages", (string)null);
-                });
-
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatMessageReaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ChangeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ChangeUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ChatMessageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Emoji")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("ViewState")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatMessageId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("ChatMessageId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("ChatMessageReactions", (string)null);
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatReadState", b =>
@@ -2167,25 +2121,6 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("ReplyToMessage");
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatMessageReaction", b =>
-                {
-                    b.HasOne("SmartTask.Web.Models.Entities.ChatMessage", "ChatMessage")
-                        .WithMany()
-                        .HasForeignKey("ChatMessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChatMessage");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ChatReadState", b =>

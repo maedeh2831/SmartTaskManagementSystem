@@ -19,7 +19,7 @@
 
         <div class="details-title">
 
-            <div class="details-logo" style="background:@Model.Color">
+            <div class="details-logo me-2" style="background:@Model.Color">
                 @if (!string.IsNullOrWhiteSpace(Model.Logo))
                 {
                     <img src="@Model.Logo" alt="@Model.Name" />
@@ -31,11 +31,19 @@
             </div>
 
             <div>
-                <h1>
+                <h1 class="project-title-inline">
                     @Model.Name
                     @if (Model.IsArchived)
                     {
                         <span class="team-archived-badge">آرشیو شده</span>
+                    }
+                    @if (Model.CanManage)
+                    {
+                        <span class="project-inline-actions">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="project-edit-inline" title="ویرایش تیم">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </span>
                     }
                 </h1>
 
@@ -56,14 +64,6 @@
         </div>
 
         <div class="details-actions">
-
-            @if (Model.CanManage)
-            {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="details-btn">
-                    <i class="fa-solid fa-pen"></i>
-                    ویرایش
-                </a>
-            }
 
             <a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="details-btn">
                 <i class="fa-solid fa-arrow-right"></i>
@@ -113,7 +113,7 @@
 
             @if (!Model.AvailableWorkspaceMembers.Any())
             {
-                <p class="team-empty-text">تمام اعضای Workspace در حال حاضر عضو این تیم هستند.</p>
+                <p class="team-empty-text">تمام اعضای فضای کاری در حال حاضر عضو این تیم هستند.</p>
             }
             else
             {

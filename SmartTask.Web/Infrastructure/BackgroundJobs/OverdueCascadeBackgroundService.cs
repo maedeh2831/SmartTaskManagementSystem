@@ -48,16 +48,23 @@ namespace SmartTask.Web.Infrastructure.BackgroundJobs
 
             var now = DateTime.Now;
 
-            // OPTIMIZED: Load all overdue tasks with minimal data
-            var overdueTasks = await context.TaskItems
+            // Load overdue tasks and check if any assignee has auto-cascade enabled
+            var overdueTasksRaw = await context.TaskItems
                 .Where(x =>
                     x.ViewState &&
                     x.DueDate.HasValue &&
                     x.DueDate.Value.Date < now.Date &&
                     x.Status != TaskStatusType.Done &&
                     x.Status != TaskStatusType.Cancelled)
-                .Select(x => new { x.Id, x.Title, x.DueDate })
+                .Include(x => x.Assignments.Where(a => a.ViewState))
+                    .ThenInclude(a => a.ApplicationUser)
                 .ToListAsync(stoppingToken);
+
+            // Only process tasks where at least one assignee has auto-cascade enabled
+            var overdueTasks = overdueTasksRaw
+                .Where(x => x.Assignments.Any(a => a.ApplicationUser.AutoCascadeDependencyDates))
+                .Select(x => new { x.Id, x.Title, x.DueDate })
+                .ToList();
 
             if (overdueTasks.Count == 0)
                 return;

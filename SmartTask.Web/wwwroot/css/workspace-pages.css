@@ -12,9 +12,9 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px;
+    gap: 16px;
     flex-wrap: wrap;
-    margin-bottom: 0;
+    margin-bottom: 24px;
 }
 
 .workspace-hero-content {
@@ -28,7 +28,7 @@
     .members-title h1,
     .dashboard-title h1,
     .settings-header h1 {
-        margin: 0 0 6px;
+        margin: 0;
         font-size: 32px;
         font-weight: 700;
         color: var(--gray900);
@@ -41,14 +41,19 @@
     .members-title p,
     .dashboard-title p,
     .settings-header p {
+        margin: 0;
         color: var(--gray500);
         font-size: 13px;
         line-height: 1.9;
     }
 
 .workspace-toolbar {
-    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .workspace-hero-actions {
@@ -72,9 +77,16 @@
 }
 
 .page-header-content,
-.details-title,
 .dashboard-title {
     display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.details-title {
+    display: flex;
+    gap: 2px;
     min-width: 0;
 }
 
@@ -167,6 +179,7 @@
     justify-content: center;
     gap: 8px;
     height: 44px;
+    min-width: 120px;
     padding: 11px 22px;
     border: none;
     border-radius: 10px;
@@ -176,6 +189,7 @@
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
+    white-space: nowrap;
     cursor: pointer;
     text-decoration: none;
     box-shadow: 0 2px 6px rgba(91, 95, 239, .18);
@@ -210,6 +224,7 @@
     justify-content: center;
     gap: 8px;
     padding: 11px 20px;
+    min-width: 120px;
     border: 1px solid var(--gray200);
     border-radius: 10px;
     background: var(--card);
@@ -218,6 +233,7 @@
     font-size: 14px;
     font-weight: 600;
     line-height: 1;
+    white-space: nowrap;
     cursor: pointer;
     text-decoration: none;
     transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
@@ -248,12 +264,14 @@
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
+    min-width: 100px;
     border: 1px solid var(--gray200);
     border-radius: 10px;
     background: var(--card);
     color: var(--gray700);
     font-size: 13px;
     font-weight: 600;
+    white-space: nowrap;
     text-decoration: none;
     transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
@@ -270,6 +288,7 @@
     justify-content: center;
     gap: 8px;
     height: auto;
+    min-width: 100px;
     padding: 11px 18px;
     border: 1px solid var(--gray200);
     border-radius: 10px;
@@ -277,6 +296,7 @@
     color: var(--gray700);
     font-size: 13px;
     font-weight: 600;
+    white-space: nowrap;
     text-decoration: none;
     box-shadow: none;
     transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
@@ -295,6 +315,7 @@
 
 .workspace-open-btn {
     border-radius: 10px;
+    white-space: nowrap;
 }
 
 .workspace-delete-btn {
@@ -1142,6 +1163,33 @@ textarea.form-control {
     border-color: var(--gray200);
 }
 
+/* When report-stat-card contains an icon (dashboard views), lay out horizontally */
+.report-stat-card:has(.report-stat-icon) {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.report-stat-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 17px;
+}
+
+.report-stat-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
 .report-stat-value {
     font-size: 20px;
     color: var(--gray800);
@@ -1190,16 +1238,13 @@ textarea.form-control {
 
     .report-project-name {
         width: 100%;
-    }
-
-    /* ======================================================
+    }    /* ======================================================
        Workspace Mobile
        ====================================================== */
 
     .workspace-hero {
         flex-direction: column;
         align-items: stretch;
-        gap: 16px;
     }
 
     .workspace-hero-content {
@@ -1208,8 +1253,12 @@ textarea.form-control {
     }
 
     .workspace-toolbar {
-        width: 100%;
-        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .workspace-hero-actions {
+        margin-inline-end: 0;
     }
 
     .workspace-search {
@@ -1220,14 +1269,9 @@ textarea.form-control {
             width: 100%;
         }
 
-    .workspace-hero-actions {
+    .workspace-hero-actions .workspace-create-btn {
         width: 100%;
-        display: flex;
     }
-
-        .workspace-hero-actions .workspace-create-btn {
-            width: 100%;
-        }
 }
 /* ==========================================================
    Project Inline Actions

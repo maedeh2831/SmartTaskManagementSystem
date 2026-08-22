@@ -1,0 +1,82 @@
+@using SmartTask.Web.Models.Enums
+@model SmartTask.Web.Models.ViewModels.Workspace.InviteMemberViewModel
+
+<div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content quick-add-modal">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-user-plus"></i>
+                    دعوت عضو جدید
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-muted mb-3" style="font-size:13px;">
+                    کاربران موجود را جستجو کنید یا یک ایمیل جدید وارد کنید. می‌توانید چند نفر را همزمان دعوت کنید.
+                </p>
+
+                <form asp-action="Invite" method="post" id="inviteForm">
+
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="WorkspaceId" />
+
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors mb-3" id="inviteValidationSummary"></div>
+
+                    <div class="mb-3 user-search-box">
+
+                        <label class="form-label">جستجوی کاربر یا وارد کردن ایمیل</label>
+
+                        <div class="autocomplete-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text"
+                                   id="userSearchInput"
+                                   class="form-control"
+                                   placeholder="نام، ایمیل کاربر یا یک ایمیل جدید را وارد کنید..."
+                                   autocomplete="off" />
+                        </div>
+
+                        <div id="userSearchResults" class="autocomplete-results"></div>
+
+                        <div id="selectedChipsContainer" class="selected-chips-container"></div>
+                        <div id="hiddenInputsContainer"></div>
+
+                        <span asp-validation-for="UserIds" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">نقش کاربران انتخاب‌شده</label>
+
+                        <select asp-for="Role" class="form-control">
+                            @foreach (WorkspaceRoleType role in Enum.GetValues(typeof(WorkspaceRoleType)))
+                            {
+                                if (role == WorkspaceRoleType.Owner)
+                                {
+                                    continue;
+                                }
+                                <option value="@role">@role</option>
+                            }
+                        </select>
+
+                        <span asp-validation-for="Role" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn workspace-btn-light" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn workspace-btn-primary" id="inviteSubmitBtn" disabled>
+                            <i class="fa-solid fa-paper-plane"></i>
+                            ارسال دعوت‌نامه
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

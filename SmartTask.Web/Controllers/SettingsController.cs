@@ -65,5 +65,15 @@ namespace SmartTask.Web.Controllers
             TempData["Success"] = "Workspace پیش‌فرض به‌روزرسانی شد.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateManagement(ManagementSettingsViewModel Management)
+        {
+            var userId = int.Parse(_userManager.GetUserId(User)!);
+            await _settingsService.UpdateManagementAsync(userId, Management);
+            TempData["Success"] = "تنظیمات مدیریتی با موفقیت ذخیره شد.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
