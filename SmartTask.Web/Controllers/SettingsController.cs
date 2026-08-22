@@ -87,79 +87,103 @@ namespace SmartTask.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActiveSessions()
         {
-            var userId = int.Parse(_userManager.GetUserId(User)!);
-            var sessions = await _sessionTracker.GetActiveSessionsAsync(userId);
-
-            var currentToken = HttpContext.Session.GetString("UserSessionToken");
-
-            var result = sessions.Select(s => new
+            try
             {
-                id = s.Id,
-                deviceInfo = s.DeviceInfo ?? "نامشخص",
-                operatingSystem = s.OperatingSystem ?? "نامشخص",
-                ipAddress = s.IpAddress ?? "نامشخص",
-                loginDate = s.LoginDate.ToString("yyyy/MM/dd HH:mm"),
-                lastActivity = s.LastActivityDate.ToString("yyyy/MM/dd HH:mm"),
-                isCurrent = s.SessionToken == currentToken
-            }).ToList();
+                var userIdStr = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var userId))
+                    return Json(Array.Empty<object>());
 
-            return Json(result);
+                var sessions = await _sessionTracker.GetActiveSessionsAsync(userId);
+
+                var currentToken = HttpContext.Session.GetString("UserSessionToken");
+
+                var result = sessions.Select(s => new
+                {
+                    id = s.Id,
+                    deviceInfo = s.DeviceInfo ?? "نامشخص",
+                    operatingSystem = s.OperatingSystem ?? "نامشخص",
+                    ipAddress = s.IpAddress ?? "نامشخص",
+                    loginDate = s.LoginDate.ToString("yyyy/MM/dd HH:mm"),
+                    lastActivity = s.LastActivityDate.ToString("yyyy/MM/dd HH:mm"),
+                    isCurrent = s.SessionToken == currentToken
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception)
+            {
+                return Json(Array.Empty<object>());
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogoutAllDevices()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Json(new { success = false });
-
-            // Update SecurityStamp — this invalidates all existing auth cookies
-            var stampResult = await _userManager.UpdateSecurityStampAsync(user);
-            if (!stampResult.Succeeded)
+            try
             {
-                return Json(new { success = false, message = "خطا در خروج از دستگاه‌ها." });
-            }
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Json(new { success = false, message = "کاربر یافت نشد." });
 
-            // Also revoke all tracked sessions in DB
-            var currentToken = HttpContext.Session.GetString("UserSessionToken");
-            if (!string.IsNullOrEmpty(currentToken))
+                // Update SecurityStamp — this invalidates all existing auth cookies
+                var stampResult = await _userManager.UpdateSecurityStampAsync(user);
+                if (!stampResult.Succeeded)
+                {
+                    return Json(new { success = false, message = "خطا در خروج از دستگاه‌ها." });
+                }
+
+                // Also revoke all tracked sessions in DB
+                var currentToken = HttpContext.Session.GetString("UserSessionToken");
+                if (!string.IsNullOrEmpty(currentToken))
+                {
+                    await _sessionTracker.RevokeAllOtherSessionsAsync(user.Id, currentToken);
+                }
+
+                // Sign out and re-sign in so current user keeps their session
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(user, false);
+
+                // Re-track current session
+                var ua = Request.Headers.UserAgent.ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var newSession = await _sessionTracker.TrackLoginAsync(user.Id, ua, ip, HttpContext);
+                HttpContext.Session.SetString("UserSessionToken", newSession.SessionToken);
+
+                return Json(new { success = true, message = "سایر دستگاه‌ها با موفقیت خارج شدند." });
+            }
+            catch (Exception)
             {
-                await _sessionTracker.RevokeAllOtherSessionsAsync(user.Id, currentToken);
+                return Json(new { success = false, message = "خطا در انجام عملیات." });
             }
-
-            // Sign out and re-sign in so current user keeps their session
-            await _signInManager.SignOutAsync();
-            await _signInManager.SignInAsync(user, false);
-
-            // Re-track current session
-            var ua = Request.Headers.UserAgent.ToString();
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var newSession = await _sessionTracker.TrackLoginAsync(user.Id, ua, ip, HttpContext);
-            HttpContext.Session.SetString("UserSessionToken", newSession.SessionToken);
-
-            return Json(new { success = true, message = "سایر دستگاه‌ها با موفقیت خارج شدند." });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAccount()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Json(new { success = false });
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Json(new { success = false, message = "کاربر یافت نشد." });
 
-            // Soft-delete using the project's existing ViewState pattern
-            user.ViewState = false;
-            user.IsActive = false;
-            user.ChangeDate = DateTime.UtcNow;
-            await _userManager.UpdateAsync(user);
+                // Soft-delete using the project's existing ViewState pattern
+                user.ViewState = false;
+                user.IsActive = false;
+                user.ChangeDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
 
-            // Invalidate all sessions by updating SecurityStamp
-            await _userManager.UpdateSecurityStampAsync(user);
+                // Invalidate all sessions by updating SecurityStamp
+                await _userManager.UpdateSecurityStampAsync(user);
 
-            // Sign out
-            await _signInManager.SignOutAsync();
+                // Sign out
+                await _signInManager.SignOutAsync();
 
-            return Json(new { success = true, message = "حساب کاربری با موفقیت حذف شد." });
+                return Json(new { success = true, message = "حساب کاربری با موفقیت حذف شد." });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "خطا در حذف حساب." });
+            }
         }
     }
 }

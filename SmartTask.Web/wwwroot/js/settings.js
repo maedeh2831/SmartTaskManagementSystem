@@ -57,7 +57,10 @@
             fetch("/Settings/GetActiveSessions", {
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                return res.json();
+            })
             .then(function (sessions) {
                 devicesLoading.style.display = "none";
                 if (!sessions || sessions.length === 0) {
@@ -114,7 +117,10 @@
                                     body: formData,
                                     headers: { "X-Requested-With": "XMLHttpRequest" }
                                 })
-                                .then(function (res) { return res.json(); })
+                                .then(function (res) {
+                                    if (!res.ok) throw new Error("HTTP " + res.status);
+                                    return res.json();
+                                })
                                 .then(function (data) {
                                     if (data.success) {
                                         showSuccess(data.message);
@@ -161,7 +167,10 @@
                         body: formData,
                         headers: { "X-Requested-With": "XMLHttpRequest" }
                     })
-                    .then(function (res) { return res.json(); })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error("HTTP " + res.status);
+                        return res.json();
+                    })
                     .then(function (data) {
                         if (data.success) {
                             Swal.fire({
