@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SmartTask.Web.Infrastructure.Interfaces;
+using SmartTask.Web.Services.Files;
 using SmartTask.Web.Services.Interfaces;
 using System.Security.Claims;
 
@@ -16,15 +17,18 @@ namespace SmartTask.Web.Hubs
         private readonly IChatService _chatService;
         private readonly IPresenceTracker _presenceTracker;
         private readonly IWebpushrService _webpushrService;
+        private readonly IFileUploadService _fileUploadService;
 
         public ChatHub(
             IChatService chatService,
             IPresenceTracker presenceTracker,
-            IWebpushrService webpushrService)
+            IWebpushrService webpushrService,
+            IFileUploadService fileUploadService)
         {
             _chatService = chatService;
             _presenceTracker = presenceTracker;
             _webpushrService = webpushrService;
+            _fileUploadService = fileUploadService;
         }
 
         public static string GetProjectGroupName(int projectId)
@@ -236,7 +240,8 @@ public async Task SendMessage(
             var projectId =
                 await _chatService.DeleteMessageAsync(
                     messageId,
-                    UserId);
+                    UserId,
+                    _fileUploadService);
 
             if (projectId == null)
             {
@@ -282,6 +287,57 @@ public async Task SendMessage(
                         userName = UserName,
                         isTyping
                     });
+        }
+
+
+        // =========================================================
+        // REACTION
+        // =========================================================
+
+        public async Task ToggleReaction(
+            int messageId,
+            string emoji)
+        {
+            var userId = UserId;
+
+            if (userId == 0)
+                throw new HubException("کاربر شناسایی نشد.");
+
+            var message =
+                await _chatService.ToggleReactionAsync(
+                    messageId, userId, emoji);
+
+            if (message == null)
+                throw new HubException("عملیات واکنش ناموفق بود.");
+
+            await Clients.Group(
+                    GetProjectGroupName(message.ProjectId))
+                .SendAsync("ReactionToggled", message);
+        }
+
+
+        // =========================================================
+        // PIN MESSAGE
+        // =========================================================
+
+        public async Task TogglePin(int messageId)
+        {
+            var userId = UserId;
+
+            if (userId == 0)
+                throw new HubException("کاربر شناسایی نشد.");
+
+            var message =
+                await _chatService.TogglePinAsync(
+                    messageId, userId);
+
+            if (message == null)
+                throw new HubException(
+                    "فقط مدیران و مالکان می‌توانند پیام را pin کنند.");
+
+            await Clients.Group(
+                    GetProjectGroupName(message.ProjectId))
+                .SendAsync("PinToggled", message);
         }
 
 

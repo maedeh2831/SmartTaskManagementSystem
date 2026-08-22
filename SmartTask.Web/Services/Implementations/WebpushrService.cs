@@ -121,11 +121,9 @@ namespace SmartTask.Web.Services.Implementations
                 "webpushrAuthToken",
                 authToken);
 
-            request.Content =
-                new StringContent(
-                    json,
-                    Encoding.UTF8,
-                    "application/json");
+            request.Content = new StringContent(
+                json,
+                new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
 
             var client =
                 _httpClientFactory.CreateClient();

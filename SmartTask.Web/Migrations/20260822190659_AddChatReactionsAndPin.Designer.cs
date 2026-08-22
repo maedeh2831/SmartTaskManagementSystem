@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTask.Web.Data.Context;
 
@@ -11,9 +12,11 @@ using SmartTask.Web.Data.Context;
 namespace SmartTask.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260822190659_AddChatReactionsAndPin")]
+    partial class AddChatReactionsAndPin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,9 +223,6 @@ namespace SmartTask.Web.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<bool>("AutoCascadeDependencyDates")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Avatar")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -271,6 +271,9 @@ namespace SmartTask.Web.Migrations
                     b.Property<string>("JobTitle")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("LastLoginDate")
                         .HasColumnType("datetime2");
@@ -1787,49 +1790,6 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("UserNotificationPreferences");
                 });
 
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ApplicationUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceInfo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastActivityDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LoginDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OperatingSystem")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SessionToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("UserSessions");
-                });
-
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStory", b =>
                 {
                     b.Property<int>("Id")
@@ -2630,17 +2590,6 @@ namespace SmartTask.Web.Migrations
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("NotificationPreferences")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSession", b =>
-                {
-                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

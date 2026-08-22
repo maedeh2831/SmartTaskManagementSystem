@@ -76,5 +76,15 @@ namespace SmartTask.Web.Infrastructure.Services
                 return _lastSeen.TryGetValue(userId, out var value) ? value : null;
             }
         }
+
+        public IReadOnlyCollection<string> GetConnections(int userId)
+        {
+            lock (_lock)
+            {
+                return _connections.TryGetValue(userId, out var set)
+                    ? set.ToList()
+                    : Array.Empty<string>();
+            }
+        }
     }
 }

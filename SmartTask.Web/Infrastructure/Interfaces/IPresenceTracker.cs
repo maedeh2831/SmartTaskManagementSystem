@@ -18,5 +18,8 @@ namespace SmartTask.Web.Infrastructure.Interfaces
         HashSet<int> FilterOnline(IEnumerable<int> userIds);
 
         DateTime? GetLastSeen(int userId);
+
+        /// <summary>شناسه اتصال‌های فعال یک کاربر.</summary>
+        IReadOnlyCollection<string> GetConnections(int userId);
     }
 }

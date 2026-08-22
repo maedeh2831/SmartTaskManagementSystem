@@ -14,6 +14,7 @@
 @section Styles
 {
     <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat-reactions.css" asp-append-version="true" />
 }
 
 <div class="chat-app" id="chatApp">
@@ -135,6 +136,11 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="chatMessageSearch" placeholder="جستجو در پیام‌های این گروه..." autocomplete="off" />
                 <button type="button" class="chat-icon-btn" id="chatSearchClose"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="chat-pinned-bar d-none" id="chatPinnedBar">
+                <span class="chat-pinned-bar-title"><i class="fa-solid fa-thumbtack"></i> پین‌شده‌ها</span>
+                <div id="chatPinnedList" style="display:flex;gap:8px;overflow-x:auto;"></div>
             </div>
 
             <div class="chat-messages" id="chatMessages">

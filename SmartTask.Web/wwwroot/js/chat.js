@@ -1,5 +1,5 @@
 /* ==========================================================
-   SmartTask - Project Group Chat
+   SmartTask - Project Group Chat (with Reactions, Pin, Mentions)
    ========================================================== */
 
 (function () {
@@ -9,6 +9,8 @@
     if (!bootstrapEl) return;
 
     const state = JSON.parse(bootstrapEl.textContent);
+
+    const EMOJI_LIST = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "👏"];
 
     const app = {
         currentUserId: state.currentUserId,
@@ -22,7 +24,13 @@
         typingSent: false,
         typingTimeout: null,
         loading: false,
-        hasMore: false
+        hasMore: false,
+        mentionQuery: null,
+        mentionStart: -1,
+        mentionMembers: [],
+        searchSkip: 0,
+        searchHasMore: false,
+        searchLoading: false
     };
 
     // ===== DOM =====
@@ -61,7 +69,14 @@
         appRoot: document.getElementById("chatApp"),
         uploadProgress: document.getElementById("chatUploadProgress"),
         uploadName: document.getElementById("chatUploadName"),
-        progressFill: document.getElementById("chatProgressFill")
+        progressFill: document.getElementById("chatProgressFill"),
+        // Mention autocomplete
+        mentionDropdown: null,
+        // Emoji picker
+        emojiPicker: null,
+        // Pinned bar
+        pinnedBar: document.getElementById("chatPinnedBar"),
+        pinnedList: document.getElementById("chatPinnedList")
     };
 
     // ===== Helpers =====
@@ -109,7 +124,6 @@
         return dayFormatter.format(date);
     }
 
-    /** زمان کوتاه برای فهرست گفتگوها: امروز ساعت، دیروز، در غیر این‌صورت تاریخ. */
     function formatListTime(iso) {
         if (!iso) return "";
         const date = new Date(iso);
@@ -196,15 +210,51 @@
             </span>`;
     }
 
+    function pinMarkup(message) {
+        if (!message.isPinned) return "";
+        return `<span class="chat-msg-pin-badge"><i class="fa-solid fa-thumbtack"></i> پین‌شده</span>`;
+    }
+
+    function reactionsMarkup(message) {
+        if (!message.reactions || message.reactions.length === 0) return "";
+
+        const items = message.reactions.map(r => {
+            const reacted = r.userIds.includes(app.currentUserId);
+            return `<button type="button" class="chat-reaction-chip ${reacted ? "reacted" : ""}" 
+                        data-emoji="${esc(r.emoji)}" data-count="${r.count}"
+                        title="${r.count} واکنش">
+                        <span class="chat-reaction-emoji">${r.emoji}</span>
+                        <span class="chat-reaction-count">${r.count}</span>
+                    </button>`;
+        }).join("");
+
+        return `<div class="chat-msg-reactions">${items}<button type="button" class="chat-reaction-add" data-action="add-reaction" title="افزودن واکنش"><i class="fa-solid fa-face-smile"></i></button></div>`;
+    }
+
+    /** Highlight @mentions in message content */
+    function highlightMentions(content) {
+        if (!content) return esc(content);
+        let escaped = esc(content);
+        // Match @name patterns in the escaped text
+        escaped = escaped.replace(/@([\p{L}\p{N}_]+)/gu, '<span class="chat-mention">@$1</span>');
+        return escaped;
+    }
+
     function messageMarkup(message, grouped) {
         const own = message.senderId === app.currentUserId;
         const hasText = message.content && message.content.trim().length > 0;
 
         const actions = `
             <span class="chat-msg-actions">
+                <button type="button" class="chat-msg-action" data-action="add-reaction" title="واکنش">
+                    <i class="fa-solid fa-face-smile"></i>
+                </button>
                 <button type="button" class="chat-msg-action" data-action="reply" title="پاسخ">
                     <i class="fa-solid fa-reply"></i>
                 </button>
+                ${!own && app.room.canManage || own
+                    ? `<button type="button" class="chat-msg-action" data-action="pin" title="${message.isPinned ? "حذف pin" : "pin کردن"}"><i class="fa-solid fa-thumbtack"></i></button>`
+                    : ""}
                 ${own && message.typeName === "Text"
                     ? `<button type="button" class="chat-msg-action" data-action="edit" title="ویرایش"><i class="fa-solid fa-pen"></i></button>`
                     : ""}
@@ -214,13 +264,15 @@
             </span>`;
 
         return `
-            <div class="chat-msg ${own ? "own" : "other"} ${grouped ? "grouped" : ""}" data-id="${message.id}" data-sender="${message.senderId}">
+            <div class="chat-msg ${own ? "own" : "other"} ${grouped ? "grouped" : ""} ${message.isPinned ? "pinned" : ""}" data-id="${message.id}" data-sender="${message.senderId}">
                 ${!own && !grouped ? avatarMarkup(message.senderName, message.senderAvatar) : `<span class="chat-msg-avatar-spacer"></span>`}
                 <div class="chat-msg-bubble">
                     ${!own && !grouped ? `<span class="chat-msg-sender">${esc(message.senderName)}</span>` : ""}
+                    ${pinMarkup(message)}
                     ${replyMarkup(message)}
                     ${message.typeName !== "Text" ? attachmentMarkup(message) : ""}
-                    ${hasText ? `<span class="chat-msg-text">${esc(message.content)}</span>` : ""}
+                    ${hasText ? `<span class="chat-msg-text">${highlightMentions(message.content)}</span>` : ""}
+                    ${reactionsMarkup(message)}
                     <span class="chat-msg-meta">
                         ${message.isEdited ? `<i class="chat-msg-edited">ویرایش‌شده</i>` : ""}
                         <time>${esc(formatTime(message.createdDate))}</time>
@@ -234,7 +286,6 @@
         return `<div class="chat-day-separator"><span>${esc(formatDay(iso))}</span></div>`;
     }
 
-    /** آیا این پیام باید به پیام قبلی چسبیده رندر شود (همان فرستنده، فاصله کمتر از ۵ دقیقه). */
     function isGrouped(message, previous) {
         if (!previous) return false;
         if (previous.senderId !== message.senderId) return false;
@@ -277,6 +328,28 @@
     function toggleLoadMore() {
         if (!dom.loadMore) return;
         dom.loadMore.classList.toggle("d-none", !app.hasMore);
+    }
+
+    // ===== Rendering: pinned messages bar =====
+
+    function renderPinnedBar() {
+        if (!dom.pinnedBar || !dom.pinnedList) return;
+
+        const pinned = app.messages.filter(m => m.isPinned);
+
+        if (pinned.length === 0) {
+            dom.pinnedBar.classList.add("d-none");
+            return;
+        }
+
+        dom.pinnedBar.classList.remove("d-none");
+        dom.pinnedList.innerHTML = pinned.map(m => `
+            <div class="chat-pinned-item" data-id="${m.id}" data-jump="${m.id}">
+                <i class="fa-solid fa-thumbtack"></i>
+                <span class="chat-pinned-sender">${esc(m.senderName)}</span>
+                <span class="chat-pinned-text">${esc(m.content || m.attachmentName || "")}</span>
+            </div>
+        `).join("");
     }
 
     // ===== Rendering: members & presence =====
@@ -322,7 +395,6 @@
         if (dom.onlineCount) dom.onlineCount.textContent = app.room.members.filter(x => x.isOnline).length;
     }
 
-    /** اعمال مجموعه کاربران آنلاین روی اعضای اتاق جاری. */
     function applyPresence() {
         if (!app.room) return;
 
@@ -410,11 +482,114 @@
         setUnread(projectId, current + 1);
     }
 
-    /** زمان‌های رندرشده در سرور را به قالب محلی تبدیل می‌کند. */
     function hydrateListTimes() {
         document.querySelectorAll(".chat-list-time[data-time]").forEach(el => {
             if (el.dataset.time) el.textContent = formatListTime(el.dataset.time);
         });
+    }
+
+    // ===== Emoji Picker =====
+
+    function showEmojiPicker(anchorEl, onSelect) {
+        closeEmojiPicker();
+
+        const picker = document.createElement("div");
+        picker.className = "chat-emoji-picker";
+        picker.innerHTML = EMOJI_LIST.map(e =>
+            `<button type="button" class="chat-emoji-option">${e}</button>`
+        ).join("");
+
+        document.body.appendChild(picker);
+
+        const rect = anchorEl.getBoundingClientRect();
+        picker.style.top = (rect.top - picker.offsetHeight - 8) + "px";
+        picker.style.left = Math.min(rect.left, window.innerWidth - picker.offsetWidth - 16) + "px";
+
+        picker.addEventListener("click", e => {
+            const btn = e.target.closest(".chat-emoji-option");
+            if (btn) {
+                onSelect(btn.textContent.trim());
+                closeEmojiPicker();
+            }
+        });
+
+        dom.emojiPicker = picker;
+
+        setTimeout(() => {
+            document.addEventListener("click", closeEmojiPickerOutside, { once: true });
+        }, 0);
+    }
+
+    function closeEmojiPicker() {
+        if (dom.emojiPicker) {
+            dom.emojiPicker.remove();
+            dom.emojiPicker = null;
+        }
+    }
+
+    function closeEmojiPickerOutside(e) {
+        if (dom.emojiPicker && !dom.emojiPicker.contains(e.target) && !e.target.closest("[data-action='add-reaction']")) {
+            closeEmojiPicker();
+        }
+    }
+
+    // ===== Mention Autocomplete =====
+
+    function showMentionDropdown(query) {
+        closeMentionDropdown();
+
+        if (!app.room || !app.room.members) return;
+
+        const q = query.toLowerCase();
+        const matches = app.room.members.filter(m =>
+            m.fullName.toLowerCase().includes(q) && m.userId !== app.currentUserId
+        ).slice(0, 6);
+
+        if (matches.length === 0) return;
+
+        app.mentionMembers = matches;
+
+        const dropdown = document.createElement("div");
+        dropdown.className = "chat-mention-dropdown";
+
+        dropdown.innerHTML = matches.map((m, i) => `
+            <div class="chat-mention-option ${i === 0 ? "selected" : ""}" data-user-id="${m.userId}" data-name="${esc(m.fullName)}">
+                <span class="chat-mention-avatar">${m.avatar ? `<img src="${esc(m.avatar)}" alt="" />` : esc(initials(m.fullName))}</span>
+                <span class="chat-mention-name">${esc(m.fullName)}</span>
+            </div>
+        `).join("");
+
+        // Position near the textarea
+        const inputRect = dom.input.getBoundingClientRect();
+        dropdown.style.position = "fixed";
+        dropdown.style.bottom = (window.innerHeight - inputRect.top + 8) + "px";
+        dropdown.style.left = inputRect.left + "px";
+        dropdown.style.right = (window.innerWidth - inputRect.right) + "px";
+
+        document.body.appendChild(dropdown);
+        dom.mentionDropdown = dropdown;
+    }
+
+    function closeMentionDropdown() {
+        if (dom.mentionDropdown) {
+            dom.mentionDropdown.remove();
+            dom.mentionDropdown = null;
+        }
+        app.mentionQuery = null;
+        app.mentionStart = -1;
+        app.mentionMembers = [];
+    }
+
+    function insertMention(name) {
+        const val = dom.input.value;
+        const before = val.substring(0, app.mentionStart);
+        const after = val.substring(dom.input.selectionStart);
+        dom.input.value = before + "@" + name + " " + after;
+        dom.input.focus();
+        const pos = before.length + name.length + 2;
+        dom.input.setSelectionRange(pos, pos);
+        autoResize();
+        closeMentionDropdown();
     }
 
     // ===== SignalR =====
@@ -430,6 +605,7 @@
 
         app.messages.push(message);
         renderMessages();
+        renderPinnedBar();
 
         if (wasNearBottom || message.senderId === app.currentUserId) {
             scrollToBottom();
@@ -464,6 +640,7 @@
 
         app.messages[index] = message;
         renderMessages();
+        renderPinnedBar();
     }
 
     function onMessageDeleted(payload) {
@@ -471,7 +648,6 @@
 
         app.messages = app.messages.filter(x => x.id !== payload.messageId);
 
-        // ارجاع پاسخ‌ها به پیام حذف‌شده باید خالی شود.
         app.messages.forEach(x => {
             if (x.replyToMessageId === payload.messageId) {
                 x.replyToSenderName = null;
@@ -480,6 +656,52 @@
         });
 
         renderMessages();
+        renderPinnedBar();
+    }
+
+    function onReactionToggled(message) {
+        if (!app.room || message.projectId !== app.room.projectId) return;
+
+        const index = app.messages.findIndex(x => x.id === message.id);
+        if (index === -1) return;
+
+        app.messages[index] = message;
+        renderMessages();
+    }
+
+    function onPinToggled(message) {
+        if (!app.room || message.projectId !== app.room.projectId) return;
+
+        const index = app.messages.findIndex(x => x.id === message.id);
+        if (index === -1) return;
+
+        app.messages[index] = message;
+        renderMessages();
+        renderPinnedBar();
+    }
+
+    function onMentionNotification(payload) {
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "info",
+                title: "شما mention شدید",
+                html: `<b>${esc(payload.senderName)}</b> شما را در پیامی ذکر کرد:<br/><i>"${esc(payload.content)}"</i>`,
+                confirmButtonText: "مشاهده",
+                timer: 6000,
+                timerProgressBar: true
+            }).then(result => {
+                if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                    if (app.room && app.room.projectId === payload.projectId) {
+                        const el = dom.body.querySelector(`.chat-msg[data-id="${payload.messageId}"]`);
+                        if (el) {
+                            el.scrollIntoView({ behavior: "smooth", block: "center" });
+                            el.classList.add("highlight");
+                            setTimeout(() => el.classList.remove("highlight"), 1500);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     function clearTyping(userId) {
@@ -531,7 +753,6 @@
             app.typingTimers.delete(payload.userId);
             renderTyping();
         }, 4000);
-        // setTimeout روی خود entry ذخیره می‌شود تا در پیام بعدی پاک شود.
         app.typingTimers.set(payload.userId, entry);
 
         renderTyping();
@@ -549,6 +770,9 @@
         connection.on("MessageEdited", onMessageEdited);
         connection.on("MessageDeleted", onMessageDeleted);
         connection.on("UserTyping", onUserTyping);
+        connection.on("ReactionToggled", onReactionToggled);
+        connection.on("PinToggled", onPinToggled);
+        connection.on("MentionNotification", onMentionNotification);
 
         connection.on("OnlineUsers", userIds => {
             app.online = new Set(userIds);
@@ -605,6 +829,7 @@
         setUnread(room.projectId, 0);
         applyPresence();
         renderMessages();
+        renderPinnedBar();
         renderTyping();
         toggleLoadMore();
         cancelReply();
@@ -656,7 +881,6 @@
                 renderMessages();
                 toggleLoadMore();
 
-                // موقعیت اسکرول حفظ می‌شود تا پرش نداشته باشیم.
                 dom.messages.scrollTop = dom.messages.scrollHeight - previousHeight;
             })
             .catch(() => { })
@@ -760,6 +984,7 @@
         }
 
         stopTyping();
+        closeMentionDropdown();
 
         if (app.editing) {
             const messageId = app.editing;
@@ -828,7 +1053,7 @@
             let message = "بارگذاری فایل ناموفق بود.";
             try {
                 message = JSON.parse(request.responseText).message || message;
-            } catch { /* پاسخ JSON نبود */ }
+            } catch { }
 
             if (typeof showError === "function") showError(message);
         });
@@ -884,7 +1109,7 @@
 
     function bindEvents() {
 
-        // انتخاب گروه از فهرست
+        // Chat list selection
         if (dom.list) {
             dom.list.addEventListener("click", event => {
                 const item = event.target.closest(".chat-list-item");
@@ -901,7 +1126,7 @@
             });
         }
 
-        // فیلتر فهرست گروه‌ها
+        // Filter chat list
         if (dom.listSearch) {
             dom.listSearch.addEventListener("input", () => {
                 const term = dom.listSearch.value.trim().toLowerCase();
@@ -913,10 +1138,10 @@
             });
         }
 
-        // ارسال پیام
+        // Send message
         if (dom.sendBtn) dom.sendBtn.addEventListener("click", send);
 
-        // ارسال اعلان آزمایشی (تست تحویل پوش)
+        // Test push
         if (dom.testPushBtn) {
             dom.testPushBtn.addEventListener("click", async function () {
                 if (!app.room || !connection || connection.state !== "Connected") {
@@ -949,8 +1174,37 @@
             });
         }
 
+        // Input with mention detection
         if (dom.input) {
             dom.input.addEventListener("keydown", event => {
+                // Mention dropdown navigation
+                if (dom.mentionDropdown) {
+                    const options = dom.mentionDropdown.querySelectorAll(".chat-mention-option");
+                    const selected = dom.mentionDropdown.querySelector(".chat-mention-option.selected");
+                    const currentIdx = selected ? Array.from(options).indexOf(selected) : -1;
+
+                    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                        event.preventDefault();
+                        if (selected) selected.classList.remove("selected");
+                        let nextIdx = event.key === "ArrowDown" ? currentIdx + 1 : currentIdx - 1;
+                        if (nextIdx < 0) nextIdx = options.length - 1;
+                        if (nextIdx >= options.length) nextIdx = 0;
+                        options[nextIdx].classList.add("selected");
+                        return;
+                    }
+
+                    if (event.key === "Enter" && selected) {
+                        event.preventDefault();
+                        insertMention(selected.dataset.name);
+                        return;
+                    }
+
+                    if (event.key === "Escape") {
+                        closeMentionDropdown();
+                        return;
+                    }
+                }
+
                 if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
                     send();
@@ -966,12 +1220,33 @@
             dom.input.addEventListener("input", () => {
                 autoResize();
                 handleTypingInput();
+                detectMention();
             });
 
-            dom.input.addEventListener("blur", stopTyping);
+            dom.input.addEventListener("blur", () => {
+                stopTyping();
+                // Delay mention close to allow click on option
+                setTimeout(closeMentionDropdown, 200);
+            });
         }
 
-        // پیوست فایل
+        // Mention dropdown clicks
+        document.addEventListener("click", e => {
+            const option = e.target.closest(".chat-mention-option");
+            if (option) {
+                insertMention(option.dataset.name);
+            }
+        });
+
+        // Pinned bar clicks
+        if (dom.pinnedBar) {
+            dom.pinnedBar.addEventListener("click", e => {
+                const item = e.target.closest(".chat-pinned-item");
+                if (item) jumpTo(parseInt(item.dataset.id, 10));
+            });
+        }
+
+        // File attachment
         if (dom.attachBtn) dom.attachBtn.addEventListener("click", () => dom.fileInput.click());
 
         if (dom.fileInput) {
@@ -981,7 +1256,7 @@
             });
         }
 
-        // کشیدن و رها کردن فایل
+        // Drag and drop
         if (dom.messages) {
             ["dragenter", "dragover"].forEach(name => {
                 dom.messages.addEventListener(name, event => {
@@ -1001,7 +1276,6 @@
                 if (event.dataTransfer.files.length > 0) uploadFile(event.dataTransfer.files[0]);
             });
 
-            // بارگذاری خودکار پیام‌های قدیمی هنگام رسیدن به بالای لیست
             dom.messages.addEventListener("scroll", () => {
                 if (dom.messages.scrollTop < 60 && app.hasMore) loadOlder();
             });
@@ -1009,25 +1283,54 @@
 
         if (dom.loadMoreBtn) dom.loadMoreBtn.addEventListener("click", loadOlder);
 
-        // کنش‌های روی پیام
+        // Message actions (reactions, reply, edit, delete, pin)
         if (dom.body) {
             dom.body.addEventListener("click", event => {
+                // Jump to replied message
                 const jump = event.target.closest(".chat-msg-reply[data-jump]");
                 if (jump) {
                     jumpTo(parseInt(jump.dataset.jump, 10));
                     return;
                 }
 
+                // Reaction chip click (toggle)
+                const reactionChip = event.target.closest(".chat-reaction-chip");
+                if (reactionChip) {
+                    const msgEl = reactionChip.closest(".chat-msg");
+                    const messageId = parseInt(msgEl.dataset.id, 10);
+                    const emoji = reactionChip.dataset.emoji;
+                    connection.invoke("ToggleReaction", messageId, emoji).catch(() => { });
+                    return;
+                }
+
+                // Add reaction button
+                const addReaction = event.target.closest("[data-action='add-reaction']");
+                if (addReaction) {
+                    const msgEl = addReaction.closest(".chat-msg");
+                    const messageId = parseInt(msgEl.dataset.id, 10);
+                    showEmojiPicker(addReaction, emoji => {
+                        connection.invoke("ToggleReaction", messageId, emoji).catch(() => { });
+                    });
+                    return;
+                }
+
+                // Other actions
                 const action = event.target.closest(".chat-msg-action");
                 if (!action) return;
 
-                const messageId = parseInt(action.closest(".chat-msg").dataset.id, 10);
+                const msgEl = action.closest(".chat-msg");
+                const messageId = parseInt(msgEl.dataset.id, 10);
                 const message = findMessage(messageId);
                 if (!message) return;
 
                 if (action.dataset.action === "reply") startReply(message);
                 else if (action.dataset.action === "edit") startEdit(message);
                 else if (action.dataset.action === "delete") deleteMessage(messageId);
+                else if (action.dataset.action === "pin") {
+                    connection.invoke("TogglePin", messageId).catch(err => {
+                        if (typeof showError === "function") showError(err.message || "عملیات pin ناموفق بود.");
+                    });
+                }
             });
         }
 
@@ -1038,7 +1341,7 @@
             });
         }
 
-        // پنل اعضا
+        // Members panel
         if (dom.membersToggle) {
             dom.membersToggle.addEventListener("click", () => dom.appRoot.classList.toggle("show-members"));
         }
@@ -1046,7 +1349,7 @@
             dom.membersClose.addEventListener("click", () => dom.appRoot.classList.remove("show-members"));
         }
 
-        // جستجو در پیام‌ها
+        // Search
         if (dom.searchToggle) {
             dom.searchToggle.addEventListener("click", () => {
                 dom.searchBar.classList.toggle("d-none");
@@ -1058,20 +1361,35 @@
             dom.searchClose.addEventListener("click", () => {
                 dom.searchBar.classList.add("d-none");
                 dom.searchInput.value = "";
+                app.searchSkip = 0;
+                app.searchHasMore = false;
                 filterMessages("");
             });
         }
 
         if (dom.searchInput) {
-            dom.searchInput.addEventListener("input", () => filterMessages(dom.searchInput.value.trim()));
+            let searchTimeout;
+            dom.searchInput.addEventListener("input", () => {
+                clearTimeout(searchTimeout);
+                const term = dom.searchInput.value.trim();
+
+                if (term.length < 2) {
+                    filterMessages(term);
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    serverSearch(term);
+                }, 300);
+            });
         }
 
-        // بازگشت به فهرست در حالت موبایل
+        // Mobile back
         if (dom.backBtn) {
             dom.backBtn.addEventListener("click", () => dom.appRoot.classList.add("show-list"));
         }
 
-        // خوانده‌شدن پیام‌ها هنگام برگشتن به پنجره
+        // Mark as read on focus
         window.addEventListener("focus", () => {
             if (app.room && connection && connection.state === signalR.HubConnectionState.Connected) {
                 connection.invoke("MarkAsRead", app.room.projectId).catch(() => { });
@@ -1085,7 +1403,62 @@
         });
     }
 
-    /** فیلتر ساده پیام‌های بارگذاری‌شده در سمت کلاینت. */
+    // ===== Mention detection =====
+
+    function detectMention() {
+        const val = dom.input.value;
+        const cursorPos = dom.input.selectionStart;
+
+        // Find @ before cursor
+        const textBefore = val.substring(0, cursorPos);
+        const lastAtIndex = textBefore.lastIndexOf("@");
+
+        if (lastAtIndex === -1 || (lastAtIndex > 0 && textBefore[lastAtIndex - 1] !== " " && textBefore[lastAtIndex - 1] !== "\n")) {
+            closeMentionDropdown();
+            return;
+        }
+
+        const query = textBefore.substring(lastAtIndex + 1);
+
+        // If there's a space after the mention, close it
+        if (query.includes(" ")) {
+            closeMentionDropdown();
+            return;
+        }
+
+        app.mentionStart = lastAtIndex;
+        app.mentionQuery = query;
+
+        showMentionDropdown(query);
+    }
+
+    // ===== Server search =====
+
+    function serverSearch(term) {
+        if (!app.room || app.searchLoading) return;
+
+        app.searchLoading = true;
+        app.searchSkip = 0;
+
+        fetch(`/Chat/Search?projectId=${app.room.projectId}&term=${encodeURIComponent(term)}&skip=0&take=50`,
+            { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            .then(response => response.json())
+            .then(data => {
+                app.searchSkip = data.nextSkip || 0;
+                app.searchHasMore = data.hasMore || false;
+
+                // Replace messages with search results
+                app.messages = data.messages || [];
+                app.hasMore = false;
+                renderMessages();
+                toggleLoadMore();
+            })
+            .catch(() => { })
+            .finally(() => { app.searchLoading = false; });
+    }
+
+    // ===== Client-side filter =====
+
     function filterMessages(term) {
         if (!dom.body) return;
 
@@ -1120,10 +1493,10 @@
 
         renderMessages();
         renderMembers();
+        renderPinnedBar();
         toggleLoadMore();
         scrollToBottom();
     }
 
     startConnection();
 })();
-
