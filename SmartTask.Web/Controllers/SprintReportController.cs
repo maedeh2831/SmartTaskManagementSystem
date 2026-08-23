@@ -24,6 +24,13 @@ public class SprintReportController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetReports(int sprintId)
     {
+        var sprint = await _sprintService.GetByIdAsync(sprintId);
+        if (sprint == null)
+            return NotFound();
+
+        if (!await _sprintService.CanManageSprintAsync(sprintId, CurrentUser.UserId))
+            return Forbid();
+
         var reports = await _sprintReportAiService.GetReportsAsync(sprintId);
         return Json(new { success = true, reports });
     }

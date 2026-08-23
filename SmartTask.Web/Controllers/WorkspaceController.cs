@@ -37,12 +37,15 @@ public class WorkspaceController : BaseController
 
     public async Task<IActionResult> Index()
     {
+        var userId = CurrentUser.UserId;
+
         var workspaces = await _context.Workspaces
-            .Where(x => x.ViewState)
+            .Where(x => x.ViewState
+                && x.Members.Any(m => m.ApplicationUserId == userId && m.ViewState))
             .Include(x => x.Members)
             .Include(x => x.Projects)
             .OrderByDescending(x => x.CreateDate)
-                    .Select(x => new WorkspaceListItemViewModel
+            .Select(x => new WorkspaceListItemViewModel
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -52,7 +55,7 @@ public class WorkspaceController : BaseController
                 Visibility = x.Visibility == VisibilityType.Private
                                 ? "خصوصی"
                                 : "عمومی",
-                MembersCount = x.Members.Count,
+                MembersCount = x.Members.Count(m => m.ViewState),
                 ProjectsCount = x.Projects.Count,
                 CreateDate = x.CreateDate
             })
@@ -72,6 +75,12 @@ public class WorkspaceController : BaseController
 
         if (workspace == null)
             return NotFound();
+
+        if (!await IsWorkspaceMemberAsync(_context, id))
+        {
+            TempData["Error"] = "شما عضو این فضای کاری نیستید.";
+            return RedirectToAction(nameof(Index));
+        }
 
         _currentContextService.SetCurrentWorkspace(id);
 
@@ -179,6 +188,12 @@ public class WorkspaceController : BaseController
         if (workspace == null)
             return NotFound();
 
+        if (!await IsWorkspaceMemberAsync(_context, id))
+        {
+            TempData["Error"] = "شما عضو این فضای کاری نیستید.";
+            return RedirectToAction(nameof(Index));
+        }
+
         var model = new EditWorkspaceViewModel
         {
             Id = workspace.Id,
@@ -255,9 +270,9 @@ public class WorkspaceController : BaseController
     [HttpGet]
     public async Task<IActionResult> Settings(int id)
     {
-        if (!await _workspaceService.IsOwnerAsync(id, CurrentUser.UserId))
+        if (!await IsWorkspaceMemberAsync(_context, id))
         {
-            TempData["Error"] = "شما اجازه دسترسی به تنظیمات این فضای کاری را ندارید.";
+            TempData["Error"] = "شما عضو این فضای کاری نیستید.";
             return RedirectToAction(nameof(Index));
         }
 

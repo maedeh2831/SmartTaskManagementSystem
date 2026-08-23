@@ -37,6 +37,12 @@ public class SprintController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var sprints = await _sprintService.GetByProjectAsync(projectId);
 
         var vm = new SprintIndexViewModel
@@ -66,6 +72,12 @@ public class SprintController : BaseController
 
         if (sprint == null)
             return NotFound();
+
+        if (!await IsProjectMemberAsync(_context, sprint.ProjectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
 
         var stories = await _context.UserStories
             .Where(x => x.SprintId == id && x.ViewState)
@@ -300,6 +312,13 @@ public class SprintController : BaseController
     [HttpGet]
     public async Task<IActionResult> PlanningTab(int id)
     {
+        var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == id);
+        if (sprint == null)
+            return NotFound();
+
+        if (!await IsProjectMemberAsync(_context, sprint.ProjectId))
+            return Forbid();
+
         if (!await _sprintService.CanManageSprintAsync(id, CurrentUser.UserId))
             return Forbid();
 

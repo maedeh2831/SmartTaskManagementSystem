@@ -37,6 +37,12 @@ public class BacklogController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         await _backlogService.GetOrCreateAsync(projectId);
 
         // Load all sprints for this project

@@ -21,8 +21,11 @@ public class ReportController : BaseController
 
     public async Task<IActionResult> Index()
     {
+        var userId = CurrentUser.UserId;
+
         var workspaces = await _context.Workspaces
-            .Where(x => x.ViewState)
+            .Where(x => x.ViewState
+                && x.Members.Any(m => m.ApplicationUserId == userId && m.ViewState))
             .Include(x => x.Members)
             .Include(x => x.Projects)
             .OrderByDescending(x => x.CreateDate)
@@ -34,7 +37,7 @@ public class ReportController : BaseController
                 Color = x.Color ?? "#4F46E5",
                 Logo = x.Logo,
                 Visibility = x.Visibility == VisibilityType.Private ? "خصوصی" : "عمومی",
-                MembersCount = x.Members.Count,
+                MembersCount = x.Members.Count(m => m.ViewState),
                 ProjectsCount = x.Projects.Count,
                 CreateDate = x.CreateDate
             })

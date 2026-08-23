@@ -42,6 +42,12 @@ public class TaskBoardController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var tasks = await _taskService.GetProjectBoardAsync(projectId, assigneeId, priority, type, labelId);
 
         var projectMembers = await _context.ProjectMembers

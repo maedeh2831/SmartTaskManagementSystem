@@ -41,6 +41,9 @@ public class WorkloadController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateCapacity(int projectMemberId, int projectId, int weeklyCapacityHours)
     {
+        if (!await _projectMemberService.IsMemberAsync(projectId, CurrentUser.UserId))
+            return Forbid();
+
         var canManage = await Request.HttpContext.RequestServices
             .GetRequiredService<IProjectService>()
             .CanManageProjectAsync(projectId, CurrentUser.UserId);

@@ -75,6 +75,12 @@ public class TaskController : BaseController
         if (story == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, story.ProjectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var tasks = await _taskService.GetByUserStoryAsync(userStoryId);
 
         var vm = new TaskIndexViewModel
@@ -104,6 +110,12 @@ public class TaskController : BaseController
 
         if (task == null)
             return NotFound();
+
+        if (!await IsProjectMemberAsync(_context, task.UserStory.ProjectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
 
         var subTasks = await _subTaskService.GetByTaskAsync(id);
         var assignees = await _taskAssignmentService.GetAssigneesAsync(id);

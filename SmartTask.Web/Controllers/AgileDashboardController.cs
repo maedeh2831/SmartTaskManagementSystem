@@ -33,6 +33,12 @@ public class AgileDashboardController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var allSprints = await _context.Sprints
             .Where(x => x.ProjectId == projectId && x.ViewState)
             .OrderByDescending(x => x.StartDate)

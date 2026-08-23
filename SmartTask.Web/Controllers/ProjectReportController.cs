@@ -51,6 +51,13 @@ public class ProjectReportController : BaseController
     [HttpGet]
     public async Task<IActionResult> ExportPdf(int projectId, DateTime? fromDate, DateTime? toDate)
     {
+        var project = await _projectService.GetByIdAsync(projectId);
+        if (project == null)
+            return NotFound();
+
+        if (!await _workspaceMemberService.IsMemberAsync(project.WorkspaceId, CurrentUser.UserId))
+            return Forbid();
+
         var model = await _reportService.GetReportAsync(projectId, fromDate, toDate);
         if (model == null)
             return NotFound();
@@ -62,6 +69,13 @@ public class ProjectReportController : BaseController
     [HttpGet]
     public async Task<IActionResult> ExportExcel(int projectId, DateTime? fromDate, DateTime? toDate)
     {
+        var project = await _projectService.GetByIdAsync(projectId);
+        if (project == null)
+            return NotFound();
+
+        if (!await _workspaceMemberService.IsMemberAsync(project.WorkspaceId, CurrentUser.UserId))
+            return Forbid();
+
         var model = await _reportService.GetReportAsync(projectId, fromDate, toDate);
         if (model == null)
             return NotFound();

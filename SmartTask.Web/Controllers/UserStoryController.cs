@@ -36,6 +36,12 @@ public class UserStoryController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var stories = await _context.UserStories
             .Where(x => x.ProjectId == projectId && x.ViewState)
             .Include(x => x.Sprint)
@@ -70,6 +76,12 @@ public class UserStoryController : BaseController
 
         if (story == null)
             return NotFound();
+
+        if (!await IsProjectMemberAsync(_context, story.ProjectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
 
         var owner = story.OwnerId.HasValue
             ? await _context.Users.FirstOrDefaultAsync(x => x.Id == story.OwnerId)

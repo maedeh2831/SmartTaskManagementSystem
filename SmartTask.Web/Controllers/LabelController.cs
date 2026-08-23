@@ -31,6 +31,12 @@ public class LabelController : BaseController
         if (project == null)
             return NotFound();
 
+        if (!await IsProjectMemberAsync(_context, projectId))
+        {
+            TempData["Error"] = "شما عضو این پروژه نیستید.";
+            return RedirectToAction("Index", "Workspace");
+        }
+
         var labels = await _labelService.GetByProjectAsync(projectId);
 
         var vm = new LabelIndexViewModel
