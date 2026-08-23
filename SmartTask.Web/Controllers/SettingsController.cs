@@ -12,11 +12,19 @@ namespace SmartTask.Web.Controllers
     {
         private readonly ISettingsService _settingsService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserSessionTracker _sessionTracker;
 
-        public SettingsController(ISettingsService settingsService, UserManager<ApplicationUser> userManager)
+        public SettingsController(
+            ISettingsService settingsService,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IUserSessionTracker sessionTracker)
         {
             _settingsService = settingsService;
             _userManager = userManager;
+            _signInManager = signInManager;
+            _sessionTracker = sessionTracker;
         }
 
         public async Task<IActionResult> Index()
@@ -74,6 +82,108 @@ namespace SmartTask.Web.Controllers
             await _settingsService.UpdateManagementAsync(userId, Management);
             TempData["Success"] = "تنظیمات مدیریتی با موفقیت ذخیره شد.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetActiveSessions()
+        {
+            try
+            {
+                var userIdStr = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var userId))
+                    return Json(Array.Empty<object>());
+
+                var sessions = await _sessionTracker.GetActiveSessionsAsync(userId);
+
+                var currentToken = HttpContext.Session.GetString("UserSessionToken");
+
+                var result = sessions.Select(s => new
+                {
+                    id = s.Id,
+                    deviceInfo = s.DeviceInfo ?? "نامشخص",
+                    operatingSystem = s.OperatingSystem ?? "نامشخص",
+                    ipAddress = s.IpAddress ?? "نامشخص",
+                    loginDate = s.LoginDate.ToString("yyyy/MM/dd HH:mm"),
+                    lastActivity = s.LastActivityDate.ToString("yyyy/MM/dd HH:mm"),
+                    isCurrent = s.SessionToken == currentToken
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception)
+            {
+                return Json(Array.Empty<object>());
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogoutAllDevices()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Json(new { success = false, message = "کاربر یافت نشد." });
+
+                // Update SecurityStamp — this invalidates all existing auth cookies
+                var stampResult = await _userManager.UpdateSecurityStampAsync(user);
+                if (!stampResult.Succeeded)
+                {
+                    return Json(new { success = false, message = "خطا در خروج از دستگاه‌ها." });
+                }
+
+                // Also revoke all tracked sessions in DB
+                var currentToken = HttpContext.Session.GetString("UserSessionToken");
+                if (!string.IsNullOrEmpty(currentToken))
+                {
+                    await _sessionTracker.RevokeAllOtherSessionsAsync(user.Id, currentToken);
+                }
+
+                // Sign out and re-sign in so current user keeps their session
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(user, false);
+
+                // Re-track current session
+                var ua = Request.Headers.UserAgent.ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var newSession = await _sessionTracker.TrackLoginAsync(user.Id, ua, ip, HttpContext);
+                HttpContext.Session.SetString("UserSessionToken", newSession.SessionToken);
+
+                return Json(new { success = true, message = "سایر دستگاه‌ها با موفقیت خارج شدند." });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "خطا در انجام عملیات." });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Json(new { success = false, message = "کاربر یافت نشد." });
+
+                // Soft-delete using the project's existing ViewState pattern
+                user.ViewState = false;
+                user.IsActive = false;
+                user.ChangeDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+
+                // Invalidate all sessions by updating SecurityStamp
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                // Sign out
+                await _signInManager.SignOutAsync();
+
+                return Json(new { success = true, message = "حساب کاربری با موفقیت حذف شد." });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "خطا در حذف حساب." });
+            }
         }
     }
 }

@@ -79,5 +79,6 @@ namespace SmartTask.Web.Models.Entities
 
         public virtual ICollection<TimeLog> TimeLogs { get; set; } = new HashSet<TimeLog>();
         public ICollection<UserNotificationPreference> NotificationPreferences { get; set; } = new List<UserNotificationPreference>();
+        public ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
     }
 }
