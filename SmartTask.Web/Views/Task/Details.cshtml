@@ -52,27 +52,7 @@
          HEADER
     ========================== -->
 
-    <header class="task-page-header">
-
-        <div class="task-breadcrumb">
-            <a asp-controller="Workspace"
-               asp-action="Details"
-               asp-route-id="@Model.ProjectId">
-                @Model.ProjectName
-            </a>
-
-            <i class="fa-solid fa-chevron-left"></i>
-
-            <a asp-controller="TaskBoard"
-               asp-action="Index"
-               asp-route-projectId="@Model.ProjectId">
-                TaskBoard
-            </a>
-
-            <i class="fa-solid fa-chevron-left"></i>
-
-            <span>@Model.Title</span>
-        </div>
+    <div class="task-page-header">
 
         <div class="task-header-main">
 
@@ -109,15 +89,6 @@
 
             <div class="task-header-actions">
 
-                <button type="button"
-                        id="taskBackBtn"
-                        class="task-action-btn secondary"
-                        data-fallback-url="/TaskBoard/Index?projectId=@Model.ProjectId">
-
-                    <i class="fa-solid fa-arrow-right"></i>
-                    <span id="taskBackLabel">بازگشت</span>
-                </button>
-
                 @if (Model.CanManage)
                 {
                     <button type="button"
@@ -144,6 +115,14 @@
 
                     </form>
                 }
+                                <button type="button"
+                        id="taskBackBtn"
+                        class="task-action-btn secondary"
+                        data-fallback-url="/TaskBoard/Index?projectId=@Model.ProjectId">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span id="taskBackLabel">بازگشت</span>
+                </button>
 
             </div>
 
@@ -231,21 +210,21 @@
 
         </div>
 
-    </header>
+    </div>
 
 
     <!-- =========================
-         SECTION NAV (sticky jump links)
+         SECTION NAV (tabs)
     ========================== -->
 
     <nav class="task-section-nav" id="taskSectionNav">
 
-        <a href="#section-overview" class="task-section-link active">
+        <button type="button" data-tab="section-overview" class="task-section-link active">
             <i class="fa-solid fa-circle-info"></i>
             <span>نمای کلی</span>
-        </a>
+        </button>
 
-        <a href="#section-subtasks" class="task-section-link">
+        <button type="button" data-tab="section-subtasks" class="task-section-link">
             <i class="fa-solid fa-list-check"></i>
             <span>زیروظایف</span>
             @if (subtaskAndChecklistCount > 0)
@@ -254,32 +233,32 @@
                     @subtaskAndChecklistCount
                 </span>
             }
-        </a>
+        </button>
 
-        <a href="#section-time" class="task-section-link">
+        <button type="button" data-tab="section-time" class="task-section-link">
             <i class="fa-solid fa-stopwatch"></i>
             <span>زمان</span>
             @if (Model.MyActiveTimer != null)
             {
                 <span class="task-tab-badge task-tab-badge-live"></span>
             }
-        </a>
+        </button>
 
-        <a href="#section-files" class="task-section-link">
+        <button type="button" data-tab="section-files" class="task-section-link">
             <i class="fa-solid fa-comments"></i>
-            <span>مستندات و گفتگو</span>
+            <span>مستندات و نظرات</span>
             @if (filesAndCommentsCount > 0)
             {
                 <span class="task-tab-badge">
                     @filesAndCommentsCount
                 </span>
             }
-        </a>
+        </button>
 
-        <a href="#section-insights" class="task-section-link">
+        <button type="button" data-tab="section-insights" class="task-section-link">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span>تحلیل و وابستگی‌ها</span>
-        </a>
+        </button>
 
     </nav>
 
@@ -288,14 +267,13 @@
          CONTENT
     ========================== -->
 
-    <main class="task-tab-content">
+    <div class="task-tab-content">
 
 
         <!-- =================================
              OVERVIEW
         ================================== -->
-
-        <section class="task-section" id="section-overview">
+        <section class="task-section task-section--active" id="section-overview">
 
             <div class="section-title">
                 <i class="fa-solid fa-circle-info"></i>
@@ -619,7 +597,7 @@
              SUBTASKS
         ================================== -->
 
-        <section class="task-section" id="section-subtasks">
+        <section class="task-section" id="section-subtasks" hidden>
 
             <div class="section-title">
                 <i class="fa-solid fa-list-check"></i>
@@ -957,7 +935,7 @@
              TIME
         ================================== -->
 
-        <section class="task-section" id="section-time">
+        <section class="task-section" id="section-time" hidden>
 
             <div class="section-title">
                 <i class="fa-solid fa-stopwatch"></i>
@@ -1181,11 +1159,11 @@
              FILES + COMMENTS
         ================================== -->
 
-        <section class="task-section" id="section-files">
+        <section class="task-section" id="section-files" hidden>
 
             <div class="section-title">
                 <i class="fa-solid fa-comments"></i>
-                مستندات و گفتگو
+                مستندات و نظرات
             </div>
 
             <div class="task-collaboration-grid">
@@ -1307,7 +1285,7 @@
 
                         <div>
                             <i class="fa-solid fa-comments"></i>
-                            گفتگو
+                            نظرات
 
                             <span class="subtask-progress-text">
                                 @Model.Comments.Count نظر
@@ -1434,7 +1412,7 @@
 
         <!-- =================================
              INSIGHTS
-        ================================== -->        <section class="task-section" id="section-insights">
+        ================================== -->        <section class="task-section" id="section-insights" hidden>
 
             <div class="section-title">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -1896,7 +1874,7 @@
 
         </section>
 
-    </main>
+    </div>
 
 </div>
 
