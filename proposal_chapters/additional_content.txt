@@ -1,0 +1,199 @@
+
+فصل سوم (ادامه): تفصیل بیشتر الگوریتم‌ها و پیاده‌سازی
+
+۳-۶-۵ تفصیل پیاده‌سازی سرویس تجزیه وظایف با هوش مصنوعی
+سرویس TaskBreakdownService یکی از نوآوری‌های کلیدی SmartTask است که با استفاده از هوش مصنوعی، تسک‌های پیچیده را به زیروظایف عملی تقسیم می‌کند. در این بخش، جزئیات فنی پیاده‌سازی این سرویس تشریح می‌شود.
+
+ساختار پرامپت:
+پرامپت ارسالی به هوش مصنوعی شامل دو بخش است: پرامپت سیستم و پرامپت کاربر. پرامپت سیستم نقش هوش مصنوعی را مشخص می‌کند (مثال: «تو یک مدیر پروژه باتجربه هستی که تسک‌ها را به زیروظایف تقسیم می‌کنی»). پرامپت کاربر شامل اطلاعات تسک مانند عنوان، توضیحات، نوع و اولویت است.
+
+فرمت خروجی:
+هوش مصنوعی ملزم است خروجی را به فرمت JSON array ارائه دهد. هر آیتم آرایه یک رشته فارسی است که حداکثر ۸ کلمه دارد. این محدودیت باعث می‌شود زیروظایف تولیدشده کوتاه و عملی باشند.
+
+مکانیزم اعتبارسنجی پاسخ:
+۱. ابتدا پاسخ به‌صورت JSON پارس می‌شود
+۲. اگر پارس موفق نبود، پاسخ به‌صورت خطی تقسیم می‌شود (Fallback)
+۳. خطوط خالی فیلتر می‌شوند
+۴. حداکثر ۷ آیتم نگه‌داشته می‌شود
+۵. هر آیتم بیش از ۸ کلمه نباشد
+
+تنظیمات API:
+- آدرس: http://92.246.145.99:1234/v1/chat/completions
+- مدل: qwen/qwen3-4b
+- Temperature: 0.5 (برای پاسخ‌های دقیق‌تر)
+- Max Tokens: 400
+- Timeout: 60 ثانیه
+
+فایل‌های مرتبط:
+- Services/Implementations/TaskBreakdownService.cs: پیاده‌سازی اصلی
+- Services/Interfaces/ITaskBreakdownService.cs: رابط
+- Controllers/SubTaskController.cs: کنترلر مرتبط
+- Views/SubTask/: View های مرتبط
+
+۳-۶-۶ تفصیل پیاده‌سازی سرویس گزارش هوشمند اسپرینت
+سرویس SprintReportAiService آمار واقعی اسپرینت را جمع‌آوری و به هوش مصنوعی ارسال می‌کند تا گزارش روایی تولید کند.
+
+داده‌های جمع‌آوری‌شده:
+۱. نام اسپرینت و پروژه
+۲. هدف اسپرینت
+۳. بازه زمانی (تاریخ شروع و پایان)
+۴. تعداد Story Point برنامه‌ریزی‌شده vs تکمیل‌شده (با درصد)
+۵. تعداد تسک‌های تکمیل‌شده vs کل
+۶. لیست User Story‌های ناتمام
+۷. بیشترین مشارکت‌کننده‌ها (۳ نفر اول)
+۸. درصد پیشرفت کلی
+
+پرامپت سیستم:
+«تو یک اسکرام‌مستر باتجربه هستی. آمار زیر از یک اسپرینت را بخوان و یک گزارش روایی و خوانا به زبان فارسی بنویس. لحن گزارش باید حرفه‌ای و در عین حال قابل فهم باشد. گزارش شامل دستاوردها، نکات ناتمام و پیشنهاد برای اسپرینت بعدی باشد. حداکثر ۳ تا ۵ جمله بنویس.»
+
+ذخیره‌سازی:
+گزارش‌های تولیدشده در جدول SprintReports ذخیره می‌شوند. هر رکورد شامل SprintId, Content, GeneratedByUserId و GeneratedDate است. این ساختار امکان مشاهده تاریخچه کامل گزارش‌ها را فراهم می‌کند.
+
+فایل‌های مرتبط:
+- Services/Implementations/SprintReportAiService.cs: پیاده‌سازی اصلی
+- Services/Interfaces/ISprintReportAiService.cs: رابط
+- Controllers/SprintReportController.cs: کنترلر
+- Models/Entities/SprintReport.cs: موجودیت ذخیره‌سازی
+
+۳-۶-۷ تفصیل پیاده‌سازی سرویس پیش‌بینی ریسک با تحلیل متنی AI
+سرویس DelayRiskService علاوه بر محاسبه عددی امتیاز ریسک، قابلیت تولید تحلیل متنی با هوش مصنوعی را نیز دارد.
+
+آمار ارسالی به AI:
+- تعداد کل تسک‌های باز پروژه
+- تعداد تسک‌های عقب‌افتاده
+- تعداد اعضای اضافه‌بار
+- تعداد زنجیره‌های پرریسک وابستگی
+- تعداد تمدیدهای خودکار ۷ روز اخیر
+- امتیاز ریسک محاسبه‌شده
+- سطح ریسک (کم/متوسط/بالا/بحرانی)
+
+پرامپت سیستم:
+«تو یک مشاور مدیریت پروژه هستی. آمار زیر از وضعیت یک پروژه را بخوان و یک تحلیل ۳-۴ جمله‌ای به زبان فارسی بنویس. لحن تحلیل باید حرفه‌ای و سازنده باشد. در پایان یک پیشنهاد عملی مشخص ارائه بده.»
+
+فایل‌ها: DelayRiskService.cs, DelayRiskViewModel, DelayRiskController.cs
+
+۳-۶-۸ تفصیل پیاده‌سازی سرویس تمدید خودکار (OverdueCascade)
+سرویس OverdueCascadeBackgroundService یک Background Service در ASP.NET Core است که به‌صورت دوره‌ای اجرا می‌شود.
+
+نحوه ثبت در Program.cs:
+builder.Services.AddHostedService<OverdueCascadeBackgroundService>();
+
+مکانیزم عملکرد:
+۱. هر ۳۰ دقیقه اجرا می‌شود
+۲. تسک‌های عقب‌افتاده را پیدا می‌کند (DueDate < امروز && وضعیت != Done && وضعیت != Cancelled)
+۳. فقط تسک‌هایی که حداقل یک عضو تخصیص‌یافته با AutoCascadeDependencyDates = true دارند، پردازش می‌شوند
+۴. برای هر تسک عقب‌افتاده، زنجیره وابستگی را بررسی می‌کند
+۵. تأخیر واقعی (نه تخمینی) را به تسک‌های وابسته اجباری منتقل می‌کند
+۶. لاگ ثبت می‌کند (جلوگیری از اعمال تکراری)
+۷. به هر عضو تخصیص‌یافته اعلان می‌دهد
+۸. فعالیت (Activity Log) ثبت می‌کند
+
+مکانیزم جلوگیری از تکرار:
+جددول OverdueCascadeLog شامل فیلدهای SourceTaskId, ImpactedTaskId, DelayDaysApplied و AppliedDate است. هنگام اعمال تمدید جدید، ابتدا بررسی می‌شود که آیا قبلاً تمدیدی برای همین جفت تسک اعمال شده یا نه. اگر اعمال شده و تأخیر جدید بیشتر از قبلی باشد، فقط مابه‌التفاوت اعمال می‌شود. اگر تأخیر جدید کمتر یا مساوی باشد، هیچ کاری انجام نمی‌شود.
+
+فایل‌ها:
+- Infrastructure/BackgroundJobs/OverdueCascadeBackgroundService.cs
+- Models/Entities/OverdueCascadeLog.cs
+- Data/Configurations/OverdueCascadeLogConfiguration.cs
+
+۳-۶-۹ تفصیل سیستم ترید تسک
+سیستم TaskTradeService یک سیستم درخواست و تأییدیه برای مبادله تسک بین اعضای تیم است.
+
+انواع ترید:
+۱. ترید یک‌طرفه (One-way): کاربر A تسک X خودش را به کاربر B پیشنهاد می‌دهد
+۲. ترید دوطرفه (Swap): کاربر A تسک X خودش را با تسک Y کاربر B عوض می‌کند
+
+جریان کار ترید یک‌طرفه:
+۱. کاربر A دکمه «ترید» روی تسک X را می‌زند
+۲. لیست اعضای پروژه (به‌جز خودش) نمایش داده می‌شود
+۳. کاربر B را انتخاب می‌کند
+۴. پیام اختیاری می‌نویسد
+۵. درخواست ایجاد می‌شود (Status = Pending)
+۶. به کاربر B اعلان داده می‌شود
+۷. کاربر B قبول یا رد می‌کند
+۸. اگر قبول → تسک X از A به B منتقل می‌شود
+۹. اگر رد → درخواست لغو می‌شود
+
+جریان کار ترید دوطرفه:
+۱. کاربر A دکمه «ترید» روی تسک X را می‌زند
+۲. کاربر B را انتخاب می‌کند
+۳. تسک Y از لیست تسک‌های کاربر B انتخاب می‌شود
+۴. پیام اختیاری می‌نویسد
+۵. درخواست ایجاد می‌شود (Status = Pending)
+۶. به کاربر B اعلان داده می‌شود
+۷. کاربر B قبول یا رد می‌کند
+۸. اگر قبول → تسک X به B و تسک Y به A منتقل می‌شوند
+۹. اگر رد → درخواست لغو می‌شود
+
+قوانین امنیتی:
+- نمی‌توان با خودتان ترید کنید (Validation: RequesterUserId != TargetUserId)
+- تسک باید به شما تخصیص داده شده باشد (Validation: بررسی TaskAssignment)
+- نمی‌توان درخواست تکراری Pending برای یک تسک ایجاد کرد (Validation: عدم وجود درخواست Pending قبلی)
+- فقط دریافت‌کننده حق پاسخ دارد (Authorization: فقط TargetUserId می‌تواند Accept/Reject کند)
+- فقط فرستنده حق لغو درخواست را دارد (Authorization: فقط RequesterUserId می‌تواند Cancel کند)
+
+فایل‌ها:
+- Services/Implementations/TaskTradeService.cs
+- Services/Interfaces/ITaskTradeService.cs
+- Controllers/TaskTradeController.cs
+- Models/Entities/TaskTradeRequest.cs
+
+۳-۶-۱۰ تفصیل سیستم چت بلادرنگ
+چت بلادرنگ SmartTask با استفاده از SignalR پیاده‌سازی شده و قابلیت‌های متنوعی دارد.
+
+قابلیت‌های چت:
+۱. ارسال پیام متنی
+۲. ارسال فایل و تصویر
+۳. پاسخ به پیام (Reply)
+۴. ویرایش پیام
+۵. حذف پیام
+۶. واکنش‌های ایموجی (Reaction)
+۷. سنجاق کردن پیام (Pin)
+۸. ذکر کردن (@Mention)
+۹. وضعیت تایپ (Typing Indicator)
+۱۰. وضعیت آنلاین/آفلاین اعضا
+۱۱. Rate Limiting (۵ پیام در ۳ ثانیه)
+۱۲. Push Notification با Webpushr برای کاربران آفلاین
+
+ChatHub (Hubs/ChatHub.cs):
+- OnConnectedAsync: کاربر به گروه project-chat-{projectId} اضافه می‌شود
+- SendMessage: ارسال پیام جدید
+- EditMessage: ویرایش پیام
+- DeleteMessage: حذف پیام
+- AddReaction: اضافه کردن واکنش ایموجی
+- PinMessage: سنجاق کردن پیام
+- TypingIndicator: ارسال وضعیت تایپ
+
+PresenceTracker (Infrastructure/Services/PresenceTracker.cs):
+- یک Singleton Service که وضعیت آنلاین/آفلاین تمام کاربران را ردیابی می‌کند
+- از Dictionary<string, HashSet<string>> استفاده می‌کند (connectionId -> groups)
+
+فایل‌ها:
+- Hubs/ChatHub.cs
+- Services/Implementations/ChatService.cs
+- Infrastructure/Services/PresenceTracker.cs
+- Services/Implementations/WebpushrService.cs
+
+فصل چهارم (ادامه): تفصیل نتایج تست‌ها
+
+۴-۳-۱ تفصیل تست‌های TaskDependencyService
+تست‌های این سرویس شامل موارد زیر هستند:
+
+۱. testWouldCreateCycle_WhenDirectCycle_ReturnsTrue:
+   سناریو: تسک A به تسک B وابسته است و کاربر می‌خواهد تسک B را به تسک A وابسته کند
+   نتیجه مورد انتظار: ShouldCreateCycle = true
+
+۲. testWouldCreateCycle_WhenIndirectCycle_ReturnsTrue:
+   سناریو: A → B → C و کاربر می‌خواهد C → A اضافه کند
+   نتیجه مورد انتظار: ShouldCreateCycle = true
+
+۳. testWouldCreateCycle_WhenNoCycle_ReturnsFalse:
+   سناریو: A → B و کاربر می‌خواهد B → C اضافه کند
+   نتیجه مورد انتظار: ShouldCreateCycle = false
+
+۴. testGetImpactedTasks_WithChainDelay:
+   سناریو: A (تأخیر ۳ روز) → B (IsRequired) → C (IsRequired)
+   نتیجه مورد انتظار: B ۳ روز تأخیر، C ۶ روز تأخیر
+
+۵. testGetImpactedTasks_WithOptionalDependency:
+   سناریو: A (تأخیر ۳ روز) → B (

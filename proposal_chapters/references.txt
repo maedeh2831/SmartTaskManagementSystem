@@ -1,0 +1,57 @@
+فهرست منابع
+
+منابع انگلیسی:
+
+Acuña, S. T., Ampuero, M. A., & Baldoquín de la Peña, G. (2011). Formal model for assigning human resources to teams in software projects. Information and Software Technology, 53(3), 259-275. https://doi.org/10.1016/j.infsof.2010.11.011
+
+Bugayenko, Y., Bakare, A., Cheverda, A., Farina, M., Kruglov, A., Plaksin, Y., Pedrycz, W., & Succi, G. (2023). Prioritizing tasks in software development: A systematic literature review. PLOS ONE, 18(4), e0283838. https://doi.org/10.1371/journal.pone.0283838
+
+Butler, C. W., Vijayasarathy, L. R., & Roberts, N. (2020). Managing software development projects for success: Aligning plan- and agility-based approaches to project complexity and project dynamism. Project Management Journal, 51(3), 262-277. https://doi.org/10.1177/8756972819848251
+
+Cunha, A. C. R. da, Moura, H. P. de, & Vasconcellos, A. M. L. de. (2016). Decision-making in software project management: A systematic literature review. Procedia Computer Science, 100, 947-954. https://doi.org/10.1016/j.procs.2016.09.255
+
+Fatima, T., Azam, F., Anwar, M. W., & Rasheed, Y. (2020). A systematic review on software project scheduling and task assignment approaches. In Proceedings of the 6th International Conference on Computing and Artificial Intelligence (pp. 369-373). ACM. https://doi.org/10.1145/3404555.3404588
+
+Hartmann, S., & Briskorn, D. (2022). An updated survey of variants and extensions of the resource-constrained project scheduling problem. European Journal of Operational Research, 297(1), 1-14. https://doi.org/10.1016/j.ejor.2021.05.004
+
+Hou, X., Zhao, Y., Liu, Y., Yang, Z., Wang, K., Li, L., Luo, X., Lo, D., Grundy, J., & Wang, H. (2024). Large language models for software engineering: A systematic literature review. ACM Transactions on Software Engineering and Methodology, 33(8), Article 220. https://doi.org/10.1145/3695988
+
+Kang, D., Jung, J., & Bae, D.-H. (2011). Constraint-based human resource allocation in software projects. Software: Practice and Experience, 41(5), 551-577. https://doi.org/10.1002/spe.1030
+
+Masso, J. E., Pino, F. J., Pardo, C., García, F., & Piattini, M. (2020). Risk management in the software life cycle: A systematic literature review. Computer Standards & Interfaces, 71, 103431. https://doi.org/10.1016/j.csi.2020.103431
+
+Morcov, S., Pintelon, L., & Kusters, R. J. (2020). Definitions, characteristics and measures of IT project complexity: A systematic literature review. International Journal of Information Systems and Project Management, 8(2), 5-21. https://doi.org/10.12821/ijispm080201
+
+Otero, L. D., Centeno, G., Ruiz-Torres, A. J., & Otero, C. E. (2009). A systematic approach for resource allocation in software projects. Computers & Industrial Engineering, 56(4), 1333-1339. https://doi.org/10.1016/j.cie.2008.08.002
+
+Power, D. J. (2008). Decision support systems: A historical overview. In F. Burstein & C. W. Holsapple (Eds.), Handbook on Decision Support Systems 1 (pp. 121-140). Springer. https://doi.org/10.1007/978-3-540-48713-5_7
+
+Rajagopalan, J., & Srivastava, P. K. (2018). Introduction of a new metric "Project Health Index" (PHI) to successfully manage IT projects. Journal of Organizational Change Management, 31(2), 385-409. https://doi.org/10.1108/JOCM-12-2016-0301
+
+Rezende, A. V., Silva, L. M. A., Britto, A., & Amaral, R. (2019). Software project scheduling problem in the context of search-based software engineering: A systematic review. Journal of Systems and Software, 155, 43-56. https://doi.org/10.1016/j.jss.2019.05.024
+
+Schwaber, K., & Sutherland, J. (2020). The Scrum Guide: The Definitive Guide to Scrum: The Rules of the Game. Scrum.org.
+
+Tavares, B. G., da Silva, C. E. S., & de Souza, A. D. (2019). Risk management analysis in Scrum software projects. International Transactions in Operational Research, 26, 1884-1905. https://doi.org/10.1111/itor.12401
+
+منابع فارسی و مستندات:
+
+Atlassian. (2024). Jira Advanced Roadmaps - Dependencies, capacity and planning. https://www.atlassian.com/software/jira
+
+Asana. (2024). Workload and task dependencies documentation. https://asana.com/product/workload
+
+Microsoft. (2024). Planner - Advanced capabilities, dependencies, timeline and workload. https://www.microsoft.com/en-us/microsoft-365/project
+
+GitHub. (2024). GitHub Projects and Issues documentation. https://docs.github.com/en/issues
+
+Microsoft. (2024). ASP.NET Core documentation. https://learn.microsoft.com/en-us/aspnet/core/
+
+Microsoft. (2024). SignalR documentation. https://learn.microsoft.com/en-us/aspnet/core/signalr/introduction
+
+Microsoft. (2024). Entity Framework Core documentation. https://learn.microsoft.com/en-us/ef/core/
+
+LM Studio. (2024). LM Studio documentation. https://lmstudio.ai/
+
+QuestPDF. (2024). QuestPDF documentation. https://www.questpdf.com/
+
+Webpushr. (2024). Webpushr Push Notification API documentation. https://webpushr.com/

@@ -1,0 +1,11 @@
+Abstract
+
+Research Motivation: Task management in software projects is one of the most challenging aspects of project management. Existing tools such as Jira, GitHub Projects, Asana, and Microsoft Planner, despite their extensive capabilities, lack intelligent automated analysis features. Project managers are forced to manually manage team workload, task dependencies, prioritization, and delay risks based on experience. This problem leads to delays, burnout, and incorrect decision-making, especially in complex projects with numerous tasks and multiple team members.
+
+Research Method: In this project, an intelligent agile task management system named SmartTask has been designed and implemented. The system is developed using ASP.NET Core 8.0 framework, SQL Server database, SignalR for real-time communication, and the Qwen3-4B AI model (via LM Studio). A layered architecture with Generic Repository and Unit of Work patterns, along with unit tests using xUnit, has been implemented.
+
+Findings and Results: SmartTask features 11 main innovations: (1) AI-powered intelligent task breakdown, (2) Offroad section for tasks outside the formal project scope, (3) automatic team workload analysis, (4) chain impact analysis of task dependencies using BFS algorithm, (5) automatic deadline extension for dependent tasks, (6) smart prioritization based on a composite scoring algorithm, (7) project delay risk prediction, (8) project health score, (9) AI-powered sprint report generation, (10) task trading system between team members, and (11) real-time chat and instant notifications. Unit tests were executed with 60 tests and a 100% success rate. Comparison with similar tools shows that SmartTask provides capabilities in 13 out of 18 comparison criteria that are not available in any existing tool.
+
+Conclusion: SmartTask fills the existing gaps in task management tools by combining analytical algorithms with artificial intelligence, providing a more comprehensive and intelligent tool for software project management. Current limitations include AI server dependency and limited scalability, which can be addressed in future work.
+
+Keywords: Agile Task Management, Artificial Intelligence, Workload Analysis, Task Dependencies, Delay Risk Prediction, Project Health Score, ASP.NET Core, SignalR
