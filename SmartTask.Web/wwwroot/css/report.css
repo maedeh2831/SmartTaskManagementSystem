@@ -250,6 +250,7 @@
 .report-export-actions {
     display: flex;
     gap: 10px;
+    justify-content: end;
     margin-top: 20px;
 }
 
