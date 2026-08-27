@@ -30,7 +30,7 @@ public class AiClientService : IAiClientService
             model = _settings.Model,
             temperature,
             reasoning_effort = "none",
-            max_tokens = 400,
+            max_tokens = 1024,
             stop = new[] { "```" },
             messages = new object[]
             {

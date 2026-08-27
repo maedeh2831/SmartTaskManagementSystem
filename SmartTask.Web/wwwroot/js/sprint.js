@@ -369,23 +369,22 @@ function initSprintPreview(scope) {
 // ===== Sprint Report Functions =====
 function loadSprintReports(sprintId) {
     const container = document.getElementById("sprintReportList");
-    if (!container) return;
-
-    fetch(`/SprintReport/List?sprintId=${sprintId}`)
+    if (!container) return;        fetch(`/SprintReport/GetReports?sprintId=${sprintId}`)
         .then(r => r.json())
         .then(data => {
-            if (data.length === 0) {
+            const reports = data.reports || [];
+            if (reports.length === 0) {
                 container.innerHTML = '<div class="team-empty-text">هنوز گزارشی تولید نشده است.</div>';
             } else {
-                container.innerHTML = data.map(report => `
-                    <div class="sprint-report-card">
+                container.innerHTML = reports.map(report => `
+                    <div class="sprint-report-card p-3 mb-2">
                         <div class="sprint-report-header">
                             <i class="fa-solid fa-file-lines"></i>
-                            <span>${report.title}</span>
-                            <small>${report.createDate}</small>
+                            <span>${report.generatedByName || "—"}</span>
+                            <small>${new Date(report.generatedDate).toLocaleDateString("fa-IR")}</small>
                         </div>
                         <div class="sprint-report-body">
-                            ${report.summary || "—"}
+                            ${report.content || "—"}
                         </div>
                     </div>
                 `).join("");
@@ -403,7 +402,17 @@ function generateSprintReport(sprintId) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...';
 
-    fetch(`/SprintReport/Generate?sprintId=${sprintId}`, { method: "POST" })
+    const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenEl ? tokenEl.value : "";
+
+    fetch("/SprintReport/Generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "RequestVerificationToken": token
+        },
+        body: "sprintId=" + sprintId + "&__RequestVerificationToken=" + encodeURIComponent(token)
+    })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
@@ -414,7 +423,7 @@ function generateSprintReport(sprintId) {
             }
         })
         .catch(() => {
-            showError("خطا در تولید گزارش");
+            showError("خطا در ارتباط با سرور");
         })
         .finally(() => {
             btn.disabled = false;
