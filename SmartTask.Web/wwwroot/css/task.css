@@ -1712,6 +1712,24 @@ body.task-modal-open {
     }
 
 
+.trade-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    color: var(--gray400);
+    font-size: 12px;
+}
+
+    .trade-divider::before,
+    .trade-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border-color, #E2E8F0);
+    }
+
+
 /* SUBTASK / CHECKLIST */
 
 .subtask-progress-text {
