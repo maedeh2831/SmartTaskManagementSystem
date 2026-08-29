@@ -1,0 +1,175 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: Tahoma, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #000; direction: rtl; text-align: right; margin: 2cm; }
+h1 { font-size: 14pt; text-align: center; margin-bottom: 5px; }
+h2 { font-size: 12pt; margin-top: 20px; margin-bottom: 5px; }
+h3 { font-size: 11pt; margin-top: 12px; margin-bottom: 3px; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 10pt; }
+th { border: 1px solid #000; padding: 4px 8px; text-align: center; background: #eee; }
+td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; }
+p { margin: 4px 0; }
+ul { margin: 3px 0; padding-right: 15px; }
+li { margin: 2px 0; }
+hr { border: none; border-top: 1px solid #000; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<h1>گزارش مقایسه وضعیت پیاده‌سازی پروژه با پیشنهادات استاد راهنما</h1>
+<p style="text-align:center">عنوان پروژه: طراحی و پیاده‌سازی سامانه تصمیم‌یار هوشمند مدیریت وظایف و پروژه مبتنی بر تحلیل داده‌های پروژه</p>
+<p style="text-align:center">دانشجو: مائده اسلامی | تاریخ: مرداد ۱۴۰۵</p>
+<hr>
+
+<h2>۱. خلاصه وضعیت کلی</h2>
+
+<table>
+<tr><th>قابلیت</th><th>پیشنهاد استاد</th><th>وضعیت</th><th>درصد</th></tr>
+<tr><td>پیش‌بینی تأخیر وظایف</td><td>سیستم با داده‌های پروژه احتمال تأخیر را پیش‌بینی کند</td><td>پیاده‌سازی شده (DelayRiskService)</td><td>۸۰٪</td></tr>
+<tr><td>پیشنهاد اولویت وظایف</td><td>امتیاز اولویت ترکیبی = f(مهلت, اهمیت, وابستگی, ریسک, بارکاری)</td><td>پیاده‌سازی شده (PriorityEngineService)</td><td>۱۰۰٪</td></tr>
+<tr><td>تشخیص ریسک پروژه</td><td>هشدار هوشمند درباره تأخیر و ریسک</td><td>پیاده‌سازی شده (DelayRisk + Health + AI Narrative)</td><td>۹۰٪</td></tr>
+<tr><td>پیشنهاد توزیع وظایف</td><td>تخصیص بر اساس مهارت, ظرفیت, حجم کار</td><td>جزئی (Workload + Trading بدون Skill)</td><td>۴۰٪</td></tr>
+<tr><td>توضیح‌پذیری تصمیمات</td><td>دلیل ریسک + پیشنهاد مشخص</td><td>پیاده‌سازی شده (AI Narrative)</td><td>۱۰۰٪</td></tr>
+<tr><td>یادگیری ماشین</td><td>Decision Tree, Random Forest, Logistic Regression</td><td>فقط Rule-Based + LLM</td><td>۳۰٪</td></tr>
+<tr><td>Benchmark مدل‌ها</td><td>Accuracy, Precision, Recall, F1-score</td><td>ندارد</td><td>۰٪</td></tr>
+<tr><td>پرسشنامه کاربران</td><td>ارزیابی کاربردپذیری</td><td>ندارد</td><td>۰٪</td></tr>
+<tr><td>داشبورد و نمودارها</td><td>وضعیت کلی, وظایف در معرض خطر, پیشنهادها</td><td>پیاده‌سازی شده (Burndown + Velocity + Health)</td><td>۹۰٪</td></tr>
+</table>
+
+<p><strong>نتیجه کلی:</strong> پروژه تقریباً ۷۰٪ از پیشنهادات استاد را پوشش داده. بخش‌های اصلی هوشمندسازی (پیش‌بینی تأخیر, اولویت‌بندی, ریسک, توضیح‌پذیری) کامل هستند. بخش‌های خالی: یادگیری ماشین واقعی, Benchmark و پرسشنامه ارزیابی.</p>
+
+<hr>
+
+<h2>۲. عنوان پروژه</h2>
+<p><strong>عنوان فعلی:</strong> «طراحی و پیاده‌سازی سامانه تصمیم‌یار هوشمند مدیریت وظایف و پروژه مبتنی بر تحلیل داده‌های پروژه»</p>
+<p><strong>پیشنهاد ۱ ChatGPT:</strong> «...با قابلیت پیش‌بینی تأخیر و ارائه پیشنهاد مبتنی بر تحلیل داده‌ها» → مناسب وضعیت فعلی</p>
+<p><strong>پیشنهاد ۲ ChatGPT:</strong> «...مبتنی بر تحلیل داده و یادگیری ماشین» → نیاز به ML دارد</p>
+<p><strong>تحلیل:</strong> پیشنهاد ۱ مناسب‌تر است چون ML واقعی نداریم. اگر ML اضافه شود پیشنهاد ۲ قابل‌دفاع‌تر است.</p>
+
+<hr>
+
+<h2>۳. قابلیت‌های هوشمند - جزئیات و فرمول‌ها</h2>
+
+<h3>۳.۱. پیش‌بینی تأخیر (DelayRiskService.cs)</h3>
+<p>امتیاز ریسک ۰ تا ۱۰۰ با ۴ شاخص وزنی:</p>
+<table>
+<tr><th>شاخص</th><th>وزن</th><th>فرمول</th></tr>
+<tr><td>نسبت تسک‌های عقب‌افتاده</td><td>۴۰٪</td><td>(تعداد overdue / کل باز) × 40</td></tr>
+<tr><td>نسبت اعضای اضافه‌بار</td><td>۳۰٪</td><td>(تعداد overloaded / کل اعضا) × 30</td></tr>
+<tr><td>زنجیره‌های پرریسک وابستگی</td><td>۲۰٪</td><td>min(تعداد زنجیره‌ها × 4, 20)</td></tr>
+<tr><td>فراوانی Cascade اخیر</td><td>۱۰٪</td><td>min(تعداد cascade ۷ روز اخیر × 2, 10)</td></tr>
+<tr><td colspan="2">مجموع</td><td>min(مجموع ۴ شاخص, 100)</td></tr>
+</table>
+<p>سطوح: ۰-۲۵ کم | ۲۶-۵۰ متوسط | ۵۱-۷۵ بالا | ۷۶-۱۰۰ بحرانی</p>
+<p><strong>توضیح‌پذیری:</strong> با کلیک روی دکمه «تحلیل هوشمند»، LM Studio (Gemma) تحلیل متنی فارسی ۳-۴ جمله‌ای تولید می‌کند که دلایل ریسک را به زبان ساده توضیح می‌دهد.</p>
+
+<h3>۳.۲. اولویت‌بندی هوشمند (PriorityEngineService.cs)</h3>
+<p>امتیاز اولویت = فوریت زمانی + تأثیر وابستگی + ریسک بارکاری</p>
+<table>
+<tr><th>عامل</th><th>وزن</th><th>شرایط</th></tr>
+<tr><td>فوریت زمانی</td><td>۴۰</td><td>overdue=40, ≤۳روز=30, ≤۷روز=20, درغیر=5</td></tr>
+<tr><td>تأثیر وابستگی</td><td>۳۰</td><td>تعداد تسک‌های downstream × 10, حداکثر 30</td></tr>
+<tr><td>ریسک بارکاری</td><td>۳۰</td><td>>100% ظرفیت=30, ≥80%=20, درغیر=5</td></tr>
+</table>
+<p>دقیقاً همان فرمولی که ChatGPT پیشنهاد داد: Priority Score = f(Deadline, Importance, Dependencies, Risk, Workload). مدیر با یک کلیک اولویت پیشنهادی را اعمال می‌کند.</p>
+
+<h3>۳.۳. سلامت پروژه (ProjectHealthService.cs)</h3>
+<p>امتیاز ترکیبی ۰ تا ۱۰۰ از ۴ زیرشاخص:</p>
+<table>
+<tr><th>زیرشاخص</th><th>وزن</th><th>منطق</th></tr>
+<tr><td>سلامت زمان‌بندی</td><td>۳۰٪</td><td>بدون overdue=30, درغیر=30×(1-نسبت overdue)</td></tr>
+<tr><td>سلامت بارکاری</td><td>۲۵٪</td><td>بدون overloaded=25, درغیر=25×(1-نسبت overloaded)</td></tr>
+<tr><td>سلامت وابستگی‌ها</td><td>۲۰٪</td><td>بدون زنجیره پرریسک=20, درغیر=20×(1-نسبت مشکل‌دار)</td></tr>
+<tr><td>پیشرفت واقعی</td><td>۲۵٪</td><td>25×(پیشرفت واقعی / پیشرفت زمانی)</td></tr>
+</table>
+
+<h3>۳.۴. تحلیل بارکاری (WorkloadAnalysisService.cs)</h3>
+<p>اشغال ظرفیت هر عضو = مجموع (ساعت تخمینی تسک‌ها ÷ تعداد اعضای تخصیص‌یافته) ÷ ظرفیت هفتگی × ۱۰۰</p>
+<p>سطوح: under (زیر ۸۰٪) | balanced (۸۰-۱۰۰٪) | overloaded (بالای ۱۰۰٪)</p>
+<p>نمایش دوگانه: بارکاری کل پروژه + بارکاری اسپرینت فعال</p>
+
+<h3>۳.۵. نمودارها (AgileDashboard)</h3>
+<p><strong>Burndown:</strong> خط ایده‌آل = TotalPoints - (TotalPoints / کل روزها × روز سپری‌شده). خط واقعی = TotalPoints - مجموع SP تکمیل‌شده تا آن روز. فقط تا روز جاری نمایش داده می‌شود.</p>
+<p><strong>Velocity:</strong> PlannedPoints = مجموع SP کل اسپرینت. CompletedPoints = مجموع SP فقط Done. فقط اسپرینت‌های Completed, حداکثر ۶ تای آخر.</p>
+
+<hr>
+
+<h2>۴. روش هوشمندسازی</h2>
+<p>ChatGPT سیستم ترکیبی Rule-Based + ML پیشنهاد داده بود.</p>
+<table>
+<tr><th>روش</th><th>وضعیت</th><th>توضیح</th></tr>
+<tr><td>Rule-Based</td><td>پیاده‌سازی شده</td><td>PriorityEngine + DelayRisk + Workload</td></tr>
+<tr><td>LLM (هوش مصنوعی مولد)</td><td>پیاده‌سازی شده</td><td>LM Studio / Gemma برای تحلیل متنی و تجزیه تسک</td></tr>
+<tr><td>Decision Tree / Random Forest</td><td>ندارد</td><td>نیاز به ML.NET و داده آموزشی</td></tr>
+<tr><td>K-Means Clustering</td><td>ندارد</td><td>خوشه‌بندی الگوهای پروژه</td></tr>
+</table>
+<p><strong>تحلیل:</strong> پروژه از Rule-Based + LLM استفاده کرده که از نظر کاربردی مشابه پیشنهاد استاد است. اگر استاد روی ML اصرار داشته باشد باید حداقل یک مدل مثل Decision Tree اضافه شود.</p>
+
+<hr>
+
+<h2>۵. تصمیم‌یار vs پیش‌بینی‌کننده</h2>
+<p>ChatGPT تأکید کرده حتماً «تصمیم‌یار» را از «پیش‌بینی‌کننده» جدا کنید.</p>
+<p><strong>فقط پیش‌بینی:</strong> «این وظیفه احتمالاً با تأخیر انجام می‌شود.»</p>
+<p><strong>تصمیم‌یار (SmartTask):</strong> «این وظیفه احتمالاً با تأخیر انجام می‌شود؛ زیرا حجم کار مسئول زیاد است و وابستگی‌های آن تکمیل نشده‌اند. پیشنهاد: افزایش اولویت، تخصیص منابع بیشتر.»</p>
+<p>وضعیت: <strong>پیاده‌سازی شده</strong> — AI Narrative در DelayRisk دقیقاً همین کار را انجام می‌دهد.</p>
+
+<hr>
+
+<h2>۶. مسئله داده</h2>
+<table>
+<tr><th>نوع داده</th><th>وضعیت</th></tr>
+<tr><td>داده واقعی پروژه (کاربران, تسک‌ها)</td><td>موجود در دیتابیس SQL Server</td></tr>
+<tr><td>داده تاریخی (WorkloadHistory)</td><td>جزئی — سابقه تأخیرها ندارد</td></tr>
+<tr><td>داده عمومی (Public Dataset)</td><td>ندارد — برای مقایسه مدل‌ها نیاز است</td></tr>
+</table>
+<p><strong>پیشنهاد:</strong> برای ارزیابی ML از مجموعه داده JKLM (واقعی Jira) استفاده شود.</p>
+
+<hr>
+
+<h2>۷. موارد ضروری</h2>
+<table>
+<tr><th>موارد</th><th>وضعیت</th></tr>
+<tr><td>تعریف دقیق مسئله پژوهش (قابل‌اندازه‌گیری)</td><td>تعریف شده</td></tr>
+<tr><td>معیار ارزیابی مشخص</td><td>جزئی — Unit Test دارد, ML Benchmark ندارد</td></tr>
+<tr><td>توضیح‌پذیری (Explainability)</td><td>کاملاً پیاده‌سازی شده</td></tr>
+<tr><td>محدود نگه‌داشتن Scope</td><td>مناسب — DelayRisk + PriorityEngine + AI Narrative</td></tr>
+<tr><td>پرسشنامه ارزیابی کاربران</td><td>ندارد</td></tr>
+<tr><td>مقایسه با سامانه‌های مشابه (Jira, Trello)</td><td>نیاز به تقویت</td></tr>
+</table>
+
+<hr>
+
+<h2>۸. نوآوری‌های فراتر از پیشنهاد</h2>
+<p>این قابلیت‌ها در پیشنهادات ChatGPT نبودند ولی در پروژه پیاده‌سازی شده‌اند:</p>
+<ul>
+<li><strong>Overdue Auto-Cascade:</strong> سرویس پس‌زمینه خودکار که تأخیر تسک‌ها را به تسک‌های وابسته منتقل می‌کند</li>
+<li><strong>Offroad Tasks:</strong> فضای جداگانه برای کارهای خارج از دامنه رسمی پروژه</li>
+<li><strong>Task Trading:</strong> سیستم درخواست و تأییدیه مبادله تسک بین اعضا</li>
+<li><strong>AI Sprint Report:</strong> تولید خودکار گزارش پایان اسپرینت با LLM</li>
+<li><strong>AI Task Breakdown:</strong> تجزیه هوشمند تسک‌ها به زیروظایف</li>
+<li><strong>Dependency Graph:</strong> نمای بصری گراف وابستگی‌ها</li>
+</ul>
+
+<hr>
+
+<h2>۹. اقدامات پیشنهادی</h2>
+<table>
+<tr><th>اولویت</th><th>اقدام</th><th>توضیح</th></tr>
+<tr><td>بالا</td><td>تقویت فصل ۲ با جدول مقایسه Jira/Trello/Asana</td><td> ChatGPT تأکید کرده مقایسه با سامانه‌های مشابه ضروری است</td></tr>
+<tr><td>بالا</td><td>افزودن شماتیک معماری</td><td>استاد تأکید کرده شماتیک معماری در فصل ۳ ضروری است</td></tr>
+<tr><td>متوسط</td><td>نوشتن فصل ۴ (پیاده‌سازی و ارزیابی)</td><td>فناوری‌ها + نحوه پیاده‌سازی + نتایج</td></tr>
+<tr><td>متوسط</td><td>نوشتن فصل ۵ (نتیجه‌گیری)</td><td>جمع‌بندی + محدودیت‌ها + کارهای آینده</td></tr>
+<tr><td>اختیاری</td><td>افزودن ML (Decision Tree)</td><td>فقط اگر استاد اصرار کند</td></tr>
+<tr><td>اختیاری</td><td>پرسشنامه ارزیابی کاربران</td><td>ارزش پایان‌نامه را بالا می‌برد</td></tr>
+<tr><td>اختیاری</td><td>افزودن Skill Matching</td><td>تخصیص تسک بر اساس مهارت اعضا</td></tr>
+</table>
+
+<hr>
+
+<h2>۱۰. جمع‌بندی</h2>
+<p>پروژه SmartTask از نظر پیاده‌سازی قابلیت‌های هوشمند، تقریباً ۷۰٪ از پیشنهادات ChatGPT را پوشش داده. بخش‌های اصلی تصمیم‌یار (پیش‌بینی تأخیر, اولویت‌بندی, ریسک, توضیح‌پذیری) کاملاً پیاده‌سازی شده. سه بخش خالی اصلی: یادگیری ماشین واقعی, Benchmark و پرسشنامه هستند که اضافه کردنشان انتخابی است و به تصمیم استاد بستگی دارد.</p>
+<p>چهار قابلیت نوآوری خالص (Overdue Cascade, Offroad, Task Trading, AI Narrative) فراتر از پیشنهادات ChatGPT هستند و ارزش علمی پروژه را بالا می‌برند.</p>
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>SmartTask - جزوه جامع پروژه کارشناسی</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Vazirmatn', 'Tahoma', sans-serif; direction: rtl; line-height: 1.9; color: #1a1a2e; background: #fff; padding: 40px 60px; font-size: 13px; }
+h1 { font-size: 28px; font-weight: 900; color: #4F46E5; border-bottom: 3px solid #4F46E5; padding-bottom: 12px; margin: 30px 0 20px 0; page-break-after: avoid; }
+h2 { font-size: 22px; font-weight: 800; color: #1e293b; border-right: 5px solid #4F46E5; padding-right: 15px; margin: 28px 0 16px 0; page-break-after: avoid; }
+h3 { font-size: 17px; font-weight: 700; color: #334155; margin: 20px 0 12px 0; page-break-after: avoid; }
+h4 { font-size: 14px; font-weight: 700; color: #475569; margin: 16px 0 8px 0; }
+p { margin: 8px 0; text-align: justify; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; page-break-inside: avoid; }
+th { background: #4F46E5; color: #fff; padding: 10px 14px; text-align: right; font-weight: 600; }
+td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; }
+tr:nth-child(even) { background: #f8fafc; }
+code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; direction: ltr; display: inline-block; }
+pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 11px; direction: ltr; text-align: left; margin: 12px 0; white-space: pre-wrap; page-break-inside: avoid; }
+pre code { background: none; padding: 0; color: inherit; }
+blockquote { border-right: 4px solid #4F46E5; background: #f0f0ff; padding: 12px 20px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+strong { color: #1e293b; }
+hr { border: none; border-top: 2px solid #e2e8f0; margin: 24px 0; }
+ul, ol { padding-right: 24px; margin: 8px 0; }
+li { margin: 4px 0; }
+.header-block { text-align: center; background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 40px; border-radius: 16px; margin-bottom: 30px; }
+.header-block h1 { color: white; border-bottom: 3px solid rgba(255,255,255,0.3); font-size: 32px; }
+.header-block p { color: rgba(255,255,255,0.9); text-align: center; }
+.toc { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 30px; margin: 20px 0; }
+.toc a { color: #4F46E5; text-decoration: none; }
+.novation-box { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 16px 20px; margin: 12px 0; page-break-inside: avoid; }
+.novation-box h3 { color: #a16207; margin-top: 0; }
+.faq-box { background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 16px 20px; margin: 12px 0; page-break-inside: avoid; }
+.faq-box h4 { color: #15803d; }
+@page { size: A4; margin: 20mm 15mm; }
+@media print { body { padding: 0; } .header-block { break-after: page; } h2 { break-after: avoid; } }
+</style>
+</head>
+<body>
+
+<div class="header-block">
+<h1>SmartTask</h1>
+<h1 style="font-size:22px; border:none; margin-top:8px;">سامانه مدیریت هوشمند وظایف چابک</h1>
+<hr style="border-color:rgba(255,255,255,0.3); margin:16px auto; width:60%;">
+<p><strong>نوع پروژه:</strong> پایان‌نامه کارشناسی</p>
+<p><strong>تکنولوژی اصلی:</strong> ASP.NET Core 8.0 MVC | SQL Server | SignalR | AI (Qwen3-4B)</p>
+<p><strong>روش‌شناسی:</strong> Agile / Scrum</p>
+</div>
+
+<div class="toc">
+<h2 style="border:none; padding:0; margin-top:0;">فهرست مطالب</h2>
+<p>۱. نمای کلی پروژه &nbsp;|&nbsp; ۲. معماری و زیرساخت فنی &nbsp;|&nbsp; ۳. لایه‌بندی معماری &nbsp;|&nbsp; ۴. موجودیت‌های داده‌ای &nbsp;|&nbsp; ۵. فیچرهای پایه‌ای &nbsp;|&nbsp; ۶. یازده نواوری اصلی &nbsp;|&nbsp; ۷. تکنولوژی‌ها و چرایی استفاده &nbsp;|&nbsp; ۸. فایل‌ساختار &nbsp;|&nbsp; ۹. تست‌ها &nbsp;|&nbsp; ۱۰. پرسش‌های متداول</p>
+</div>
+
+<!-- SECTION 1 -->
+<h1>۱. نمای کلی پروژه</h1>
+
+<h2>SmartTask چیست؟</h2>
+<p>SmartTask یک سامانه وب‌محور مدیریت وظایف چابک (Agile Task Management) است که بر اساس روش‌شناسی Scrum طراحی شده. هدف اصلی پروژه این است که فراتر از ابزارهای ساده مدیریت تسک، ابزارهای هوشمند و خودکاری در اختیار مدیران پروژه و اعضای تیم قرار دهد.</p>
+
+<h3>اهداف کلیدی</h3>
+<ul>
+<li><strong>تحلیل خودکار بار کاری اعضا</strong> بر اساس ساعت تخمینی و ظرفیت هفتگی</li>
+<li><strong>شناسایی وابستگی بین وظایف</strong> و محاسبه زنجیره تأثیر تأخیرها</li>
+<li><strong>اولویت‌بندی هوشمند</strong> با الگوریتم امتیازدهی (نه فقط حس مدیر)</li>
+<li><strong>پیش‌بینی ریسک تأخیر</strong> و نمایش بصری وضعیت پروژه</li>
+<li><strong>گزارش‌گیری AI</strong> در پایان هر اسپرینت</li>
+<li><strong>تجزیه وظایف با AI</strong> برای کمک به اعضای کم‌تجربه</li>
+<li><strong>مبادله تسک</strong> بین اعضا با سیستم درخواست و تأییدیه</li>
+<li><strong>ثبت کارهای فوری خارج از دامنه</strong> (آفرود) بدون آسیب به ساختار رسمی</li>
+</ul>
+
+<h3>مخاطبان سامانه</h3>
+<table>
+<tr><th>نقش</th><th>دسترسی</th></tr>
+<tr><td><strong>Admin</strong></td><td>مدیریت کل سامانه، کاربران، داشبورد ادمین</td></tr>
+<tr><td><strong>ProjectManager</strong></td><td>مدیریت پروژه‌ها، اسپرینت‌ها، تیم‌ها، مشاهده تحلیل‌ها</td></tr>
+<tr><td><strong>Member</strong></td><td>ثبت وظایف، ترید تسک، مشاهده داشبورد</td></tr>
+</table>
+
+<h3>ساختار سازمانی سامانه</h3>
+<pre><code>Workspace (فضای کاری)
+  └── Project (پروژه)
+        ├── Backlog (بک‌لاگ)
+        │     └── UserStory (داستان کاربری)
+        │           └── TaskItem (وظیفه اجرایی)
+        │                 ├── SubTaskItem (زیروظیفه)
+        │                 ├── TaskAssignment (تخصیص به عضو)
+        │                 ├── TaskDependency (وابستگی)
+        │                 ├── Comment, Attachment, Checklist, Label, TimeLog
+        ├── Sprint (اسپرینت)
+        ├── OffroadTask (کارهای آفرود)
+        ├── TaskTradeRequest (درخواست ترید)
+        └── ProjectMember (اعضای پروژه)</code></pre>
+
+<!-- SECTION 2 -->
+<h1>۲. معماری و زیرساخت فنی</h1>
+
+<h2>تکنولوژی‌های استفاده‌شده</h2>
+<table>
+<tr><th>لایه</th><th>تکنولوژی</th><th>نسخه</th></tr>
+<tr><td>Framework</td><td>ASP.NET Core MVC</td><td>8.0</td></tr>
+<tr><td>ORM</td><td>Entity Framework Core</td><td>8.0.28</td></tr>
+<tr><td>Authentication</td><td>ASP.NET Core Identity</td><td>8.0.8</td></tr>
+<tr><td>Real-time</td><td>SignalR</td><td>built-in</td></tr>
+<tr><td>Database</td><td>Microsoft SQL Server</td><td>-</td></tr>
+<tr><td>PDF</td><td>QuestPDF</td><td>2026.7.2</td></tr>
+<tr><td>Excel</td><td>ClosedXML</td><td>0.105.1</td></tr>
+<tr><td>AI</td><td>OpenAI-compatible API (LM Studio + Qwen3-4B)</td><td>-</td></tr>
+<tr><td>Email</td><td>System.Net.Mail (SMTP)</td><td>-</td></tr>
+<tr><td>Push Notification</td><td>Webpushr</td><td>API v1</td></tr>
+<tr><td>Testing</td><td>xUnit + Moq + EF InMemory</td><td>-</td></tr>
+</table>
+
+<h3>چرا ASP.NET Core 8.0؟</h3>
+<ul>
+<li><strong>عملکرد بالا:</strong> Kestrel web server بهینه‌شده</li>
+<li><strong>Dependency Injection</strong> داخلی و قدرتمند</li>
+<li><strong>SignalR</strong> برای ارتباط بلادرنگ (Real-time)</li>
+<li><strong>Entity Framework Core</strong> برای ORM قدرتمند</li>
+<li><strong>پشتیبانی عالی از Identity</strong> برای احراز هویت و نقش‌ها</li>
+</ul>
+
+<h3>چرا SignalR؟</h3>
+<p><strong>SignalR چیست؟</strong> SignalR یک کتابخانه مایکروسافت برای اضافه کردن قابلیت ارتباط بلادرنگ (Real-time) به اپلیکیشن‌های وب است. به جای رفرش مداوم صفحه، سرور خودش پیام را فوراً به مرورگر می‌فرستد.</p>
+<p><strong>چرا در SmartTask استفاده شد؟</strong></p>
+<ol>
+<li><strong>اعلان‌های فوری:</strong> وقتی Task جدیدی تخصیص داده شود، اعلان فوراً به کاربر می‌رسد</li>
+<li><strong>پیام‌رسانی گروهی چت:</strong> چت پروژه بدون رفرش صفحه کار می‌کند</li>
+<li><strong>وضعیت آنلاین/آفلاین:</strong> نشان دادن اینکه کی آنلاین است</li>
+<li><strong>تایپ کردن:</strong> نشان دادن «...در حال تایپ» به سایرین</li>
+</ol>
+<p><strong>کجا در پروژه استفاده شد؟</strong></p>
+<ul>
+<li><code>Hubs/NotificationHub.cs</code> — هاب اعلان‌ها</li>
+<li><code>Hubs/ChatHub.cs</code> — هاب چت گروهی پروژه‌ها</li>
+<li><code>Program.cs</code> — ثبت هاب‌ها: <code>app.MapHub&lt;NotificationHub&gt;("/hubs/notification")</code></li>
+<li><code>NotificationService.cs</code> — ارسال اعلان با <code>_hubContext.Clients.Group(...).SendAsync("ReceiveNotification", ...)</code></li>
+</ul>
+
+<!-- SECTION 3 -->
+<h1>۳. لایه‌بندی معماری</h1>
+<pre><code>┌─────────────────────────────────────┐
+│        Controllers (MVC)            │  ← لایه ارائه (Presentation)
+├─────────────────────────────────────┤
+│        Services (Implementations)   │  ← لایه منطق تجاری (Business Logic)
+├─────────────────────────────────────┤
+│        Infrastructure               │  ← Repository + UnitOfWork + BackgroundJobs
+├─────────────────────────────────────┤
+│        Data (DbContext + Config)    │  ← لایه دسترسی به داده (Data Access)
+├─────────────────────────────────────┤
+│        Models (Entities + Enums)    │  ← مدل‌های داده‌ای
+└─────────────────────────────────────┘</code></pre>
+
+<h3>BaseEntity — کلاس پایه تمام موجودیت‌ها</h3>
+<pre><code>// SmartTask.Web/Models/Entities/BaseEntity.cs
+public abstract class BaseEntity {
+    public int Id { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public string? ChangeUser { get; set; }
+    public DateTime? ChangeDate { get; set; }
+    public bool ViewState { get; set; } = true;  // Soft Delete
+}</code></pre>
+<p><strong>نکته مهم:</strong> فیلد <code>ViewState</code> برای <strong>Soft Delete</strong> استفاده می‌شود. رکوردها هرگز حذف فیزیکی نمی‌شوند و فقط <code>ViewState = false</code> می‌شوند.</p>
+
+<h3>Generic Repository + Unit of Work</h3>
+<p>الگوی <strong>Repository</strong> برای جلوگیری از تکرار کد دسترسی به دیتابیس و الگوی <strong>UnitOfWork</strong> برای تضمین ذخیره چند تغییر در یک تراکنش استفاده شده.</p>
+
+<!-- SECTION 4 -->
+<h1>۴. موجودیت‌های داده‌ای</h1>
+
+<table>
+<tr><th>موجودیت</th><th>فایل</th><th>توضیح</th></tr>
+<tr><td>ApplicationUser</td><td>Models/Entities/ApplicationUser.cs</td><td>کاربر با Identity، تنظیمات شخصی، ظرفیت کاری</td></tr>
+<tr><td>Project</td><td>Models/Entities/Project.cs</td><td>پروژه با وضعیت، اولویت، رنگ و آیکون</td></tr>
+<tr><td>Sprint</td><td>Models/Entities/Sprint.cs</td><td>اسپرینت با هدف، بازه زمانی، ظرفیت</td></tr>
+<tr><td>UserStory</td><td>Models/Entities/UserStory.cs</td><td>داستان کاربری با Story Point و Business Value</td></tr>
+<tr><td>TaskItem</td><td>Models/Entities/TaskItem.cs</td><td>وظیفه اجرایی با نوع، اولویت، وضعیت، ساعت تخمینی</td></tr>
+<tr><td>TaskDependency</td><td>Models/Entities/TaskDependency.cs</td><td>وابستگی بین دو Task (اجباری/اختیاری)</td></tr>
+<tr><td>OffroadTask</td><td>Models/Entities/OffroadTask.cs</td><td>کار آفرود خارج از دامنه رسمی</td></tr>
+<tr><td>TaskTradeRequest</td><td>Models/Entities/TaskTradeRequest.cs</td><td>درخواست مبادله/واگذاری تسک</td></tr>
+<tr><td>OverdueCascadeLog</td><td>Models/Entities/OverdueCascadeLog.cs</td><td>لاگ تمدید خودکار (جلوگیری از تکرار)</td></tr>
+<tr><td>SprintReport</td><td>Models/Entities/SprintReport.cs</td><td>گزارش هوشمند پایان اسپرینت</td></tr>
+<tr><td>Notification</td><td>Models/Entities/Notification.cs</td><td>اعلان با ۸ نوع مختلف</td></tr>
+</table>
+
+<!-- SECTION 5 -->
+<h1>۵. فیچرهای پایه‌ای سامانه</h1>
+
+<h3>احراز هویت و مدیریت نقش‌ها</h3>
+<p>فناوری: <strong>ASP.NET Core Identity</strong>. فایل‌ها: <code>AccountController.cs</code>, <code>RoleSeeder.cs</code>, <code>AdminSeeder.cs</code>. نقش‌ها: Admin, ProjectManager, Member. کوکی با نام <code>SmartTask</code> و انقضای ۷ روز.</p>
+
+<h3>چت گروهی پروژه</h3>
+<p>فایل‌ها: <code>ChatService.cs</code>, <code>ChatHub.cs</code>. پیام‌رسانی بلادرنگ با SignalR. قابلیت‌ها: ارسال فایل، Reply، ویرایش/حذف، Reaction ایموجی، Pin، @Mention، Typing Indicator، آنلاین/آفلاین، Rate Limiting (۵ پیام در ۳ ثانیه)، Push Notification با Webpushr.</p>
+
+<h3>سیستم اعلان</h3>
+<p>فایل‌ها: <code>NotificationService.cs</code>, <code>NotificationHub.cs</code>. ۸ نوع اعلان: System, Reminder, Assignment, Comment, Mention, Invitation, StatusChange, Deadline. اعلان‌های بلادرنگ با SignalR. تنظیمات شخصی اعلان‌ها.</p>
+
+<h3>یادآوری (Reminder)</h3>
+<p>فایل: <code>ReminderService.cs</code>. یادآوری دستی و خودکار. سرویس پس‌زمینه <code>ReminderBackgroundService</code> دوره‌ای یادآوری‌های ارسال‌نشده را بررسی می‌کند.</p>
+
+<h3>گزارش‌گیری</h3>
+<p>خروجی PDF با QuestPDF و Excel با ClosedXML. نمودار Burndown و Velocity.</p>
+
+<!-- SECTION 6 -->
+<h1>۶. نواوری‌های اصلی پروژه (۱۱ نواوری)</h1>
+<p style="background:#fef3c7; padding:12px; border-radius:8px; font-weight:600;">⚠️ این بخش مهم‌ترین بخش پروژه است. هر نواوری مشکل مشخصی را حل می‌کند و SmartTask را از ابزارهای ساده متمایز می‌کند.</p>
+
+<div class="novation-box">
+<h3>نواوری ۱: تجزیه هوشمند وظایف با هوش مصنوعی (AI Task Breakdown)</h3>
+<p><strong>مشکل:</strong> وقتی تسک پیچیده ثبت می‌شود، اعضای کم‌تجربه نمی‌دانند از کجا شروع کنند.</p>
+<p><strong>راه‌حل:</strong> با یک کلیک، AI تسک را به ۳-۷ زیروظیفه عملی تقسیم می‌کند.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>سرویس</td><td><code>TaskBreakdownService.cs</code></td></tr>
+<tr><td>رابط</td><td><code>ITaskBreakdownService.cs</code></td></tr>
+<tr><td>کنترلر</td><td><code>SubTaskController.cs</code></td></tr>
+<tr><td>مدل AI</td><td>Qwen3-4B</td></tr>
+<tr><td>آدرس API</td><td><code>http://92.246.145.99:1234/v1/chat/completions</code></td></tr>
+<tr><td>پرامپت</td><td><code>فقط JSON array از رشته فارسی (۳ تا ۷ آیتم، هرکدام حداکثر ۸ کلمه)</code></td></tr>
+<tr><td>Temperature</td><td>۰.۵</td></tr>
+</table>
+<p><strong>نحوه عملکرد:</strong> کاربر دکمه «تجزیه با هوش مصنوعی» را می‌زند → عنوان و توضیحات تسک به AI ارسال می‌شود → AI JSON array برمی‌گرداند → پاسخ پارس می‌شود (Fallback به متن ساده) → لیست زیروظایف نمایش داده می‌شود.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۲: بخش آفرود (Offroad Tasks)</h3>
+<p><strong>مشکل:</strong> کارهای فوری خارج از Sprint (مثلاً رفع باگ سرور) اگر در Backlog وارد شوند، ساختار Sprint را به‌هم می‌ریزند.</p>
+<p><strong>راه‌حل:</strong> فضای جداگانه «آفرود» بدون آسیب به ساختار رسمی.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>موجودیت</td><td><code>OffroadTask.cs</code></td></tr>
+<tr><td>سرویس</td><td><code>OffroadTaskService.cs</code></td></tr>
+<tr><td>کنترلر</td><td><code>OffroadController.cs</code></td></tr>
+<tr><td>وضعیت‌ها</td><td>ToDo, InProgress, Done, Cancelled</td></tr>
+<tr><td>اولویت‌ها</td><td>Low, Normal, High, Critical</td></tr>
+</table>
+<p><strong>مزیت نسبت به Jira/Trello:</strong> در Jira و Trello تسک خارج از Sprint باید در Backlog وارد شود. SmartTask با بخش آفرود این مشکل را حل کرده.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۳: تحلیل بارکاری اعضا (Workload Analysis)</h3>
+<p><strong>مشکل:</strong> مدیر پروژه نمی‌داند هر عضو چقدر بار کاری دارد.</p>
+<p><strong>راه‌حل:</strong> محاسبه خودکار درصد اشغال بر اساس ساعت تخمینی و ظرفیت هفتگی.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>سرویس</td><td><code>WorkloadAnalysisService.cs</code></td></tr>
+<tr><td>فرمول</td><td><code>درصد اشغال = (ساعات تخصیص‌یافته ÷ ظرفیت هفتگی) × ۱۰۰</code></td></tr>
+<tr><td>وضعیت‌ها</td><td><code>under</code> (&lt;80%), <code>balanced</code> (80-100%), <code>overloaded</code> (&gt;100%)</td></tr>
+<tr><td>محدوده</td><td>تحلیل کل پروژه + تحلیل اسپرینت فعال</td></tr>
+</table>
+<p><strong>بهینه‌سازی:</strong> از <code>ComputeAssignmentMap</code> برای جلوگیری از حلقه‌های O(n²) استفاده شده.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۴: تحلیل تأثیر وابستگی وظایف (Dependency Impact Analysis)</h3>
+<p><strong>مشکل:</strong> وقتی تسک A عقب بیفتد، مدیر باید دستی بررسی کند کدام تسک‌ها تحت تأثیرند.</p>
+<p><strong>راه‌حل:</strong> پیمایش خودکار گراف وابستگی با الگوریتم BFS.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>سرویس</td><td><code>TaskDependencyService.cs</code></td></tr>
+<tr><td>الگوریتم</td><td>BFS (جستجوی اول عرض) برای پیمایش گراف</td></tr>
+<tr><td>محافظت حلقوی</td><td><code>WouldCreateCycleAsync()</code> — BFS معکوس</td></tr>
+<tr><td>خروجی</td><td>لیست تسک‌های تأثیرپذیر با عمق و تاریخ پیش‌بینی‌شده</td></tr>
+</table>
+<p><strong>مثال:</strong> اگر Task A سه روز تأخیر داشته باشد → Task B (وابسته به A) +۳ روز → Task C (وابسته به B) +۳ روز</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۵: تمدید خودکار موعد وظایف وابسته (Overdue Auto-Cascade)</h3>
+<p><strong>مشکل:</strong> مدیر باید دستی موعد تمام تسک‌های وابسته را آپدیت کند.</p>
+<p><strong>راه‌حل:</strong> سرویس پس‌زمینه هر ۳۰ دقیقه تسک‌های عقب‌افتاده را شناسایی و تأخیر را خودکار منتقل می‌کند.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>سرویس</td><td><code>OverdueCascadeBackgroundService.cs</code></td></tr>
+<tr><td>لاگ</td><td><code>OverdueCascadeLog.cs</code></td></tr>
+<tr><td>فاصله اجرا</td><td>هر ۳۰ دقیقه</td></tr>
+<tr><td>نوع</td><td><code>BackgroundService</code> در ASP.NET Core</td></tr>
+</table>
+<p><strong>مکانیزم جلوگیری از تکرار:</strong> جدول <code>OverdueCascadeLog</code> ثبت می‌کند چند روز تأخیر اعمال شده. اگر تأخیر جدید بیشتر باشد، فقط مابه‌التفاوت اعمال می‌شود.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۶: اولویت‌بندی هوشمند وظایف (Smart Priority System)</h3>
+<p><strong>مشکل:</strong> اولویت‌ها معمولاً بر اساس حس مدیر تعیین می‌شوند.</p>
+<p><strong>راه‌حل:</strong> الگوریتم امتیازدهی با ترکیب سه عامل.</p>
+<table>
+<tr><th>عامل</th><th>وزن</th><th>منطق</th></tr>
+<tr><td>فوریت زمانی</td><td>۰-۴۰</td><td>موعد گذشته → ۴۰، امروز → ۴۰، هر روز کمتر</td></tr>
+<tr><td>تأثیر وابستگی</td><td>۰-۳۵</td><td>هر تسک وابسته اجباری +۷ (حداکثر ۳۵)</td></tr>
+<tr><td>ریسک بارکاری</td><td>۰-۲۵</td><td>&gt;100% اشغال → 25، 80-100% → 15</td></tr>
+</table>
+<p><strong>تبدیل امتیاز:</strong> 0-20=Lowest, 21-40=Low, 41-60=Medium, 61-80=High, 81-100=Highest</p>
+<p><strong>سرویس:</strong> <code>PriorityEngineService.cs</code>. قابلیت اعمال با یک کلیک.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۷: پیش‌بینی ریسک تأخیر پروژه (Delay Risk Prediction)</h3>
+<p><strong>مشکل:</strong> مدیر نمی‌داند پروژه چقدر در معرض تأخیر است.</p>
+<p><strong>راه‌حل:</strong> امتیاز ریسک ۰-۱۰۰ + تحلیل متنی AI.</p>
+<table>
+<tr><th>شاخص</th><th>حداکثر</th><th>منطق</th></tr>
+<tr><td>نسبت تسک‌های عقب‌افتاده</td><td>۴۰</td><td>(عقب‌افتاده ÷ کل باز) × 40</td></tr>
+<tr><td>نسبت اعضای اضافه‌بار</td><td>۳۰</td><td>(اضافه‌بار ÷ کل) × 30</td></tr>
+<tr><td>زنجیره‌های پرریسک</td><td>۲۰</td><td>تعداد × 4 (حداکثر ۲۰)</td></tr>
+<tr><td>تمدیدهای اخیر</td><td>۱۰</td><td>تعداد ۷ روز اخیر × 2 (حداکثر ۱۰)</td></tr>
+</table>
+<p><strong>سطوح:</strong> 0-25=کم(سبز), 26-50=متوسط(زرد), 51-75=بالا(نارنجی), 76-100=بحرانی(قرمز)</p>
+<p><strong>سرویس:</strong> <code>DelayRiskService.cs</code>. تحلیل متنی AI به زبان فارسی با لحن مشاور مدیریت.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۸: شاخص سلامت پروژه (Project Health Score)</h3>
+<p><strong>مشکل:</strong> فهمیدن وضعیت کلی پروژه نیازمند ورود به چندین صفحه است.</p>
+<p><strong>راه‌حل:</strong> یک عدد ترکیبی ۰-۱۰۰ با رنگ و نماد.</p>
+<table>
+<tr><th>زیرشاخص</th><th>وزن</th></tr>
+<tr><td>سلامت زمان‌بندی</td><td>۳۰٪</td></tr>
+<tr><td>سلامت بارکاری</td><td>۲۵٪</td></tr>
+<tr><td>سلامت وابستگی</td><td>۲۰٪</td></tr>
+<tr><td>درصد پیشرفت</td><td>۲۵٪</td></tr>
+</table>
+<p><strong>فرمول:</strong> <code>HealthScore = Schedule×0.30 + Workload×0.25 + Dependency×0.20 + Delivery×0.25</code></p>
+<p><strong>سطوح:</strong> ≥85=عالی😊, ≥70=خوب🙂, ≥50=نیازمند توجه😐, &lt;50=بحرانی☹️</p>
+<p><strong>سرویس:</strong> <code>ProjectHealthService.cs</code></p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۹: تولید گزارش هوشمند پایان اسپرینت (AI Sprint Report)</h3>
+<p><strong>مشکل:</strong> نوشتن گزارش پایان اسپرینت کاری زمان‌بر و تکراری است.</p>
+<p><strong>راه‌حل:</strong> AI با تحلیل آمار واقعی، گزارش روایی ۳-۵ جمله‌ای تولید می‌کند.</p>
+<p><strong>داده‌های جمع‌آوری‌شده:</strong> نام اسپرینت، هدف، بازه زمانی، Story Point برنامه‌ریزی vs تکمیل، تسک‌های ناتمام، بیشترین مشارکت‌کننده‌ها.</p>
+<p><strong>سرویس:</strong> <code>SprintReportAiService.cs</code>. گزارش‌ها در <code>SprintReport.cs</code> ذخیره و تاریخچه قابل مشاهده است.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۱۰: ترید کردن وظایف بین اعضا (Task Trading)</h3>
+<p><strong>مشکل:</strong> عضو درگیر کار دیگری است و باید تسکش را واگذار کند — بدون اجازه طرف مقابل ممکن نیست.</p>
+<p><strong>راه‌حل:</strong> سیستم درخواست و تأییدیه. دو نوع: واگذاری یک‌طرفه و مبادله دوطرفه.</p>
+<table>
+<tr><th>جزئیات</th><th>مقدار</th></tr>
+<tr><td>سرویس</td><td><code>TaskTradeService.cs</code></td></tr>
+<tr><td>موجودیت</td><td><code>TaskTradeRequest.cs</code></td></tr>
+<tr><td>وضعیت‌ها</td><td>Pending, Accepted, Rejected, Cancelled</td></tr>
+</table>
+<p><strong>قوانین امنیتی:</strong> نمی‌توان با خودتان ترید کنید. تسک باید به شما تخصیص داشته باشد. فقط دریافت‌کننده حق پاسخ دارد.</p>
+</div>
+
+<div class="novation-box">
+<h3>نواوری ۱۱: گراف وابستگی وظایف (Dependency Graph) — در حال پیاده‌سازی</h3>
+<p><strong>مشکل:</strong> خواندن لیست‌های متنی وابستگی‌ها دشوار است.</p>
+<p><strong>راه‌حل:</strong> نمای گرافیکی تسک‌ها به صورت گره و یال با رنگ‌بندی وضعیت.</p>
+<p><strong>پیاده‌سازی:</strong> متد <code>GetDependencyGraphAsync()</code> در <code>TaskDependencyService</code>. خروجی: <code>DependencyGraphViewModel</code> با Nodes و Edges.</p>
+<p><strong>رنگ‌بندی:</strong> سبز=تمام‌شده, قرمز=عقب‌افتاده, نارنجی=پرریسک, خاکستری=عادی</p>
+</div>
+
+<!-- SECTION 7 -->
+<h1>۷. تکنولوژی‌ها و چرایی استفاده</h1>
+
+<h3>هوش مصنوعی (OpenAI-compatible API)</h3>
+<p><strong>فایل‌ها:</strong> <code>IAiClientService.cs</code>, <code>AiClientService.cs</code>, <code>OpenAiSettings.cs</code></p>
+<p><strong>نحوه اتصال:</strong> HTTP POST به <code>http://92.246.145.99:1234/v1/chat/completions</code>. مدل Qwen3-4B روی LM Studio. تایم‌اوت ۶۰ ثانیه، حداکثر ۴۰۰ توکن.</p>
+<p><strong>کجاها استفاده شده:</strong> (۱) <code>TaskBreakdownService</code> — تجزیه تسک, (۲) <code>DelayRiskService</code> — تحلیل ریسک, (۳) <code>SprintReportAiService</code> — گزارش اسپرینت</p>
+<p><strong>ویژگی پرامپت‌ها:</strong> همه به فارسی، استفاده از <code>/no_think</code> برای جلوگیری از تفکر اضافی، temperature بین ۰.۵ تا ۰.۷.</p>
+
+<h3>Email Service</h3>
+<p><strong>فایل‌ها:</strong> <code>EmailSettings.cs</code>, <code>IEmailService.cs</code>, <code>EmailService.cs</code></p>
+<p><strong>کجا:</strong> <code>WorkspaceInvitationService</code> — ارسال ایمیل دعوت‌نامه با لینک ثبت‌نام/پذیرش. قالب HTML با دکمه استایل‌دار.</p>
+
+<h3>Webpushr (Push Notification)</h3>
+<p><strong>فایل:</strong> <code>WebpushrService.cs</code></p>
+<p><strong>نحوه کار:</strong> کاربر اشتراک Push می‌کند → <code>WebpushrSubscriberId</code> ذخیره می‌شود → هنگام ارسال پیام چت، به اعضای آفلاین Push ارسال می‌شود.</p>
+
+<h3>Background Services</h3>
+<table>
+<tr><th>سرویس</th><th>وظیفه</th><th>فاصله</th></tr>
+<tr><td><code>OverdueCascadeBackgroundService</code></td><td>تمدید خودکار موعد وابسته‌ها</td><td>هر ۳۰ دقیقه</td></tr>
+<tr><td><code>ReminderBackgroundService</code></td><td>ارسال یادآوری‌ها</td><td>دوره‌ای</td></tr>
+</table>
+
+<!-- SECTION 8 -->
+<h1>۸. فایل‌ساختار پروژه</h1>
+<pre><code>SmartTask.Web/
+├── Program.cs                          # نقطه ورود برنامه
+├── Controllers/                        # 41 کنترلر MVC
+│   ├── AccountController.cs            # احراز هویت
+│   ├── TaskController.cs               # مدیریت تسک
+│   ├── TaskDependencyController.cs     # وابستگی‌ها
+│   ├── OffroadController.cs            # آفرود
+│   ├── WorkloadController.cs           # بارکاری
+│   ├── DelayRiskController.cs          # ریسک و اولویت هوشمند
+│   ├── TaskTradeController.cs          # ترید تسک
+│   ├── SprintReportController.cs       # گزارش اسپرینت
+│   └── ... (32 کنترلر دیگر)
+├── Data/
+│   ├── Context/ApplicationDbContext.cs
+│   └── Configurations/                # 34 فایل Fluent API
+├── Hubs/
+│   ├── NotificationHub.cs              # هاب اعلان‌ها (SignalR)
+│   └── ChatHub.cs                      # هاب چت (SignalR)
+├── Infrastructure/
+│   ├── BackgroundJobs/                 # سرویس‌های پس‌زمینه
+│   ├── Repositories/                   # GenericRepository + UnitOfWork
+│   └── Seed/                           # RoleSeeder + AdminSeeder
+├── Models/
+│   ├── Entities/                       # 34 موجودیت
+│   ├── Enums/                          # 23 شمارشگر
+│   └── ViewModels/                     # 30+ پوشه
+├── Services/
+│   ├── AI/                             # AiClientService
+│   ├── Email/                          # EmailService
+│   ├── Interfaces/                     # 45 رابط
+│   └── Implementations/               # 45 پیاده‌سازی
+├── Views/                              # 30+ پوشه View
+└── wwwroot/                            # فایل‌های استاتیک</code></pre>
+
+<!-- SECTION 9 -->
+<h1>۹. تست‌ها و کیفیت کد</h1>
+
+<table>
+<tr><th>تست</th><th>سرویس</th><th>تمرکز</th></tr>
+<tr><td>TaskDependencyServiceTests</td><td>TaskDependencyService</td><td>چرخه وابستگی، BFS، محاسبه تأخیر</td></tr>
+<tr><td>WorkloadAnalysisServiceTests</td><td>WorkloadAnalysisService</td><td>محاسبه بارکاری</td></tr>
+<tr><td>PriorityEngineServiceTests</td><td>PriorityEngineService</td><td>امتیازدهی هوشمند</td></tr>
+<tr><td>ProjectHealthServiceTests</td><td>ProjectHealthService</td><td>شاخص سلامت</td></tr>
+<tr><td>SprintServiceTests</td><td>SprintService</td><td>مدیریت اسپرینت</td></tr>
+<tr><td>SubTaskServiceTests</td><td>SubTaskService</td><td>زیروظایف</td></tr>
+<tr><td>TaskServiceTests</td><td>TaskService</td><td>CRUD تسک</td></tr>
+<tr><td>DateFormatServiceTests</td><td>DateFormatService</td><td>تاریخ شمسی/میلادی</td></tr>
+</table>
+
+<h3>نکات بهینه‌سازی</h3>
+<ul>
+<li><strong>Soft Delete</strong> با ViewState در BaseEntity</li>
+<li><strong>ExecuteUpdateAsync</strong> به جای Load-Modify-Save</li>
+<li><strong>Batch Operations</strong> برای اعلان‌ها و فعالیت‌ها</li>
+<li><strong>In-Memory Traversal</strong> برای گراف وابستگی (جلوگیری از N+1 Query)</li>
+<li><strong>Pre-computed Maps</strong> برای محاسبه بارکاری</li>
+</ul>
+
+<!-- SECTION 10 -->
+<h1>۱۰. پرسش‌های متداول اساتید</h1>
+
+<div class="faq-box">
+<h4>س: چرا از هوش مصنوعی استفاده کردید؟</h4>
+<p><strong>ج:</strong> در سه بخش: (۱) تجزیه خودکار تسک‌ها برای اعضای کم‌تجربه، (۲) تحلیل متنی ریسک پروژه به جای اعداد خام، (۳) تولید خودکار گزارش اسپرینت. هدف: کاهش بار کاری مدیر و افزایش سرعت تصمیم‌گیری.</p>
+</div>
+
+<div class="faq-box">
+<h4>س: تفاوت SmartTask با Jira یا Trello چیست؟</h4>
+<p><strong>ج:</strong> (۱) بخش آفرود، (۲) تحلیل بارکاری خودکار، (۳) تمدید خودکار وابسته‌ها، (۴) اولویت‌بندی هوشمند، (۵) گزارش‌گیری AI، (۶) تجزیه تسک با AI، (۷) ترید تسک با سیستم درخواست و تأییدیه.</p>
+</div>
+
+<div class="faq-box">
+<h4>س: چرا SignalR استفاده کردید؟</h4>
+<p><strong>ج:</strong> (۱) اعلان‌های فوری — تخصیص تسک جدید → اعلان فوراً برسد، (۲) چت گروهی — پیام‌رسانی Real-time بدون رفرش صفحه.</p>
+</div>
+
+<div class="faq-box">
+<h4>س: مکانیزم جلوگیری از حلقوی شدن وابستگی‌ها چیست؟</h4>
+<p><strong>ج:</strong> الگوریتم BFS معکوس. وقتی کاربر B را وابسته به A می‌کند، سیستم از B شروع به پیمایش می‌کند. اگر به A برسد → حلقوی است → خطا.</p>
+</div>
+
+<div class="faq-box">
+<h4>س: تمدید خودکار چگونه از تکرار جلوگیری می‌کند؟</h4>
+<p><strong>ج:</strong> جدول <code>OverdueCascadeLog</code> ثبت می‌کند چند روز اعمال شده. اگر تأخیر جدید بیشتر باشد → فقط مابه‌التفاوت. اگر کمتر/مساوی → هیچ کاری.</p>
+</div>
+
+<div class="faq-box">
+<h4>س: هوش مصنوعی چگونه متصل می‌شود؟</h4>
+<p><strong>ج:</strong> HTTP POST به API سازگار با OpenAI. مدل Qwen3-4B روی LM Studio. تایم‌اوت ۶۰ ثانیه، حداکثر ۴۰۰ توکن. پرامپت‌ها به فارسی.</p>
+</div>
+
+<hr>
+<p style="text-align:center; color:#64748b; margin-top:30px;">SmartTask — سامانه مدیریت هوشمند وظایف چابک | پروژه کارشناسی | ۱۴۰۵</p>
+
+</body>
+</html>

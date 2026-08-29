@@ -1,0 +1,237 @@
+@model List<SmartTask.Web.Models.Entities.Sprint>
+@using SmartTask.Web.Models.Enums
+
+@{
+    ViewData["Title"] = "گزارش اسپرینت";
+    var projectId = (int)ViewBag.ProjectId;
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprintreport.css" asp-append-version="true" />
+}
+
+<div class="workspace-container">
+    @Html.AntiForgeryToken()
+
+    <!-- Hero -->
+    <div class="workspace-hero">
+        <div class="workspace-hero-content">
+            <h1>
+                <i class="fa-solid fa-chart-simple"></i>
+                گزارش اسپرینت
+            </h1>
+            <p>گزارش‌های هوشمند تولیدشده توسط هوش مصنوعی در پایان هر اسپرینت</p>
+        </div>
+        <div class="workspace-toolbar">
+            <a asp-controller="Project" asp-action="Details" asp-route-id="@projectId"
+               class="workspace-filter">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به پروژه
+            </a>
+        </div>
+    </div>
+
+    <!-- Sprint List -->
+    @if (!Model.Any())
+    {
+        <div class="workspace-empty">
+            <i class="fa-solid fa-chart-simple"></i>
+            <h3>هنوز اسپرینتی وجود ندارد</h3>
+            <p>برای مشاهده گزارش، ابتدا اسپرینت‌هایی در پروژه ایجاد کنید.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var sprint in Model.OrderByDescending(s => s.EndDate))
+        {
+            var statusClass = sprint.Status.ToString().ToLower();
+            var statusLabel = sprint.Status switch
+            {
+                SprintStatusType.Planning => "برنامه‌ریزی",
+                SprintStatusType.Active => "فعال",
+                SprintStatusType.Completed => "پایان یافته",
+                SprintStatusType.Cancelled => "لغو شده",
+                _ => "-"
+            };
+            var statusIcon = sprint.Status switch
+            {
+                SprintStatusType.Planning => "fa-flag",
+                SprintStatusType.Active => "fa-bolt",
+                SprintStatusType.Completed => "fa-flag-checkered",
+                SprintStatusType.Cancelled => "fa-ban",
+                _ => "fa-circle"
+            };
+            var isCompleted = sprint.Status == SprintStatusType.Completed;
+
+            <div class="sprint-report-card p-3 my-2" data-sprint-id="@sprint.Id">
+                <div class="sprint-report-header">
+                    <div class="sprint-report-info">
+                        <h3>
+                            <i class="fa-solid fa-flag"></i>
+                            @sprint.Name
+                        </h3>
+                        <div class="sprint-report-meta">
+                            <span>
+                                <i class="fa-regular fa-calendar"></i>
+                                @sprint.StartDate.ToString("yyyy/MM/dd") تا @sprint.EndDate.ToString("yyyy/MM/dd")
+                            </span>
+                            <span class="sprint-status-badge status-@statusClass">
+                                <i class="fa-solid @statusIcon"></i>
+                                @statusLabel
+                            </span>
+                        </div>
+                    </div>
+                    <div class="sprint-report-actions">
+                        @if (isCompleted)
+                        {
+                            <button type="button" class="ai-suggest-btn generate-report-btn"
+                                    data-sprint-id="@sprint.Id" data-project-id="@projectId">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                تولید گزارش جدید
+                            </button>
+                        }
+                        <a asp-controller="Sprint" asp-action="Details" asp-route-id="@sprint.Id"
+                           class="workspace-filter">
+                            <i class="fa-solid fa-eye"></i>
+                            مشاهده
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Reports container -->
+                <div class="sprint-report-list" data-sprint-id="@sprint.Id">
+                    @if (!isCompleted)
+                    {
+                        <div class="sprint-report-empty">
+                            <i class="fa-solid fa-info-circle"></i>
+                            گزارش فقط برای اسپرینت‌های پایان‌یافته قابل تولید است.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sprint-report-loading">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            در حال بارگذاری گزارش‌ها...
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            const tokenValue = token ? token.value : "";
+
+            // Load reports for each completed sprint
+            document.querySelectorAll(".sprint-report-card").forEach(function (card) {
+                const sprintId = card.dataset.sprintId;
+                const listEl = card.querySelector(".sprint-report-list");
+                if (!listEl || listEl.querySelector(".sprint-report-empty")) return;
+
+                loadReports(sprintId, listEl);
+            });
+
+            // Generate report buttons
+            document.querySelectorAll(".generate-report-btn").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const sprintId = this.dataset.sprintId;
+                    const card = this.closest(".sprint-report-card");
+                    const listEl = card.querySelector(".sprint-report-list");
+
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...';
+
+                    const self = this;
+                    fetch("/SprintReport/Generate", {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": tokenValue,
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: "sprintId=" + sprintId + "&__RequestVerificationToken=" + encodeURIComponent(tokenValue)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.report) {
+                            prependReport(listEl, data.report);
+                        } else {
+                            alert(data.message || "خطا در تولید گزارش");
+                        }
+                    })
+                    .catch(() => alert("خطا در ارتباط با سرور"))
+                    .finally(() => {
+                        self.disabled = false;
+                        self.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> تولید گزارش جدید';
+                    });
+                });
+            });
+
+            function loadReports(sprintId, listEl) {
+                fetch("/SprintReport/GetReports?sprintId=" + sprintId)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.reports && data.reports.length > 0) {
+                            listEl.innerHTML = "";
+                            data.reports.forEach(function (report) {
+                                appendReport(listEl, report);
+                            });
+                        } else {
+                            listEl.innerHTML =
+                                '<div class="sprint-report-empty">' +
+                                '<i class="fa-regular fa-file-lines"></i>' +
+                                '<p>هنوز گزارشی برای این اسپرینت تولید نشده است.</p>' +
+                                '</div>';
+                        }
+                    })
+                    .catch(() => {
+                        listEl.innerHTML =
+                            '<div class="sprint-report-empty">' +
+                            '<i class="fa-solid fa-exclamation-triangle"></i>' +
+                            '<p>خطا در بارگذاری گزارش‌ها.</p>' +
+                            '</div>';
+                    });
+            }
+
+            function appendReport(listEl, report) {
+                const html = createReportHtml(report);
+                // Remove empty state if present
+                const empty = listEl.querySelector(".sprint-report-empty");
+                if (empty) empty.remove();
+                listEl.insertAdjacentHTML("beforeend", html);
+            }
+
+            function prependReport(listEl, report) {
+                const html = createReportHtml(report);
+                const empty = listEl.querySelector(".sprint-report-empty");
+                if (empty) empty.remove();
+                listEl.insertAdjacentHTML("afterbegin", html);
+            }
+
+            function createReportHtml(report) {
+                const date = new Date(report.generatedDate);
+                const dateStr = date.toLocaleDateString("fa-IR");
+                return '<div class="sprint-report-item">' +
+                    '<div class="sprint-report-item-header">' +
+                    '<span class="sprint-report-author">' +
+                    '<i class="fa-solid fa-robot"></i> ' +
+                    report.generatedByName +
+                    '</span>' +
+                    '<span class="sprint-report-date">' +
+                    '<i class="fa-regular fa-calendar"></i> ' + dateStr +
+                    '</span>' +
+                    '</div>' +
+                    '<div class="sprint-report-content">' +
+                    report.content +
+                    '</div>' +
+                    '</div>';
+            }
+        });
+    </script>
+}

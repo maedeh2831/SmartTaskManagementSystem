@@ -315,51 +315,59 @@
 
 
 // ==========================================================
-// Task Details — Section Nav Scroll Spy
+// Task Details — Tab switching
 // ==========================================================
 (function () {
 
-    const sectionNav = document.querySelector(".task-section-nav");
-    if (!sectionNav) return;
+    const nav = document.getElementById("taskSectionNav");
+    if (!nav) return;
 
-    const links = sectionNav.querySelectorAll(".task-section-link");
-    const sections = document.querySelectorAll(".task-section");
-    if (!links.length || !sections.length) return;
+    const buttons = nav.querySelectorAll(".task-section-link[data-tab]");
+    if (!buttons.length) return;
 
-    function activateLink(id) {
-        links.forEach(link => {
-            const isActive = link.getAttribute("href") === "#" + id;
-            link.classList.toggle("active", isActive);
+    function switchTab(targetId) {
+        // hide all sections
+        document.querySelectorAll(".task-section").forEach(function (sec) {
+            sec.hidden = true;
+            sec.classList.remove("task-section--active");
         });
+
+        // deactivate all tab buttons
+        buttons.forEach(function (btn) {
+            btn.classList.remove("active");
+        });
+
+        // show target section
+        var target = document.getElementById(targetId);
+        if (target) {
+            target.hidden = false;
+            target.classList.add("task-section--active");
+        }
+
+        // activate clicked button
+        var activeBtn = nav.querySelector('[data-tab="' + targetId + '"]');
+        if (activeBtn) {
+            activeBtn.classList.add("active");
+        }
+
+        // remember active tab in sessionStorage so refresh keeps position
+        try { sessionStorage.setItem("taskActiveTab", targetId); } catch (e) { }
     }
 
-    // Intersection Observer for scroll spy
-    const observer = new IntersectionObserver(function (entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                activateLink(entry.target.id);
-            }
-        });
-    }, {
-        rootMargin: "-20% 0px -60% 0px",
-        threshold: 0
-    });
-
-    sections.forEach(section => observer.observe(section));
-
-    // Smooth scroll on link click
-    links.forEach(link => {
-        link.addEventListener("click", function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute("href").substring(1);
-            const target = document.getElementById(targetId);
-            if (target) {
-                const navHeight = sectionNav.offsetHeight + 20;
-                const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
-                window.scrollTo({ top: top, behavior: "smooth" });
-            }
+    // attach click handlers
+    buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            switchTab(this.dataset.tab);
         });
     });
+
+    // restore tab from sessionStorage on page load
+    try {
+        var saved = sessionStorage.getItem("taskActiveTab");
+        if (saved && document.getElementById(saved)) {
+            switchTab(saved);
+        }
+    } catch (e) { }
 
 })();
 

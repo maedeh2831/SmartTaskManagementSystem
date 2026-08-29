@@ -369,24 +369,22 @@ function initSprintPreview(scope) {
 // ===== Sprint Report Functions =====
 function loadSprintReports(sprintId) {
     const container = document.getElementById("sprintReportList");
-    if (!container) return;
-
-    fetch(`/SprintReport/GetReports?sprintId=${sprintId}`)
+    if (!container) return;        fetch(`/SprintReport/GetReports?sprintId=${sprintId}`)
         .then(r => r.json())
         .then(data => {
-            var reports = data.reports || [];
+            const reports = data.reports || [];
             if (reports.length === 0) {
                 container.innerHTML = '<div class="team-empty-text">هنوز گزارشی تولید نشده است.</div>';
             } else {
                 container.innerHTML = reports.map(report => `
-                    <div class="sprint-report-card">
+                    <div class="sprint-report-card p-3 mb-2">
                         <div class="sprint-report-header">
                             <i class="fa-solid fa-file-lines"></i>
-                            <span>${report.title || report.generatedByName}</span>
-                            <small>${report.generatedDate || report.createDate || ''}</small>
+                            <span>${report.generatedByName || "—"}</span>
+                            <small>${new Date(report.generatedDate).toLocaleDateString("fa-IR")}</small>
                         </div>
                         <div class="sprint-report-body">
-                            ${report.content || report.summary || "—"}
+                            ${report.content || "—"}
                         </div>
                     </div>
                 `).join("");
@@ -404,15 +402,17 @@ function generateSprintReport(sprintId) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...';
 
-    var tokenEl = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')
-        || document.querySelector('input[name="__RequestVerificationToken"]');
-    var token = tokenEl ? tokenEl.value : "";
+    const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenEl ? tokenEl.value : "";
 
-    var formData = new FormData();
-    formData.append("sprintId", sprintId);
-    formData.append("__RequestVerificationToken", token);
-
-    fetch(`/SprintReport/Generate?sprintId=${sprintId}`, { method: "POST", body: formData })
+    fetch("/SprintReport/Generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "RequestVerificationToken": token
+        },
+        body: "sprintId=" + sprintId + "&__RequestVerificationToken=" + encodeURIComponent(token)
+    })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
@@ -423,7 +423,7 @@ function generateSprintReport(sprintId) {
             }
         })
         .catch(() => {
-            showError("خطا در تولید گزارش");
+            showError("خطا در ارتباط با سرور");
         })
         .finally(() => {
             btn.disabled = false;

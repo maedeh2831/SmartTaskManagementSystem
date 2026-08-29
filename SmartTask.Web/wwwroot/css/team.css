@@ -1,251 +1,1142 @@
-/* ==========================================================
+﻿/* ==========================================================
                     SmartTask Team UI
+   ========================================================== */
+
+
+/* ==========================================================
+   Archived Badge
    ========================================================== */
 
 .team-archived-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     margin-right: 10px;
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 3px 9px;
+    border-radius: 999px;
     background: var(--gray100);
     color: var(--gray500);
-    font-size: 12px;
+    font-size: 10px;
+    line-height: 1.2;
     font-weight: 700;
+    white-space: nowrap;
     vertical-align: middle;
 }
 
+
+/* ==========================================================
+   Team Stats
+   ========================================================== */
+
 .team-stat-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* ================= Card (Index) ================= */
 
-.team-card .workspace-card-header {
-    border-radius: 12px 12px 0 0;
+/* ==========================================================
+   Team Card
+   ========================================================== */
+
+.team-card {
+    min-width: 0;
 }
 
-.team-card .workspace-status {
-    background: var(--card);
-}
+    .team-card .workspace-card-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 64px;
+        padding: 14px 16px;
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
+    }
 
-.team-archived-badge {
-    font-size: 10px;
-    padding: 3px 9px;
-}
+    .team-card .workspace-status {
+        background: var(--card);
+    }
 
-/* ================= Add Member ================= */
+    .team-card .workspace-card-header > * {
+        min-width: 0;
+    }
+
+
+    /* ==========================================================
+   Team Header
+   ========================================================== */
+
+    .team-card .workspace-card-header h1,
+    .team-card .workspace-card-header h2,
+    .team-card .workspace-card-header h3,
+    .team-card .workspace-card-header h4 {
+        min-width: 0;
+        margin: 0;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+
+/* ==========================================================
+   Add Member
+   ========================================================== */
 
 .add-member-fields {
     display: flex;
-    gap: 16px;
-    align-items: center;
-    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: nowrap;
 }
 
     .add-member-fields select {
-        flex: 1;
-        min-width: 220px;
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
     }
 
     .add-member-fields .btn-primary {
+        flex: 0 0 auto;
+        min-width: 110px;
         white-space: nowrap;
     }
 
+
+/* ==========================================================
+   Empty State
+   ========================================================== */
+
 .team-empty-text {
+    width: 100%;
+    padding: 18px 12px;
     color: var(--gray500);
     text-align: center;
-    padding: 20px 0;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.8;
 }
 
-/* ================= Member List ================= */
+
+/* ==========================================================
+   Member List
+   ========================================================== */
 
 .team-member-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
+    width: 100%;
 }
 
 .team-member-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-width: 0;
     gap: 16px;
+    padding: 13px 14px;
     background: var(--card);
     border: 1px solid var(--gray200);
     border-radius: 10px;
-    padding: 14px 16px;
     box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
-    transition: border-color .2s ease, background .2s ease;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
 }
 
     .team-member-row:hover {
         background: var(--primary-light);
         border-color: var(--primary-border);
+        box-shadow: 0 3px 10px rgba(15, 23, 42, .05);
     }
+
+
+/* ==========================================================
+   Member Info
+   ========================================================== */
 
 .team-member-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    flex: 1 1 auto;
     min-width: 0;
+    gap: 12px;
 }
 
-    .team-member-info h4 {
-        font-size: 14px;
-        font-weight: 700;
-        margin: 0 0 6px;
-        color: var(--gray800);
+    .team-member-info > div {
+        min-width: 0;
     }
 
+    .team-member-info h4 {
+        margin: 0 0 5px;
+        color: var(--gray800);
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+
+/* ==========================================================
+   Team Role
+   ========================================================== */
+
 .team-role-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 3px 10px;
+    border-radius: 999px;
     background: var(--primary-light);
     color: var(--primary);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.team-role-badge.role-leader {
-    background: #FEF3C7;
-    color: #B45309;
-}
+    .team-role-badge.role-leader {
+        background: #FEF3C7;
+        color: #B45309;
+    }
 
 [data-theme="dark"] .team-role-badge.role-leader {
     background: rgba(245, 158, 11, .18);
     color: #FBBF24;
 }
 
+
+/* ==========================================================
+   Member Actions
+   ========================================================== */
+
 .team-member-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    gap: 8px;
+    min-width: 0;
 }
 
     .team-member-actions .role-select {
-        height: 40px;
-        min-height: auto;
-        padding: 6px 12px;
-        font-size: 13px;
         width: auto;
-        border-radius: 8px;
+        min-width: 110px;
+        max-width: 180px;
+        height: 38px;
+        min-height: 38px;
+        padding: 6px 11px;
         border: 1px solid var(--gray200);
+        border-radius: 8px;
         background: var(--card);
         color: var(--gray700);
+        font-family: inherit;
+        font-size: 12px;
         font-weight: 600;
         cursor: pointer;
-        font-family: inherit;
     }
 
     .team-member-actions .workspace-delete-btn {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
         border-radius: 8px;
     }
 
-/* ================= Projects ================= */
+
+/* ==========================================================
+   Projects
+   ========================================================== */
 
 .team-project-chips {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    width: 100%;
 }
 
 .team-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    max-width: 100%;
+    padding: 5px 10px;
     background: var(--gray50);
     border: 1px solid var(--gray200);
+    border-radius: 9px;
     color: var(--gray700);
-    padding: 7px 14px;
-    border-radius: 10px;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.4;
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
-/* ================= Archive toggle ================= */
+    .team-project-chip > span {
+        min-width: 0;
+    }
 
-.team-archive-toggle {
+
+/* ==========================================================
+   Remove Project
+   ========================================================== */
+
+.remove-project-form {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+    .remove-project-form button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        color: inherit;
+        opacity: .55;
+        cursor: pointer;
+        transition: opacity .2s ease, background .2s ease, color .2s ease;
+    }
+
+        .remove-project-form button:hover {
+            opacity: 1;
+            color: var(--danger);
+        }
+
+
+/* ==========================================================
+   Assign Project
+   ========================================================== */
+
+.assign-project-form {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 700;
+    width: 100%;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray200);
+}
+
+    .assign-project-form select {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .assign-project-form button {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+
+/* ==========================================================
+   Archive Toggle
+   ========================================================== */
+
+.team-archive-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     color: var(--gray700);
+    font-weight: 700;
     cursor: pointer;
 }
 
     .team-archive-toggle input {
         width: 18px;
         height: 18px;
+        margin: 0;
+        flex: 0 0 18px;
         accent-color: var(--danger);
     }
 
 .team-hint-text {
     display: block;
-    margin-top: 8px;
+    margin-top: 7px;
     color: var(--gray400);
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.7;
 }
 
-/* ================= Responsive ================= */
+
+/* ==========================================================
+   ==========================================================
+                TASK DEPENDENCIES CARD
+   ==========================================================
+   ========================================================== */
+
+
+/* ==========================================================
+   Main Card
+   ========================================================== */
+
+.details-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+
+    /* ==========================================================
+   Card Header
+   ========================================================== */
+
+    .details-card .card-title {
+        display: flex;
+        align-items: center;
+        min-height: 52px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--gray200);
+    }
+
+        .details-card .card-title > div {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            color: var(--gray800);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .details-card .card-title i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            border-radius: 9px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+
+/* ==========================================================
+   Cascade Information
+   ========================================================== */
+
+.cascade-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 16px 18px 0;
+    padding: 14px 15px;
+    border: 1px solid var(--primary-border);
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--gray700);
+    line-height: 1.8;
+}
+
+    .cascade-info-box > i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        margin-top: 1px;
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--primary);
+        font-size: 13px;
+    }
+
+    .cascade-info-box > div {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .cascade-info-box strong {
+        color: var(--gray800);
+    }
+
+    .cascade-info-box ul {
+        margin: 8px 0 0;
+        padding-right: 18px;
+    }
+
+    .cascade-info-box li {
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+        .cascade-info-box li:last-child {
+            margin-bottom: 0;
+        }
+
+    .cascade-info-box a {
+        color: var(--primary);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .cascade-info-box a:hover {
+            text-decoration: underline;
+        }
+
+
+/* ==========================================================
+   Dependency Alert
+   ========================================================== */
+
+.dependency-alert {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 14px 18px 0;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 158, 11, .25);
+    border-radius: 10px;
+    background: rgba(245, 158, 11, .08);
+    color: var(--gray700);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+    .dependency-alert > i {
+        margin-left: 4px;
+        color: #D97706;
+        font-size: 14px;
+    }
+
+    .dependency-alert strong {
+        color: var(--gray800);
+    }
+
+
+/* ==========================================================
+   Dependency Columns
+   ========================================================== */
+
+.dependency-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+    padding: 0 18px;
+}
+
+.dependency-column {
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    background: var(--card);
+}
+
+
+    /* ==========================================================
+   Dependency Column Header
+   ========================================================== */
+
+    .dependency-column h5 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 32px;
+        margin: 0 0 13px;
+        padding-bottom: 11px;
+        border-bottom: 1px solid var(--gray200);
+        color: var(--gray800);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+        .dependency-column h5 i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            flex: 0 0 26px;
+            border-radius: 7px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+        }
+
+
+/* ==========================================================
+   Dependency Chip
+   ========================================================== */
+
+.dependency-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    padding: 9px 10px;
+    border: 1px solid var(--gray200);
+    border-radius: 9px;
+    background: var(--gray50);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+    .dependency-chip:last-child {
+        margin-bottom: 0;
+    }
+
+    .dependency-chip:hover {
+        background: var(--card);
+        border-color: var(--primary-border);
+        transform: translateY(-1px);
+    }
+
+
+    /* ==========================================================
+   Dependency Task Link
+   ========================================================== */
+
+    .dependency-chip > a {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--gray800);
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .dependency-chip > a:hover {
+            color: var(--primary);
+        }
+
+
+    /* ==========================================================
+   Status Badge
+   ========================================================== */
+
+    .dependency-chip .task-status-badge {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 10px;
+    }
+
+
+/* ==========================================================
+   Optional Badge
+   ========================================================== */
+
+.dependency-optional-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   Delete Dependency
+   ========================================================== */
+
+.dependency-chip form {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.delete-dependency-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--gray400);
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+    .delete-dependency-btn:hover {
+        background: rgba(239, 68, 68, .1);
+        color: var(--danger);
+    }
+
+    .delete-dependency-btn i {
+        font-size: 11px;
+    }
+
+
+/* ==========================================================
+   Dependency Empty State
+   ========================================================== */
+
+.dependency-column .team-empty-text {
+    margin: 0;
+    padding: 18px 8px;
+    color: var(--gray400);
+    font-size: 11px;
+}
+
+
+/* ==========================================================
+   Add Dependency Form
+   ========================================================== */
+
+.dependency-add-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray200);
+}
+
+    .dependency-add-form select {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .dependency-add-form .form-control {
+        height: 38px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+
+/* ==========================================================
+   Required Checkbox
+   ========================================================== */
+
+.dependency-required-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    white-space: nowrap;
+    color: var(--gray600);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .dependency-required-check input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+
+
+/* ==========================================================
+   Add Button
+   ========================================================== */
+
+.dependency-add-form .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    gap: 6px;
+    padding: 0 13px;
+    white-space: nowrap;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+
+/* ==========================================================
+   Dependency Impact Box
+   ========================================================== */
+
+.dependency-impact-box {
+    margin: 18px;
+    padding: 15px;
+    border: 1px solid var(--gray200);
+    border-radius: 12px;
+    background: var(--gray50);
+}
+
+    .dependency-impact-box h5 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 12px;
+        color: var(--gray800);
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+        .dependency-impact-box h5 i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 27px;
+            height: 27px;
+            border-radius: 7px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+        }
+
+
+/* ==========================================================
+   Impact List
+   ========================================================== */
+
+.dependency-impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.dependency-impact-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid var(--gray200);
+    border-radius: 8px;
+    background: var(--card);
+}
+
+    .dependency-impact-item > a {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--gray800);
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .dependency-impact-item > a:hover {
+            color: var(--primary);
+        }
+
+
+/* ==========================================================
+   Impact Depth
+   ========================================================== */
+
+.dependency-depth-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 46px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: var(--gray100);
+    color: var(--gray500);
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   Projected Date
+   ========================================================== */
+
+.dependency-projected-date {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   Required / Optional Impact
+   ========================================================== */
+
+.dependency-impact-item.required {
+    border-right: 3px solid var(--primary);
+}
+
+.dependency-impact-item.optional {
+    border-right: 3px solid var(--gray300);
+}
+
+
+/* ==========================================================
+   Dark Mode
+   ========================================================== */
+
+[data-theme="dark"] .dependency-alert {
+    background: rgba(245, 158, 11, .1);
+}
+
+[data-theme="dark"] .dependency-chip,
+[data-theme="dark"] .dependency-impact-item,
+[data-theme="dark"] .dependency-column {
+    background: var(--card);
+}
+
+
+/* ==========================================================
+   Responsive — Tablet
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .dependency-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .dependency-add-form {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .dependency-required-check {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .dependency-add-form .btn {
+        grid-column: 2;
+        grid-row: 1;
+    }
+}
+
+
+/* ==========================================================
+   Responsive — Team Tablet
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .team-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .team-member-row {
+        gap: 12px;
+    }
+
+    .team-member-actions .role-select {
+        min-width: 100px;
+    }
+}
+
+
+/* ==========================================================
+   Responsive — Mobile
+   ========================================================== */
 
 @media (max-width: 768px) {
+
+    /* Team */
+
+    .team-card .workspace-card-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        min-height: auto;
+        padding: 14px;
+    }
+
+        .team-card .workspace-card-header .workspace-card-title {
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .team-card .workspace-card-header .workspace-card-actions {
+            width: 100%;
+            justify-content: flex-start;
+            margin-right: 0;
+        }
 
     .add-member-fields {
         flex-direction: column;
         align-items: stretch;
     }
 
+        .add-member-fields .btn-primary {
+            width: 100%;
+            min-width: 0;
+        }
+
     .team-member-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .team-member-info {
+        width: 100%;
     }
 
     .team-member-actions {
         width: 100%;
-        justify-content: space-between;
-    }
-}
-.team-project-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.remove-project-form {
-    display: inline-block;
-}
-
-    .remove-project-form button {
-        background: none;
-        border: none;
-        color: inherit;
-        opacity: .6;
-        cursor: pointer;
-        font-size: 10px;
-        padding: 2px;
-        transition: opacity .2s ease;
+        justify-content: flex-start;
     }
 
-        .remove-project-form button:hover {
-            opacity: 1;
+        .team-member-actions .role-select {
+            flex: 1;
+            min-width: 0;
+            max-width: none;
         }
 
-.assign-project-form {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--gray200);
+    .assign-project-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .assign-project-form select,
+        .assign-project-form button {
+            width: 100%;
+        }
+
+
+    /* Dependencies */
+
+    .details-card .card-title {
+        padding: 12px 14px;
+    }
+
+    .cascade-info-box,
+    .dependency-alert {
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+
+    .dependency-columns {
+        margin-top: 14px;
+        padding: 0 12px;
+    }
+
+    .dependency-column {
+        padding: 12px;
+    }
+
+    .dependency-chip {
+        flex-wrap: wrap;
+    }
+
+        .dependency-chip > a {
+            flex: 1 1 100%;
+            width: 100%;
+        }
+
+        .dependency-chip .task-status-badge,
+        .dependency-optional-badge,
+        .dependency-chip form {
+            margin-top: 2px;
+        }
+
+    .dependency-add-form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .dependency-add-form select,
+        .dependency-add-form .btn {
+            width: 100%;
+        }
+
+    .dependency-required-check {
+        justify-content: flex-start;
+    }
+
+    .dependency-impact-box {
+        margin: 14px 12px;
+        padding: 12px;
+    }
+
+    .dependency-impact-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+        .dependency-impact-item > a {
+            flex: 1 1 calc(100% - 60px);
+        }
+
+    .dependency-projected-date {
+        flex: 1 1 100%;
+        width: 100%;
+    }
 }
 
-/* ================= Reduced motion ================= */
 
+/* ==========================================================
+   Responsive — Small Mobile
+   ========================================================== */
 
+@media (max-width: 480px) {
 
-    .assign-project-form select {
-        flex: 1;
+    .team-stat-grid {
+        grid-template-columns: 1fr;
     }
+
+    .team-card .workspace-card-header {
+        padding: 12px;
+    }
+
+    .team-member-row {
+        padding: 12px;
+    }
+
+    .team-member-actions {
+        flex-wrap: wrap;
+    }
+
+        .team-member-actions .role-select {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .team-member-actions .workspace-delete-btn {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+    .team-project-chip {
+        max-width: 100%;
+    }
+}
+
+
+/* ==========================================================
+   Reduced Motion
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .team-member-row,
+    .remove-project-form button,
+    .dependency-chip {
+        transition: none !important;
+    }
+
+        .dependency-chip:hover {
+            transform: none;
+        }
+}
