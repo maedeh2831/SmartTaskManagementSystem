@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿function initAgileDashboard() {
 
     const primaryColor = "#5B5FEF";
     const dangerColor = "#EF4444";
@@ -53,20 +53,27 @@
     if (velocityCanvas && window.__velocityData && window.__velocityData.length) {
         const data = window.__velocityData;
 
+        const hasPoints = data.some(d => (d.plannedPoints || d.completedPoints || d.PlannedPoints || d.CompletedPoints) > 0);
+        const planned = data.map(d => d.plannedPoints ?? d.PlannedPoints ?? 0);
+        const completed = data.map(d => d.completedPoints ?? d.CompletedPoints ?? 0);
+        const labels = data.map(d => d.sprintName ?? d.SprintName ?? '???');
+
+        console.log('[Velocity] labels:', labels, 'planned:', planned, 'completed:', completed);
+
         new Chart(velocityCanvas, {
             type: "bar",
             data: {
-                labels: data.map(d => d.sprintName),
+                labels: labels,
                 datasets: [
                     {
                         label: "برنامه‌ریزی‌شده",
-                        data: data.map(d => d.plannedPoints),
+                        data: planned,
                         backgroundColor: "#C7D2FE",
                         borderRadius: 6
                     },
                     {
                         label: "تکمیل‌شده",
-                        data: data.map(d => d.completedPoints),
+                        data: completed,
                         backgroundColor: primaryColor,
                         borderRadius: 6
                     }
@@ -84,4 +91,11 @@
         });
     }
 
-});
+}
+
+// Run immediately — script is loaded after DOM is ready (in @section Scripts)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAgileDashboard);
+} else {
+    initAgileDashboard();
+}
