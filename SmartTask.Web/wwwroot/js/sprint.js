@@ -371,21 +371,22 @@ function loadSprintReports(sprintId) {
     const container = document.getElementById("sprintReportList");
     if (!container) return;
 
-    fetch(`/SprintReport/List?sprintId=${sprintId}`)
+    fetch(`/SprintReport/GetReports?sprintId=${sprintId}`)
         .then(r => r.json())
         .then(data => {
-            if (data.length === 0) {
+            var reports = data.reports || [];
+            if (reports.length === 0) {
                 container.innerHTML = '<div class="team-empty-text">هنوز گزارشی تولید نشده است.</div>';
             } else {
-                container.innerHTML = data.map(report => `
+                container.innerHTML = reports.map(report => `
                     <div class="sprint-report-card">
                         <div class="sprint-report-header">
                             <i class="fa-solid fa-file-lines"></i>
-                            <span>${report.title}</span>
-                            <small>${report.createDate}</small>
+                            <span>${report.title || report.generatedByName}</span>
+                            <small>${report.generatedDate || report.createDate || ''}</small>
                         </div>
                         <div class="sprint-report-body">
-                            ${report.summary || "—"}
+                            ${report.content || report.summary || "—"}
                         </div>
                     </div>
                 `).join("");
@@ -403,7 +404,15 @@ function generateSprintReport(sprintId) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...';
 
-    fetch(`/SprintReport/Generate?sprintId=${sprintId}`, { method: "POST" })
+    var tokenEl = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')
+        || document.querySelector('input[name="__RequestVerificationToken"]');
+    var token = tokenEl ? tokenEl.value : "";
+
+    var formData = new FormData();
+    formData.append("sprintId", sprintId);
+    formData.append("__RequestVerificationToken", token);
+
+    fetch(`/SprintReport/Generate?sprintId=${sprintId}`, { method: "POST", body: formData })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
