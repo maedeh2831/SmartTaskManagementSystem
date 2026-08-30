@@ -219,9 +219,10 @@ public class SprintService : BaseService<Sprint>, ISprintService
                     .Where(s => s.ViewState && s.Status == StoryStatusType.Done)
                     .Sum(s => s.StoryPoint)
             })
-            .OrderBy(x => x.SprintName)
             .ToListAsync();
 
+        // Reverse so chart shows oldest→newest (left→right)
+        completedSprints.Reverse();
         return completedSprints;
     }
 }

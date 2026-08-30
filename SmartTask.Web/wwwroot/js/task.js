@@ -373,6 +373,98 @@
 
 
 // ==========================================================
+// Trade Modal
+// ==========================================================
+(function () {
+
+    const openBtn = document.getElementById("openTradeModalBtn");
+    const overlay = document.getElementById("tradeModalOverlay");
+    if (!openBtn || !overlay) return;
+
+    const closeBtn = document.getElementById("tradeModalClose");
+    const cancelBtn = document.getElementById("tradeModalCancel");
+    const userSelect = document.getElementById("tradeTargetUserSelect");
+    const taskSelect = document.getElementById("tradeTargetTaskSelect");
+
+    function openModal() {
+        overlay.classList.add("active");
+        document.body.classList.add("task-modal-open");
+    }
+
+    function closeModal() {
+        overlay.classList.remove("active");
+        document.body.classList.remove("task-modal-open");
+    }
+
+    openBtn.addEventListener("click", openModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && overlay.classList.contains("active")) {
+            closeModal();
+        }
+    });
+
+    // When user selects a target member, load their tasks via AJAX
+    if (userSelect && taskSelect) {
+        userSelect.addEventListener("change", async function () {
+            const userId = this.value;
+            const token = document.querySelector('#tradeModalOverlay input[name="__RequestVerificationToken"]');
+
+            // Reset task select
+            taskSelect.innerHTML = '<option value="">— در حال بارگذاری...</option>';
+            taskSelect.disabled = true;
+
+            if (!userId) {
+                taskSelect.innerHTML = '<option value="">— ابتدا عضو را انتخاب کنید —</option>';
+                return;
+            }
+
+            // Get projectId and taskId from hidden inputs in the form
+            const form = overlay.querySelector("form");
+            const projectIdInput = form ? form.querySelector('input[name="projectId"]') : null;
+            const taskIdInput = form ? form.querySelector('input[name="taskId"]') : null;
+
+            if (!projectIdInput || !taskIdInput) return;
+
+            const projectId = projectIdInput.value;
+            const taskId = taskIdInput.value;
+
+            try {
+                const response = await fetch(
+                    `/TaskTrade/GetUserTasks?projectId=${projectId}&userId=${userId}&excludeTaskId=${taskId}`
+                );
+                const data = await response.json();
+
+                if (data.success && data.tasks && data.tasks.length > 0) {
+                    taskSelect.innerHTML = '<option value="">— بدون تسک متقابل (واگذاری) —</option>';
+                    data.tasks.forEach(t => {
+                        const opt = document.createElement("option");
+                        opt.value = t.id;
+                        opt.textContent = t.title;
+                        taskSelect.appendChild(opt);
+                    });
+                    taskSelect.disabled = false;
+                } else {
+                    taskSelect.innerHTML = '<option value="">— بدون تسک متقابل (واگذاری) —</option>';
+                    taskSelect.disabled = false;
+                }
+            } catch (err) {
+                taskSelect.innerHTML = '<option value="">— خطا در بارگذاری —</option>';
+                console.error("Trade task load error:", err);
+            }
+        });
+    }
+
+})();
+
+
+// ==========================================================
 // Task Create / Edit Modal
 // پشتیبانی از چند مودال هم‌زمان روی یک صفحه
 // (createTaskModal در Index.cshtml + editTaskModal در Details.cshtml)
