@@ -3,6 +3,7 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Services.Gamification;
 using SmartTask.Web.Services.Interfaces;
 
 namespace SmartTask.Web.Services.Implementations
@@ -14,6 +15,7 @@ namespace SmartTask.Web.Services.Implementations
         private readonly INotificationService _notificationService;
         private readonly IActivityLogService _activityLogService;
         private readonly ICurrentUserService _currentUser;
+        private readonly ITaskRewardCoordinator _rewardCoordinator;
 
         public TaskService(
             IGenericRepository<TaskItem> repository,
@@ -22,7 +24,8 @@ namespace SmartTask.Web.Services.Implementations
             IUserStoryService userStoryService,
             INotificationService notificationService,
             IActivityLogService activityLogService,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            ITaskRewardCoordinator rewardCoordinator)
             : base(repository, unitOfWork)
         {
             _context = context;
@@ -30,6 +33,7 @@ namespace SmartTask.Web.Services.Implementations
             _notificationService = notificationService;
             _activityLogService = activityLogService;
             _currentUser = currentUser;
+            _rewardCoordinator = rewardCoordinator;
         }
 
         public override async Task AddAsync(TaskItem entity)
@@ -94,6 +98,8 @@ namespace SmartTask.Web.Services.Implementations
             if (task == null)
                 return;
 
+            var wasAlreadyDone = task.Status == TaskStatusType.Done;
+
             task.Status = status;
             task.ChangeDate = DateTime.Now;
 
@@ -113,6 +119,22 @@ namespace SmartTask.Web.Services.Implementations
                 task.Id);
 
             await NotifyStatusChangeAsync(task, statusDisplay);
+
+            // اعطای پاداش گیمیفیکیشن فقط در اولین تکمیل تسک
+            if (status == TaskStatusType.Done && !wasAlreadyDone)
+            {
+                var assigneeIds = task.Assignments
+                    .Where(a => a.ViewState)
+                    .Select(a => a.ApplicationUserId)
+                    .ToList();
+
+                await _rewardCoordinator.HandleTaskCompletedAsync(
+                    task.Id,
+                    task.Title,
+                    assigneeIds,
+                    task.Priority,
+                    task.Estimate);
+            }
         }
 
         private static string GetStatusDisplay(TaskStatusType status) => status switch

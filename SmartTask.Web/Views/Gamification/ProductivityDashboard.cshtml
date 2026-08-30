@@ -1,0 +1,192 @@
+@{
+    ViewData["Title"] = "داشبورد بهره‌وری";
+}
+
+<style>
+    .prod-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .prod-header { margin-bottom: 2rem; }
+    .prod-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .prod-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .prod-score-hero { text-align: center; padding: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1.5rem; }
+    .prod-score-hero .score { font-size: 4rem; font-weight: 800; line-height: 1; }
+    .prod-score-hero .tier { font-size: 1.1rem; font-weight: 600; margin-top: .5rem; }
+    .prod-score-hero .label { font-size: .85rem; color: var(--gray500); margin-top: .25rem; }
+
+    .prod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .prod-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; }
+    .prod-stat .value { font-size: 2rem; font-weight: 700; color: var(--text); }
+    .prod-stat .label { font-size: .8rem; color: var(--gray500); margin-top: .25rem; }
+    .prod-stat .bar { height: 6px; background: var(--gray200); border-radius: 3px; margin-top: .5rem; overflow: hidden; }
+    .prod-stat .bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+
+    .prod-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .prod-section h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .prod-section h3 i { color: var(--primary); }
+
+    .history-chart { height: 200px; display: flex; align-items: flex-end; gap: 4px; padding-top: 1rem; }
+    .history-bar { flex: 1; min-width: 8px; background: var(--primary); border-radius: 4px 4px 0 0; transition: height .5s ease; position: relative; }
+    .history-bar:hover { opacity: .8; }
+    .history-bar .tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: .7rem; white-space: nowrap; }
+    .history-bar:hover .tooltip { display: block; }
+
+    .bench-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .bench-item { text-align: center; padding: 1rem; background: var(--bg); border-radius: 10px; }
+    .bench-item .value { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+    .bench-item .label { font-size: .8rem; color: var(--gray500); margin-top: .2rem; }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--gray400); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--primary); }
+
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<div class="prod-container">
+    <div class="prod-header">
+        <h1>📈 داشبورد بهره‌وری</h1>
+        <p>پیگیری معیارهای بهره‌وری و مقایسه با میانگین تیم</p>
+    </div>
+
+    <!-- Main Score -->
+    <div class="prod-score-hero" id="prodScoreHero">
+        <div class="score" id="prodScore" style="color:var(--primary);">—</div>
+        <div class="tier" id="prodTier">—</div>
+        <div class="label">امتیاز بهره‌وری</div>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="prod-grid" id="prodMetrics">
+        <div class="prod-stat">
+            <div class="value" id="metric-completion">—</div>
+            <div class="label">نرخ تکمیل</div>
+            <div class="bar"><div class="bar-fill" id="bar-completion" style="width:0;background:var(--primary);"></div></div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="metric-ontime">—</div>
+            <div class="label">تحویل به‌موقع</div>
+            <div class="bar"><div class="bar-fill" id="bar-ontime" style="width:0;background:var(--success);"></div></div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="metric-consistency">—</div>
+            <div class="label">ثبات فعالیت</div>
+            <div class="bar"><div class="bar-fill" id="bar-consistency" style="width:0;background:var(--warning);"></div></div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="metric-quality">—</div>
+            <div class="label">کیفیت کار</div>
+            <div class="bar"><div class="bar-fill" id="bar-quality" style="width:0;background:var(--danger);"></div></div>
+        </div>
+    </div>
+
+    <!-- Streak & Activity -->
+    <div class="prod-grid">
+        <div class="prod-stat">
+            <div class="value" id="prod-streak">—</div>
+            <div class="label">🔥 روزهای پیاپی</div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="prod-completed">—</div>
+            <div class="label">تکمیل شده</div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="prod-assigned">—</div>
+            <div class="label">تخصیص یافته</div>
+        </div>
+        <div class="prod-stat">
+            <div class="value" id="prod-ontime-count">—</div>
+            <div class="label">به‌موقع تحویل</div>
+        </div>
+    </div>
+
+    <!-- History Chart -->
+    <div class="prod-section">
+        <h3><i class="fa-solid fa-chart-line"></i> روند ۳۰ روز اخیر</h3>
+        <div class="history-chart" id="historyChart">
+            <div class="empty-state" style="width:100%;"><p>در حال بارگذاری...</p></div>
+        </div>
+    </div>
+
+    <!-- Benchmarks -->
+    <div class="prod-section">
+        <h3><i class="fa-solid fa-scale-balanced"></i> مقایسه عملکرد</h3>
+        <div class="bench-grid" id="benchGrid">
+            <div class="bench-item"><div class="value" id="bench-avg">—</div><div class="label">میانگین فضای کاری</div></div>
+            <div class="bench-item"><div class="value" id="bench-rank">—</div><div class="label">رتبه‌بندی صدکی</div></div>
+            <div class="bench-item"><div class="value" id="bench-diff">—</div><div class="label">اختلاف با میانگین</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")';
+        if (!userId || userId === '0') return;
+
+        // Load main metrics
+        fetch('/api/productivity/user/' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                // Score
+                document.getElementById('prodScore').textContent = Math.round(d.productivityScore || d.score || 0);
+                var tier = d.tierName || d.tier || 'Bronze';
+                var badge = d.tierBadge || '🥉';
+                document.getElementById('prodTier').textContent = badge + ' ' + tier;
+                document.getElementById('prodScore').style.color = d.tierColor || 'var(--primary)';
+
+                // Metrics bars
+                var completion = d.taskCompletionRate || d.completionRate || 0;
+                var ontime = d.onTimeDeliveryRate || d.onTimeRate || 0;
+                var consistency = d.consistencyRate || 0;
+                var quality = d.qualityScore || 0;
+
+                document.getElementById('metric-completion').textContent = Math.round(completion) + '%';
+                document.getElementById('metric-ontime').textContent = Math.round(ontime) + '%';
+                document.getElementById('metric-consistency').textContent = Math.round(consistency) + '%';
+                document.getElementById('metric-quality').textContent = Math.round(quality) + '%';
+                document.getElementById('bar-completion').style.width = completion + '%';
+                document.getElementById('bar-ontime').style.width = ontime + '%';
+                document.getElementById('bar-consistency').style.width = consistency + '%';
+                document.getElementById('bar-quality').style.width = quality + '%';
+
+                // Stats
+                document.getElementById('prod-streak').textContent = (d.currentStreak || 0) + ' روز';
+                document.getElementById('prod-completed').textContent = d.totalTasksCompleted || 0;
+                document.getElementById('prod-assigned').textContent = d.totalTasksAssigned || 0;
+                document.getElementById('prod-ontime-count').textContent = d.onTimeTasksCompleted || 0;
+            })
+            .catch(function(e) { console.error('Productivity load error:', e); });
+
+        // Load history
+        fetch('/api/productivity/user/' + userId + '/history?days=30')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var history = data.history || data || [];
+                if (!history || history.length === 0) return;
+                var chart = document.getElementById('historyChart');
+                chart.innerHTML = '';
+                var max = Math.max.apply(null, history.map(function(h) { return h.productivityScore || h.score || 0; }));
+                history.forEach(function(h) {
+                    var score = h.productivityScore || h.score || 0;
+                    var pct = max > 0 ? (score / max * 100) : 0;
+                    var bar = document.createElement('div');
+                    bar.className = 'history-bar';
+                    bar.style.height = pct + '%';
+                    bar.innerHTML = '<span class="tooltip">' + Math.round(score) + ' - ' + (h.snapshotDate || h.date || '') + '</span>';
+                    chart.appendChild(bar);
+                });
+            })
+            .catch(function() {});
+
+        // Load benchmarks
+        fetch('/api/productivity/benchmarks')
+            .then(function(r) { return r.json(); })
+            .then(function(b) {
+                document.getElementById('bench-avg').textContent = Math.round(b.workspaceAverageScore || b.averageScore || 0);
+                document.getElementById('bench-rank').textContent = Math.round(b.userRankPercentile || b.rankPercentile || 0) + '%';
+                var diff = (b.comparisonToAverage || b.comparison || 0);
+                document.getElementById('bench-diff').textContent = (diff >= 0 ? '+' : '') + Math.round(diff);
+                document.getElementById('bench-diff').style.color = diff >= 0 ? 'var(--success)' : 'var(--danger)';
+            })
+            .catch(function() {});
+    })();
+</script>

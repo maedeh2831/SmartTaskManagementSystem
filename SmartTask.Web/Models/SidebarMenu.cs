@@ -208,6 +208,41 @@ namespace SmartTask.Web.Models
                     }
                 }
             },
+            // ===== بازی‌وارسازی =====
+            new()
+            {
+                Title = "بازی‌وارسازی",
+                Category = "بازی‌وارسازی",
+                Icon = "fa-solid fa-gamepad",
+                RequiresContext = ContextRequirementType.None,
+                Children = new()
+                {
+                    new() { Title = "ردیف‌بندی", Icon = "fa-solid fa-trophy", Controller = "GamificationMVC", Action = "Leaderboards", RequiresContext = ContextRequirementType.None },
+                    new() { Title = "دستاوردها", Icon = "fa-solid fa-medal", Controller = "GamificationMVC", Action = "Achievements", RequiresContext = ContextRequirementType.None },
+                    new() { Title = "بازارچه", Icon = "fa-solid fa-store", Controller = "GamificationMVC", Action = "Marketplace", RequiresContext = ContextRequirementType.None },
+                    new() { Title = "انبار من", Icon = "fa-solid fa-box-open", Controller = "GamificationMVC", Action = "Inventory", RequiresContext = ContextRequirementType.None },
+                    new() { Title = "مسیر پیشرفت", Icon = "fa-solid fa-flag-checkered", Controller = "GamificationMVC", Action = "Milestones", RequiresContext = ContextRequirementType.None },
+                }
+            },
+            new()
+            {
+                Title = "بهره‌وری",
+                Category = "بازی‌وارسازی",
+                Icon = "fa-solid fa-chart-line",
+                Controller = "ProductivityMVC",
+                Action = "Index",
+                RequiresContext = ContextRequirementType.None
+            },
+            new()
+            {
+                Title = "شبیه‌سازی",
+                Category = "بازی‌وارسازی",
+                Icon = "fa-solid fa-flask",
+                Controller = "SimulationMVC",
+                Action = "Index",
+                RequiresContext = ContextRequirementType.Project
+            },
+
             // ===== سیستم =====
             new()
             {

@@ -13,18 +13,20 @@ public class SprintServiceTests
 {
     private readonly Mock<IGenericRepository<Sprint>> _repoMock;
     private readonly Mock<IUnitOfWork> _uowMock;
+    private readonly Mock<SmartTask.Web.Services.Gamification.ITaskRewardCoordinator> _rewardCoordinatorMock;
 
     public SprintServiceTests()
     {
         _repoMock = new Mock<IGenericRepository<Sprint>>();
         _uowMock = new Mock<IUnitOfWork>();
+        _rewardCoordinatorMock = new Mock<SmartTask.Web.Services.Gamification.ITaskRewardCoordinator>();
     }
 
     private SprintService CreateService(ApplicationDbContext context)
     {
         _repoMock.Setup(r => r.Query())
             .Returns(() => context.Sprints.AsQueryable());
-        return new SprintService(_repoMock.Object, _uowMock.Object, context);
+        return new SprintService(_repoMock.Object, _uowMock.Object, context, _rewardCoordinatorMock.Object);
     }
 
     private void SeedSprint(

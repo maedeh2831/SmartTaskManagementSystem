@@ -1,0 +1,357 @@
+@{
+    ViewData["Title"] = "شبیه‌سازی پروژه";
+    var projectId = Context.Request.Query["projectId"].FirstOrDefault() ?? "";
+}
+
+<style>
+    .sim-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .sim-header { margin-bottom: 2rem; }
+    .sim-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .sim-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .sim-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: .5rem; overflow-x: auto; }
+    .sim-tab { padding: .5rem 1.25rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--gray500); transition: all .2s; white-space: nowrap; }
+    .sim-tab:hover { background: var(--primary-light); color: var(--primary); }
+    .sim-tab.active { background: var(--primary); color: #fff; }
+
+    .sim-panel { display: none; animation: fadeIn .3s ease; }
+    .sim-panel.active { display: block; }
+
+    .sim-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .sim-card h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .sim-card h3 i { color: var(--primary); font-size: 1rem; }
+
+    .critical-path-list { display: flex; flex-direction: column; gap: .75rem; }
+    .cp-task { display: flex; align-items: center; gap: 1rem; padding: .75rem 1rem; background: var(--bg); border-radius: 8px; border-left: 4px solid var(--danger); transition: background .2s; }
+    .cp-task:hover { background: var(--hover-bg); }
+    .cp-task .task-name { flex: 1; font-weight: 500; color: var(--text); }
+    .cp-task .task-days { font-size: .85rem; color: var(--gray500); background: var(--bg-secondary); padding: 2px 10px; border-radius: 20px; }
+    .cp-task .slack-zero { font-size: .8rem; color: var(--danger); font-weight: 600; }
+    .cp-task .slack-positive { font-size: .8rem; color: var(--success); font-weight: 600; }
+
+    .what-if-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .form-group label { font-weight: 600; font-size: .85rem; color: var(--text); }
+    .form-group select, .form-group input { padding: .6rem .75rem; border: 1px solid var(--border); border-radius: 8px; font-size: .9rem; background: var(--card); color: var(--text); transition: border-color .2s; }
+    .form-group select:focus, .form-group input:focus { border-color: var(--primary); outline: none; }
+
+    .impact-results { margin-top: 1.5rem; animation: slideUp .4s ease; }
+    .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .impact-stat { text-align: center; padding: 1.25rem; background: var(--bg); border-radius: 10px; }
+    .impact-stat .value { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .impact-stat .label { font-size: .8rem; color: var(--gray500); margin-top: .25rem; }
+    .impact-stat.danger .value { color: var(--danger); }
+    .impact-stat.warning .value { color: var(--warning); }
+
+    .affected-tasks { display: flex; flex-direction: column; gap: .5rem; }
+    .affected-task { display: flex; justify-content: space-between; align-items: center; padding: .6rem 1rem; background: var(--bg); border-radius: 8px; }
+    .affected-task .name { font-weight: 500; color: var(--text); }
+    .affected-task .delay { font-size: .85rem; color: var(--danger); font-weight: 600; }
+
+    .scenario-list { display: flex; flex-direction: column; gap: .75rem; }
+    .scenario-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg); border-radius: 10px; cursor: pointer; transition: all .2s; border: 1px solid transparent; }
+    .scenario-item:hover { border-color: var(--primary); background: var(--primary-light); }
+    .scenario-item .info h4 { font-size: .95rem; font-weight: 600; color: var(--text); }
+    .scenario-item .info p { font-size: .8rem; color: var(--gray500); margin-top: .2rem; }
+    .scenario-item .date { font-size: .8rem; color: var(--gray400); }
+
+    .btn-sim { padding: .65rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: .5rem; }
+    .btn-sim-primary { background: var(--primary); color: #fff; }
+    .btn-sim-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-sim-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-sim-outline:hover { background: var(--hover-bg); }
+
+    .sim-loading { text-align: center; padding: 3rem; color: var(--gray500); }
+    .sim-loading i { font-size: 2rem; color: var(--primary); animation: spin 1s linear infinite; }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--gray400); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+
+<div class="sim-container">
+    <div class="sim-header">
+        <h1>🔬 شبیه‌سازی پروژه</h1>
+        <p>تحلیل مسیر بحرانی و سناریوهای «اگر چه بشود»</p>
+    </div>
+
+    <div class="sim-tabs">
+        <div class="sim-tab active" onclick="switchSimTab('critical-path')">
+            <i class="fa-solid fa-route"></i> مسیر بحرانی
+        </div>
+        <div class="sim-tab" onclick="switchSimTab('what-if')">
+            <i class="fa-solid fa-flask"></i> سناریو «اگر چه بشود»
+        </div>
+        <div class="sim-tab" onclick="switchSimTab('scenarios')">
+            <i class="fa-solid fa-code-branch"></i> سناریوهای ذخیره‌شده
+        </div>
+    </div>
+
+    <!-- Critical Path Panel -->
+    <div class="sim-panel active" id="panel-critical-path">
+        <div class="sim-card">
+            <h3><i class="fa-solid fa-route"></i> مسیر بحرانی پروژه</h3>
+            <div id="criticalPathContent">
+                <div class="sim-loading"><i class="fa-solid fa-spinner"></i><p>در حال محاسبه...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What-If Panel -->
+    <div class="sim-panel" id="panel-what-if">
+        <div class="sim-card">
+            <h3><i class="fa-solid fa-flask"></i> سناریوی جدید</h3>
+            <div class="what-if-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>وظیفه مورد نظر</label>
+                        <select id="simTaskSelect">
+                            <option value="">انتخاب کنید...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>روزهای تأخیر</label>
+                        <input type="number" id="simDelayDays" min="1" max="365" value="5" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>نام سناریو (اختیاری)</label>
+                    <input type="text" id="simScenarioName" placeholder="مثلاً: تأخیر تأمین‌کننده" />
+                </div>
+                <div>
+                    <button class="btn-sim btn-sim-primary" onclick="runWhatIf()">
+                        <i class="fa-solid fa-play"></i> اجرای شبیه‌سازی
+                    </button>
+                </div>
+            </div>
+            <div id="whatIfResults"></div>
+        </div>
+    </div>
+
+    <!-- Saved Scenarios Panel -->
+    <div class="sim-panel" id="panel-scenarios">
+        <div class="sim-card">
+            <h3><i class="fa-solid fa-code-branch"></i> سناریوهای ذخیره‌شده</h3>
+            <div id="scenariosContent">
+                <div class="sim-loading"><i class="fa-solid fa-spinner"></i><p>در حال بارگذاری...</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var SIM_PROJECT_ID = '@projectId';
+    var SIM_TASKS = [];
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // خطای واقعی سرور را بیرون می‌کشد تا بی‌صدا رد نشود
+    function readResponse(r) {
+        return r.json().catch(function () { return {}; }).then(function (body) {
+            if (r.status === 403) throw new Error('برای مشاهده تحلیل این پروژه دسترسی کافی ندارید');
+            if (r.status === 404) throw new Error(body.message || 'پروژه یافت نشد');
+            if (!r.ok) throw new Error(body.message || ('خطای سرور (' + r.status + ')'));
+            return body;
+        });
+    }
+
+    function errorBox(message, retryFn) {
+        return '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i>' +
+            '<p>' + escapeHtml(message) + '</p>' +
+            (retryFn ? '<button class="btn-sim btn-sim-primary" style="margin-top:1rem;" onclick="' + retryFn + '">' +
+                '<i class="fa-solid fa-rotate"></i> تلاش مجدد</button>' : '') +
+            '</div>';
+    }
+
+    function switchSimTab(tab) {
+        document.querySelectorAll('.sim-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.sim-panel').forEach(function(p) { p.classList.remove('active'); });
+        event.target.closest('.sim-tab').classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+        if (tab === 'critical-path') loadCriticalPath();
+        if (tab === 'scenarios') loadScenarios();
+    }
+
+    // یک بار داده را می‌گیرد و هم مسیر بحرانی و هم فهرست وظایف را پر می‌کند
+    function loadCriticalPath() {
+        var el = document.getElementById('criticalPathContent');
+        el.innerHTML = '<div class="sim-loading"><i class="fa-solid fa-spinner"></i><p>در حال محاسبه...</p></div>';
+
+        fetch('/api/simulation/project/' + SIM_PROJECT_ID + '/critical-path', {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(readResponse)
+            .then(function (data) {
+                // نام فیلدها طبق CriticalPathDto: taskSlackTimes
+                var tasks = data.taskSlackTimes || [];
+                SIM_TASKS = tasks;
+                populateTaskSelect(tasks);
+
+                if (tasks.length === 0) {
+                    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-route"></i>' +
+                        '<p>این پروژه وظیفه‌ای با تاریخ و تخمین ندارد، پس مسیر بحرانی محاسبه نمی‌شود</p></div>';
+                    return;
+                }
+
+                var criticalCount = tasks.filter(function (t) { return t.isOnCriticalPath; }).length;
+
+                var html = '<div style="margin-bottom:1rem;display:flex;gap:1.5rem;flex-wrap:wrap;color:var(--gray500);font-size:.85rem;">' +
+                    '<span>طول مسیر بحرانی: <strong>' + (data.criticalPathLengthDays || 0) + ' روز</strong></span>' +
+                    '<span>وظایف بحرانی: <strong>' + criticalCount + '</strong> از ' + tasks.length + '</span>' +
+                    '</div><div class="critical-path-list">';
+
+                tasks.forEach(function (t) {
+                    var critical = t.isOnCriticalPath;
+                    html += '<div class="cp-task" style="border-left-color:' +
+                        (critical ? 'var(--danger)' : 'var(--success)') + ';">';
+                    html += '<span class="task-name">' + escapeHtml(t.taskTitle || '—') + '</span>';
+                    html += '<span class="task-days">' + (t.estimateDays || 0) + ' روز</span>';
+                    html += critical
+                        ? '<span class="slack-zero">بحرانی</span>'
+                        : '<span class="slack-positive">انعطاف: ' + (t.slackTimeDays || 0) + ' روز</span>';
+                    html += '</div>';
+                });
+
+                html += '</div>';
+                el.innerHTML = html;
+            })
+            .catch(function (e) {
+                console.error('Critical path load failed:', e);
+                el.innerHTML = errorBox(e.message, 'loadCriticalPath()');
+            });
+    }
+
+    function populateTaskSelect(tasks) {
+        var sel = document.getElementById('simTaskSelect');
+        if (!sel) return;
+
+        if (!tasks || tasks.length === 0) {
+            sel.innerHTML = '<option value="">وظیفه‌ای برای شبیه‌سازی موجود نیست</option>';
+            return;
+        }
+
+        var html = '<option value="">انتخاب کنید...</option>';
+        tasks.forEach(function (t) {
+            html += '<option value="' + t.taskId + '">' +
+                escapeHtml(t.taskTitle || ('وظیفه #' + t.taskId)) +
+                (t.isOnCriticalPath ? ' (بحرانی)' : '') +
+                '</option>';
+        });
+        sel.innerHTML = html;
+    }
+
+    function runWhatIf() {
+        var taskId = document.getElementById('simTaskSelect').value;
+        var delayDays = document.getElementById('simDelayDays').value;
+        var scenarioName = document.getElementById('simScenarioName').value;
+        if (!taskId) { alert('یک وظیفه انتخاب کنید'); return; }
+
+        var el = document.getElementById('whatIfResults');
+        el.innerHTML = '<div class="sim-loading"><i class="fa-solid fa-spinner"></i><p>در حال شبیه‌سازی...</p></div>';
+
+        fetch('/api/simulation/project/' + SIM_PROJECT_ID + '/what-if', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                projectId: parseInt(SIM_PROJECT_ID),
+                taskId: parseInt(taskId),
+                delayDays: parseInt(delayDays),
+                scenarioName: scenarioName
+            })
+        })
+            .then(readResponse)
+            .then(function (data) {
+                // پاسخ SimulationScenarioDto است و جزئیات در impactAnalysis قرار دارد
+                var impact = data.impactAnalysis || data;
+
+                var html = '<div class="impact-results"><div class="impact-grid">';
+                html += '<div class="impact-stat danger"><div class="value">' +
+                    (impact.projectDelayDays != null ? impact.projectDelayDays : 0) +
+                    '</div><div class="label">روز تأخیر پروژه</div></div>';
+                html += '<div class="impact-stat warning"><div class="value">' +
+                    (impact.totalAffectedTasks != null ? impact.totalAffectedTasks : 0) +
+                    '</div><div class="label">وظایف تأثیرپذیر</div></div>';
+                html += '<div class="impact-stat"><div class="value">' +
+                    escapeHtml(impact.riskLevel || '—') + '</div><div class="label">سطح ریسک</div></div>';
+                html += '</div>';
+
+                var affected = impact.affectedTasks || [];
+                if (affected.length > 0) {
+                    html += '<h4 style="margin:1rem 0 .5rem;color:var(--text);font-size:.95rem;">زنجیره تأثیرات</h4>';
+                    html += '<div class="affected-tasks">';
+                    affected.forEach(function (t) {
+                        html += '<div class="affected-task">';
+                        html += '<span class="name">' + escapeHtml(t.taskTitle || '—') +
+                            (t.dependencyPath ? '<br><small style="color:var(--gray400);">' +
+                                escapeHtml(t.dependencyPath) + '</small>' : '') + '</span>';
+                        html += '<span class="delay">+' + (t.daysShifted != null ? t.daysShifted : 0) + ' روز</span>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div style="background:var(--bg);padding:1rem;border-radius:8px;color:var(--gray600);font-size:.9rem;margin-top:1rem;">' +
+                        'این تأخیر هیچ وظیفه دیگری را تحت تأثیر قرار نمی‌دهد.</div>';
+                }
+
+                html += '</div>';
+                el.innerHTML = html;
+            })
+            .catch(function (e) {
+                console.error('What-if failed:', e);
+                el.innerHTML = errorBox(e.message);
+            });
+    }
+
+    function loadScenarios() {
+        var el = document.getElementById('scenariosContent');
+        el.innerHTML = '<div class="sim-loading"><i class="fa-solid fa-spinner"></i><p>در حال بارگذاری...</p></div>';
+
+        fetch('/api/simulation/project/' + SIM_PROJECT_ID + '/scenarios', {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(readResponse)
+            .then(function (data) {
+                var scenarios = Array.isArray(data) ? data : (data.scenarios || []);
+                if (scenarios.length === 0) {
+                    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-code-branch"></i>' +
+                        '<p>هنوز سناریویی ذخیره نشده</p></div>';
+                    return;
+                }
+
+                var html = '<div class="scenario-list">';
+                scenarios.forEach(function (s) {
+                    var when = s.simulatedAt ? new Date(s.simulatedAt).toLocaleDateString('fa-IR') : '';
+                    html += '<div class="scenario-item">';
+                    html += '<div class="info"><h4>' +
+                        escapeHtml(s.scenarioName || ('سناریو #' + s.id)) + '</h4><p>' +
+                        'تأخیر ' + (s.delayDays || 0) + ' روز در «' + escapeHtml(s.simulatedTaskTitle || '—') + '»' +
+                        ' — تأخیر پروژه: ' + (s.projectDelayDays || 0) + ' روز</p></div>';
+                    html += '<span class="date">' + when + '</span>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                el.innerHTML = html;
+            })
+            .catch(function (e) {
+                console.error('Scenarios load failed:', e);
+                el.innerHTML = errorBox(e.message, 'loadScenarios()');
+            });
+    }
+
+    // بارگذاری اولیه
+    if (SIM_PROJECT_ID) {
+        loadCriticalPath();
+    } else {
+        document.getElementById('criticalPathContent').innerHTML =
+            '<div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>ابتدا یک پروژه انتخاب کنید</p></div>';
+        populateTaskSelect([]);
+    }
+</script>

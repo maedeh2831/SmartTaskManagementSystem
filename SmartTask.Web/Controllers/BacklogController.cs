@@ -45,18 +45,21 @@ public class BacklogController : BaseController
 
         await _backlogService.GetOrCreateAsync(projectId);
 
-        // Load all sprints for this project
+        // Load all sprints for this project with their stories and tasks
         var sprints = await _context.Sprints
             .Where(x => x.ProjectId == projectId && x.ViewState)
             .Include(x => x.UserStories.Where(s => s.ViewState))
             .ThenInclude(x => x.Owner)
+            .Include(x => x.UserStories)
+            .ThenInclude(x => x.Tasks.Where(t => t.ViewState))
             .OrderBy(x => x.StartDate)
             .ToListAsync();
 
-        // Load unassigned stories (not in any sprint)
+        // Load unassigned stories (not in any sprint) with their tasks
         var unassignedStories = await _context.UserStories
             .Where(x => x.ProjectId == projectId && x.SprintId == null && x.ViewState)
             .Include(x => x.Owner)
+            .Include(x => x.Tasks.Where(t => t.ViewState))
             .OrderBy(x => x.Order)
             .ToListAsync();
 
@@ -66,6 +69,11 @@ public class BacklogController : BaseController
             .ToListAsync();
 
         var contributorsMap = await _userStoryService.GetContributorsMapAsync(projectId);
+
+        // Load task assignments to get assignee names
+        var taskAssignments = await _context.TaskAssignments
+            .Include(x => x.ApplicationUser)
+            .ToListAsync();
 
         var vm = new BacklogIndexViewModel
         {
@@ -90,7 +98,17 @@ public class BacklogController : BaseController
                     Status = x.Status,
                     OwnerId = x.OwnerId,
                     OwnerName = x.Owner != null ? x.Owner.FullName : null,
-                    Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>()
+                    Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>(),
+                    Tasks = x.Tasks.Select(t => new BacklogTaskItemViewModel
+                    {
+                        Id = t.Id,
+                        Title = t.Title,
+                        Status = t.Status,
+                        Type = t.Type,
+                        Priority = t.Priority,
+                        Estimate = t.Estimate,
+                        AssigneeName = taskAssignments.FirstOrDefault(a => a.TaskItemId == t.Id)?.ApplicationUser?.FullName
+                    }).ToList()
                 }).ToList()
             }).ToList(),
             UnassignedStories = unassignedStories.Select(x => new UserStoryListItemViewModel
@@ -104,7 +122,17 @@ public class BacklogController : BaseController
                 Status = x.Status,
                 OwnerId = x.OwnerId,
                 OwnerName = x.Owner != null ? x.Owner.FullName : null,
-                Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>()
+                Contributors = contributorsMap.TryGetValue(x.Id, out var names) ? names : new List<string>(),
+                Tasks = x.Tasks.Select(t => new BacklogTaskItemViewModel
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Status = t.Status,
+                    Type = t.Type,
+                    Priority = t.Priority,
+                    Estimate = t.Estimate,
+                    AssigneeName = taskAssignments.FirstOrDefault(a => a.TaskItemId == t.Id)?.ApplicationUser?.FullName
+                }).ToList()
             }).ToList(),
             ProjectMembers = members.Select(x => new ProjectMemberOptionViewModel
             {

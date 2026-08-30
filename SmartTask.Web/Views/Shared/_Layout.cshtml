@@ -1,11 +1,17 @@
 ﻿@inject SmartTask.Web.Infrastructure.Interfaces.ICurrentUserService CurrentUserService
+@inject SmartTask.Web.Services.Gamification.IEquippedCosmeticsService EquippedCosmetics
 @{
     var themePreference = "system";
     var isJalaliDate = false;
+    var shopTheme = "";
     if (CurrentUserService.IsAuthenticated && CurrentUserService.CurrentUser != null)
     {
         themePreference = CurrentUserService.CurrentUser.Theme.ToString().ToLower();
         isJalaliDate = CurrentUserService.CurrentUser.DateFormat == SmartTask.Web.Models.Enums.DateFormatType.Jalali;
+
+        // پوسته خریداری‌شده و فعال‌شده از فروشگاه
+        var equipped = await EquippedCosmetics.GetForUserAsync(CurrentUserService.UserId);
+        shopTheme = equipped.ThemeSlug ?? "";
     }
 }
 
@@ -26,6 +32,14 @@
             }
             document.documentElement.setAttribute("data-theme", theme);
             document.documentElement.setAttribute("data-theme-preference", stored || "system");
+
+            // پوسته فروشگاه (در صورت فعال بودن)
+            var shopTheme = "@shopTheme";
+            if (shopTheme) {
+                document.documentElement.setAttribute("data-shop-theme", shopTheme);
+            } else {
+                document.documentElement.removeAttribute("data-shop-theme");
+            }
         })();
     </script>
     

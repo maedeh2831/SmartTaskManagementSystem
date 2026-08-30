@@ -11,14 +11,17 @@ namespace SmartTask.Web.Services.Implementations;
 public class SprintService : BaseService<Sprint>, ISprintService
 {
     private readonly ApplicationDbContext _context;
+    private readonly SmartTask.Web.Services.Gamification.ITaskRewardCoordinator _rewardCoordinator;
 
     public SprintService(
         IGenericRepository<Sprint> repository,
         IUnitOfWork unitOfWork,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        SmartTask.Web.Services.Gamification.ITaskRewardCoordinator rewardCoordinator)
         : base(repository, unitOfWork)
     {
         _context = context;
+        _rewardCoordinator = rewardCoordinator;
     }
 
     public async Task<Sprint?> GetDetailsAsync(int id)
@@ -130,9 +133,15 @@ public class SprintService : BaseService<Sprint>, ISprintService
         var sprint = await _context.Sprints.FirstOrDefaultAsync(x => x.Id == sprintId);
         if (sprint == null) return;
 
+        // فقط اولین بار پاداش داده می‌شود
+        var wasAlreadyCompleted = sprint.Status == SprintStatusType.Completed;
+
         sprint.Status = SprintStatusType.Completed;
         sprint.ChangeDate = DateTime.Now;
         await _context.SaveChangesAsync();
+
+        if (!wasAlreadyCompleted)
+            await _rewardCoordinator.HandleSprintCompletedAsync(sprintId);
     }
 
     public new async Task DeleteAsync(int id)

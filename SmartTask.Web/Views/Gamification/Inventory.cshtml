@@ -1,0 +1,259 @@
+@{
+    ViewData["Title"] = "انبار من";
+}
+
+<style>
+    .inv-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .inv-header { margin-bottom: 2rem; }
+    .inv-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .inv-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .inv-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: .25rem; }
+    .inv-tab { padding: .5rem 1.25rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--gray500); transition: all .2s; white-space: nowrap; border: 1px solid var(--border); background: transparent; }
+    .inv-tab:hover { background: var(--primary-light); color: var(--primary); }
+    .inv-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .inv-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: all .25s; position: relative; }
+    .inv-item:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+    .inv-item.equipped { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+    .inv-item .icon { font-size: 2.5rem; margin-bottom: .5rem; }
+    .inv-item .name { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: .25rem; }
+    .inv-item .desc { font-size: .8rem; color: var(--gray500); line-height: 1.4; margin-bottom: .5rem; min-height: 2.2rem; }
+    .inv-item .meta { font-size: .75rem; color: var(--gray400); display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap; }
+    .inv-item .badge-equipped { position: absolute; top: 8px; right: 8px; background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: .7rem; font-weight: 600; }
+    .inv-rarity { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .68rem; font-weight: 700; color: #fff; }
+    .inv-rarity.r1 { background: #95a5a6; }
+    .inv-rarity.r2 { background: #27ae60; }
+    .inv-rarity.r3 { background: #3498db; }
+    .inv-rarity.r4 { background: #9b59b6; }
+    .inv-rarity.r5 { background: #f39c12; }
+
+    .inv-btn { margin-top: .75rem; padding: .45rem .9rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; width: 100%; }
+    .inv-btn:disabled { opacity: .6; cursor: default; }
+    .inv-btn-equip { background: var(--primary); color: #fff; }
+    .inv-btn-equip:hover:not(:disabled) { opacity: .85; }
+    .inv-btn-unequip { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .inv-btn-unequip:hover:not(:disabled) { background: var(--hover-bg); }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--gray400); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--primary); opacity: .35; }
+
+    .inv-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: .85rem 1.75rem; border-radius: 8px; z-index: 9999; font-weight: 600; color: #fff; }
+</style>
+
+<div class="inv-container">
+    <div class="inv-header">
+        <h1><i class="fa-solid fa-box-open"></i> انبار من</h1>
+        <p>اقلام خریداری‌شده و تجهیزات پروفایل خود را مدیریت کنید</p>
+    </div>
+
+    <div class="inv-tabs" id="invTabs"></div>
+
+    <div class="inv-grid" id="invGrid">
+        <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>در حال بارگذاری...</p></div>
+    </div>
+</div>
+
+<script>
+    var allItems = [];
+    var activeCategory = '';
+
+    var RARITY_NAMES = { 1: 'عام', 2: 'نادر', 3: 'بسیار نادر', 4: 'حماسی', 5: 'افسانه‌ای' };
+    var CATEGORY_NAMES = {
+        'Avatar Border': 'حاشیه آواتار',
+        'Badge': 'نشان',
+        'Theme': 'پوسته',
+        'Perk': 'مزایا'
+    };
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function rarityKey(rarity) {
+        if (typeof rarity === 'number') return rarity;
+        var parsed = parseInt(rarity, 10);
+        if (!isNaN(parsed)) return parsed;
+        var byName = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5 };
+        return byName[String(rarity || '').toLowerCase()] || 1;
+    }
+
+    function showToast(message, ok) {
+        var toast = document.createElement('div');
+        toast.className = 'inv-toast';
+        toast.style.background = ok ? '#27ae60' : '#e74c3c';
+        toast.innerHTML = '<i class="fa-solid ' + (ok ? 'fa-check-circle' : 'fa-triangle-exclamation') + '"></i> ' + escapeHtml(message);
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 3000);
+    }
+
+    // دسته‌بندی‌ها از داده واقعی ساخته می‌شوند تا با اقلام موجود مطابق باشند
+    function renderTabs() {
+        var categories = [];
+        allItems.forEach(function (i) {
+            var c = i.category || '';
+            if (c && categories.indexOf(c) === -1) categories.push(c);
+        });
+
+        var html = '<button class="inv-tab' + (activeCategory === '' ? ' active' : '') + '" data-category="">همه (' + allItems.length + ')</button>';
+        categories.forEach(function (c) {
+            var count = allItems.filter(function (i) { return i.category === c; }).length;
+            html += '<button class="inv-tab' + (activeCategory === c ? ' active' : '') + '" data-category="' + escapeHtml(c) + '">' +
+                escapeHtml(CATEGORY_NAMES[c] || c) + ' (' + count + ')</button>';
+        });
+
+        var tabs = document.getElementById('invTabs');
+        tabs.innerHTML = html;
+        tabs.querySelectorAll('.inv-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                activeCategory = this.dataset.category;
+                renderTabs();
+                renderItems();
+            });
+        });
+    }
+
+    function renderItems() {
+        var el = document.getElementById('invGrid');
+        var items = activeCategory
+            ? allItems.filter(function (i) { return i.category === activeCategory; })
+            : allItems;
+
+        if (!items.length) {
+            el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><p>' +
+                (allItems.length === 0 ? 'انبار شما خالی است — از فروشگاه خرید کنید' : 'موردی در این دسته یافت نشد') +
+                '</p></div>';
+            return;
+        }
+
+        el.innerHTML = items.map(function (i, index) {
+            var equipped = i.isEquipped === true;
+            var rk = rarityKey(i.rarity);
+
+            return '<div class="inv-item ' + (equipped ? 'equipped' : '') + '">' +
+                (equipped ? '<span class="badge-equipped">✓ فعال</span>' : '') +
+                '<div class="icon">' + escapeHtml(i.itemIcon || '📦') + '</div>' +
+                '<div class="name">' + escapeHtml(i.itemName || 'نامشخص') + '</div>' +
+                '<div class="desc">' + escapeHtml(i.itemDescription || '') + '</div>' +
+                '<div class="meta">' +
+                    '<span class="inv-rarity r' + rk + '">' + (RARITY_NAMES[rk] || '') + '</span>' +
+                    '<span>تعداد: ' + (i.quantity || 1) + '</span>' +
+                '</div>' +
+                '<button class="inv-btn ' + (equipped ? 'inv-btn-unequip' : 'inv-btn-equip') + '" data-index="' + index + '">' +
+                    (equipped ? 'غیرفعال کردن' : 'فعال کردن') +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        el.querySelectorAll('.inv-btn[data-index]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var item = items[parseInt(this.dataset.index, 10)];
+                if (!item) return;
+                toggleEquip(item, this);
+            });
+        });
+    }
+
+    // پوسته، حاشیه آواتار و نشان را بدون بارگذاری مجدد صفحه اعمال می‌کند
+    function applyCosmetics(cosmetics) {
+        if (!cosmetics) return;
+
+        // ۱. پوسته خریداری‌شده روی ریشه سند
+        if (cosmetics.themeSlug) {
+            document.documentElement.setAttribute('data-shop-theme', cosmetics.themeSlug);
+        } else {
+            document.documentElement.removeAttribute('data-shop-theme');
+        }
+
+        // ۲. حاشیه آواتار در هدر
+        var avatar = document.querySelector('.user-avatar');
+        if (avatar) {
+            if (cosmetics.avatarBorderColor) {
+                avatar.classList.add('has-equipped-border');
+                avatar.style.setProperty('--equipped-border-color', cosmetics.avatarBorderColor);
+                avatar.title = cosmetics.avatarBorderName || '';
+                avatar.classList.toggle('border-legendary', cosmetics.avatarBorderRarity >= 5);
+            } else {
+                avatar.classList.remove('has-equipped-border', 'border-legendary');
+                avatar.style.removeProperty('--equipped-border-color');
+                avatar.removeAttribute('title');
+            }
+
+            // ۳. نشان روی آواتار
+            var badge = avatar.querySelector('.user-avatar-badge');
+            if (cosmetics.badgeIcon) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'user-avatar-badge';
+                    avatar.appendChild(badge);
+                }
+                badge.textContent = cosmetics.badgeIcon;
+                badge.title = cosmetics.badgeName || '';
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+    }
+
+    function toggleEquip(item, btn) {        var action = item.isEquipped ? 'unequip' : 'equip';
+        var original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+        fetch('/api/gamification/inventory/' + item.id + '/' + action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+        })
+            .then(function (r) {
+                // پاسخ خطا هم بدنه JSON دارد؛ باید وضعیت بررسی شود
+                return r.json().catch(function () { return {}; }).then(function (body) {
+                    if (!r.ok) throw new Error(body.message || ('HTTP ' + r.status));
+                    return body;
+                });
+            })
+            .then(function (body) {
+                showToast(action === 'equip' ? 'قلم فعال شد' : 'قلم غیرفعال شد', true);
+                // بدون رفرش اعمال می‌شود: پوسته، حاشیه آواتار و نشان فوراً به‌روز می‌شوند
+                applyCosmetics(body && body.cosmetics ? body.cosmetics : null);
+                return loadInventory();
+            })
+            .catch(function (e) {
+                console.error('Equip/unequip failed:', e);
+                btn.disabled = false;
+                btn.innerHTML = original;
+                showToast(e.message || 'عملیات ناموفق بود', false);
+            });
+    }
+
+    function loadInventory() {
+        var userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")';
+        var el = document.getElementById('invGrid');
+
+        if (!userId || userId === '0') {
+            el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-lock"></i><p>برای مشاهده انبار وارد شوید</p></div>';
+            return Promise.resolve();
+        }
+
+        return fetch('/api/gamification/inventory/' + userId, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                allItems = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+                renderTabs();
+                renderItems();
+            })
+            .catch(function (e) {
+                console.error('Inventory load failed:', e);
+                el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i>' +
+                    '<p>خطا در بارگذاری انبار</p>' +
+                    '<button class="inv-btn inv-btn-equip" style="max-width:160px;margin:1rem auto 0;" onclick="loadInventory()">تلاش مجدد</button></div>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadInventory);
+</script>

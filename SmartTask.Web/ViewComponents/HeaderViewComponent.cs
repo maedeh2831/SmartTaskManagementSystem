@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.ViewModels.Shared;
+using SmartTask.Web.Services.Gamification;
 
 namespace SmartTask.Web.ViewComponents
 {
     public class HeaderViewComponent : ViewComponent
     {
         private readonly ICurrentUserService _currentUser;
+        private readonly IEquippedCosmeticsService _cosmeticsService;
 
-        public HeaderViewComponent(ICurrentUserService currentUser)
+        public HeaderViewComponent(
+            ICurrentUserService currentUser,
+            IEquippedCosmeticsService cosmeticsService)
         {
             _currentUser = currentUser;
+            _cosmeticsService = cosmeticsService;
         }
 
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
             var model = new HeaderViewModel
             {
@@ -22,6 +27,9 @@ namespace SmartTask.Web.ViewComponents
                 IsAdmin = _currentUser.IsAdmin,
                 Avatar = _currentUser.Avatar
             };
+
+            if (_currentUser.IsAuthenticated)
+                model.Cosmetics = await _cosmeticsService.GetForUserAsync(_currentUser.UserId);
 
             return View(model);
         }

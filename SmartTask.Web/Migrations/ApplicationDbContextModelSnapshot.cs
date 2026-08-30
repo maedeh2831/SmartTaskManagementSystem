@@ -155,6 +155,173 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.AbuseReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AutoDetectionRule")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ConfidenceLevel")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DetectionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IncidentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RefundedAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReportType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewNotes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReviewedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("RewardsRefunded")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RewardsSuspended")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SeverityScore")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SuspensionUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AbuseReports");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.Achievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ConditionValue")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Rarity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RewardExperience")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RewardPoints")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Achievements", (string)null);
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ActivityLog", b =>
                 {
                     b.Property<int>("Id")
@@ -797,6 +964,342 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("Labels", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.Leaderboard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementsUnlocked")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ConsecutiveCompletionDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("GlobalRank")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("MonthlyPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("MonthlyPointsResetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectsCompleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RankChangeFromPrevious")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TasksCompleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalExperience")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WeeklyPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("WeeklyPointsResetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("WorkspaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkspaceRank")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GlobalRank")
+                        .HasDatabaseName("IX_Leaderboard_GlobalRank");
+
+                    b.HasIndex("LastUpdated")
+                        .HasDatabaseName("IX_Leaderboard_LastUpdated");
+
+                    b.HasIndex("TotalPoints")
+                        .HasDatabaseName("IX_Leaderboard_TotalPoints");
+
+                    b.HasIndex("UserId", "WorkspaceId")
+                        .HasDatabaseName("IX_Leaderboard_UserId_WorkspaceId");
+
+                    b.HasIndex("WorkspaceId", "WorkspaceRank")
+                        .HasDatabaseName("IX_Leaderboard_WorkspaceId_WorkspaceRank");
+
+                    b.ToTable("Leaderboards", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.MarketplaceItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AvailableFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("AvailableUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsLimitedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rarity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalSold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsLimitedTime", "AvailableFrom", "AvailableUntil");
+
+                    b.ToTable("MarketplaceItems");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.MarketplaceTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MarketplaceItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsSpent")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(2);
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserWalletId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MarketplaceItemId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TransactionDate");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserWalletId");
+
+                    b.HasIndex("UserId", "TransactionDate");
+
+                    b.ToTable("MarketplaceTransactions");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.Milestone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RewardExperience")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RewardPoints")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetValue")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Milestones");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -963,6 +1466,221 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("OverdueCascadeLogs", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProductivityMetrics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("ConsistencyRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentStreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("CurrentTier")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCurrentPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("LastActivityDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LongestStreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<double>("OnTimeDeliveryRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("OnTimeTasksCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("OverdueTasksCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("PeriodEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PeriodStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("ProductivityScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<double>("QualityScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<double>("TaskCompletionRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("TasksReopened")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalDaysInPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalTasksAssigned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalTasksCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WorkedDaysThisPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.HasIndex("UserId", "WorkspaceId", "IsCurrentPeriod");
+
+                    b.ToTable("ProductivityMetrics", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProductivityScoreHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("ConsistencyRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentStreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<double>("OnTimeDeliveryRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("OnTimeTasksThisPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("PeriodType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Daily");
+
+                    b.Property<int>("ProductivityMetricsId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ProductivityScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<double>("QualityScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<DateTime>("SnapshotDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("TaskCompletionRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("TasksCompletedThisPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TierAtSnapshot")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductivityMetricsId");
+
+                    b.HasIndex("UserId", "SnapshotDate");
+
+                    b.ToTable("ProductivityScoreHistories", (string)null);
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -1090,6 +1808,69 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("ProjectMembers", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProjectSimulation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BaselineEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("BaselineStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CriticalPathCalculatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CriticalPathLengthDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalTasksCount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectId", "CreatedDate");
+
+                    b.ToTable("ProjectSimulations");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ProjectTeam", b =>
                 {
                     b.Property<int>("Id")
@@ -1185,6 +1966,171 @@ namespace SmartTask.Web.Migrations
                     b.HasIndex("ApplicationUserId", "IsSent");
 
                     b.ToTable("Reminders", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SeasonalEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AchievementBonusMultiplier")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentParticipants")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EligibilityCriteria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ExtraPointsPerCompletion")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasEventLeaderboard")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RewardBonusMultiplier")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeasonalEvents");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SimulationScenario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AffectedTasksJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CriticalPathJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DelayDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("NewProjectEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OriginalProjectEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OriginalTaskEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectDelayDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectSimulationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RiskLevel")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Medium");
+
+                    b.Property<string>("ScenarioName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("SimulatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SimulatedTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalAffectedTasks")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectSimulationId");
+
+                    b.HasIndex("RiskLevel");
+
+                    b.HasIndex("SimulatedAt");
+
+                    b.HasIndex("SimulatedTaskId");
+
+                    b.HasIndex("ProjectSimulationId", "SimulatedAt");
+
+                    b.ToTable("SimulationScenarios");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Sprint", b =>
@@ -1660,6 +2606,124 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("Teams", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.TeamLeaderboard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementsUnlocked")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ActiveMembersThisWeek")
+                        .HasColumnType("int");
+
+                    b.Property<double>("AverageCompletionRate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<double>("AverageProductivity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("AverageTeamLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("MonthlyPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("MonthlyPointsResetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectsCompleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RankChangeFromPrevious")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TasksCompleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamMemberCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamRank")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalTeamExperience")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalTeamPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WeeklyPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("WeeklyPointsResetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastUpdated")
+                        .HasDatabaseName("IX_TeamLeaderboard_LastUpdated");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("IX_TeamLeaderboard_TeamId");
+
+                    b.HasIndex("TotalTeamPoints")
+                        .HasDatabaseName("IX_TeamLeaderboard_TotalTeamPoints");
+
+                    b.HasIndex("WorkspaceId", "TeamRank")
+                        .HasDatabaseName("IX_TeamLeaderboard_WorkspaceId_TeamRank");
+
+                    b.ToTable("TeamLeaderboards", (string)null);
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.TeamMember", b =>
                 {
                     b.Property<int>("Id")
@@ -1762,6 +2826,171 @@ namespace SmartTask.Web.Migrations
                     b.ToTable("TimeLogs", (string)null);
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserAchievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProgressPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UnlockedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProgressionId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AchievementId");
+
+                    b.HasIndex("UserProgressionId");
+
+                    b.HasIndex("UserId", "AchievementId")
+                        .IsUnique();
+
+                    b.ToTable("UserAchievements", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserInventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AcquiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EquippedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEquipped")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("MarketplaceItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsEquipped");
+
+                    b.HasIndex("MarketplaceItemId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "MarketplaceItemId")
+                        .IsUnique();
+
+                    b.ToTable("UserInventories");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserMilestoneProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentProgress")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastProgressUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MilestoneId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetValue")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MilestoneId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMilestoneProgresses");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserNotificationPreference", b =>
                 {
                     b.Property<int>("Id")
@@ -1785,6 +3014,138 @@ namespace SmartTask.Web.Migrations
                         .IsUnique();
 
                     b.ToTable("UserNotificationPreferences");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserProgression", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("ExperienceForNextLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1000);
+
+                    b.Property<DateTime>("JoinedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastProgressUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("SprintsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TasksCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalExperience")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProgressions", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSeasonalEventProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementsUnlocked")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ClaimedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentRank")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventPoints")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasClaimed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoinedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeasonalEventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TasksCompleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeasonalEventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSeasonalEventProgresses");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSession", b =>
@@ -1911,6 +3272,191 @@ namespace SmartTask.Web.Migrations
                     b.HasIndex("ProjectId", "Status");
 
                     b.ToTable("UserStories", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStreak", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentStreak")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastCompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastResetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LongestStreak")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Milestone100Days")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Milestone14Days")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Milestone30Days")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Milestone3Days")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Milestone7Days")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StreakStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TasksCompletedToday")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserTimeZone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("XpGainedToday")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserStreaks");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserWallet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AvailablePoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SpentPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserWallets", (string)null);
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.WalletTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ChangeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangeUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("RelatedAchievementId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProgressionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserWalletId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ViewState")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionDate");
+
+                    b.HasIndex("UserProgressionId");
+
+                    b.HasIndex("UserWalletId");
+
+                    b.ToTable("WalletTransactions", (string)null);
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Workspace", b =>
@@ -2128,6 +3674,23 @@ namespace SmartTask.Web.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.AbuseReport", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId");
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedByUser");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ActivityLog", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
@@ -2302,6 +3865,51 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.Leaderboard", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.MarketplaceTransaction", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.MarketplaceItem", "MarketplaceItem")
+                        .WithMany("Transactions")
+                        .HasForeignKey("MarketplaceItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.UserWallet", "UserWallet")
+                        .WithMany()
+                        .HasForeignKey("UserWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MarketplaceItem");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserWallet");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Notification", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
@@ -2358,6 +3966,44 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("SourceTask");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProductivityMetrics", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProductivityScoreHistory", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ProductivityMetrics", "ProductivityMetrics")
+                        .WithMany("ScoreHistory")
+                        .HasForeignKey("ProductivityMetricsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ProductivityMetrics");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
@@ -2384,6 +4030,17 @@ namespace SmartTask.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProjectSimulation", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
@@ -2424,6 +4081,17 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("TaskItem");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SimulationScenario", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ProjectSimulation", "ProjectSimulation")
+                        .WithMany("Scenarios")
+                        .HasForeignKey("ProjectSimulationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectSimulation");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Sprint", b =>
@@ -2588,6 +4256,25 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Workspace");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.TeamLeaderboard", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("Workspace");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.TeamMember", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
@@ -2626,6 +4313,71 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("TaskItem");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserAchievement", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Achievement", "Achievement")
+                        .WithMany("UserAchievements")
+                        .HasForeignKey("AchievementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.UserProgression", "UserProgression")
+                        .WithMany("Achievements")
+                        .HasForeignKey("UserProgressionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Achievement");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserProgression");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserInventory", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.MarketplaceItem", "MarketplaceItem")
+                        .WithMany("UserInventories")
+                        .HasForeignKey("MarketplaceItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MarketplaceItem");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserMilestoneProgress", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.Milestone", "Milestone")
+                        .WithMany()
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Milestone");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserNotificationPreference", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
@@ -2637,10 +4389,40 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserProgression", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithOne()
+                        .HasForeignKey("SmartTask.Web.Models.Entities.UserProgression", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSeasonalEventProgress", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.SeasonalEvent", "SeasonalEvent")
+                        .WithMany("UserProgresses")
+                        .HasForeignKey("SeasonalEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SeasonalEvent");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserSession", b =>
                 {
                     b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("UserSessions")
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2679,6 +4461,47 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Sprint");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStreak", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserWallet", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.ApplicationUser", "User")
+                        .WithOne()
+                        .HasForeignKey("SmartTask.Web.Models.Entities.UserWallet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("SmartTask.Web.Models.Entities.UserProgression", "UserProgression")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("UserProgressionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartTask.Web.Models.Entities.UserWallet", "UserWallet")
+                        .WithMany("Transactions")
+                        .HasForeignKey("UserWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserProgression");
+
+                    b.Navigation("UserWallet");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Workspace", b =>
@@ -2737,6 +4560,11 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Workspace");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.Achievement", b =>
+                {
+                    b.Navigation("UserAchievements");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("ActivityLogs");
@@ -2758,6 +4586,8 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("TeamMemberships");
 
                     b.Navigation("TimeLogs");
+
+                    b.Navigation("UserSessions");
 
                     b.Navigation("WorkspaceMemberships");
                 });
@@ -2782,6 +4612,18 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("TaskLabels");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.MarketplaceItem", b =>
+                {
+                    b.Navigation("Transactions");
+
+                    b.Navigation("UserInventories");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProductivityMetrics", b =>
+                {
+                    b.Navigation("ScoreHistory");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Project", b =>
                 {
                     b.Navigation("Backlog");
@@ -2795,6 +4637,16 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("Sprints");
 
                     b.Navigation("UserStories");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.ProjectSimulation", b =>
+                {
+                    b.Navigation("Scenarios");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.SeasonalEvent", b =>
+                {
+                    b.Navigation("UserProgresses");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Sprint", b =>
@@ -2830,9 +4682,21 @@ namespace SmartTask.Web.Migrations
                     b.Navigation("ProjectTeams");
                 });
 
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserProgression", b =>
+                {
+                    b.Navigation("Achievements");
+
+                    b.Navigation("WalletTransactions");
+                });
+
             modelBuilder.Entity("SmartTask.Web.Models.Entities.UserStory", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("SmartTask.Web.Models.Entities.UserWallet", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("SmartTask.Web.Models.Entities.Workspace", b =>

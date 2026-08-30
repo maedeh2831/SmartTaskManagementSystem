@@ -1,15 +1,28 @@
 ﻿@model SmartTask.Web.Models.ViewModels.Shared.HeaderViewModel
+@{
+    var cosmetics = Model.Cosmetics;
+    var borderColor = cosmetics?.AvatarBorderColor;
+    var hasBorder = !string.IsNullOrWhiteSpace(borderColor);
+    var borderRarity = cosmetics?.AvatarBorderRarity ?? 0;
+}
 
 <div class="dropdown">
 
     <button class="user-menu"
             data-bs-toggle="dropdown">
 
-        <div class="user-avatar">
+        <div class="user-avatar @(hasBorder ? "has-equipped-border" : "") @(borderRarity >= 5 ? "border-legendary" : "")"
+             @(hasBorder ? $"style=--equipped-border-color:{borderColor}" : "")
+             @(hasBorder ? $"title={cosmetics!.AvatarBorderName}" : "")>
 
             <img src="@Model.AvatarUrl"
                  alt="@Model.FullName"
                  class="user-avatar-image" />
+
+            @if (!string.IsNullOrWhiteSpace(cosmetics?.BadgeIcon))
+            {
+                <span class="user-avatar-badge" title="@cosmetics.BadgeName">@cosmetics.BadgeIcon</span>
+            }
 
         </div>
 
