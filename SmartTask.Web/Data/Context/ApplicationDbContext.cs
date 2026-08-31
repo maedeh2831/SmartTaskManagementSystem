@@ -64,6 +64,10 @@ namespace SmartTask.Web.Data.Context
         public DbSet<TimeLog> TimeLogs { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
+
+        // AI Decision Support
+        public DbSet<AiDecisionLog> AiDecisionLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

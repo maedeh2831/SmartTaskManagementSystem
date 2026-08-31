@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Models.ViewModels.Ai;
 using SmartTask.Web.Models.ViewModels.Risk;
 using SmartTask.Web.Models.ViewModels.Search;
 using SmartTask.Web.Services.AI;
@@ -97,6 +98,74 @@ public class DelayRiskService : IDelayRiskService
         };
     }
 
+    /// <summary>
+    /// تحلیل ترکیبی: الگوریتم + LLM. ابتدا امتیاز الگوریتمی محاسبه شده،
+    /// سپس داده‌ها به LLM داده میشه و خروجی ساختاریافته JSON دریافت میشه.
+    /// </summary>
+    public async Task<DelayRiskViewModel?> GetRiskOverviewWithAiAsync(int projectId, int currentUserId)
+    {
+        // 1) تحلیل الگوریتمی (همون کد قبلی)
+        var risk = await GetRiskOverviewAsync(projectId, currentUserId);
+        if (risk == null) return null;
+
+        // 2) ارسال داده‌های ساختاریافته به LLM
+        try
+        {
+            var aiResult = await GetAiRiskAnalysisAsync(risk);
+            if (aiResult != null)
+            {
+                risk.AiAnalysis = aiResult.Summary;
+                risk.AiFactors = aiResult.Factors;
+                risk.AiSuggestion = aiResult.Suggestion;
+                risk.AiRiskScore = aiResult.RiskScore;
+                risk.AiConfidence = aiResult.Confidence;
+            }
+        }
+        catch (Exception ex)
+        {
+            // اگه LLM fail کرد، فقط تحلیل الگوریتمی نمایش داده میشه
+            System.Diagnostics.Debug.WriteLine($"[DelayRiskService] AI analysis failed: {ex.GetType().Name}: {ex.Message}");
+            if (ex.InnerException != null)
+                System.Diagnostics.Debug.WriteLine($"[DelayRiskService] Inner: {ex.InnerException.Message}");
+        }
+
+        return risk;
+    }
+
+    /// <summary>
+    /// ارسال داده‌های ریسک به LLM و دریافت خروجی ساختاریافته JSON.
+    /// </summary>
+    private async Task<AiRiskAnalysisResult?> GetAiRiskAnalysisAsync(DelayRiskViewModel risk)
+    {
+        var systemPrompt =
+            "تو یک تحلیل‌گر مدیریت پروژه نرم‌افزاری هستی. " +
+            "بر اساس آمار عددی زیر، تحلیل ریسک تأخیر پروژه را به صورت JSON بازگردان.\n" +
+            "فقط JSON معتبر برگردان. فرمت:\n" +
+            "{\n" +
+            "  \"risk_score\": عدد 0-100,\n" +
+            "  \"risk_level\": \"low\" یا \"medium\" یا \"high\" یا \"critical\",\n" +
+            "  \"factors\": [لیست عوامل تأثیرگذار به فارسی],\n" +
+            "  \"suggestion\": \"پیشنهاد عملی به فارسی\",\n" +
+            "  \"confidence\": \"high\" یا \"medium\" یا \"low\",\n" +
+            "  \"summary\": \"تحلیل کوتاه 1-2 جمله به فارسی\"\n" +
+            "}";
+
+        var userPrompt =
+            $"نام پروژه: {risk.ProjectName}\n" +
+            $"امتیاز ریسک الگوریتمی: {risk.RiskScore} (سطح: {risk.RiskLevelDisplay})\n" +
+            $"تسک‌های عقب‌افتاده: {risk.OverdueTasksCount} از {risk.TotalOpenTasksCount}\n" +
+            $"اعضای اضافه‌بار: {risk.OverloadedMembersCount} از {risk.TotalMembersCount}\n" +
+            $"زنجیره‌های وابستگی پرریسک: {risk.RiskyDependencyChainsCount}\n" +
+            $"تمدید خودکار موعد (۷ روز اخیر): {risk.RecentCascadeCount}\n" +
+            $"وزن‌ها → تأخیر: {risk.OverdueScore}/40, بارکاری: {risk.WorkloadScore}/30, وابستگی: {risk.DependencyScore}/20, Cascade: {risk.CascadeScore}/10";
+
+        return await _aiClient.GetStructuredCompletionAsync<AiRiskAnalysisResult>(
+            systemPrompt, userPrompt, temperature: 0.5);
+    }
+
+    /// <summary>
+    /// متد قبلی - برای سازگاری با کدهای موجود حفظ شده.
+    /// </summary>
     public async Task<string> GenerateNarrativeAsync(int projectId, int currentUserId)
     {
         var risk = await GetRiskOverviewAsync(projectId, currentUserId);

@@ -11,7 +11,6 @@ namespace SmartTask.Web.Models.Entities
         public int ImpactedTaskId { get; set; }
         public int DelayDaysApplied { get; set; }
         public DateTime AppliedDate { get; set; } = DateTime.Now;
-
         public TaskItem SourceTask { get; set; } = null!;
         public TaskItem ImpactedTask { get; set; } = null!;
     }

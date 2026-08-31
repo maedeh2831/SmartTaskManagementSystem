@@ -13,14 +13,16 @@ namespace SmartTask.Web.Tests.Services;
 public class ProjectHealthServiceTests
 {
     private readonly Mock<IDelayRiskService> _riskMock;
+    private readonly Mock<IAiClientService> _aiMock;
 
     public ProjectHealthServiceTests()
     {
         _riskMock = new Mock<IDelayRiskService>();
+        _aiMock = new Mock<IAiClientService>();
     }
 
     private ProjectHealthService CreateService(ApplicationDbContext context)
-        => new(context, _riskMock.Object);
+        => new(context, _riskMock.Object, _aiMock.Object);
 
     [Fact]
     public async Task GetHealthAsync_MissingProject_ReturnsNull()

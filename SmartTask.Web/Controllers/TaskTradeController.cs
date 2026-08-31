@@ -37,7 +37,8 @@ public class TaskTradeController : BaseController
     public async Task<IActionResult> GetUserTasks(int projectId, int userId, int excludeTaskId)
     {
         var tasks = await _tradeService.GetUserTasksAsync(projectId, userId, excludeTaskId);
-        return Json(new { success = true, tasks });
+        var result = tasks.Select(t => new { id = int.Parse(t.Value!), title = t.Text });
+        return Json(new { success = true, tasks = result });
     }
 
     [HttpPost]

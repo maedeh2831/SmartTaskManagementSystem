@@ -44,8 +44,41 @@ public class ProjectDashboardController : BaseController
         }
 
         ViewBag.WorkspaceId = project.WorkspaceId;
-        dashboard.Health = await _projectHealthService.GetHealthAsync(projectId, CurrentUser.UserId);
+        dashboard.Health = await _projectHealthService.GetHealthWithAiAsync(projectId, CurrentUser.UserId);
 
         return View(dashboard);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GetAiHealthAnalysis(int projectId)
+    {
+        var project = await _projectService.GetByIdAsync(projectId);
+        if (project == null) return Json(new { success = false, message = "پروژه یافت نشد." });
+
+        if (!await _workspaceMemberService.IsMemberAsync(project.WorkspaceId, CurrentUser.UserId))
+            return Json(new { success = false, message = "شما عضو این پروژه نیستید." });
+
+        try
+        {
+            var health = await _projectHealthService.GetHealthWithAiAsync(projectId, CurrentUser.UserId);
+            if (health == null)
+                return Json(new { success = false, message = "داده‌ای یافت نشد." });
+
+            return Json(new
+            {
+                success = true,
+                healthScore = health.HealthScore,
+                healthLevel = health.HealthLevelDisplay,
+                aiOverallAssessment = health.AiOverallAssessment,
+                aiCriticalAreas = health.AiCriticalAreas,
+                aiRecommendations = health.AiRecommendations,
+                aiForecast = health.AiForecast
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "خطا: " + ex.Message });
+        }
     }
 }

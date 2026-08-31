@@ -13,16 +13,18 @@ public class PriorityEngineServiceTests
     private readonly Mock<ITaskDependencyService> _dependencyMock;
     private readonly Mock<IWorkloadAnalysisService> _workloadMock;
     private readonly Mock<ITaskService> _taskMock;
+    private readonly Mock<SmartTask.Web.Services.AI.IAiClientService> _aiMock;
 
     public PriorityEngineServiceTests()
     {
         _dependencyMock = new Mock<ITaskDependencyService>();
         _workloadMock = new Mock<IWorkloadAnalysisService>();
         _taskMock = new Mock<ITaskService>();
+        _aiMock = new Mock<SmartTask.Web.Services.AI.IAiClientService>();
     }
 
     private PriorityEngineService CreateService(ApplicationDbContext context)
-        => new(context, _dependencyMock.Object, _workloadMock.Object, _taskMock.Object);
+        => new(context, _dependencyMock.Object, _workloadMock.Object, _taskMock.Object, _aiMock.Object);
 
     private void MockNoImpact()
         => _dependencyMock

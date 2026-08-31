@@ -16,4 +16,20 @@ public class ProjectHealthViewModel
 
     public int CompletedTasksCount { get; set; }
     public int TotalTasksCount { get; set; }
+
+    // ===== فیلدهای تحلیل AI =====
+    /// <summary>ارزیابی کلی هوش مصنوعی از وضعیت پروژه</summary>
+    public string? AiOverallAssessment { get; set; }
+
+    /// <summary>بخش‌های بحرانی از دید AI</summary>
+    public List<string> AiCriticalAreas { get; set; } = new();
+
+    /// <summary>پیشنهادات عملی AI</summary>
+    public List<string> AiRecommendations { get; set; } = new();
+
+    /// <summary>پیش‌بینی AI از آینده پروژه</summary>
+    public string? AiForecast { get; set; }
+
+    /// <summary>اولویت اقدامات پیشنهادی AI</summary>
+    public List<string> AiActionItems { get; set; } = new();
 }

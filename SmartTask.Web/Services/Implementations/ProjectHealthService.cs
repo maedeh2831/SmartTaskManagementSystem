@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Models.ViewModels.Ai;
 using SmartTask.Web.Models.ViewModels.Health;
+using SmartTask.Web.Services.AI;
 using SmartTask.Web.Services.Interfaces;
 
 namespace SmartTask.Web.Services.Implementations;
@@ -10,11 +12,16 @@ public class ProjectHealthService : IProjectHealthService
 {
     private readonly ApplicationDbContext _context;
     private readonly IDelayRiskService _delayRiskService;
+    private readonly IAiClientService _aiClient;
 
-    public ProjectHealthService(ApplicationDbContext context, IDelayRiskService delayRiskService)
+    public ProjectHealthService(
+        ApplicationDbContext context,
+        IDelayRiskService delayRiskService,
+        IAiClientService aiClient)
     {
         _context = context;
         _delayRiskService = delayRiskService;
+        _aiClient = aiClient;
     }
 
     public async Task<ProjectHealthViewModel?> GetHealthAsync(int projectId, int currentUserId)
@@ -72,5 +79,67 @@ public class ProjectHealthService : IProjectHealthService
             CompletedTasksCount = completedTasksCount,
             TotalTasksCount = totalTasksCount
         };
+    }
+
+    /// <summary>
+    /// تحلیل ترکیبی: الگوریتم + LLM. ابتدا امتیاز الگوریتمی،
+    /// سپس LLM تحلیل تکمیلی تولید می‌کنه.
+    /// </summary>
+    public async Task<ProjectHealthViewModel?> GetHealthWithAiAsync(int projectId, int currentUserId)
+    {
+        // 1) تحلیل الگوریتمی (همون کد قبلی)
+        var health = await GetHealthAsync(projectId, currentUserId);
+        if (health == null) return null;
+
+        // 2) ارسال داده‌ها به LLM
+        try
+        {
+            var aiResult = await GetAiHealthAnalysisAsync(health);
+            if (aiResult != null)
+            {
+                health.AiOverallAssessment = aiResult.OverallAssessment;
+                health.AiCriticalAreas = aiResult.CriticalAreas;
+                health.AiRecommendations = aiResult.Recommendations;
+                health.AiForecast = aiResult.Forecast;
+                health.AiActionItems = aiResult.ActionItems;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ProjectHealthService] AI analysis failed: {ex.GetType().Name}: {ex.Message}");
+            if (ex.InnerException != null)
+                System.Diagnostics.Debug.WriteLine($"[ProjectHealthService] Inner: {ex.InnerException.Message}");
+        }
+
+        return health;
+    }
+
+    /// <summary>
+    /// ارسال داده‌های سلامت پروژه به LLM و دریافت تحلیل ساختاریافته.
+    /// </summary>
+    private async Task<AiHealthAnalysisResult?> GetAiHealthAnalysisAsync(ProjectHealthViewModel health)
+    {
+        var systemPrompt =
+            "تو یک تحلیل‌گر مدیریت پروژه نرم‌افزاری هستی. " +
+            "بر اساس شاخص‌های سلامت پروژه، تحلیل جامع به صورت JSON بازگردان.\n" +
+            "فقط JSON معتبر برگردان. فرمت:\n" +
+            "{\n" +
+            "  \"overall_assessment\": \"ارزیابی کلی 1-2 جمله به فارسی\",\n" +
+            "  \"critical_areas\": [بخش‌های بحرانی به فارسی],\n" +
+            "  \"recommendations\": [حداکثر 3 پیشنهاد عملی به فارسی],\n" +
+            "  \"forecast\": \"پیش‌بینی آینده پروژه 1 جمله\",\n" +
+            "  \"action_items\": [اولویت اقدامات به فارسی]\n" +
+            "}";
+
+        var userPrompt =
+            $"امتیاز سلامت کلی: {health.HealthScore}/100 (سطح: {health.HealthLevelDisplay})\n" +
+            $"برنامه‌ریزی: {health.ScheduleHealth}/100\n" +
+            $"بارکاری: {health.WorkloadHealth}/100\n" +
+            $"وابستگی: {health.DependencyHealth}/100\n" +
+            $"تحویل: {health.DeliveryHealth}/100\n" +
+            $"تسک‌های تکمیل‌شده: {health.CompletedTasksCount} از {health.TotalTasksCount}";
+
+        return await _aiClient.GetStructuredCompletionAsync<AiHealthAnalysisResult>(
+            systemPrompt, userPrompt, temperature: 0.5);
     }
 }

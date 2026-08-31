@@ -1544,6 +1544,55 @@
                     </ul>
                 }
 
+                <!-- AI Reasons -->
+                @if (Model.SmartPriority.AiReasons.Any() || !string.IsNullOrEmpty(Model.SmartPriority.AiExplanation))
+                {
+                    <div class="ai-priority-section">
+
+                        <div class="ai-priority-header">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>تحلیل تکمیلی هوش مصنوعی</span>
+                        </div>
+
+                        @if (Model.SmartPriority.AiReasons.Any())
+                        {
+                            <ul class="ai-priority-reasons">
+                                @foreach (var aiReason in Model.SmartPriority.AiReasons)
+                                {
+                                    <li>
+                                        <i class="fa-solid fa-sparkles"></i>
+                                        @aiReason
+                                    </li>
+                                }
+                            </ul>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SmartPriority.AiExplanation))
+                        {
+                            <div class="ai-explanation-box">
+                                <p>@Model.SmartPriority.AiExplanation</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SmartPriority.AiSuggestedAction))
+                        {
+                            <div class="ai-action-box">
+                                <strong><i class="fa-solid fa-lightbulb"></i> پیشنهاد عملی:</strong>
+                                <p>@Model.SmartPriority.AiSuggestedAction</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SmartPriority.AiResourceSuggestion))
+                        {
+                            <div class="ai-resource-box">
+                                <strong><i class="fa-solid fa-users"></i> پیشنهاد منابع:</strong>
+                                <p>@Model.SmartPriority.AiResourceSuggestion</p>
+                            </div>
+                        }
+
+                    </div>
+                }
+
                 @if (Model.SmartPriority.IsDifferent &&
                      Model.SmartPriority.CanApply)
                 {

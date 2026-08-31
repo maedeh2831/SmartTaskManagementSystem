@@ -155,6 +155,7 @@ namespace SmartTask.Web
 
             // ردیابی حضور کاربران در حافظه؛ باید Singleton باشد.
             builder.Services.AddSingleton<IPresenceTracker, PresenceTracker>();
+            builder.Services.AddScoped<AiDecisionLogService>();
 
             builder.Services.Configure<EmailSettings>(
             builder.Configuration.GetSection("EmailSettings"));

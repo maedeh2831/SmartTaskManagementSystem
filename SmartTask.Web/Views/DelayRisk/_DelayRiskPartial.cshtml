@@ -138,31 +138,157 @@
 </div>
 
 
-<!-- AI Narrative Card -->
+<!-- AI Section -->
 <div class="ai-narrative-card">
 
     <div class="ai-narrative-header">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        <h3>تحلیل هوشمند وضعیت پروژه</h3>
+        <i class="fa-solid fa-brain"></i>
+        <h3>تحلیل هوش مصنوعی</h3>
     </div>
 
-    <div id="narrativeBox" class="ai-narrative-box">
-        <div class="ai-narrative-placeholder">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>برای دریافت تحلیل هوشمند، دکمه زیر را بزنید.</span>
+    <!-- دکمه‌ها -->
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem;">
+        <button type="button" id="generateNarrativeBtn" class="ai-generate-btn" data-project-id="@Model.ProjectId">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> تحلیل متنی
+        </button>
+        <button type="button" id="generateStructuredBtn" class="ai-generate-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);" data-project-id="@Model.ProjectId">
+            <i class="fa-solid fa-brain"></i> تحلیل ساختاریافته AI
+        </button>
+    </div>
+
+    <!-- باکس تحلیل متنی -->
+    <div id="narrativeBox" class="ai-narrative-box" style="display:none;">
+    </div>
+
+    <!-- باکس تحلیل ساختاریافته -->
+    <div id="structuredAiBox" style="display:none;">
+
+        <div style="background:rgba(139,92,246,0.1); border-radius:10px; padding:1rem; margin-bottom:1rem; border-right:3px solid #8b5cf6;">
+            <div id="aiScoreComparison" style="display:flex; align-items:center; justify-content:center; gap:1.5rem; margin-bottom:0.75rem;">
+                <div style="text-align:center;">
+                    <div style="font-size:0.8rem; color:#94a3b8;">امتیاز الگوریتمی</div>
+                    <div id="aiAlgoScore" style="font-size:1.8rem; font-weight:bold; color:#e2e8f0;"></div>
+                </div>
+                <i class="fa-solid fa-arrows-left-right" style="color:#8b5cf6; font-size:1.2rem;"></i>
+                <div style="text-align:center;">
+                    <div style="font-size:0.8rem; color:#94a3b8;">امتیاز AI</div>
+                    <div id="aiRiskScore" style="font-size:1.8rem; font-weight:bold; color:#a78bfa;"></div>
+                </div>
+            </div>
+            <div id="aiConfidence" style="text-align:center;"></div>
         </div>
+
+        <div id="aiFactorsBox" style="margin-bottom:1rem;">
+            <h4 style="color:#f59e0b; margin-bottom:0.5rem;"><i class="fa-solid fa-list-check"></i> عوامل تأثیرگذار:</h4>
+            <ul id="aiFactorsList" style="margin:0; padding-right:1.25rem; color:#e2e8f0;"></ul>
+        </div>
+
+        <div id="aiSuggestionBox" style="margin-bottom:1rem; background:rgba(52,211,153,0.1); border-radius:8px; padding:0.75rem 1rem; border-right:3px solid #34d399; display:none;">
+            <h4 style="color:#34d399; margin-bottom:0.3rem;"><i class="fa-solid fa-lightbulb"></i> پیشنهاد عملی:</h4>
+            <p id="aiSuggestionText" style="margin:0;  line-height:1.7;"></p>
+        </div>
+
+        <div id="aiSummaryBox" style="background:rgba(59,130,246,0.1); border-radius:8px; padding:0.75rem 1rem; border-right:3px solid #3b82f6; display:none;">
+            <h4 style="color:#3b82f6; margin-bottom:0.3rem;"><i class="fa-solid fa-file-lines"></i> خلاصه تحلیل:</h4>
+            <p id="aiSummaryText" style="margin:0;  line-height:1.7;"></p>
+        </div>
+
     </div>
 
-    <button type="button"
-            id="generateNarrativeBtn"
-            class="ai-generate-btn"
-            data-project-id="@Model.ProjectId"
-            aria-label="تولید تحلیل هوشمند">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        تولید تحلیل هوشمند
-    </button>
+    <!-- Loading -->
+    <div id="aiLoading" style="display:none; text-align:center; padding:1.5rem; color:#a78bfa;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+        <p style="margin-top:0.5rem;">در حال تحلیل توسط هوش مصنوعی...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="aiError" style="display:none; text-align:center; padding:1rem; color:#ef4444; background:rgba(239,68,68,0.1); border-radius:8px;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <p id="aiErrorText" style="margin:0.5rem 0 0 0;"></p>
+    </div>
 
 </div>
+
+<script>
+(function() {
+    var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+    var projectId = @Model.ProjectId;
+
+    // تحلیل متنی
+    document.getElementById('generateNarrativeBtn')?.addEventListener('click', function() {
+        var box = document.getElementById('narrativeBox');
+        var loading = document.getElementById('aiLoading');
+        var error = document.getElementById('aiError');
+        box.style.display = 'block';
+        box.innerHTML = '<div style="text-align:center;padding:1rem;color:#94a3b8;"><i class="fa-solid fa-spinner fa-spin"></i> در حال تولید...</div>';
+        loading.style.display = 'none';
+        error.style.display = 'none';
+
+        fetch('/DelayRisk/GenerateNarrative?projectId=' + projectId, {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': token, 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(r => r.json()).then(d => {
+            if (d.success) {
+                box.innerHTML = '<p style="margin:0;color:#e2e8f0;line-height:1.8;">' + d.narrative + '</p>';
+            } else {
+                box.innerHTML = '<p style="color:#ef4444;">' + (d.message || 'خطا') + '</p>';
+            }
+        }).catch(() => { box.innerHTML = '<p style="color:#ef4444;">خطا در ارتباط</p>';
+        });
+    });
+
+    // تحلیل ساختاریافته
+    document.getElementById('generateStructuredBtn')?.addEventListener('click', function() {
+        var loading = document.getElementById('aiLoading');
+        var error = document.getElementById('aiError');
+        var box = document.getElementById('structuredAiBox');
+        loading.style.display = 'block';
+        error.style.display = 'none';
+        box.style.display = 'none';
+
+        fetch('/DelayRisk/GetAiAnalysis?projectId=' + projectId, {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': token, 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(r => r.json()).then(d => {
+            loading.style.display = 'none';
+            if (!d.success) {
+                error.style.display = 'block';
+                document.getElementById('aiErrorText').textContent = d.message || 'خطا در تحلیل';
+                return;
+            }
+            // نمایش نتایج
+            document.getElementById('aiAlgoScore').textContent = d.algorithmScore;
+            document.getElementById('aiRiskScore').textContent = d.aiRiskScore ?? '--';
+            if (d.aiConfidence) {
+                var confText = d.aiConfidence === 'high' ? 'بالا' : d.aiConfidence === 'medium' ? 'متوسط' : 'پایین';
+                document.getElementById('aiConfidence').innerHTML = '<span style="background:rgba(139,92,246,0.2);padding:0.25rem 0.75rem;border-radius:20px;font-size:0.85rem;color:#a78bfa;">اطمینان: ' + confText + '</span>';
+            }
+            // عوامل
+            if (d.aiFactors && d.aiFactors.length > 0) {
+                var ul = document.getElementById('aiFactorsList');
+                ul.innerHTML = '';
+                d.aiFactors.forEach(f => { ul.innerHTML += '<li style="margin-bottom:0.3rem;">' + f + '</li>'; });
+                document.getElementById('aiFactorsBox').style.display = 'block';
+            }
+            // پیشنهاد
+            if (d.aiSuggestion) {
+                document.getElementById('aiSuggestionText').textContent = d.aiSuggestion;
+                document.getElementById('aiSuggestionBox').style.display = 'block';
+            }
+            // خلاصه
+            if (d.aiAnalysis) {
+                document.getElementById('aiSummaryText').textContent = d.aiAnalysis;
+                document.getElementById('aiSummaryBox').style.display = 'block';
+            }
+            box.style.display = 'block';
+        }).catch(() => {
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            document.getElementById('aiErrorText').textContent = 'خطا در ارتباط با سرور هوش مصنوعی';
+        });
+    });
+})();
+</script>
 
 <script>
     document.querySelectorAll('.fa-digits').forEach(function(el) {

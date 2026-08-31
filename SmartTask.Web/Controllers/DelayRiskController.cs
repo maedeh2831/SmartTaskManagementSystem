@@ -29,7 +29,7 @@ public class DelayRiskController : BaseController
             return RedirectToAction("Index", "Project");
         }
 
-        var vm = await _delayRiskService.GetRiskOverviewAsync(projectId, CurrentUser.UserId);
+        var vm = await _delayRiskService.GetRiskOverviewWithAiAsync(projectId, CurrentUser.UserId);
 
         if (vm == null)
             return NotFound();
@@ -52,6 +52,36 @@ public class DelayRiskController : BaseController
         catch (Exception)
         {
             return Json(new { success = false, message = "خطا در ارتباط با سرویس هوش مصنوعی. لطفاً بعداً دوباره تلاش کنید." });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GetAiAnalysis(int projectId)
+    {
+        if (!await _projectMemberService.IsMemberAsync(projectId, CurrentUser.UserId))
+            return Json(new { success = false, message = "شما عضو این پروژه نیستید." });
+
+        try
+        {
+            var vm = await _delayRiskService.GetRiskOverviewWithAiAsync(projectId, CurrentUser.UserId);
+            if (vm == null)
+                return Json(new { success = false, message = "پروژه یافت نشد." });
+
+            return Json(new
+            {
+                success = true,
+                aiRiskScore = vm.AiRiskScore,
+                aiConfidence = vm.AiConfidence,
+                aiFactors = vm.AiFactors,
+                aiSuggestion = vm.AiSuggestion,
+                aiAnalysis = vm.AiAnalysis,
+                algorithmScore = vm.RiskScore
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "خطا در تحلیل هوش مصنوعی: " + ex.Message });
         }
     }
 }

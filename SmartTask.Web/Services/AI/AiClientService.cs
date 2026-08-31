@@ -23,18 +23,17 @@ public class AiClientService : IAiClientService
         double temperature = 0.7,
         CancellationToken cancellationToken = default)
     {
-    try 
+    try
 	{	        
         var requestBody = new
         {
             model = _settings.Model,
             temperature,
-            reasoning_effort = "none",
-            max_tokens = 1024,
+            max_tokens = 4096,
             stop = new[] { "```" },
             messages = new object[]
             {
-                new { role = "system", content = systemPrompt },
+                new { role = "system", content = systemPrompt + "\n\n/no_think" },
                 new { role = "user", content = userPrompt }
             }
         };
@@ -51,7 +50,7 @@ public class AiClientService : IAiClientService
         }
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(TimeSpan.FromSeconds(60));
+        cts.CancelAfter(TimeSpan.FromSeconds(120));
 
         HttpResponseMessage response;
         try
@@ -71,11 +70,18 @@ public class AiClientService : IAiClientService
 
         var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
         using var doc = JsonDocument.Parse(responseJson);
-        var content = doc.RootElement
+        var message = doc.RootElement
             .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
+            .GetProperty("message");
+
+        // Qwen3 reasoning models: content might be empty, reasoning_content has the thinking
+        var content = message.TryGetProperty("content", out var contentProp) ? contentProp.GetString() : null;
+        
+        // If content is empty or null, try reasoning_content (Qwen3 reasoning model)
+        if (string.IsNullOrWhiteSpace(content) && message.TryGetProperty("reasoning_content", out var reasoningProp))
+        {
+            content = reasoningProp.GetString();
+        }
 
         return content ?? string.Empty;
 
@@ -84,6 +90,42 @@ public class AiClientService : IAiClientService
         {
 
             throw ex;
+        }
+    }
+
+    public async Task<T?> GetStructuredCompletionAsync<T>(
+        string systemPrompt,
+        string userPrompt,
+        double temperature = 0.5,
+        CancellationToken cancellationToken = default)
+    {
+        // System prompt رو تقویت می‌کنیم که LLM فقط JSON برگردونه
+        var structuredSystemPrompt = systemPrompt +
+            "\n\nمهم: خروجی باید فقط JSON معتبر باشد. هیچ متن اضافی، Markdown، یا تگی قبل یا بعد از JSON نباشد. " +
+            "فقط آبجکت JSON را بازگردان.";
+
+        var rawResponse = await GetCompletionAsync(structuredSystemPrompt, userPrompt, temperature, cancellationToken);
+
+        // تلاش برای Parse کردن JSON خروجی
+        var cleaned = rawResponse.Trim();
+
+        // حذف Markdown code fence اگر وجود داشته باشه
+        if (cleaned.StartsWith("```"))
+        {
+            var firstNewLine = cleaned.IndexOf('\n');
+            var lastFence = cleaned.LastIndexOf("```");
+            if (firstNewLine >= 0 && lastFence > firstNewLine)
+                cleaned = cleaned.Substring(firstNewLine + 1, lastFence - firstNewLine - 1).Trim();
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<T>(cleaned, _jsonOptions);
+        }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[AiClientService] JSON parse failed: {ex.Message}. Raw: {cleaned.Substring(0, Math.Min(200, cleaned.Length))}");
+            return default;
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Models.ViewModels.Ai;
 using SmartTask.Web.Models.ViewModels.Priority;
+using SmartTask.Web.Services.AI;
 using SmartTask.Web.Services.Interfaces;
 
 namespace SmartTask.Web.Services.Implementations;
@@ -12,17 +14,20 @@ public class PriorityEngineService : IPriorityEngineService
     private readonly ITaskDependencyService _dependencyService;
     private readonly IWorkloadAnalysisService _workloadService;
     private readonly ITaskService _taskService;
+    private readonly IAiClientService _aiClient;
 
     public PriorityEngineService(
         ApplicationDbContext context,
         ITaskDependencyService dependencyService,
         IWorkloadAnalysisService workloadService,
-        ITaskService taskService)
+        ITaskService taskService,
+        IAiClientService aiClient)
     {
         _context = context;
         _dependencyService = dependencyService;
         _workloadService = workloadService;
         _taskService = taskService;
+        _aiClient = aiClient;
     }
 
     public async Task<SmartPriorityViewModel> GetSuggestionAsync(int taskId, int currentUserId)
@@ -120,6 +125,75 @@ public class PriorityEngineService : IPriorityEngineService
             Reasons = reasons,
             CanApply = await _taskService.CanManageTaskAsync(taskId, currentUserId)
         };
+    }
+
+    /// <summary>
+    /// تحلیل ترکیبی: الگوریتم + LLM. ابتدا امتیاز الگوریتمی،
+    /// سپس LLM دلایل تکمیلی و پیشنهاد عملی تولید می‌کنه.
+    /// </summary>
+    public async Task<SmartPriorityViewModel> GetSuggestionWithAiAsync(int taskId, int currentUserId)
+    {
+        // 1) تحلیل الگوریتمی (همون کد قبلی)
+        var suggestion = await GetSuggestionAsync(taskId, currentUserId);
+
+        // 2) ارسال داده‌ها به LLM برای دلایل تکمیلی
+        try
+        {
+            var task = await _context.TaskItems
+                .Include(t => t.UserStory)
+                .Include(t => t.Assignments)
+                .FirstOrDefaultAsync(t => t.Id == taskId);
+
+            if (task != null)
+            {
+                var aiResult = await GetAiPriorityReasonsAsync(task, suggestion);
+                if (aiResult != null)
+                {
+                    suggestion.AiReasons = aiResult.AiReasons;
+                    suggestion.AiSuggestedAction = aiResult.AiSuggestedAction;
+                    suggestion.AiExplanation = aiResult.Explanation;
+                    suggestion.AiResourceSuggestion = aiResult.ResourceSuggestion;
+                }
+            }
+        }
+        catch
+        {
+            // اگه LLM fail کرد، فقط تحلیل الگوریتمی نمایش داده میشه
+        }
+
+        return suggestion;
+    }
+
+    /// <summary>
+    /// ارسال داده‌های اولویت به LLM و دریافت دلایل تکمیلی.
+    /// </summary>
+    private async Task<AiPriorityReasonResult?> GetAiPriorityReasonsAsync(
+        Models.Entities.TaskItem task, SmartPriorityViewModel algoResult)
+    {
+        var systemPrompt =
+            "تو یک مشاور مدیریت پروژه نرم‌افزاری هستی. " +
+            "بر اساس اطلاعات زیر، دلایل تکمیلی برای اولویت‌بندی این Task به صورت JSON بازگردان.\n" +
+            "فقط JSON معتبر برگردان. فرمت:\n" +
+            "{\n" +
+            "  \"ai_reasons\": [حداکثر 3 دلیل تکمیلی به فارسی],\n" +
+            "  \"ai_suggested_action\": \"عمل پیشنهادی به فارسی\",\n" +
+            "  \"explanation\": \"توضیح 1-2 جمله‌ای چرا این اولویت پیشنهاد شده\",\n" +
+            "  \"resource_suggestion\": \"پیشنهاد در مورد تخصیص منابع\"\n" +
+            "}";
+
+        var assignees = string.Join(", ", task.Assignments.Select(a => a.ApplicationUserId));
+        var userPrompt =
+            $"عنوان Task: {task.Title}\n" +
+            $"اولویت فعلی: {algoResult.CurrentPriority}\n" +
+            $"اولویت پیشنهادی الگوریتم: {algoResult.SuggestedPriority} (امتیاز: {algoResult.TotalScore}/100)\n" +
+            $" форیت زمانی: {algoResult.UrgencyScore}/40\n" +
+            $"وابستگی: {algoResult.DependencyScore}/35\n" +
+            $"بارکاری: {algoResult.WorkloadScore}/25\n" +
+            $"دلایل الگوریتم: {string.Join(" | ", algoResult.Reasons)}\n" +
+            $"مسئول(ین): {assignees}";
+
+        return await _aiClient.GetStructuredCompletionAsync<AiPriorityReasonResult>(
+            systemPrompt, userPrompt, temperature: 0.5);
     }
 
     public async Task ApplySuggestionAsync(int taskId, int currentUserId)

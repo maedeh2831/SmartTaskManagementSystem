@@ -61,6 +61,79 @@
         </div>
 
     </div>
+
+    <!-- AI Button -->
+    <div class="my-4">
+        <button type="button" id="dashAiBtn" class="ai-generate-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9); width:100%;">
+            <i class="fa-solid fa-brain"></i> تحلیل سلامت توسط هوش مصنوعی
+        </button>
+    </div>
+
+    <!-- AI Loading -->
+    <div id="dashAiLoading" style="display:none; text-align:center; padding:1rem; color:#a78bfa; margin-top:1rem;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.2rem;"></i>
+        <p style="margin-top:0.5rem;">در حال تحلیل...</p>
+    </div>
+
+    <!-- AI Error -->
+    <div id="dashAiError" style="display:none; text-align:center; padding:0.75rem; color:#ef4444; background:rgba(239,68,68,0.1); border-radius:8px; margin-top:1rem;">
+        <p id="dashAiErrorText" style="margin:0;"></p>
+    </div>
+
+    <!-- AI Results -->
+    <div id="dashAiResult" style="display:none; margin-top:1rem; padding:1.25rem; border-radius:12px; background:linear-gradient(135deg, #1a1a2e, #16213e); border:1px solid rgba(139,92,246,0.3);">
+
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem;">
+            <i class="fa-solid fa-brain" style="color:#a78bfa;"></i>
+            <h4 style="margin:0; color:#e2e8f0;">ارزیابی هوش مصنوعی</h4>
+        </div>
+
+        <div id="dashAiAssessment" style="background:rgba(139,92,246,0.1); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; border-right:3px solid #8b5cf6; display:none;">
+            <p id="dashAiAssessmentText" style="margin:0;  line-height:1.7;"></p>
+        </div>
+
+        <div id="dashAiCritical" style="margin-bottom:1rem; display:none;">
+            <h5 style="color:#f59e0b; margin-bottom:0.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> بخش‌های بحرانی:</h5>
+            <ul id="dashAiCriticalList" style="margin:0; padding-right:1.25rem; color:#e2e8f0;"></ul>
+        </div>
+
+        <div id="dashAiRecs" style="margin-bottom:1rem; display:none;">
+            <h5 style="color:#34d399; margin-bottom:0.5rem;"><i class="fa-solid fa-lightbulb"></i> پیشنهادات:</h5>
+            <ul id="dashAiRecsList" style="margin:0; padding-right:1.25rem; color:#e2e8f0;"></ul>
+        </div>
+
+        <div id="dashAiForecast" style="display:none; background:rgba(52,211,153,0.1); border-radius:8px; padding:0.75rem 1rem; border-right:3px solid #34d399;">
+            <h5 style="color:#34d399; margin-bottom:0.3rem;"><i class="fa-solid fa-chart-line"></i> پیش‌بینی:</h5>
+            <p id="dashAiForecastText" style="margin:0;  line-height:1.7;"></p>
+        </div>
+
+    </div>
+
+    <script>
+    (function() {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        var pid = @Model.Health.ProjectId;
+        document.getElementById('dashAiBtn')?.addEventListener('click', function() {
+            var loading = document.getElementById('dashAiLoading');
+            var error = document.getElementById('dashAiError');
+            var result = document.getElementById('dashAiResult');
+            loading.style.display = 'block'; error.style.display = 'none'; result.style.display = 'none';
+            fetch('/ProjectDashboard/GetAiHealthAnalysis?projectId=' + pid, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token, 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(r => r.json()).then(d => {
+                loading.style.display = 'none';
+                if (!d.success) { error.style.display='block'; document.getElementById('dashAiErrorText').textContent=d.message||'خطا'; return; }
+                if (d.aiOverallAssessment) { document.getElementById('dashAiAssessmentText').textContent=d.aiOverallAssessment; document.getElementById('dashAiAssessment').style.display='block'; }
+                if (d.aiCriticalAreas && d.aiCriticalAreas.length) { var ul=document.getElementById('dashAiCriticalList'); ul.innerHTML=''; d.aiCriticalAreas.forEach(f=>{ul.innerHTML+='<li style="margin-bottom:0.3rem;">'+f+'</li>';}); document.getElementById('dashAiCritical').style.display='block'; }
+                if (d.aiRecommendations && d.aiRecommendations.length) { var ul2=document.getElementById('dashAiRecsList'); ul2.innerHTML=''; d.aiRecommendations.forEach(f=>{ul2.innerHTML+='<li style="margin-bottom:0.3rem;">'+f+'</li>';}); document.getElementById('dashAiRecs').style.display='block'; }
+                if (d.aiForecast) { document.getElementById('dashAiForecastText').textContent=d.aiForecast; document.getElementById('dashAiForecast').style.display='block'; }
+                result.style.display='block';
+            }).catch(()=>{ loading.style.display='none'; error.style.display='block'; document.getElementById('dashAiErrorText').textContent='خطا در ارتباط'; });
+        });
+    })();
+    </script>
+
 }
 
 <!-- Stat Cards -->

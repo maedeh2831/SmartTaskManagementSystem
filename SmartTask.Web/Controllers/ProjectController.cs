@@ -442,7 +442,7 @@ public class ProjectController : BaseController
     {
         var dashboard = await _projectDashboardService.GetDashboardAsync(projectId);
         if (dashboard == null) return null;
-        dashboard.Health = await _projectHealthService.GetHealthAsync(projectId, CurrentUser.UserId);
+        dashboard.Health = await _projectHealthService.GetHealthWithAiAsync(projectId, CurrentUser.UserId);
         return dashboard;
     }
 
@@ -666,7 +666,7 @@ public class ProjectController : BaseController
     {
         var dashboard = await _projectDashboardService.GetDashboardAsync(projectId);
         if (dashboard == null) return Content("<div class='workspace-empty'><p>داشبورد یافت نشد</p></div>");
-        dashboard.Health = await _projectHealthService.GetHealthAsync(projectId, CurrentUser.UserId);
+        dashboard.Health = await _projectHealthService.GetHealthWithAiAsync(projectId, CurrentUser.UserId);
         return PartialView("/Views/ProjectDashboard/_DashboardPartial.cshtml", dashboard);
     }
 

@@ -581,3 +581,132 @@
         transform: none !important;
     }
 }
+
+/* ==========================================================
+   AI Structured Analysis Card
+   ========================================================== */
+
+.ai-structured-card {
+    background: var(--card);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 16px;
+    box-shadow: 0 2px 8px rgba(91, 95, 239, .1);
+}
+
+.ai-structured-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+    .ai-structured-header i {
+        color: var(--primary);
+        font-size: 18px;
+    }
+
+    .ai-structured-header h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gray800);
+    }
+
+.ai-confidence-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: auto;
+}
+
+    .confidence-high {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .confidence-medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .confidence-low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+.ai-score-comparison {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--gray50);
+    border-radius: 10px;
+}
+
+.ai-score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-score-label {
+    font-size: 12px;
+    color: var(--gray500);
+}
+
+.ai-score-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray800);
+}
+
+.ai-score-value.ai-highlight {
+    color: var(--primary);
+}
+
+.ai-score-divider {
+    color: var(--gray400);
+    font-size: 18px;
+}
+
+.ai-factors-list,
+.ai-suggestion-box,
+.ai-summary-box {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--gray50);n}
+
+.ai-factors-list h4,
+.ai-suggestion-box h4,
+.ai-summary-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray700);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-factors-list ul {
+    margin: 0;
+    padding-right: 20px;
+    color: var(--gray600);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.ai-suggestion-box p,
+.ai-summary-box p {
+    margin: 0;
+    color: var(--gray700);
+    font-size: 13px;
+    line-height: 1.8;
+}
