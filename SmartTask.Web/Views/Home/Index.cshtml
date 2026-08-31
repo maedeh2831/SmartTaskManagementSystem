@@ -194,6 +194,42 @@
     </div>
 </div>
 
+<!-- Gamification Quick Stats -->
+<div class="row g-3 mb-4" id="gamificationStats" style="display:none;">
+    <div class="col-md-3">
+        <div class="card h-100" style="border-left:4px solid var(--primary);">
+            <div class="card-body text-center py-3">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="g-xp">—</div>
+                <div style="font-size:.8rem;color:var(--gray500);">نقاط تجربه</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100" style="border-left:4px solid var(--warning);">
+            <div class="card-body text-center py-3">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="g-tier">—</div>
+                <div style="font-size:.8rem;color:var(--gray500);">سطح بهره‌وری</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100" style="border-left:4px solid var(--success);">
+            <div class="card-body text-center py-3">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="g-streak">—</div>
+                <div style="font-size:.8rem;color:var(--gray500);">روزهای پیاپی</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100" style="border-left:4px solid var(--danger);">
+            <div class="card-body text-center py-3">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="g-achievements">—</div>
+                <div style="font-size:.8rem;color:var(--gray500);">دستاوردها</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script src="~/lib/chartjs/chart.umd.min.js"></script>
@@ -201,4 +237,20 @@
         const homeChartData = @Html.Raw(JsonSerializer.Serialize(Model.TaskStatusChart));
     </script>
     <script src="~/js/home-dashboard.js" asp-append-version="true"></script>
+    <script>
+        (function() {
+            var userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")';
+            if (!userId || userId === '0') return;
+            fetch('/api/gamification/profile/' + userId)
+                .then(function(r) { return r.json(); })
+                .then(function(p) {
+                    document.getElementById('gamificationStats').style.display = '';
+                    document.getElementById('g-xp').textContent = (p.totalExperience || p.xp || 0).toLocaleString('fa-IR');
+                    document.getElementById('g-tier').textContent = (p.productivityTier || p.tier || 'Bronze');
+                    document.getElementById('g-streak').textContent = (p.currentStreak || p.streak || 0) + ' روز';
+                    document.getElementById('g-achievements').textContent = (p.achievementsUnlocked || p.achievementCount || 0);
+                })
+                .catch(function() {});
+        })();
+    </script>
 }

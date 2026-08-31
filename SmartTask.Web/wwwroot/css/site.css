@@ -569,3 +569,80 @@ body.auth-body {
    Reduced Motion — respect user preference
    ============================================================ */
 
+
+/* ─────────────────────────────────────────────
+   پوسته‌های خریداری‌شده از فروشگاه
+   با data-shop-theme روی <html> اعمال می‌شوند و
+   فقط رنگ‌های اصلی را بازنویسی می‌کنند تا با
+   حالت روشن/تیره سازگار بمانند.
+   ───────────────────────────────────────────── */
+
+[data-shop-theme="ocean-blue"] {
+    --primary: #1E90FF;
+    --primary-dark: #1873CC;
+    --primary-darker: #145CA3;
+    --primary-light: #E6F2FF;
+    --primary-border: #A8D3FF;
+    --primary-mid: #4FA8FF;
+    --primary-glow: rgba(30, 144, 255, .18);
+}
+
+[data-shop-theme="forest-green"] {
+    --primary: #228B22;
+    --primary-dark: #1B6F1B;
+    --primary-darker: #145214;
+    --primary-light: #E8F6E8;
+    --primary-border: #A9DBA9;
+    --primary-mid: #52A852;
+    --primary-glow: rgba(34, 139, 34, .18);
+}
+
+[data-shop-theme="neon-cyberpunk"] {
+    --primary: #FF00FF;
+    --primary-dark: #CC00CC;
+    --primary-darker: #A300A3;
+    --primary-light: #FFE6FF;
+    --primary-border: #FFA8FF;
+    --primary-mid: #FF4FFF;
+    --primary-glow: rgba(255, 0, 255, .22);
+}
+
+[data-shop-theme="sunset-orange"] {
+    --primary: #FF7F50;
+    --primary-dark: #E8663A;
+    --primary-darker: #C24F2A;
+    --primary-light: #FFF0EB;
+    --primary-border: #FFC7B3;
+    --primary-mid: #FF9E7A;
+    --primary-glow: rgba(255, 127, 80, .2);
+}
+
+[data-shop-theme="midnight-purple"] {
+    --primary: #6A0DAD;
+    --primary-dark: #55088A;
+    --primary-darker: #400569;
+    --primary-light: #F0E6F7;
+    --primary-border: #C9A3E0;
+    --primary-mid: #8B3DC4;
+    --primary-glow: rgba(106, 13, 173, .2);
+}
+
+[data-shop-theme="sakura-blossom"] {
+    --primary: #FF6FA5;
+    --primary-dark: #E85288;
+    --primary-darker: #C43D6D;
+    --primary-light: #FFEDF3;
+    --primary-border: #FFC2D6;
+    --primary-mid: #FF92BC;
+    --primary-glow: rgba(255, 111, 165, .2);
+}
+
+[data-shop-theme="monochrome-pro"] {
+    --primary: #334155;
+    --primary-dark: #1E293B;
+    --primary-darker: #0F172A;
+    --primary-light: #F1F5F9;
+    --primary-border: #CBD5E1;
+    --primary-mid: #64748B;
+    --primary-glow: rgba(51, 65, 85, .18);
+}

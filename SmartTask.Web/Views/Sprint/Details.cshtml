@@ -308,9 +308,11 @@
                 <span>در حال بارگذاری...</span>
             </div>
         </div>
-    }
+    }    </div>
 
-</div>
+<form id="antiForgeryForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
 
 @section Scripts
 {

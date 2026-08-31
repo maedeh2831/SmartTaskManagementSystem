@@ -4,6 +4,7 @@ using SmartTask.Web.Common.Filters;
 using SmartTask.Web.Data.Context;
 using SmartTask.Web.Hubs;
 using SmartTask.Web.Infrastructure.BackgroundJobs;
+using SmartTask.Web.Infrastructure.Events;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Infrastructure.Repositories;
 using SmartTask.Web.Infrastructure.Seed;
@@ -11,6 +12,7 @@ using SmartTask.Web.Infrastructure.Services;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Services.Email;
 using SmartTask.Web.Services.Files;
+using SmartTask.Web.Services.Gamification;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
 using SmartTask.Web.Services.AI;
@@ -49,13 +51,21 @@ namespace SmartTask.Web
             });
 
             // MVC
-            builder.Services
-                .AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-                });
+            var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+            if (!string.IsNullOrWhiteSpace(googleClientId))
+            {
+                builder.Services
+                    .AddAuthentication()
+                    .AddGoogle(options =>
+                    {
+                        options.ClientId = googleClientId;
+                        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+                    });
+            }
+            else
+            {
+                builder.Services.AddAuthentication();
+            }
 
             builder.Services
            .AddControllersWithViews();
@@ -153,6 +163,39 @@ namespace SmartTask.Web
             builder.Services.AddScoped<IChatService, ChatService>();
             builder.Services.AddScoped<IWebpushrService, WebpushrService>();
 
+            // Gamification Services
+            builder.Services.AddSingleton<IEventBus, InMemoryEventBus>();
+            builder.Services.AddScoped<DomainEventPublisher>();
+            builder.Services.AddScoped<IRewardEngine, RewardEngine>();
+            builder.Services.AddScoped<IAchievementEngine, AchievementEngine>();
+            builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<IProductivityMetricsService, ProductivityMetricsService>();
+            builder.Services.AddScoped<ITaskRewardCoordinator, TaskRewardCoordinator>();
+            builder.Services.AddScoped<IEquippedCosmeticsService, EquippedCosmeticsService>();
+            builder.Services.AddScoped<IRewardEligibilityService, RewardEligibilityService>();
+
+            // Marketplace & Economy Services (Phase 3)
+            builder.Services.AddScoped<IMarketplaceService, MarketplaceService>();
+            builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+            builder.Services.AddScoped<IEconomyAnalysisService, EconomyAnalysisService>();
+
+            // Leaderboard & Competition (Phase 4)
+            builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+
+            // Advanced Features (Phase 5)
+            builder.Services.AddScoped<IStreakService, StreakService>();
+            builder.Services.AddScoped<ISeasonalEventService, SeasonalEventService>();
+            builder.Services.AddScoped<IAbuseDetectionEngine, AbuseDetectionEngine>();
+            builder.Services.AddScoped<IGamificationAnalyticsService, GamificationAnalyticsService>();
+
+            // Simulation & Analysis
+            builder.Services.AddScoped<ICriticalPathAnalyzer, CriticalPathAnalyzer>();
+            builder.Services.AddScoped<IImpactAnalysisService, ImpactAnalysisService>();
+            builder.Services.AddScoped<IProjectSimulationEngine, ProjectSimulationEngine>();
+
+            // Gamification Background Service
+            builder.Services.AddHostedService<GamificationBackgroundService>();
+
             // ردیابی حضور کاربران در حافظه؛ باید Singleton باشد.
             builder.Services.AddSingleton<IPresenceTracker, PresenceTracker>();
             builder.Services.AddScoped<AiDecisionLogService>();
@@ -224,6 +267,13 @@ namespace SmartTask.Web
 
                 // create Admin
                 await AdminSeeder.SeedAsync(userManager);
+
+                // Seed gamification data
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                await AchievementSeeder.SeedAsync(context);
+                await MilestoneSeeder.SeedAsync(context);
+                await MarketplaceItemSeeder.SeedMarketplaceItemsAsync(context);
+                await GamificationDataSeeder.SeedAllAsync(context);
             }
 
             app.Run();

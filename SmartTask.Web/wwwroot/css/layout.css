@@ -1371,3 +1371,43 @@ textarea:focus-visible {
         display: block;
     }
 }
+
+/* ─────────────────────────────────────────────
+   اقلام فعال فروشگاه (حاشیه آواتار و نشان)
+   رنگ از طریق متغیر --equipped-border-color
+   توسط سرور تنظیم می‌شود.
+   ───────────────────────────────────────────── */
+
+.user-avatar.has-equipped-border {
+    position: relative;
+    box-shadow: 0 0 0 2px var(--equipped-border-color, var(--primary)),
+                0 0 10px color-mix(in srgb, var(--equipped-border-color, var(--primary)) 45%, transparent);
+}
+
+.user-avatar.has-equipped-border.border-legendary {
+    animation: equippedBorderGlow 2.2s ease-in-out infinite;
+}
+
+@keyframes equippedBorderGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 2px var(--equipped-border-color, var(--primary)),
+                    0 0 8px color-mix(in srgb, var(--equipped-border-color, var(--primary)) 40%, transparent);
+    }
+    50% {
+        box-shadow: 0 0 0 3px var(--equipped-border-color, var(--primary)),
+                    0 0 18px color-mix(in srgb, var(--equipped-border-color, var(--primary)) 75%, transparent);
+    }
+}
+
+.user-avatar-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    font-size: 13px;
+    line-height: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, .18);
+}

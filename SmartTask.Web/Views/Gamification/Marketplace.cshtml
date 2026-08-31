@@ -1,0 +1,327 @@
+@{
+    ViewData["Title"] = "بازار";
+}
+
+<style>
+    .mk-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .mk-header { margin-bottom: 2rem; }
+    .mk-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .mk-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .mk-wallet { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .mk-wallet-left { display: flex; align-items: center; gap: 1rem; }
+    .mk-wallet-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; }
+    .mk-wallet-label { font-size: .8rem; color: var(--gray500); font-weight: 500; }
+    .mk-wallet-value { font-size: 1.6rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .mk-wallet-unit { font-size: .8rem; color: var(--gray500); font-weight: 500; }
+
+    .mk-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: .5rem; overflow-x: auto; }
+    .mk-tab { padding: .5rem 1.25rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--gray500); transition: all .2s; white-space: nowrap; border: none; background: transparent; }
+    .mk-tab:hover { background: var(--primary-light); color: var(--primary); }
+    .mk-tab.active { background: var(--primary); color: #fff; }
+
+    .mk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+
+    .mk-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+    .mk-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+
+    .mk-card-top { padding: 1.25rem 1rem .75rem; text-align: center; position: relative; }
+    .mk-icon { font-size: 2.5rem; line-height: 1; margin-bottom: .6rem; }
+    .mk-name { font-weight: 600; color: var(--text); font-size: .95rem; }
+
+    .mk-rarity { position: absolute; top: .6rem; left: .6rem; padding: .2rem .5rem; border-radius: 6px; font-size: .68rem; font-weight: 700; color: #fff; }
+    .mk-rarity.r1 { background: #95a5a6; }
+    .mk-rarity.r2 { background: #27ae60; }
+    .mk-rarity.r3 { background: #3498db; }
+    .mk-rarity.r4 { background: #9b59b6; }
+    .mk-rarity.r5 { background: #f39c12; }
+
+    .mk-owned { position: absolute; top: .6rem; right: .6rem; padding: .2rem .5rem; border-radius: 6px; font-size: .68rem; font-weight: 700; background: var(--success, #27ae60); color: #fff; }
+
+    .mk-card-body { padding: 0 1rem 1rem; display: flex; flex-direction: column; flex: 1; }
+    .mk-desc { font-size: .8rem; color: var(--gray500); line-height: 1.6; margin-bottom: .85rem; flex: 1; }
+    .mk-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+    .mk-price { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+    .mk-price.free { color: var(--success, #27ae60); }
+    .mk-stock { font-size: .7rem; color: var(--gray500); }
+    .mk-limited { font-size: .7rem; color: #e67e22; font-weight: 600; }
+
+    .mk-btn { width: 100%; padding: .5rem; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .2s; }
+    .mk-btn:hover { opacity: .9; }
+    .mk-btn:disabled { background: var(--border); color: var(--gray500); cursor: not-allowed; }
+
+    .mk-state { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--gray500); }
+    .mk-state i { font-size: 2.5rem; margin-bottom: 1rem; display: block; color: var(--primary); }
+    .mk-state .mk-btn { max-width: 160px; margin: 1rem auto 0; }
+
+    .mk-modal-item { text-align: center; }
+    .mk-modal-item .mk-icon { font-size: 3rem; }
+    .mk-modal-total { display: flex; justify-content: space-between; padding: .75rem 0 0; border-top: 1px solid var(--border); margin-top: .75rem; font-weight: 600; color: var(--text); }
+</style>
+
+<div class="mk-container">
+    <div class="mk-header">
+        <h1>🏪 بازار</h1>
+        <p>با امتیازهایی که به دست آورده‌اید، اقلام و مزایای پروفایل خود را خریداری کنید</p>
+    </div>
+
+    <div class="mk-wallet">
+        <div class="mk-wallet-left">
+            <div class="mk-wallet-icon"><i class="fa-solid fa-wallet"></i></div>
+            <div>
+                <div class="mk-wallet-label">موجودی شما</div>
+                <div><span class="mk-wallet-value" id="currentPoints">—</span> <span class="mk-wallet-unit">امتیاز</span></div>
+            </div>
+        </div>
+        <a href="/GamificationMVC/Inventory" class="mk-btn" style="max-width:180px;text-decoration:none;text-align:center;">
+            <i class="fa-solid fa-box-open"></i> کوله‌پشتی من
+        </a>
+    </div>
+
+    <div class="mk-tabs">
+        <button type="button" class="mk-tab active" data-category="">همه</button>
+        <button type="button" class="mk-tab" data-category="Avatar Border">حاشیه آواتار</button>
+        <button type="button" class="mk-tab" data-category="Badge">نشان‌ها</button>
+        <button type="button" class="mk-tab" data-category="Theme">تم‌ها</button>
+        <button type="button" class="mk-tab" data-category="Perk">مزایا</button>
+    </div>
+
+    <div class="mk-grid" id="marketplaceItems">
+        <div class="mk-state">
+            <div class="spinner-border" role="status"></div>
+            <div style="margin-top:.75rem;">در حال بارگذاری...</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="purchaseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--card);border:1px solid var(--border);border-radius:12px;">
+            <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                <h5 class="modal-title" style="color:var(--text);font-size:1rem;font-weight:700;">تأیید خرید</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="purchaseItemDetails"></div>
+                <div style="margin-top:1rem;">
+                    <label for="purchaseQuantity" style="font-size:.85rem;color:var(--gray500);font-weight:500;">تعداد</label>
+                    <input type="number" id="purchaseQuantity" class="form-control" value="1" min="1"
+                           style="background:var(--bg);border:1px solid var(--border);color:var(--text);">
+                </div>
+                <div class="mk-modal-total">
+                    <span>هزینه کل</span>
+                    <span><strong id="totalCost">0</strong> امتیاز</span>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--border);">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="mk-btn" style="max-width:140px;" id="confirmPurchaseBtn">تأیید خرید</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var currentItemForPurchase = null;
+    var walletPoints = 0;
+
+    var RARITY_NAMES = { 1: 'عام', 2: 'غیرعادی', 3: 'کمیاب', 4: 'حماسی', 5: 'افسانه‌ای' };
+    var CATEGORY_NAMES = {
+        'Avatar Border': 'حاشیه آواتار',
+        'Badge': 'نشان',
+        'Theme': 'تم',
+        'Perk': 'مزیت'
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadMarketplaceItems();
+        loadWalletStatus();
+
+        document.querySelectorAll('.mk-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.mk-tab').forEach(function (b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                loadMarketplaceItems(this.dataset.category);
+            });
+        });
+
+        document.getElementById('confirmPurchaseBtn').addEventListener('click', confirmPurchase);
+        document.getElementById('purchaseQuantity').addEventListener('input', updateTotalCost);
+    });
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // rarity از API به‌صورت عدد می‌آید (۱ تا ۵)
+    function rarityKey(rarity) {
+        if (typeof rarity === 'number') return rarity;
+        var byName = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5 };
+        var parsed = parseInt(rarity, 10);
+        if (!isNaN(parsed)) return parsed;
+        return byName[String(rarity || '').toLowerCase()] || 1;
+    }
+
+    function getRarityName(rarity) {
+        return RARITY_NAMES[rarityKey(rarity)] || 'نامشخص';
+    }
+
+    function loadMarketplaceItems(category) {
+        category = category || '';
+        var container = document.getElementById('marketplaceItems');
+        container.innerHTML = '<div class="mk-state"><div class="spinner-border" role="status"></div><div style="margin-top:.75rem;">در حال بارگذاری...</div></div>';
+
+        var url = '/api/gamification/marketplace/items?category=' + encodeURIComponent(category) + '&skip=0&take=100';
+
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(function (data) {
+                var items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+                renderMarketplaceItems(items);
+            })
+            .catch(function (error) {
+                console.error('Error loading marketplace items:', error);
+                container.innerHTML =
+                    '<div class="mk-state">' +
+                    '<i class="fa-solid fa-store-slash"></i>' +
+                    'خطا در بارگذاری اقلام. لطفاً دوباره تلاش کنید.' +
+                    '<button class="mk-btn" onclick="loadMarketplaceItems()">تلاش مجدد</button>' +
+                    '</div>';
+            });
+    }
+
+    function renderMarketplaceItems(items) {
+        var container = document.getElementById('marketplaceItems');
+
+        if (!items || items.length === 0) {
+            container.innerHTML =
+                '<div class="mk-state"><i class="fa-solid fa-box-open"></i>هیچ قلمی در این دسته یافت نشد</div>';
+            return;
+        }
+
+        container.innerHTML = items.map(function (item, index) {
+            var rk = rarityKey(item.rarity);
+            var isFree = !item.price || item.price === 0;
+            var outOfStock = item.stock === 0;
+            var priceText = isFree ? 'رایگان' : item.price.toLocaleString('fa-IR');
+
+            var stockNote = '';
+            if (item.stock > 0) {
+                stockNote = '<span class="mk-stock">موجودی: ' + item.stock.toLocaleString('fa-IR') + '</span>';
+            } else if (item.isLimitedTime) {
+                stockNote = '<span class="mk-limited"><i class="fa-regular fa-clock"></i> محدود</span>';
+            } else {
+                stockNote = '<span class="mk-stock">' + (CATEGORY_NAMES[item.category] || item.category || '') + '</span>';
+            }
+
+            return '' +
+                '<div class="mk-card">' +
+                    '<div class="mk-card-top" style="background:' + escapeHtml(item.color || '#888') + '1a;">' +
+                        '<span class="mk-rarity r' + rk + '">' + getRarityName(item.rarity) + '</span>' +
+                        (item.isOwned ? '<span class="mk-owned">✓ دارید</span>' : '') +
+                        '<div class="mk-icon">' + escapeHtml(item.icon || '📦') + '</div>' +
+                        '<div class="mk-name">' + escapeHtml(item.name) + '</div>' +
+                    '</div>' +
+                    '<div class="mk-card-body">' +
+                        '<p class="mk-desc">' + escapeHtml(item.description || '') + '</p>' +
+                        '<div class="mk-meta">' +
+                            '<span class="mk-price' + (isFree ? ' free' : '') + '">' + priceText +
+                                (isFree ? '' : ' <i class="fa-solid fa-coins" style="font-size:.8rem;"></i>') +
+                            '</span>' +
+                            stockNote +
+                        '</div>' +
+                        '<button class="mk-btn" data-index="' + index + '"' + (outOfStock ? ' disabled' : '') + '>' +
+                            (outOfStock ? 'ناموجود' : (item.isOwned ? 'خرید دوباره' : 'خرید')) +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+        }).join('');
+
+        // اتصال رویدادها بدون تزریق JSON در HTML
+        container.querySelectorAll('.mk-btn[data-index]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                openPurchaseModal(items[parseInt(this.dataset.index, 10)]);
+            });
+        });
+    }
+
+    function openPurchaseModal(item) {
+        if (!item) return;
+        currentItemForPurchase = item;
+
+        document.getElementById('purchaseItemDetails').innerHTML =
+            '<div class="mk-modal-item">' +
+                '<div class="mk-icon">' + escapeHtml(item.icon || '📦') + '</div>' +
+                '<div class="mk-name">' + escapeHtml(item.name) + '</div>' +
+                '<p class="mk-desc" style="margin-top:.5rem;">' + escapeHtml(item.description || '') + '</p>' +
+                '<div class="mk-price">' + (item.price || 0).toLocaleString('fa-IR') + ' امتیاز</div>' +
+            '</div>';
+
+        document.getElementById('purchaseQuantity').value = 1;
+        updateTotalCost();
+        new bootstrap.Modal(document.getElementById('purchaseModal')).show();
+    }
+
+    function updateTotalCost() {
+        if (!currentItemForPurchase) return;
+        var quantity = parseInt(document.getElementById('purchaseQuantity').value, 10) || 1;
+        var total = (currentItemForPurchase.price || 0) * quantity;
+        document.getElementById('totalCost').textContent = total.toLocaleString('fa-IR');
+    }
+
+    function confirmPurchase() {
+        if (!currentItemForPurchase) return;
+
+        var quantity = parseInt(document.getElementById('purchaseQuantity').value, 10) || 1;
+        var btn = document.getElementById('confirmPurchaseBtn');
+        btn.disabled = true;
+
+        fetch('/api/gamification/marketplace/purchase/' + currentItemForPurchase.id, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ quantity: quantity })
+        })
+            .then(function (response) { return response.json().catch(function () { return {}; }); })
+            .then(function (result) {
+                if (result && result.success) {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('purchaseModal'));
+                    if (modal) modal.hide();
+                    loadMarketplaceItems(document.querySelector('.mk-tab.active').dataset.category);
+                    loadWalletStatus();
+                } else {
+                    alert('خطا: ' + ((result && result.message) || 'خرید انجام نشد.'));
+                }
+            })
+            .catch(function (error) {
+                console.error('Purchase error:', error);
+                alert('خطا در برقراری ارتباط با سرور.');
+            })
+            .finally(function () { btn.disabled = false; });
+    }
+
+    function loadWalletStatus() {
+        var userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")';
+        var el = document.getElementById('currentPoints');
+
+        if (!userId || userId === '0') { el.textContent = '—'; return; }
+
+        fetch('/api/gamification/profile/' + userId, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (p) {
+                var w = p && p.wallet ? p.wallet : {};
+                var pts = w.availablePoints != null ? w.availablePoints
+                        : (w.points != null ? w.points : 0);
+                walletPoints = pts;
+                el.textContent = pts.toLocaleString('fa-IR');
+            })
+            .catch(function () { el.textContent = '—'; });
+    }
+</script>

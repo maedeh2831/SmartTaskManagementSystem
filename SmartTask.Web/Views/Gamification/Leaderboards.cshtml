@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "ردیف‌بندی";
+}
+
+<style>
+    .lb-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .lb-header { margin-bottom: 2rem; }
+    .lb-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .lb-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .lb-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: .5rem; overflow-x: auto; }
+    .lb-tab { padding: .5rem 1.25rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--gray500); transition: all .2s; white-space: nowrap; }
+    .lb-tab:hover { background: var(--primary-light); color: var(--primary); }
+    .lb-tab.active { background: var(--primary); color: #fff; }
+
+    .lb-time-filters { display: flex; gap: .35rem; margin-bottom: 1.5rem; }
+    .lb-time-btn { padding: .4rem 1rem; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--gray500); cursor: pointer; font-size: .8rem; font-weight: 500; transition: all .2s; }
+    .lb-time-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .lb-panel { display: none; animation: fadeIn .3s ease; }
+    .lb-panel.active { display: block; }
+
+    .lb-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .lb-table { width: 100%; border-collapse: collapse; }
+    .lb-table th { padding: .75rem 1rem; text-align: right; font-size: .8rem; font-weight: 600; color: var(--gray500); background: var(--bg); border-bottom: 1px solid var(--border); }
+    .lb-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); font-size: .9rem; }
+    .lb-table tr:last-child td { border-bottom: none; }
+    .lb-table tr:hover td { background: var(--hover-bg); }
+
+    .lb-rank { font-weight: 700; width: 50px; text-align: center; }
+    .lb-rank.gold { color: #FFD700; }
+    .lb-rank.silver { color: #C0C0C0; }
+    .lb-rank.bronze { color: #CD7F32; }
+
+    .lb-user { display: flex; align-items: center; gap: .75rem; }
+    .lb-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: .85rem; }
+    .lb-user-info .name { font-weight: 600; color: var(--text); }
+    .lb-user-info .tier { font-size: .75rem; color: var(--gray500); }
+
+    .lb-points { font-weight: 700; color: var(--primary); }
+    .lb-level { font-size: .8rem; color: var(--gray500); }
+    .lb-tasks { font-size: .8rem; color: var(--success); }
+
+    .lb-top3 { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+    .lb-podium { text-align: center; padding: 1rem; }
+    .lb-podium .avatar { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto .5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; }
+    .lb-podium.first .avatar { background: linear-gradient(135deg, #FFD700, #FFA500); color: #fff; }
+    .lb-podium.second .avatar { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #fff; }
+    .lb-podium.third .avatar { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; }
+    .lb-podium .name { font-weight: 600; font-size: .9rem; color: var(--text); }
+    .lb-podium .pts { font-size: .8rem; color: var(--gray500); }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--gray400); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--primary); }
+
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+
+<div class="lb-container">
+    <div class="lb-header">
+        <h1>🏆 ردیف‌بندی و رقابت</h1>
+        <p>رتبه‌بندی خود را ببینید و با همکاران رقابت کنید</p>
+    </div>
+
+    <div class="lb-tabs">
+        <div class="lb-tab active" onclick="switchLbTab('global')">
+            <i class="fa-solid fa-globe"></i> رتبه‌بندی جهانی
+        </div>
+        <div class="lb-tab" onclick="switchLbTab('workspace')">
+            <i class="fa-solid fa-building"></i> رتبه‌بندی فضای کاری
+        </div>
+        <div class="lb-tab" onclick="switchLbTab('teams')">
+            <i class="fa-solid fa-users"></i> رتبه‌بندی تیم‌ها
+        </div>
+        <div class="lb-tab" onclick="switchLbTab('myrank')">
+            <i class="fa-solid fa-user"></i> رتبه من
+        </div>
+    </div>
+
+    <div class="lb-time-filters">
+        <button class="lb-time-btn active" onclick="setTimeRange(this,'all')">همه زمان‌ها</button>
+        <button class="lb-time-btn" onclick="setTimeRange(this,'month')">این ماه</button>
+        <button class="lb-time-btn" onclick="setTimeRange(this,'week')">این هفته</button>
+    </div>
+
+    <!-- Global -->
+    <div class="lb-panel active" id="panel-global">
+        <div id="globalPodcast" class="lb-top3"></div>
+        <div class="lb-card"><div class="lb-table-wrap" id="globalTable"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>در حال بارگذاری...</p></div></div></div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="lb-panel" id="panel-workspace">
+        <div class="lb-card"><div class="lb-table-wrap" id="workspaceTable"><div class="empty-state"><p>ابتدا یک فضای کاری انتخاب کنید</p></div></div></div>
+    </div>
+
+    <!-- Teams -->
+    <div class="lb-panel" id="panel-teams">
+        <div class="lb-card"><div class="lb-table-wrap" id="teamsTable"><div class="empty-state"><p>در حال بارگذاری...</p></div></div></div>
+    </div>
+
+    <!-- My Rank -->
+    <div class="lb-panel" id="panel-myrank">
+        <div class="lb-card"><div id="myRankContent"><div class="empty-state"><p>در حال بارگذاری...</p></div></div></div>
+    </div>
+</div>
+
+<script>
+    var currentTab = 'global';
+    var currentRange = 'all';
+
+    function switchLbTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.lb-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.lb-panel').forEach(function(p) { p.classList.remove('active'); });
+        event.target.closest('.lb-tab').classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+        loadTabData();
+    }
+
+    function setTimeRange(btn, range) {
+        currentRange = range;
+        document.querySelectorAll('.lb-time-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        loadTabData();
+    }
+
+    function loadTabData() {
+        if (currentTab === 'global') loadGlobal();
+        else if (currentTab === 'workspace') loadWorkspace();
+        else if (currentTab === 'teams') loadTeams();
+        else if (currentTab === 'myrank') loadMyRank();
+    }
+
+    function renderTable(data, containerId) {
+        var el = document.getElementById(containerId);
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>داده‌ای یافت نشد</p></div>';
+            return;
+        }
+        var html = '<table class="lb-table"><thead><tr><th class="lb-rank">رتبه</th><th>کاربر</th><th>امتیاز</th><th>سطح</th><th>وظایف</th></tr></thead><tbody>';
+        data.forEach(function(e, i) {
+            var rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+            var initials = ((e.userName || e.user?.firstName || '?')[0] || '').toUpperCase();
+            html += '<tr>';
+            html += '<td class="lb-rank ' + rankClass + '">' + (i + 1) + '</td>';
+            html += '<td><div class="lb-user"><div class="lb-avatar">' + initials + '</div><div class="lb-user-info"><div class="name">' + (e.userName || (e.user?.firstName || '') + ' ' + (e.user?.lastName || '')) + '</div></div></div></td>';
+            html += '<td class="lb-points">' + (e.totalPoints || e.points || 0) + '</td>';
+            html += '<td class="lb-level">' + (e.currentLevel || e.level || 1) + '</td>';
+            html += '<td class="lb-tasks">' + (e.tasksCompleted || 0) + '</td>';
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        el.innerHTML = html;
+    }
+
+    function renderPodium(data) {
+        var el = document.getElementById('globalPodcast');
+        if (!data || data.length < 3) { el.innerHTML = ''; return; }
+        var classes = ['second', 'first', 'third'];
+        var order = [1, 0, 2];
+        var html = '';
+        order.forEach(function(idx) {
+            var e = data[idx];
+            var initials = ((e.userName || e.user?.firstName || '?')[0] || '').toUpperCase();
+            html += '<div class="lb-podium ' + classes[idx] + '">';
+            html += '<div class="avatar">' + initials + '</div>';
+            html += '<div class="name">' + (e.userName || (e.user?.firstName || '') + ' ' + (e.user?.lastName || '')) + '</div>';
+            html += '<div class="pts">' + (e.totalPoints || e.points || 0) + ' XP</div>';
+            html += '</div>';
+        });
+        el.innerHTML = html;
+    }
+
+    function loadGlobal() {
+        fetch('/api/gamification/leaderboards/global?page=1&pageSize=50&timeRange=' + currentRange)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var entries = data.entries || data.data || data || [];
+                renderPodium(entries);
+                renderTable(entries, 'globalTable');
+            })
+            .catch(function() { document.getElementById('globalTable').innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-triangle"></i><p>خطا در بارگذاری</p></div>'; });
+    }
+
+    function loadWorkspace() { document.getElementById('workspaceTable').innerHTML = '<div class="empty-state"><p>فضای کاری فعال نیست</p></div>'; }
+    function loadTeams() { document.getElementById('teamsTable').innerHTML = '<div class="empty-state"><p>تیمی یافت نشد</p></div>'; }
+
+    function loadMyRank() {
+        var userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")';
+        if (!userId || userId === '0') { document.getElementById('myRankContent').innerHTML = '<div class="empty-state"><p>ورود نیاز است</p></div>'; return; }
+        fetch('/api/gamification/leaderboards/user-entry/' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(e) {
+                var el = document.getElementById('myRankContent');
+                el.innerHTML = '<div style="padding:2rem;text-align:center;">' +
+                    '<div style="font-size:3rem;margin-bottom:1rem;">🏅</div>' +
+                    '<h3 style="font-size:1.5rem;font-weight:700;color:var(--text);">رتبه ' + (e.rank || '—') + '</h3>' +
+                    '<p style="color:var(--gray500);margin-top:.25rem;">از ' + (e.totalUsers || '—') + ' نفر</p>' +
+                    '<div style="display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;">' +
+                    '<div><div style="font-size:1.75rem;font-weight:700;color:var(--primary);">' + (e.totalPoints || 0) + '</div><div style="font-size:.8rem;color:var(--gray500);">امتیاز</div></div>' +
+                    '<div><div style="font-size:1.75rem;font-weight:700;color:var(--warning);">Lv.' + (e.currentLevel || 1) + '</div><div style="font-size:.8rem;color:var(--gray500);">سطح</div></div>' +
+                    '<div><div style="font-size:1.75rem;font-weight:700;color:var(--success);">' + (e.tasksCompleted || 0) + '</div><div style="font-size:.8rem;color:var(--gray500);">وظیفه</div></div>' +
+                    '</div></div>';
+            })
+            .catch(function() { document.getElementById('myRankContent').innerHTML = '<div class="empty-state"><p>خطا در بارگذاری</p></div>'; });
+    }
+
+    loadGlobal();
+</script>

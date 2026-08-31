@@ -65,6 +65,39 @@ namespace SmartTask.Web.Data.Context
         public DbSet<TaskDependency> TaskDependencies { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
 
+        // Gamification
+        public DbSet<UserProgression> UserProgressions { get; set; }
+        public DbSet<UserWallet> UserWallets { get; set; }
+        public DbSet<WalletTransaction> WalletTransactions { get; set; }
+        public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<UserAchievement> UserAchievements { get; set; }
+        public DbSet<Milestone> Milestones { get; set; }
+        public DbSet<UserMilestoneProgress> UserMilestoneProgresses { get; set; }
+
+        // Marketplace
+        public DbSet<MarketplaceItem> MarketplaceItems { get; set; }
+        public DbSet<UserInventory> UserInventories { get; set; }
+        public DbSet<MarketplaceTransaction> MarketplaceTransactions { get; set; }
+
+        // Leaderboards
+        public DbSet<Leaderboard> Leaderboards { get; set; }
+        public DbSet<TeamLeaderboard> TeamLeaderboards { get; set; }
+
+        // Productivity Metrics
+        public DbSet<ProductivityMetrics> ProductivityMetrics { get; set; }
+        public DbSet<ProductivityScoreHistory> ProductivityScoreHistories { get; set; }
+
+        // Phase 5: Advanced Features
+        public DbSet<UserStreak> UserStreaks { get; set; }
+        public DbSet<SeasonalEvent> SeasonalEvents { get; set; }
+        public DbSet<UserSeasonalEventProgress> UserSeasonalEventProgresses { get; set; }
+        public DbSet<AbuseReport> AbuseReports { get; set; }
+
+        // Project Simulation
+        public DbSet<ProjectSimulation> ProjectSimulations { get; set; }
+        public DbSet<SimulationScenario> SimulationScenarios { get; set; }
+
+
         // AI Decision Support
         public DbSet<AiDecisionLog> AiDecisionLogs { get; set; }
 

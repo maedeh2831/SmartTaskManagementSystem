@@ -34,6 +34,7 @@ public class ProjectController : BaseController
     private readonly IOffroadTaskService _offroadTaskService;
     private readonly ITaskTradeService _taskTradeService;
     private readonly IProjectMemberService _projectMemberService;
+    private readonly SmartTask.Web.Services.Gamification.ITaskRewardCoordinator _rewardCoordinator;
 
     public ProjectController(
         IProjectService projectService,
@@ -45,7 +46,8 @@ public class ProjectController : BaseController
         IProjectHealthService projectHealthService,
         IOffroadTaskService offroadTaskService,
         ITaskTradeService taskTradeService,
-        IProjectMemberService projectMemberService)
+        IProjectMemberService projectMemberService,
+        SmartTask.Web.Services.Gamification.ITaskRewardCoordinator rewardCoordinator)
         : base(currentUser)
     {
         _projectService = projectService;
@@ -57,6 +59,7 @@ public class ProjectController : BaseController
         _offroadTaskService = offroadTaskService;
         _taskTradeService = taskTradeService;
         _projectMemberService = projectMemberService;
+        _rewardCoordinator = rewardCoordinator;
     }
 
     public async Task<IActionResult> Index(int workspaceId)
@@ -286,6 +289,9 @@ public class ProjectController : BaseController
         if (project == null)
             return NotFound();
 
+        // فقط اولین بار که پروژه تکمیل می‌شود پاداش داده شود
+        var wasAlreadyCompleted = project.Status == ProjectStatusType.Completed;
+
         project.Name = model.Name;
         project.Key = model.Key;
         project.Description = model.Description;
@@ -302,6 +308,9 @@ public class ProjectController : BaseController
             project.EndDate = DateTime.Now;
 
         await _context.SaveChangesAsync();
+
+        if (model.Status == ProjectStatusType.Completed && !wasAlreadyCompleted)
+            await _rewardCoordinator.HandleProjectCompletedAsync(project.Id);
 
         TempData["Success"] = "پروژه با موفقیت ویرایش شد.";
         return RedirectToAction(nameof(Details), new { id = project.Id });

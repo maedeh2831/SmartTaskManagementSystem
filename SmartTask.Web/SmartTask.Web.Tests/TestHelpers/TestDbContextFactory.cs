@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.InMemory.Infrastructure.Internal;
 using SmartTask.Web.Data.Context;
 
 namespace SmartTask.Web.Tests.TestHelpers;
@@ -18,6 +20,9 @@ public static class TestDbContextFactory
 
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(dbName)
+            // فروشگاه از تراکنش استفاده می‌کند؛ ذخیره‌ساز درون‌حافظه تراکنش ندارد
+            // و بدون این تنظیم، هشدار به استثنا تبدیل می‌شود.
+            .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         return new ApplicationDbContext(options);

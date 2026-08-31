@@ -1,0 +1,128 @@
+@model SmartTask.Web.Models.ViewModels.Gamification.LeaderboardEntryDto
+
+@{
+    var rankClass = Model.GlobalRank == 1 ? "gold" : Model.GlobalRank == 2 ? "silver" : Model.GlobalRank == 3 ? "bronze" : "";
+    var rankEmoji = Model.GlobalRank == 1 ? "🥇" : Model.GlobalRank == 2 ? "🥈" : Model.GlobalRank == 3 ? "🥉" : "🎖️";
+}
+
+<div class="user-profile-badge">
+    <div class="badge-container">
+        <!-- Level Badge -->
+        <span class="level-badge" title="Level @Model.CurrentLevel">
+            <i class="fas fa-star"></i> Lvl @Model.CurrentLevel
+        </span>
+
+        <!-- Rank Badge -->
+        <span class="rank-badge @rankClass" title="Global Rank #@Model.GlobalRank">
+            @rankEmoji #@Model.GlobalRank
+        </span>
+
+        <!-- Points Display -->
+        <span class="points-badge" title="Total Points">
+            <i class="fas fa-coins"></i> @Model.TotalPoints.ToString("N0")
+        </span>
+
+        <!-- Achievements Count -->
+        @if (Model.AchievementsUnlocked > 0)
+        {
+            <span class="achievements-badge" title="@Model.AchievementsUnlocked Achievements">
+                <i class="fas fa-medal"></i> @Model.AchievementsUnlocked
+            </span>
+        }
+    </div>
+
+    <div class="stats-row mt-2">
+        <small class="text-muted">
+            <i class="fas fa-tasks"></i> @Model.TasksCompleted tasks completed
+            <span class="separator">•</span>
+            <i class="fas fa-project-diagram"></i> @Model.ProjectsCompleted projects
+        </small>
+    </div>
+</div>
+
+<style>
+    .user-profile-badge {
+        display: inline-block;
+    }
+
+    .badge-container {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .level-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .rank-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+        background-color: #f0f0f0;
+        color: #333;
+    }
+
+    .rank-badge.gold {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: white;
+    }
+
+    .rank-badge.silver {
+        background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+        color: white;
+    }
+
+    .rank-badge.bronze {
+        background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+        color: white;
+    }
+
+    .points-badge {
+        display: inline-block;
+        background-color: #e7f3ff;
+        color: #0066cc;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .achievements-badge {
+        display: inline-block;
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+    }
+
+    .stats-row i {
+        margin-right: 0.25rem;
+    }
+
+    .separator {
+        margin: 0 0.5rem;
+    }
+</style>

@@ -12,5 +12,8 @@
 
         public string AvatarUrl => string.IsNullOrWhiteSpace(Avatar) ? "/images/default-avatar.svg" : Avatar;
 
+        /// <summary>اقلام فعال کاربر از فروشگاه (حاشیه آواتار، نشان، پوسته)</summary>
+        public SmartTask.Web.Models.ViewModels.Gamification.EquippedCosmeticsDto? Cosmetics { get; set; }
+
     }
 }

@@ -3,6 +3,7 @@ using SmartTask.Web.Data.Context;
 using SmartTask.Web.Infrastructure.Interfaces;
 using SmartTask.Web.Models.Entities;
 using SmartTask.Web.Models.Enums;
+using SmartTask.Web.Services.Gamification;
 using SmartTask.Web.Services.Implementations;
 using SmartTask.Web.Services.Interfaces;
 using SmartTask.Web.Tests.TestHelpers;
@@ -18,6 +19,7 @@ public class TaskServiceTests
     private readonly Mock<INotificationService> _notificationMock;
     private readonly Mock<IActivityLogService> _activityMock;
     private readonly Mock<ICurrentUserService> _currentUserMock;
+    private readonly Mock<ITaskRewardCoordinator> _rewardCoordinatorMock;
 
     public TaskServiceTests()
     {
@@ -27,6 +29,7 @@ public class TaskServiceTests
         _notificationMock = new Mock<INotificationService>();
         _activityMock = new Mock<IActivityLogService>();
         _currentUserMock = new Mock<ICurrentUserService>();
+        _rewardCoordinatorMock = new Mock<ITaskRewardCoordinator>();
     }
 
     private TaskService CreateService(ApplicationDbContext context)
@@ -42,7 +45,8 @@ public class TaskServiceTests
             _storyMock.Object,
             _notificationMock.Object,
             _activityMock.Object,
-            _currentUserMock.Object);
+            _currentUserMock.Object,
+            _rewardCoordinatorMock.Object);
     }
 
     [Fact]
@@ -195,6 +199,75 @@ public class TaskServiceTests
         var updated = await context.TaskItems.FindAsync(seed.TaskId);
         Assert.Equal(TaskStatusType.InProgress, updated!.Status);
         Assert.Null(updated.CompletedDate);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_AwardsGamificationReward_WhenTaskFirstCompleted()
+    {
+        var seed = TestDbContextFactory.CreateSeeded();
+        var context = seed.Context;
+        _activityMock.Setup(x => x.LogAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<int?>()))
+            .Returns(Task.CompletedTask);
+        _notificationMock.Setup(x => x.CreateAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NotificationType>()))
+            .Returns(Task.CompletedTask);
+        var service = CreateService(context);
+
+        await service.ChangeStatusAsync(seed.TaskId, TaskStatusType.Done);
+
+        _rewardCoordinatorMock.Verify(x => x.HandleTaskCompletedAsync(
+            seed.TaskId,
+            It.IsAny<string>(),
+            It.IsAny<IEnumerable<int>>(),
+            It.IsAny<TaskPriorityType>(),
+            It.IsAny<int>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_DoesNotAwardReward_WhenAlreadyDone()
+    {
+        var seed = TestDbContextFactory.CreateSeeded();
+        var context = seed.Context;
+        var task = context.TaskItems.First();
+        task.Status = TaskStatusType.Done;
+        task.CompletedDate = DateTime.Now;
+        await context.SaveChangesAsync();
+
+        _activityMock.Setup(x => x.LogAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<int?>()))
+            .Returns(Task.CompletedTask);
+        _notificationMock.Setup(x => x.CreateAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NotificationType>()))
+            .Returns(Task.CompletedTask);
+        var service = CreateService(context);
+
+        await service.ChangeStatusAsync(seed.TaskId, TaskStatusType.Done);
+
+        // تسکی که قبلاً تکمیل شده نباید دوباره پاداش بگیرد
+        _rewardCoordinatorMock.Verify(x => x.HandleTaskCompletedAsync(
+            It.IsAny<int>(),
+            It.IsAny<string>(),
+            It.IsAny<IEnumerable<int>>(),
+            It.IsAny<TaskPriorityType>(),
+            It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_DoesNotAwardReward_WhenStatusIsNotDone()
+    {
+        var seed = TestDbContextFactory.CreateSeeded();
+        var context = seed.Context;
+        _activityMock.Setup(x => x.LogAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<int?>()))
+            .Returns(Task.CompletedTask);
+        _notificationMock.Setup(x => x.CreateAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NotificationType>()))
+            .Returns(Task.CompletedTask);
+        var service = CreateService(context);
+
+        await service.ChangeStatusAsync(seed.TaskId, TaskStatusType.InProgress);
+
+        _rewardCoordinatorMock.Verify(x => x.HandleTaskCompletedAsync(
+            It.IsAny<int>(),
+            It.IsAny<string>(),
+            It.IsAny<IEnumerable<int>>(),
+            It.IsAny<TaskPriorityType>(),
+            It.IsAny<int>()), Times.Never);
     }
 
     [Fact]

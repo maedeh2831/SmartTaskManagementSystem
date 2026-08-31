@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "دستاوردها";
+}
+
+<style>
+    .ach-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .ach-header { margin-bottom: 2rem; }
+    .ach-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .ach-header p { color: var(--gray500); margin-top: .25rem; }
+
+    .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .ach-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all .25s; position: relative; overflow: hidden; }
+    .ach-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+    .ach-card.unlocked { border-color: var(--primary); }
+    .ach-card.locked { opacity: .55; filter: grayscale(.5); }
+    .ach-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+    .ach-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: .35rem; }
+    .ach-card p { font-size: .8rem; color: var(--gray500); line-height: 1.5; }
+    .ach-badge { position: absolute; top: 10px; right: 10px; padding: 2px 10px; border-radius: 20px; font-size: .7rem; font-weight: 600; }
+    .ach-badge.unlocked { background: #dcfce7; color: #166534; }
+    .ach-badge.locked { background: var(--bg); color: var(--gray400); }
+    .ach-progress { margin-top: .75rem; }
+    .ach-progress .bar { height: 6px; background: var(--gray200); border-radius: 3px; overflow: hidden; }
+    .ach-progress .fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+    .ach-progress .text { font-size: .75rem; color: var(--gray500); margin-top: .25rem; }
+    .ach-date { font-size: .75rem; color: var(--gray400); margin-top: .5rem; }
+    .empty-state { text-align: center; padding: 3rem; color: var(--gray400); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--primary); }
+</style>
+
+<div class="ach-container">
+    <div class="ach-header">
+        <h1>🏆 دستاوردها</h1>
+        <p>دستاوردهای باز‌شده و پیشرفت شما</p>
+    </div>
+    <div id="achGrid" class="ach-grid">
+        <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>در حال بارگذاری...</p></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        fetch('/api/gamification/achievements')
+            .then(function(r) { return r.json(); })
+            .then(function(achievements) {
+                var grid = document.getElementById('achGrid');
+                if (!achievements || achievements.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>هنوز دستاوردی تعریف نشده</p></div>';
+                    return;
+                }
+                var html = '';
+                achievements.forEach(function(a) {
+                    var unlocked = a.isUnlocked || a.isEarned || false;
+                    var progress = a.progressPercent || (unlocked ? 100 : 0);
+                    var color = unlocked ? 'var(--primary)' : 'var(--gray300)';
+                    html += '<div class="ach-card ' + (unlocked ? 'unlocked' : 'locked') + '">';
+                    html += '<span class="ach-badge ' + (unlocked ? 'unlocked' : 'locked') + '">' + (unlocked ? '✓ بازشده' : 'قفل') + '</span>';
+                    html += '<div class="ach-icon">' + (a.icon || a.iconEmoji || '🏅') + '</div>';
+                    html += '<h3>' + (a.name || a.title || '—') + '</h3>';
+                    html += '<p>' + (a.description || '') + '</p>';
+                    html += '<div class="ach-progress"><div class="bar"><div class="fill" style="width:' + progress + '%;background:' + color + ';"></div></div>';
+                    html += '<div class="text">' + progress + '%</div></div>';
+                    if (a.unlockedDate || a.earnedDate) { html += '<div class="ach-date">بازشده: ' + (a.unlockedDate || a.earnedDate) + '</div>'; }
+                    html += '</div>';
+                });
+                grid.innerHTML = html;
+            })
+            .catch(function() {
+                document.getElementById('achGrid').innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-triangle"></i><p>خطا در بارگذاری دستاوردها</p></div>';
+            });
+    })();
+</script>
