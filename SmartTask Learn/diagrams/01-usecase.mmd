@@ -1,0 +1,56 @@
+graph TB
+    subgraph actors["بازیگران سامانه"]
+        Admin["مدیر سیستم"]
+        Manager["مدیر پروژه"]
+        Member["عضو تیم"]
+        Viewer["مشاهده‌گر"]
+    end
+
+    subgraph core["مدیریت پروژه"]
+        UC1["ایجاد/ویرایش Workspace"]
+        UC2["ایجاد/ویرایش Project"]
+        UC3["مدیریت Sprint و Backlog"]
+        UC4["ایجاد/ویرایش Task"]
+        UC5["تخصیص Task به اعضا"]
+        UC6["تعریف وابستگی"]
+        UC7["ثبت زمان"]
+        UC8["Chat بلادرنگ"]
+    end
+
+    subgraph analysis["تحلیل و تصمیم‌یار"]
+        UC9["تحلیل بارکاری"]
+        UC10["اولویت‌بندی هوشمند"]
+        UC11["تحلیل ریسک تأخیر"]
+        UC12["سلامت پروژه"]
+        UC13["تجزیه هوشمند Task"]
+        UC14["شبیه‌سازی What-If"]
+    end
+
+    subgraph gamification["گیمیفیکیشن"]
+        UC15["مشاهده Points و XP"]
+        UC16["فروشگاه Marketplace"]
+        UC17["Leaderboard"]
+    end
+
+    Admin --> UC1
+    Admin --> UC2
+    Manager --> UC2
+    Manager --> UC3
+    Manager --> UC4
+    Manager --> UC5
+    Manager --> UC6
+    Manager --> UC9
+    Manager --> UC10
+    Manager --> UC11
+    Manager --> UC12
+    Manager --> UC14
+    Member --> UC4
+    Member --> UC7
+    Member --> UC8
+    Member --> UC13
+    Member --> UC15
+    Member --> UC16
+    Member --> UC17
+    Viewer --> UC9
+    Viewer --> UC12
+    Viewer --> UC17

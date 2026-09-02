@@ -1,0 +1,64 @@
+graph TB
+    subgraph Presentation["لایه نمایش (Presentation)"]
+        MVC["ASP.NET Core MVC"]
+        Views["Razor Views"]
+        JS["JavaScript / AJAX"]
+        SignalR["SignalR Hub"]
+    end
+
+    subgraph Controller["لایه کنترلر"]
+        C1["ProjectController"]
+        C2["TaskController"]
+        C3["WorkloadController"]
+        C4["DelayRiskController"]
+        C5["DependencyController"]
+        C6["GamificationController"]
+        C7["ProductivityController"]
+    end
+
+    subgraph Service["لایه سرویس"]
+        S1["ProjectService"]
+        S2["TaskService"]
+        S3["WorkloadAnalysisService"]
+        S4["DelayRiskService"]
+        S5["TaskDependencyService"]
+        S6["PriorityEngineService"]
+        S7["ProjectHealthService"]
+        S8["SprintReportAiService"]
+    end
+
+    subgraph AI["لایه تصمیم‌یار AI"]
+        A1["AiClientService"]
+        A2["TaskBreakdownService"]
+        A3["AiDecisionLogService"]
+        LLM["Qwen3-4B / LM Studio"]
+    end
+
+    subgraph Infra["لایه زیرساخت"]
+        GR["GenericRepository&lt;T&gt;"]
+        UOW["UnitOfWork"]
+        BG["Background Services"]
+        Email["Email Service"]
+    end
+
+    subgraph Data["لایه داده"]
+        DB["ApplicationDbContext"]
+        EF["Entity Framework Core"]
+        SQL["SQL Server"]
+    end
+
+    MVC --> C1 & C2 & C3 & C4 & C5 & C6 & C7
+    C1 & C2 & C3 --> S1 & S2 & S3
+    C4 --> S4
+    C5 --> S5
+    S4 & S6 & S7 --> A1
+    S8 --> A1
+    A1 --> LLM
+    A2 --> A1
+    A3 --> A1
+    S1 & S2 & S3 & S4 & S5 & S6 & S7 --> GR & UOW
+    GR --> DB
+    UOW --> DB
+    DB --> EF
+    EF --> SQL
+    BG --> DB

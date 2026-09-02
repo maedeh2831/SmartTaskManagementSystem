@@ -1,0 +1,30 @@
+graph TD
+    A["تحلیل نیازمندی‌ها"] --> B["طراحی پایگاه داده"]
+    B --> C["طراحی معماری لایه‌ای"]
+    C --> D["پیاده‌سازی Models و Entities"]
+    D --> E["پیاده‌سازی Repository و UnitOfWork"]
+    E --> F["پیاده‌سازی Services"]
+    F --> G["پیاده‌سازی Controllers"]
+    G --> H["پیاده‌سازی Views"]
+
+    H --> I{"انتخاب بخش تحلیلی"}
+
+    I --> J["تحلیل بارکاری"]
+    I --> K["تحلیل وابستگی"]
+    I --> L["اولویت‌بندی هوشمند"]
+    I --> M["تحلیل ریسک"]
+    I --> N["سلامت پروژه"]
+
+    J & K & L & M & N --> O["پیاده‌سازی AI Layer"]
+    O --> P["اتصال به LM Studio"]
+    P --> Q["پیاده‌سازی گیمیفیکیشن"]
+    Q --> R["پیاده‌سازی شبیه‌سازی"]
+    R --> S["پیاده‌سازی Background Services"]
+    S --> T["تست‌های واحد"]
+    T --> U["تست یکپارچگی"]
+    U --> V["استقرار"]
+
+    style A fill:#2563eb,color:#fff
+    style V fill:#059669,color:#fff
+    style O fill:#7c3aed,color:#fff
+    style T fill:#d97706,color:#fff

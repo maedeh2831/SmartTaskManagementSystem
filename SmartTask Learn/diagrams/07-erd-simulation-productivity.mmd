@@ -1,0 +1,60 @@
+erDiagram
+    PROJECT_SIMULATION {
+        int Id PK
+        int ProjectId FK
+        string Name
+        string Description
+        date CreatedDate
+    }
+    SIMULATION_SCENARIO {
+        int Id PK
+        int SimulationId FK
+        string ScenarioName
+        int TargetTaskId FK
+        int DelayDays
+        string Result
+        date CreatedDate
+    }
+    PRODUCTIVITY_METRICS {
+        int Id PK
+        int UserId FK
+        int ProjectId FK
+        float CompletionRate
+        float OnTimeRate
+        float Consistency
+        float QualityScore
+        float FinalScore
+        string Level
+        date CalculatedDate
+    }
+    PRODUCTIVITY_SCORE_HISTORY {
+        int Id PK
+        int UserId FK
+        float Score
+        string Level
+        date RecordDate
+    }
+    OVERDUE_CASCADE_LOG {
+        int Id PK
+        int TaskItemId FK
+        int AffectedTaskId FK
+        date OldDueDate
+        date NewDueDate
+        date CreatedDate
+    }
+    TIME_LOG {
+        int Id PK
+        int TaskItemId FK
+        int UserId FK
+        datetime StartTime
+        datetime EndTime
+        int DurationMinutes
+        string Description
+    }
+
+    PROJECT_SIMULATION ||--o{ SIMULATION_SCENARIO : contains
+    SIMULATION_SCENARIO }o--|| TASK_ITEM : targets
+    USER_PROGRESSION ||--o{ PRODUCTIVITY_METRICS : measured_by
+    PRODUCTIVITY_METRICS ||--o{ PRODUCTIVITY_SCORE_HISTORY : tracked
+    TASK_ITEM ||--o{ OVERDUE_CASCADE_LOG : triggers
+    TASK_ITEM ||--o{ TIME_LOG : recorded_for
