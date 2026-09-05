@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@mermaid-js/mermaid-cli": "^11.16.0",
-    "mammoth": "^1.12.2"
-  }
-}
