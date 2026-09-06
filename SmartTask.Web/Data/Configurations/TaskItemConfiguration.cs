@@ -36,6 +36,10 @@ namespace SmartTask.Web.Data.Configurations
                 .HasDefaultValue(TaskType.Task);
 
             builder.Property(x => x.Estimate)
+                .HasConversion(
+                    v => (decimal)v,
+                    v => (int)v)
+                .HasColumnType("decimal(18,2)")
                 .HasDefaultValue(0);
 
             builder.HasOne(x => x.UserStory)
